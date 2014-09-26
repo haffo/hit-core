@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>nist-healthcare-tools-core-services</artifactId>
+	<artifactId>nht-core-services</artifactId>
 	<packaging>jar</packaging>
-	<name>nist-healthcare-tools-core-services</name>
+	<name>nht-core-services</name>
 	<url>http://maven.apache.org</url>
 	<parent>
 		<groupId>gov.nist.healthcare.tools.core</groupId>
-		<artifactId>nist-healthcare-tools-core</artifactId>
+		<artifactId>nht-core</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<properties>
@@ -19,7 +19,7 @@
 
 		<dependency>
 			<groupId>gov.nist.healthcare.tools.core</groupId>
-			<artifactId>nist-healthcare-tools-core-models</artifactId>
+			<artifactId>nht-core-models</artifactId>
 			<version>${parent.version}</version>
 		</dependency>
 		
