@@ -11,7 +11,7 @@
  * bear some notice that they are derived from it, and any modified versions
  * bear some notice that they have been modified.
  */
-package gov.nist.healthcare.tools.core.models.soap;
+package gov.nist.healthcare.tools.core.models.xml;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +21,14 @@ import java.util.List;
  * 
  * @author Harold Affo (NIST)
  */
-public class SoapMessageModel {
-	protected List<SoapMessageElement> elements;
+public class XmlMessageModel {
+	protected List<XmlMessageElement> elements;
 
-	public List<SoapMessageElement> getElements() {
+	public List<XmlMessageElement> getElements() {
 		return elements;
 	}
 
-	public void setElements(List<SoapMessageElement> elements) {
+	public void setElements(List<XmlMessageElement> elements) {
 		this.elements = elements;
 	}
 
@@ -36,8 +36,8 @@ public class SoapMessageModel {
 	 * @param type
 	 * @param content
 	 */
-	public SoapMessageModel() {
-		elements = new ArrayList<SoapMessageElement>();
+	public XmlMessageModel() {
+		elements = new ArrayList<XmlMessageElement>();
 	}
 
 }

@@ -1,16 +1,16 @@
-package gov.nist.healthcare.tools.core.models.soap;
+package gov.nist.healthcare.tools.core.models.xml;
 
-public class Coordinate {
+public class XmlCoordinate {
 	int line;
 	int index;
 
-	public Coordinate() {
+	public XmlCoordinate() {
 		super();
 		this.line = 0;
 		this.index = 0;
 	}
 
-	public Coordinate(int line, int index) {
+	public XmlCoordinate(int line, int index) {
 		super();
 		this.line = line;
 		this.index = index;
@@ -32,8 +32,8 @@ public class Coordinate {
 		this.index = index;
 	}
 
-	public Coordinate plus(Coordinate two) {
-		Coordinate sum = new Coordinate();
+	public XmlCoordinate plus(XmlCoordinate two) {
+		XmlCoordinate sum = new XmlCoordinate();
 		sum.setLine(Math.max(two.getLine(), this.getLine()));
 		if (two.getLine() > this.getLine()) {
 			sum.setIndex(two.getIndex());

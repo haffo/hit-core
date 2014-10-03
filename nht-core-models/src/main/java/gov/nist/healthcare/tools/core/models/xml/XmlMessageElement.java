@@ -11,7 +11,7 @@
  * bear some notice that they are derived from it, and any modified versions
  * bear some notice that they have been modified.
  */
-package gov.nist.healthcare.tools.core.models.soap;
+package gov.nist.healthcare.tools.core.models.xml;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,72 +22,72 @@ import java.util.List;
  * @author Harold Affo (NIST)
  * 
  */
-public class SoapMessageElement implements Serializable {
+public class XmlMessageElement implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	public static String DEFAULT_TYPE = "default";
 
-	private SoapMessageElementData data;
+	private XmlMessageElementData data;
 
 	private String label;
 
-	private List<SoapMessageElement> children;
+	private List<XmlMessageElement> children;
 
-	public SoapMessageElement() {
+	public XmlMessageElement() {
 		this.data = null;
 		this.children = null;
 		this.label = "No defined";
 	}
 
-	public SoapMessageElement(SoapMessageElementData data) {
+	public XmlMessageElement(XmlMessageElementData data) {
 		this(data, null);
 	}
 
-	public SoapMessageElement(SoapMessageElementData data,
-			SoapMessageElement parent) {
+	public XmlMessageElement(XmlMessageElementData data,
+			XmlMessageElement parent) {
 		this.data = data;
-		this.children = new ArrayList<SoapMessageElement>();
+		this.children = new ArrayList<XmlMessageElement>();
 		if (parent != null) {
 			if (parent.getChildren() == null) {
-				parent.setChildren(new ArrayList<SoapMessageElement>());
+				parent.setChildren(new ArrayList<XmlMessageElement>());
 			}
 			parent.getChildren().add(this);
 		}
 		label = data.getName();
 	}
 
-	public SoapMessageElement(SoapMessageElementData data, String label,
-			SoapMessageElement parent) {
+	public XmlMessageElement(XmlMessageElementData data, String label,
+			XmlMessageElement parent) {
 		this.data = data;
-		this.children = new ArrayList<SoapMessageElement>();
+		this.children = new ArrayList<XmlMessageElement>();
 		if (parent != null) {
 			if (parent.getChildren() == null) {
-				parent.setChildren(new ArrayList<SoapMessageElement>());
+				parent.setChildren(new ArrayList<XmlMessageElement>());
 			}
 			parent.getChildren().add(this);
 		}
 		this.label = label;
 	}
 
-	public SoapMessageElement(String type, SoapMessageElementData data,
-			SoapMessageElement parent) {
+	public XmlMessageElement(String type, XmlMessageElementData data,
+			XmlMessageElement parent) {
 		this(data, parent);
 	}
 
-	public SoapMessageElementData getData() {
+	public XmlMessageElementData getData() {
 		return this.data;
 	}
 
-	public void setData(SoapMessageElementData data) {
+	public void setData(XmlMessageElementData data) {
 		this.data = data;
 	}
 
-	public List<SoapMessageElement> getChildren() {
+	public List<XmlMessageElement> getChildren() {
 		return this.children;
 	}
 
-	public void setChildren(List<SoapMessageElement> children) {
+	public void setChildren(List<XmlMessageElement> children) {
 		this.children = children;
 	}
 
@@ -127,10 +127,10 @@ public class SoapMessageElement implements Serializable {
 		return "";
 	}
 
-	public SoapMessageElement getChild(int line) {
-		List<SoapMessageElement> children = getChildren();
-		for (SoapMessageElement node : children) {
-			SoapMessageElementData data = node.getData();
+	public XmlMessageElement getChild(int line) {
+		List<XmlMessageElement> children = getChildren();
+		for (XmlMessageElement node : children) {
+			XmlMessageElementData data = node.getData();
 			if (data.getStart().getLine() == line) {
 				return node;
 			}

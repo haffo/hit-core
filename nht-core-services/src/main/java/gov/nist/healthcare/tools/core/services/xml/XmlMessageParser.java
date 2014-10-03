@@ -8,14 +8,16 @@
  * modified freely provided that any derivative works bear some notice that they are derived from it, and any
  * modified versions bear some notice that they have been modified.
  */
-package gov.nist.healthcare.tools.core.services.soap;
+package gov.nist.healthcare.tools.core.services.xml;
 
 
 import gov.nist.healthcare.tools.core.models.message.MessageModel;
- import gov.nist.healthcare.tools.core.services.message.MessageParser;
+import gov.nist.healthcare.tools.core.models.xml.XmlMessageModel;
+import gov.nist.healthcare.tools.core.services.message.MessageParser;
 
+import java.io.InputStream;
 
-public interface SoapMessageParser  extends MessageParser{
+public interface XmlMessageParser  extends MessageParser{
 
 	/**
 	 * 
@@ -23,6 +25,6 @@ public interface SoapMessageParser  extends MessageParser{
 	 * @return
 	 * @throws SoapParserException
 	 */
- 	public MessageModel parse(String soapXml, Object... options) throws SoapMessageParserException;
+ 	public MessageModel parse(String xml, Object... options) throws XmlParserException;
  
 }

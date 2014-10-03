@@ -11,9 +11,10 @@
  * bear some notice that they are derived from it, and any modified versions
  * bear some notice that they have been modified.
  */
-package gov.nist.healthcare.tools.core.models.soap;
+package gov.nist.healthcare.tools.core.models.xml;
 
 import gov.nist.healthcare.tools.core.models.message.MessageElementData;
+import gov.nist.healthcare.tools.core.models.utils.XmlUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -28,14 +29,14 @@ import org.jdom2.xpath.XPathHelper;
  * 
  */
 
-public class SoapMessageElementData extends MessageElementData implements
+public class XmlMessageElementData extends MessageElementData implements
 		Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private final Coordinate start;
+	private final XmlCoordinate start;
 
-	private final Coordinate end;
+	private final XmlCoordinate end;
 
 	private int column = -1;
 
@@ -43,7 +44,7 @@ public class SoapMessageElementData extends MessageElementData implements
 	 * 
 	 * @param element
 	 */
-	public SoapMessageElementData(Element element) {
+	public XmlMessageElementData(Element element) {
 		this(element, element.getName(), "none", 20000, 20000);
 		if (element.getChildren().isEmpty()) {
 			this.value = element.getValue();
@@ -52,13 +53,13 @@ public class SoapMessageElementData extends MessageElementData implements
 		}
 	}
 
-	private Coordinate getStartCoordinate(Element element) {
+	private XmlCoordinate getStartCoordinate(Element element) {
 		Located locatedElement = (Located) element;
-		return new Coordinate(locatedElement.getLine(), 0);
+		return new XmlCoordinate(locatedElement.getLine(), 0);
 	}
 
-	private Coordinate getEndCoordinate(Element element) {
-		return new Coordinate(getEndLine(element), 1000);
+	private XmlCoordinate getEndCoordinate(Element element) {
+		return new XmlCoordinate(getEndLine(element), 1000);
 		// Located locatedElement = (Located) element;
 		// if (element.getChildren() == null || element.getChildren().isEmpty())
 		// {
@@ -91,16 +92,20 @@ public class SoapMessageElementData extends MessageElementData implements
 
 	}
 
-	private int getEndLine(Element element) {
-		return ((Located) element).getLine() + getChildrenTotalLines(element)
-				- 1;
-	}
+	// private int getEndLine(Element element) {
+	// return ((Located) element).getLine() + getChildrenTotalLines(element);
+	// }
 
-	public SoapMessageElementData(Element element, String name, String usage,
+	public XmlMessageElementData(Element element, String name, String usage,
 			Integer minOccurs, Integer maxOccurs) {
 		Located locatedElement = (Located) element;
 		start = getStartCoordinate(element);
 		end = getEndCoordinate(element);
+
+		System.out.println("Element:" + XmlUtils.toString(element) + ", name:"
+				+ name + ", start=" + start.getLine() + ", end="
+				+ end.getLine());
+
 		this.column = locatedElement.getColumn();
 		this.path = XPathHelper.getAbsolutePath(element);
 		this.name = name;
@@ -161,7 +166,7 @@ public class SoapMessageElementData extends MessageElementData implements
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		SoapMessageElementData other = (SoapMessageElementData) obj;
+		XmlMessageElementData other = (XmlMessageElementData) obj;
 		if (this.maxOccurs == null) {
 			if (other.maxOccurs != null) {
 				return false;
@@ -214,12 +219,26 @@ public class SoapMessageElementData extends MessageElementData implements
 		this.column = column;
 	}
 
-	public Coordinate getStart() {
+	public XmlCoordinate getStart() {
 		return start;
 	}
 
-	public Coordinate getEnd() {
+	public XmlCoordinate getEnd() {
 		return end;
+	}
+
+	private int getNumberOfLine(Element element) {
+		String content = XmlUtils.toString(element);
+		String[] lines = content.split(System.getProperty("line.separator"));
+		return lines.length;
+	}
+
+	public int getEndLine(Element element) {
+		return getStartLine(element) + getNumberOfLine(element) - 1;
+	}
+
+	public int getStartLine(Element element) {
+		return ((Located) element).getLine();
 	}
 
 }
