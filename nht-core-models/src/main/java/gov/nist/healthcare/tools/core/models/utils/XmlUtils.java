@@ -1,5 +1,7 @@
 package gov.nist.healthcare.tools.core.models.utils;
 
+import gov.nist.healthcare.tools.core.models.xml.XmlCoordinate;
+
 import java.io.IOException;
 
 import javax.xml.transform.TransformerException;
@@ -9,6 +11,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.located.Located;
 import org.jdom2.located.LocatedJDOMFactory;
 import org.jdom2.output.XMLOutputter;
 
@@ -55,4 +58,26 @@ public class XmlUtils {
 		return new XMLOutputter().outputString(element);
 	}
 
+	public static XmlCoordinate getStartCoordinate(Element element) {
+		Located locatedElement = (Located) element;
+		return new XmlCoordinate(locatedElement.getLine(), 0);
+	}
+
+	public static XmlCoordinate getEndCoordinate(Element element) {
+		return new XmlCoordinate(getEndLine(element), 1000);
+	}
+
+	private static int getNumberOfLine(Element element) {
+		String content = XmlUtils.toString(element);
+		String[] lines = content.split(System.getProperty("line.separator"));
+		return lines.length;
+	}
+
+	public static int getEndLine(Element element) {
+		return getStartLine(element) + getNumberOfLine(element) - 1;
+	}
+
+	public static int getStartLine(Element element) {
+		return ((Located) element).getLine();
+	}
 }

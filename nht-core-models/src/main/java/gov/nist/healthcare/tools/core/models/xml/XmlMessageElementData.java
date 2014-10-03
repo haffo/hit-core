@@ -17,7 +17,6 @@ import gov.nist.healthcare.tools.core.models.message.MessageElementData;
 import gov.nist.healthcare.tools.core.models.utils.XmlUtils;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.jdom2.Element;
 import org.jdom2.located.Located;
@@ -53,59 +52,11 @@ public class XmlMessageElementData extends MessageElementData implements
 		}
 	}
 
-	private XmlCoordinate getStartCoordinate(Element element) {
-		Located locatedElement = (Located) element;
-		return new XmlCoordinate(locatedElement.getLine(), 0);
-	}
-
-	private XmlCoordinate getEndCoordinate(Element element) {
-		return new XmlCoordinate(getEndLine(element), 1000);
-		// Located locatedElement = (Located) element;
-		// if (element.getChildren() == null || element.getChildren().isEmpty())
-		// {
-		// result = new Coordinate(getEndLine(element),
-		// 1000);
-		// } else {
-		//
-		// int line =
-		//
-		// List<Element> children = element.getChildren();
-		// for (Element child : children) {
-		// result.plus(getEndCoordinate(child));
-		// }
-		// }
-		// return new Coordinate(locatedElement.getLine(),
-		// locatedElement.getColumn() + element.getText().length());
-	}
-
-	private int getChildrenTotalLines(Element element) {
-		if (element.getChildren() == null || element.getChildren().isEmpty()) {
-			return 1;
-		} else {
-			int counter = 2;
-			List<Element> children = element.getChildren();
-			for (Element child : children) {
-				counter = counter + getChildrenTotalLines(child);
-			}
-			return counter; // include end element
-		}
-
-	}
-
-	// private int getEndLine(Element element) {
-	// return ((Located) element).getLine() + getChildrenTotalLines(element);
-	// }
-
 	public XmlMessageElementData(Element element, String name, String usage,
 			Integer minOccurs, Integer maxOccurs) {
 		Located locatedElement = (Located) element;
-		start = getStartCoordinate(element);
-		end = getEndCoordinate(element);
-
-		System.out.println("Element:" + XmlUtils.toString(element) + ", name:"
-				+ name + ", start=" + start.getLine() + ", end="
-				+ end.getLine());
-
+		start = XmlUtils.getStartCoordinate(element);
+		end = XmlUtils.getEndCoordinate(element);
 		this.column = locatedElement.getColumn();
 		this.path = XPathHelper.getAbsolutePath(element);
 		this.name = name;
@@ -116,10 +67,6 @@ public class XmlMessageElementData extends MessageElementData implements
 		this.description = toString();
 	}
 
-	/*
-	 * public Element getElement() { return element; } public void
-	 * setElement(Element element) { this.element = element; }
-	 */
 	@Override
 	public String toString() {
 
@@ -225,20 +172,6 @@ public class XmlMessageElementData extends MessageElementData implements
 
 	public XmlCoordinate getEnd() {
 		return end;
-	}
-
-	private int getNumberOfLine(Element element) {
-		String content = XmlUtils.toString(element);
-		String[] lines = content.split(System.getProperty("line.separator"));
-		return lines.length;
-	}
-
-	public int getEndLine(Element element) {
-		return getStartLine(element) + getNumberOfLine(element) - 1;
-	}
-
-	public int getStartLine(Element element) {
-		return ((Located) element).getLine();
 	}
 
 }
