@@ -11,6 +11,8 @@
 
 package gov.nist.healthcare.tools.core.models.profile;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Harold Affo (NIST)
  * 
@@ -21,6 +23,7 @@ public class Profile {
 
 	protected String description;
 
+	@JsonIgnore
 	protected String content;
 
 	public Profile() {
