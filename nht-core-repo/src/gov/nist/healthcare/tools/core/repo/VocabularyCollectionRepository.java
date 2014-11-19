@@ -8,14 +8,17 @@
  * modified freely provided that any derivative works bear some notice that they are derived from it, and any
  * modified versions bear some notice that they have been modified.
  */
-package gov.nist.healthcare.tools.core.services.validation;
 
-import gov.nist.healthcare.tools.core.models.ValidationResult;
+package gov.nist.healthcare.tools.core.repo;
 
+import gov.nist.healthcare.tools.core.models.VocabularyCollection;
 
-public interface Validator {
- 
-	public ValidationResult validate(String message, String title,Object ... options);
+import org.springframework.data.jpa.repository.JpaRepository;
 
+public interface VocabularyCollectionRepository extends
+		JpaRepository<VocabularyCollection, Long> {
 
+	// @Query("select vocabCollection from VocabularyCollection vocabCollection where vocabCollection.testCase.id = :testCaseId ORDER BY vocabCollection.name")
+	// List<VocabularyCollection> findAllByTestCaseId(
+	// @Param("testCaseId") Long testCaseId);
 }

@@ -10,7 +10,7 @@
  */
 package gov.nist.healthcare.tools.core.services.profile;
 
-import gov.nist.healthcare.tools.core.models.profile.ProfileModel;
+import gov.nist.healthcare.tools.core.models.ProfileModel;
 
 
 

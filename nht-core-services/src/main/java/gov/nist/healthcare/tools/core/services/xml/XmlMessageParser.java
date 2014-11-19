@@ -11,8 +11,8 @@
 package gov.nist.healthcare.tools.core.services.xml;
 
 
-import gov.nist.healthcare.tools.core.models.message.MessageModel;
-import gov.nist.healthcare.tools.core.models.xml.XmlMessageModel;
+import gov.nist.healthcare.tools.core.models.MessageModel;
+import gov.nist.healthcare.tools.core.models.XmlMessageModel;
 import gov.nist.healthcare.tools.core.services.message.MessageParser;
 
 import java.io.InputStream;

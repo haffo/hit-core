@@ -1,6 +1,6 @@
 package gov.nist.healthcare.tools.core.models.utils;
 
-import gov.nist.healthcare.tools.core.models.xml.XmlCoordinate;
+import gov.nist.healthcare.tools.core.models.XmlCoordinate;
 
 import java.io.IOException;
 
@@ -40,8 +40,10 @@ public class XmlUtils {
 		// transformer.transform(xmlInput, xmlOutput);
 		// String res = xmlOutput.getWriter().toString();
 		// System.out.println(res);
+		// System.setProperty("javax.xml.parsers.SAXParserFactory",
+		// "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
 		Document doc = toDocument(input);
-		String res = new XMLOutputter().outputString(doc.getRootElement());
+		String res = toString(doc.getRootElement());
 
 		return res;
 	}
@@ -56,6 +58,10 @@ public class XmlUtils {
 
 	public static String toString(Element element) {
 		return new XMLOutputter().outputString(element);
+	}
+
+	public static String toString(Document document) {
+		return new XMLOutputter().outputString(document.getRootElement());
 	}
 
 	public static XmlCoordinate getStartCoordinate(Element element) {

@@ -8,14 +8,51 @@
  * modified freely provided that any derivative works bear some notice that they are derived from it, and any
  * modified versions bear some notice that they have been modified.
  */
-package gov.nist.healthcare.tools.core.services.validation;
 
-import gov.nist.healthcare.tools.core.models.ValidationResult;
+package gov.nist.healthcare.tools.core.models;
 
+import java.io.Serializable;
 
-public interface Validator {
- 
-	public ValidationResult validate(String message, String title,Object ... options);
+/**
+ * @author Harold Affo (NIST)
+ * 
+ */
+public class Command implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	protected String content;
+	protected String endpoint;
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public Command() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Command(String content) {
+		super();
+		this.content = content;
+	}
+
+	public Command(String content, String endpoint) {
+		super();
+		this.content = content;
+		this.endpoint = endpoint;
+	}
+
+	public String getEndpoint() {
+		return endpoint;
+	}
+
+	public void setEndpoint(String endpoint) {
+		this.endpoint = endpoint;
+	}
 
 }

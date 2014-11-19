@@ -8,14 +8,38 @@
  * modified freely provided that any derivative works bear some notice that they are derived from it, and any
  * modified versions bear some notice that they have been modified.
  */
-package gov.nist.healthcare.tools.core.services.validation;
+package gov.nist.healthcare.tools.core.models;
 
-import gov.nist.healthcare.tools.core.models.ValidationResult;
+import java.util.List;
 
+/**
+ * @author Harold Affo (NIST)
+ */
+public class ValidationFailure {
 
-public interface Validator {
- 
-	public ValidationResult validate(String message, String title,Object ... options);
+	protected String title;
+	protected List<? extends Object> failures;
 
+	public ValidationFailure(String title, List<? extends Object> failures) {
+		super();
+		this.title = title;
+		this.failures = failures;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public List<? extends Object> getFailures() {
+		return failures;
+	}
+
+	public void setFailures(List<? extends Object> failures) {
+		this.failures = failures;
+	}
 
 }

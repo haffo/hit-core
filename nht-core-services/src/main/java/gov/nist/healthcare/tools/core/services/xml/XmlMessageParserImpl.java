@@ -13,10 +13,10 @@
  */
 package gov.nist.healthcare.tools.core.services.xml;
 
-import gov.nist.healthcare.tools.core.models.message.MessageElement;
-import gov.nist.healthcare.tools.core.models.message.MessageModel;
+import gov.nist.healthcare.tools.core.models.MessageElement;
+import gov.nist.healthcare.tools.core.models.MessageModel;
+import gov.nist.healthcare.tools.core.models.XmlMessageElementData;
 import gov.nist.healthcare.tools.core.models.utils.XmlUtils;
-import gov.nist.healthcare.tools.core.models.xml.XmlMessageElementData;
 import gov.nist.healthcare.tools.core.services.soap.SoapMessageParser;
 import gov.nist.healthcare.tools.core.services.xml.XmlParserException;
 

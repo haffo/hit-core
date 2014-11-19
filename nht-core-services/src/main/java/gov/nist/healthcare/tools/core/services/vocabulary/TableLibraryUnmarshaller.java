@@ -18,7 +18,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import gov.nist.healthcare.tools.core.models.vocabulary.VocabularyLibrary;
+import gov.nist.healthcare.tools.core.models.VocabularyLibrary;
 
  
 /**

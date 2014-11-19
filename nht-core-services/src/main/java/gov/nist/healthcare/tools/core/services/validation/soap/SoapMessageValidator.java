@@ -10,7 +10,7 @@
  */
 package gov.nist.healthcare.tools.core.services.validation.soap;
 
-import gov.nist.healthcare.tools.core.models.validation.ValidationResult;
+import gov.nist.healthcare.tools.core.models.ValidationResult;
 import gov.nist.healthcare.tools.core.services.validation.Validator;
 
 

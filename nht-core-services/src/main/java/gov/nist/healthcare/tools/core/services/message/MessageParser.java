@@ -11,7 +11,7 @@
 
 package gov.nist.healthcare.tools.core.services.message;
 
-import gov.nist.healthcare.tools.core.models.message.MessageModel;
+import gov.nist.healthcare.tools.core.models.MessageModel;
 
 import java.util.List;
 

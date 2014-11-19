@@ -11,8 +11,8 @@
 package gov.nist.healthcare.tools.core.services.soap;
 
 
-import gov.nist.healthcare.tools.core.models.message.MessageModel;
- import gov.nist.healthcare.tools.core.services.message.MessageParser;
+import gov.nist.healthcare.tools.core.models.MessageModel;
+import gov.nist.healthcare.tools.core.services.message.MessageParser;
 
 
 public interface SoapMessageParser  extends MessageParser{
