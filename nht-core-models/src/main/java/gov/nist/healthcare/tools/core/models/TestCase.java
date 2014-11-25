@@ -29,6 +29,7 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @(#) TestPlan.java
@@ -48,14 +49,19 @@ public class TestCase implements java.io.Serializable {
 
 	@NotNull
 	@Column(nullable = false)
+	@JsonProperty("label")
 	protected String name;
 
-	@Column(nullable = true)
-	protected String label;
+	protected String testPackagePath;
+
+	@NotNull
+	@Column(nullable = false)
+	protected String parentName;
 
 	@Embedded
 	protected TestStory testStory;
 
+	@JsonIgnore
 	@OneToOne(mappedBy = "testCase", cascade = CascadeType.PERSIST)
 	protected TestContext testContext;
 
@@ -70,7 +76,6 @@ public class TestCase implements java.io.Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-		this.label = name;
 	}
 
 	public TestCase(String name) {
@@ -113,14 +118,6 @@ public class TestCase implements java.io.Serializable {
 		this.sutType = sutType;
 	}
 
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
 	public TestContext getTestContext() {
 		return testContext;
 	}
@@ -136,6 +133,22 @@ public class TestCase implements java.io.Serializable {
 
 	public void setTestPlan(TestPlan testPlan) {
 		this.testPlan = testPlan;
+	}
+
+	public String getParentName() {
+		return parentName;
+	}
+
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
+	}
+
+	public String getTestPackagePath() {
+		return testPackagePath;
+	}
+
+	public void setTestPackagePath(String testPackagePath) {
+		this.testPackagePath = testPackagePath;
 	}
 
 }

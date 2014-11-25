@@ -42,7 +42,6 @@ public class Profile implements java.io.Serializable {
 	@JoinColumn(unique = true)
 	protected TestContext testContext;
 
-	@JsonIgnore
 	@NotNull
 	@Column(columnDefinition = "LONGTEXT")
 	protected String content;

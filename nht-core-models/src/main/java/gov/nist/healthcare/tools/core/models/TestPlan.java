@@ -28,6 +28,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @(#) TestPlan.java
  */
@@ -42,11 +44,15 @@ public class TestPlan implements java.io.Serializable {
 
 	@NotNull
 	@Column(nullable = false)
+	@JsonProperty("label")
 	protected String name;
 
 	@Column(nullable = true)
 	protected String description;
 
+	protected String testProcedurePath;
+
+	@JsonProperty("children")
 	@OneToMany(mappedBy = "testPlan", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	protected Set<TestCase> testCases = new HashSet<TestCase>();
 
@@ -103,10 +109,19 @@ public class TestPlan implements java.io.Serializable {
 	public void addTestCase(TestCase testCase) {
 		testCases.add(testCase);
 		testCase.setTestPlan(this);
+		testCase.setParentName(this.name);
 	}
 
 	public Set<TestCase> getTestCases() {
 		return Collections.unmodifiableSet(testCases);
+	}
+
+	public String getTestProcedurePath() {
+		return testProcedurePath;
+	}
+
+	public void setTestProcedurePath(String testProcedurePath) {
+		this.testProcedurePath = testProcedurePath;
 	}
 
 }
