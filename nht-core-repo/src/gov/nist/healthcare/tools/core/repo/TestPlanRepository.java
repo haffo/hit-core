@@ -14,7 +14,11 @@ package gov.nist.healthcare.tools.core.repo;
 import gov.nist.healthcare.tools.core.models.TestPlan;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
-
+	
+	@Query("select testPlan.testProcedurePath from TestPlan testPlan where testPlan.id = :testPlanId")
+	String getTestProcedurePathByTestPlanId(@Param("testPlan") Long testPlanId);
 }

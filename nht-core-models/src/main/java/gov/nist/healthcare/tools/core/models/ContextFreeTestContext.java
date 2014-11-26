@@ -15,7 +15,7 @@ import javax.persistence.OneToOne;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class CFTestContext extends TestContext {
+public class ContextFreeTestContext extends TestContext {
 
 	protected static final long serialVersionUID = 1L;
 
