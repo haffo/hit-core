@@ -6,10 +6,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
-public class User {
+public class User implements java.io.Serializable {
+
+	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected Long id;
@@ -17,12 +17,8 @@ public class User {
 	@Column(nullable = true, unique = true)
 	protected String username;
 
-	@JsonIgnore
 	@Column(nullable = true)
 	protected String password;
-
-	@Column(nullable = true, unique = true)
-	protected String tokenId;
 
 	public Long getId() {
 		return id;
@@ -30,14 +26,6 @@ public class User {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getTokenId() {
-		return tokenId;
-	}
-
-	public void setTokenId(String tokenId) {
-		this.tokenId = tokenId;
 	}
 
 	public String getUsername() {

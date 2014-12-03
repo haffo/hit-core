@@ -1,6 +1,6 @@
 package gov.nist.healthcare.tools.core.transport;
 
-public class TransportServerException extends Exception {
+public class TransportServerException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	public TransportServerException() {

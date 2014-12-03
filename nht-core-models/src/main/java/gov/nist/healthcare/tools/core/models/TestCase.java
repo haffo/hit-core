@@ -52,6 +52,8 @@ public class TestCase implements java.io.Serializable {
 	@JsonProperty("label")
 	protected String name;
 
+	protected String testType;
+
 	protected String testPackagePath;
 
 	@NotNull
@@ -149,6 +151,14 @@ public class TestCase implements java.io.Serializable {
 
 	public void setTestPackagePath(String testPackagePath) {
 		this.testPackagePath = testPackagePath;
+	}
+
+	public String getTestType() {
+		return testType;
+	}
+
+	public void setTestType(String testType) {
+		this.testType = testType;
 	}
 
 }

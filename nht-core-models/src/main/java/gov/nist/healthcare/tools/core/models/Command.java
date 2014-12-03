@@ -22,6 +22,9 @@ public class Command implements Serializable {
 	private static final long serialVersionUID = 1L;
 	protected String content;
 	protected String endpoint;
+	protected Long testCaseId;
+	protected Long userId;
+	protected String type;
 
 	public String getContent() {
 		return content;
@@ -53,6 +56,30 @@ public class Command implements Serializable {
 
 	public void setEndpoint(String endpoint) {
 		this.endpoint = endpoint;
+	}
+
+	public Long getTestCaseId() {
+		return testCaseId;
+	}
+
+	public void setTestCaseId(Long testCaseId) {
+		this.testCaseId = testCaseId;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

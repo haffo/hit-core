@@ -20,5 +20,5 @@ import org.springframework.data.repository.query.Param;
 public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 	
 	@Query("select testPlan.testProcedurePath from TestPlan testPlan where testPlan.id = :testPlanId")
-	String getTestProcedurePathByTestPlanId(@Param("testPlan") Long testPlanId);
+	String getTestProcedurePathByTestPlanId(@Param("testPlanId") Long testPlanId);
 }
