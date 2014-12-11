@@ -21,4 +21,5 @@ public interface TestCaseRepository extends JpaRepository<TestCase, Long> {
 	
 	@Query("select testCase.testPackagePath from TestCase testCase where testCase.id = :testCaseId")
 	String getTestPackagePathByTestCaseId(@Param("testCaseId") Long testCaseId);
-}
+	
+ }

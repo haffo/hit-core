@@ -22,7 +22,7 @@ public interface ConnectivityTestContextRepository extends
 	ConnectivityTestContext findOneByTestCaseId(
 			@Param("testCaseId") Long testCaseId);
 
-	@Query("select distinct testContext.testCase.testPlan from ConnectivityTestContext testContext")
+	@Query("select distinct testContext.testCase.testPlan from ConnectivityTestContext testContext order by testContext.testCase.testPlan.name ASC")
 	List<TestPlan> findAllTestPlans();
 	//
 	// @Query("select distinct testContext.testCase.sutType from ConnectivityTestContext testContext")

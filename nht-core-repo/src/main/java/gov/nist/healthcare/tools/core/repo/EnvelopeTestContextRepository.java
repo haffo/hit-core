@@ -17,7 +17,7 @@ public interface EnvelopeTestContextRepository extends
 	@Query("select testContext from EnvelopeTestContext testContext where testContext.testCase.id = :testCaseId")
 	EnvelopeTestContext findOneByTestCaseId(@Param("testCaseId") Long testCaseId);
 
-	@Query("select distinct testContext.testCase.testPlan from EnvelopeTestContext testContext")
+	@Query("select distinct testContext.testCase.testPlan from EnvelopeTestContext testContext order by testContext.testCase.testPlan.name ASC")
 	List<TestPlan> findAllTestPlans();
 
 	@Query("select testContext.testCase from EnvelopeTestContext testContext where testContext.testCase.sutType = :sutType")

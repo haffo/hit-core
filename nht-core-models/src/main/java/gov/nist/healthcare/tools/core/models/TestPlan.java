@@ -26,6 +26,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -53,6 +54,7 @@ public class TestPlan implements java.io.Serializable {
 	protected String testProcedurePath;
 
 	@JsonProperty("children")
+	@OrderBy("name ASC")
 	@OneToMany(mappedBy = "testPlan", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	protected Set<TestCase> testCases = new HashSet<TestCase>();
 

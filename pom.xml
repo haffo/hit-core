@@ -17,7 +17,6 @@
 	<properties>
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<core.version>1.0.49-SNAPSHOT</core.version>
 		<spring.version>4.1.1.RELEASE</spring.version>
 	</properties>
 
@@ -71,7 +70,7 @@
 			<version>2.4</version>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>gov.nist.healthcare.core</groupId>
 			<artifactId>core-hl7-v2-message</artifactId>
 			<version>${core.version}</version>
@@ -89,9 +88,9 @@
 					<artifactId>commons-io</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency> -->
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>gov.nist.healthcare.core</groupId>
 			<artifactId>core-hl7-v2-parser</artifactId>
 			<version>${core.version}</version>
@@ -109,7 +108,7 @@
 					<artifactId>commons-io</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>

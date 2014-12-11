@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
@@ -13,6 +14,9 @@ import javax.persistence.OneToMany;
 public class EnvelopeTestContext extends TestContext {
 
 	private static final long serialVersionUID = 1L;
+
+	@Column(nullable = true)
+	private String validationPhase;
 
 	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	protected Set<Message> exampleMessages = new HashSet<Message>();
@@ -25,4 +29,17 @@ public class EnvelopeTestContext extends TestContext {
 		exampleMessages.add(exampleMessage);
 		exampleMessage.setTestContext(this);
 	}
+
+	public String getValidationPhase() {
+		return validationPhase;
+	}
+
+	public void setValidationPhase(String validationPhase) {
+		this.validationPhase = validationPhase;
+	}
+
+	public void setExampleMessages(Set<Message> exampleMessages) {
+		this.exampleMessages = exampleMessages;
+	}
+
 }

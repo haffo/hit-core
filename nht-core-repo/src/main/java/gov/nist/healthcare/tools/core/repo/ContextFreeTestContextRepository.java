@@ -22,7 +22,7 @@ public interface ContextFreeTestContextRepository extends
 	List<Message> findExampleMessagesByTestCaseId(
 			@Param("testCaseId") Long testCaseId);
 
-	@Query("select distinct testContext.testCase from ContextFreeTestContext testContext")
+	@Query("select distinct testContext.testCase from ContextFreeTestContext testContext order by testContext.testCase.name ASC")
 	List<TestCase> findAllTestCases();
 
 	@Query("select profile from Profile profile where profile.testContext.testCase.id = :testCaseId")

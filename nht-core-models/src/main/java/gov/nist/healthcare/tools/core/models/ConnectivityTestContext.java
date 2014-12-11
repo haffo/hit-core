@@ -14,6 +14,12 @@ public class ConnectivityTestContext extends TestContext {
 	@Column(columnDefinition = "LONGTEXT")
 	protected String exampleMessage;
 
+	@Column(nullable = true)
+	private String requestValidationPhase;
+
+	@Column(nullable = true)
+	private String responseValidationPhase;
+
 	public String getMessage() {
 		return message;
 	}
@@ -28,6 +34,22 @@ public class ConnectivityTestContext extends TestContext {
 
 	public void setExampleMessage(String exampleMessage) {
 		this.exampleMessage = exampleMessage;
+	}
+
+	public String getRequestValidationPhase() {
+		return requestValidationPhase;
+	}
+
+	public void setRequestValidationPhase(String requestValidationPhase) {
+		this.requestValidationPhase = requestValidationPhase;
+	}
+
+	public String getResponseValidationPhase() {
+		return responseValidationPhase;
+	}
+
+	public void setResponseValidationPhase(String responseValidationPhase) {
+		this.responseValidationPhase = responseValidationPhase;
 	}
 
 }
