@@ -38,9 +38,22 @@ public class Profile implements java.io.Serializable {
 	protected Long id;
 
 	@JsonIgnore
-	@OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	@JoinColumn(unique = true)
-	protected TestContext testContext;
+	protected TestCaseContext testContext;
+
+	@JsonIgnore
+	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(unique = true)
+	protected TestStepContext testStepContext;
+
+	public TestStepContext getTestStepContext() {
+		return testStepContext;
+	}
+
+	public void setTestStepContext(TestStepContext testStepContext) {
+		this.testStepContext = testStepContext;
+	}
 
 	@NotNull
 	@Column(columnDefinition = "LONGTEXT")
@@ -71,6 +84,13 @@ public class Profile implements java.io.Serializable {
 		this.content = content;
 	}
 
+	public Profile(String content) {
+		super();
+		this.name = null;
+		this.description = null;
+		this.content = content;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -95,11 +115,11 @@ public class Profile implements java.io.Serializable {
 		this.content = content;
 	}
 
-	public TestContext getTestContext() {
+	public TestCaseContext getTestContext() {
 		return testContext;
 	}
 
-	public void setTestContext(TestContext testContext) {
+	public void setTestContext(TestCaseContext testContext) {
 		this.testContext = testContext;
 	}
 

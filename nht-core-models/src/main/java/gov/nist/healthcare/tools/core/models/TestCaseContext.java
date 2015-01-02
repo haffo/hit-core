@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class TestContext implements java.io.Serializable {
+public abstract class TestCaseContext implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 

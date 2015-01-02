@@ -20,6 +20,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -44,8 +45,12 @@ public class Message implements java.io.Serializable {
 	protected String content;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
-	protected TestContext testContext;
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	protected TestCaseContext testContext;
+
+	@JsonIgnore
+	@OneToOne(fetch = FetchType.LAZY)
+	protected TestStepContext testStepContext;
 
 	public Long getId() {
 		return id;
@@ -62,6 +67,13 @@ public class Message implements java.io.Serializable {
 		super();
 		this.name = name;
 		this.description = description;
+		this.content = content;
+	}
+
+	public Message(String content) {
+		super();
+		this.name = null;
+		this.description = null;
 		this.content = content;
 	}
 
@@ -98,11 +110,11 @@ public class Message implements java.io.Serializable {
 		this.content = content;
 	}
 
-	public TestContext getTestContext() {
+	public TestCaseContext getTestContext() {
 		return testContext;
 	}
 
-	public void setTestContext(TestContext testContext) {
+	public void setTestContext(TestCaseContext testContext) {
 		this.testContext = testContext;
 	}
 

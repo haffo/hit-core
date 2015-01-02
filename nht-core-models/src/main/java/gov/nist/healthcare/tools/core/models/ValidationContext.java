@@ -17,7 +17,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
@@ -45,9 +44,20 @@ public class ValidationContext {
 	protected String content;
 
 	@JsonIgnore
-	@OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	@JoinColumn(unique = true)
-	protected TestContext testContext;
+	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	protected TestCaseContext testContext;
+
+	@JsonIgnore
+	@OneToOne(optional = true, fetch = FetchType.LAZY)
+	protected TestCaseContext testStepContext;
+
+	public TestCaseContext getTestStepContext() {
+		return testStepContext;
+	}
+
+	public void setTestStepContext(TestCaseContext testStepContext) {
+		this.testStepContext = testStepContext;
+	}
 
 	public ValidationContext() {
 		super();
@@ -77,6 +87,14 @@ public class ValidationContext {
 		super();
 		this.title = title;
 		this.description = description;
+		this.content = content;
+	}
+
+	public ValidationContext(String content) {
+		super();
+		this.title = null;
+		this.description = null;
+		this.content = content;
 	}
 
 	public void setContent(String content) {
@@ -91,11 +109,11 @@ public class ValidationContext {
 		this.description = description;
 	}
 
-	public TestContext getTestContext() {
+	public TestCaseContext getTestContext() {
 		return testContext;
 	}
 
-	public void setTestContext(TestContext testContext) {
+	public void setTestContext(TestCaseContext testContext) {
 		this.testContext = testContext;
 	}
 

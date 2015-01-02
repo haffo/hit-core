@@ -14,6 +14,10 @@
 
 package gov.nist.healthcare.tools.core.models;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -24,8 +28,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -60,16 +67,39 @@ public class TestCase implements java.io.Serializable {
 	@Column(nullable = false)
 	protected String parentName;
 
+	@Column(columnDefinition = "TEXT")
+	protected String instructionsText;
+
+	@Lob
+	@Basic(fetch = FetchType.EAGER)
+	@Column(length = 100000)
+	protected byte[] instructionsImage;
+
+	@Lob
+	@Basic(fetch = FetchType.EAGER)
+	@Column(length = 100000)
+	protected byte[] contentImage;
+
+	@Lob
+	@Basic(fetch = FetchType.EAGER)
+	@Column(length = 100000)
+	protected byte[] testDataSpecificationImage;
+
 	@Embedded
 	protected TestStory testStory;
 
 	@JsonIgnore
 	@OneToOne(mappedBy = "testCase", cascade = CascadeType.PERSIST)
-	protected TestContext testContext;
+	protected TestCaseContext testContext;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	protected TestPlan testPlan;
+
+	@JsonProperty("children")
+	@OrderBy("name ASC")
+	@OneToMany(mappedBy = "testCase", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	protected Set<TestStep> testSteps = new HashSet<TestStep>();
 
 	public TestCase() {
 		super();
@@ -120,11 +150,11 @@ public class TestCase implements java.io.Serializable {
 		this.sutType = sutType;
 	}
 
-	public TestContext getTestContext() {
+	public TestCaseContext getTestContext() {
 		return testContext;
 	}
 
-	public void setTestContext(TestContext testContext) {
+	public void setTestContext(TestCaseContext testContext) {
 		this.testContext = testContext;
 		this.testContext.setTestCase(this);
 	}
@@ -159,6 +189,52 @@ public class TestCase implements java.io.Serializable {
 
 	public void setTestType(String testType) {
 		this.testType = testType;
+	}
+
+	public String getInstructionsText() {
+		return instructionsText;
+	}
+
+	public void setInstructionsText(String instructionsText) {
+		this.instructionsText = instructionsText;
+	}
+
+	public byte[] getInstructionsImage() {
+		return instructionsImage;
+	}
+
+	public void setInstructionsImage(byte[] instructionsImage) {
+		this.instructionsImage = instructionsImage;
+	}
+
+	public byte[] getContentImage() {
+		return contentImage;
+	}
+
+	public void setContentImage(byte[] contentImage) {
+		this.contentImage = contentImage;
+	}
+
+	public byte[] getTestDataSpecificationImage() {
+		return testDataSpecificationImage;
+	}
+
+	public void setTestDataSpecificationImage(byte[] testDataSpecificationImage) {
+		this.testDataSpecificationImage = testDataSpecificationImage;
+	}
+
+	public Set<TestStep> getTestSteps() {
+		return testSteps;
+	}
+
+	public void setTestSteps(Set<TestStep> testSteps) {
+		this.testSteps = testSteps;
+	}
+
+	public void addTestStep(TestStep testStep) {
+		testSteps.add(testStep);
+		testStep.setTestCase(this);
+		testStep.setParentName(this.name);
 	}
 
 }

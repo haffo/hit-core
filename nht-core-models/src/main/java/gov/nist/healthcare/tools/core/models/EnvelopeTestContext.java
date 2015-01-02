@@ -11,7 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 @Entity
-public class EnvelopeTestContext extends TestContext {
+public class EnvelopeTestContext extends TestCaseContext {
 
 	private static final long serialVersionUID = 1L;
 

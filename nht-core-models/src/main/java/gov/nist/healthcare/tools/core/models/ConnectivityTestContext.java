@@ -1,10 +1,13 @@
 package gov.nist.healthcare.tools.core.models;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Lob;
 
 @Entity
-public class ConnectivityTestContext extends TestContext {
+public class ConnectivityTestContext extends TestCaseContext {
 
 	private static final long serialVersionUID = 1L;
 
@@ -19,6 +22,32 @@ public class ConnectivityTestContext extends TestContext {
 
 	@Column(nullable = true)
 	private String responseValidationPhase;
+
+	@Lob
+	@Basic(fetch = FetchType.EAGER)
+	@Column(length = 100000)
+	protected byte[] requestContentImage;
+
+	@Lob
+	@Basic(fetch = FetchType.EAGER)
+	@Column(length = 100000)
+	protected byte[] responseContentImage;
+
+	public byte[] getRequestContentImage() {
+		return requestContentImage;
+	}
+
+	public void setRequestContentImage(byte[] requestContentImage) {
+		this.requestContentImage = requestContentImage;
+	}
+
+	public byte[] getResponseContentImage() {
+		return responseContentImage;
+	}
+
+	public void setResponseContentImage(byte[] responseContentImage) {
+		this.responseContentImage = responseContentImage;
+	}
 
 	public String getMessage() {
 		return message;

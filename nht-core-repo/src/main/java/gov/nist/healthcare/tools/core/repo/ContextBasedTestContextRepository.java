@@ -1,6 +1,6 @@
 package gov.nist.healthcare.tools.core.repo;
 
-import gov.nist.healthcare.tools.core.models.ContextBasedTestContext;
+import gov.nist.healthcare.tools.core.models.ContextBasedTestCaseContext;
 import gov.nist.healthcare.tools.core.models.Message;
 import gov.nist.healthcare.tools.core.models.Profile;
 import gov.nist.healthcare.tools.core.models.TestPlan;
@@ -12,10 +12,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ContextBasedTestContextRepository extends
-		JpaRepository<ContextBasedTestContext, Long> {
+		JpaRepository<ContextBasedTestCaseContext, Long> {
 
 	@Query("select testContext from ContextBasedTestContext testContext where testContext.testCase.id = :testCaseId")
-	ContextBasedTestContext findOneByTestCaseId(
+	ContextBasedTestCaseContext findOneByTestCaseId(
 			@Param("testCaseId") Long testCaseId);
 
 	@Query("select testContext.exampleMessages from ContextBasedTestContext testContext where testContext.testCase.id = :testCaseId")

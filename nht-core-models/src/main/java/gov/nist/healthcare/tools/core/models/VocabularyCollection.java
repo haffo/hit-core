@@ -23,9 +23,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -47,9 +47,20 @@ public class VocabularyCollection {
 	protected Long id;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(unique = true)
-	protected TestContext testContext;
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	protected TestCaseContext testContext;
+
+	@JsonIgnore
+	@OneToOne(optional = true, fetch = FetchType.LAZY)
+	protected TestStepContext testStepContext;
+
+	public TestStepContext getTestStepContext() {
+		return testStepContext;
+	}
+
+	public void setTestStepContext(TestStepContext testStepContext) {
+		this.testStepContext = testStepContext;
+	}
 
 	@OneToMany(mappedBy = "vocabularyCollection", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	protected Set<VocabularyLibrary> vocabularyLibraries = new HashSet<VocabularyLibrary>();
@@ -104,11 +115,11 @@ public class VocabularyCollection {
 		this.vocabularyLibraries = vocabularyLibraries;
 	}
 
-	public TestContext getTestContext() {
+	public TestCaseContext getTestContext() {
 		return testContext;
 	}
 
-	public void setTestContext(TestContext testContext) {
+	public void setTestContext(TestCaseContext testContext) {
 		this.testContext = testContext;
 	}
 

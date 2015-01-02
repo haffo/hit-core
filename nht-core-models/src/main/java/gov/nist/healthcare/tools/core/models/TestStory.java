@@ -44,6 +44,12 @@ public class TestStory implements java.io.Serializable {
 	@Column(columnDefinition = "TEXT")
 	private String noteToTesters;
 
+	@Column
+	private String pdfPath;
+
+	@Column
+	private String htmlPath;
+
 	public TestStory(String description, String comments, String preCondition,
 			String postCondition, String testObjectives, String notes) {
 		super();
@@ -121,6 +127,22 @@ public class TestStory implements java.io.Serializable {
 
 	public void setNoteToTesters(String noteToTesters) {
 		this.noteToTesters = noteToTesters;
+	}
+
+	public String getPdfPath() {
+		return pdfPath;
+	}
+
+	public void setPdfPath(String pdfPath) {
+		this.pdfPath = pdfPath;
+	}
+
+	public String getHtmlPath() {
+		return htmlPath;
+	}
+
+	public void setHtmlPath(String htmlPath) {
+		this.htmlPath = htmlPath;
 	}
 
 	@Override

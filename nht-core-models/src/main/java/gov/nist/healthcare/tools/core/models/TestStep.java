@@ -10,55 +10,102 @@
  */
 package gov.nist.healthcare.tools.core.models;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Entity
 public class TestStep implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	protected int sequenceNum;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	protected Long id;
 
-	protected String type;
+	@NotNull
+	@Column(nullable = false)
+	@JsonProperty("label")
+	protected String name;
 
-	protected Transaction transaction;
-
+	@Column(nullable = true)
 	protected String description;
 
-	protected VendorDataSheet vendorDataSheet;
+	@Column
+	protected String dataSheetHtmlPath;
 
-	public TestStep(Long id, int sequenceNum, String type,
-			Transaction transaction, String description) {
-		super();
-		this.sequenceNum = sequenceNum;
-		this.type = type;
-		this.transaction = transaction;
-		this.description = description;
-	}
+	@Column
+	protected String dataSheetPdfPath;
+
+	@Embedded
+	protected TestStory testStory;
+
+	@NotNull
+	@Column(nullable = false)
+	protected String parentName;
+
+	@JsonIgnore
+	@OneToOne(mappedBy = "testStep", cascade = CascadeType.PERSIST)
+	protected TestStepContext testContext;
+
+	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY)
+	protected TestCase testCase;
 
 	public TestStep() {
 		super();
+		testStory = new TestStory();
 	}
 
-	public int getSequenceNum() {
-		return sequenceNum;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void setSequenceNum(int sequenceNum) {
-		this.sequenceNum = sequenceNum;
+	public Long getId() {
+		return this.id;
 	}
 
-	public String getType() {
-		return type;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public String getName() {
+		return this.name;
 	}
 
-	public Transaction getTransaction() {
-		return transaction;
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Id: ").append(getId()).append(", ");
+		sb.append("Name: ").append(getName()).append(", ");
+		return sb.toString();
 	}
 
-	public void setTransaction(Transaction transaction) {
-		this.transaction = transaction;
+	public TestStory getTestStory() {
+		return testStory;
+	}
+
+	public void setTestStory(TestStory testStory) {
+		this.testStory = testStory;
+	}
+
+	public String getParentName() {
+		return parentName;
+	}
+
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
 	}
 
 	public String getDescription() {
@@ -69,12 +116,36 @@ public class TestStep implements java.io.Serializable {
 		this.description = description;
 	}
 
-	public VendorDataSheet getVendorDataSheet() {
-		return vendorDataSheet;
+	public TestStepContext getTestContext() {
+		return testContext;
 	}
 
-	public void setVendorDataSheet(VendorDataSheet vendorDataSheet) {
-		this.vendorDataSheet = vendorDataSheet;
+	public void setTestContext(TestStepContext testContext) {
+		this.testContext = testContext;
+	}
+
+	public TestCase getTestCase() {
+		return testCase;
+	}
+
+	public void setTestCase(TestCase testCase) {
+		this.testCase = testCase;
+	}
+
+	public String getDataSheetHtmlPath() {
+		return dataSheetHtmlPath;
+	}
+
+	public void setDataSheetHtmlPath(String dataSheetHtmlPath) {
+		this.dataSheetHtmlPath = dataSheetHtmlPath;
+	}
+
+	public String getDataSheetPdfPath() {
+		return dataSheetPdfPath;
+	}
+
+	public void setDataSheetPdfPath(String dataSheetPdfPath) {
+		this.dataSheetPdfPath = dataSheetPdfPath;
 	}
 
 }
