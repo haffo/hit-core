@@ -59,10 +59,10 @@ public class Profile implements java.io.Serializable {
 	@Column(columnDefinition = "LONGTEXT")
 	protected String content;
 
-	@NotNull
-	@Column(nullable = false)
+	@Column(nullable = true)
 	protected String name;
 
+	@Column(nullable = true)
 	protected String description;
 
 	public Long getId() {

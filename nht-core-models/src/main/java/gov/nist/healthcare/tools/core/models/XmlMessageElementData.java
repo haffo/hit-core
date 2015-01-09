@@ -13,7 +13,7 @@
  */
 package gov.nist.healthcare.tools.core.models;
 
-import gov.nist.healthcare.tools.core.models.utils.XmlUtils;
+import gov.nist.healthcare.tools.core.models.utils.XmlUtil;
 
 import java.io.Serializable;
 
@@ -54,8 +54,8 @@ public class XmlMessageElementData extends MessageElementData implements
 	public XmlMessageElementData(Element element, String name, String usage,
 			Integer minOccurs, Integer maxOccurs) {
 		Located locatedElement = (Located) element;
-		start = XmlUtils.getStartCoordinate(element);
-		end = XmlUtils.getEndCoordinate(element);
+		start = XmlUtil.getStartCoordinate(element);
+		end = XmlUtil.getEndCoordinate(element);
 		this.column = locatedElement.getColumn();
 		this.path = XPathHelper.getAbsolutePath(element);
 		this.name = name;

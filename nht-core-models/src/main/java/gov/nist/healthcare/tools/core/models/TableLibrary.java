@@ -17,7 +17,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -45,7 +44,6 @@ public class TableLibrary implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@NotNull
 	protected String name;
 
 	protected String description;
@@ -59,7 +57,7 @@ public class TableLibrary implements java.io.Serializable {
 	protected TestCaseContext testContext;
 
 	@JsonIgnore
-	@OneToOne(optional = true, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	protected TestStepContext testStepContext;
 
 	public TestStepContext getTestStepContext() {

@@ -63,6 +63,8 @@ public class TestCase implements java.io.Serializable {
 
 	protected String testPackagePath;
 
+	transient protected TestClassType type = TestClassType.TestCase;
+
 	@NotNull
 	@Column(nullable = false)
 	protected String parentName;
@@ -235,6 +237,10 @@ public class TestCase implements java.io.Serializable {
 		testSteps.add(testStep);
 		testStep.setTestCase(this);
 		testStep.setParentName(this.name);
+	}
+
+	public TestClassType getType() {
+		return type;
 	}
 
 }

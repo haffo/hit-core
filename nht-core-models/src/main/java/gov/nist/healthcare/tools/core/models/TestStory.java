@@ -44,10 +44,8 @@ public class TestStory implements java.io.Serializable {
 	@Column(columnDefinition = "TEXT")
 	private String noteToTesters;
 
-	@Column
 	private String pdfPath;
 
-	@Column
 	private String htmlPath;
 
 	public TestStory(String description, String comments, String preCondition,

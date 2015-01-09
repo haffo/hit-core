@@ -10,6 +10,8 @@
  */
 package gov.nist.healthcare.tools.core.models;
 
+import java.io.Serializable;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -26,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
-public class TestStep implements java.io.Serializable {
+public class TestStep implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,13 +41,8 @@ public class TestStep implements java.io.Serializable {
 	@JsonProperty("label")
 	protected String name;
 
-	@Column(nullable = true)
-	protected String description;
-
-	@Column
 	protected String dataSheetHtmlPath;
 
-	@Column
 	protected String dataSheetPdfPath;
 
 	@Embedded
@@ -57,11 +54,13 @@ public class TestStep implements java.io.Serializable {
 
 	@JsonIgnore
 	@OneToOne(mappedBy = "testStep", cascade = CascadeType.PERSIST)
-	protected TestStepContext testContext;
+	protected TestStepContext testStepContext;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	protected TestCase testCase;
+
+	transient protected final TestClassType type = TestClassType.TestStep;
 
 	public TestStep() {
 		super();
@@ -108,20 +107,16 @@ public class TestStep implements java.io.Serializable {
 		this.parentName = parentName;
 	}
 
-	public String getDescription() {
-		return description;
+	public TestStepContext getTestStepContext() {
+		return testStepContext;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+	public void setTestStepContext(TestStepContext testStepContext) {
+		this.testStepContext = testStepContext;
 
-	public TestStepContext getTestContext() {
-		return testContext;
-	}
-
-	public void setTestContext(TestStepContext testContext) {
-		this.testContext = testContext;
+		if (this.testStepContext != null) {
+			this.testStepContext.setTestStep(this);
+		}
 	}
 
 	public TestCase getTestCase() {
@@ -146,6 +141,10 @@ public class TestStep implements java.io.Serializable {
 
 	public void setDataSheetPdfPath(String dataSheetPdfPath) {
 		this.dataSheetPdfPath = dataSheetPdfPath;
+	}
+
+	public TestClassType getType() {
+		return type;
 	}
 
 }

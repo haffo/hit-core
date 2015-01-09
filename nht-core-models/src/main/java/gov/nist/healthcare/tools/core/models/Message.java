@@ -21,7 +21,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -34,8 +33,7 @@ public class Message implements java.io.Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected Long id;
 
-	@NotNull
-	@Column(nullable = false)
+	@Column(nullable = true)
 	protected String name;
 
 	@Column(nullable = true)
@@ -116,6 +114,14 @@ public class Message implements java.io.Serializable {
 
 	public void setTestContext(TestCaseContext testContext) {
 		this.testContext = testContext;
+	}
+
+	public TestStepContext getTestStepContext() {
+		return testStepContext;
+	}
+
+	public void setTestStepContext(TestStepContext testStepContext) {
+		this.testStepContext = testStepContext;
 	}
 
 }

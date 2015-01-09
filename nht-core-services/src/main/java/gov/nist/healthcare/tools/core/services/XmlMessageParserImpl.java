@@ -16,7 +16,7 @@ package gov.nist.healthcare.tools.core.services;
 import gov.nist.healthcare.tools.core.models.MessageElement;
 import gov.nist.healthcare.tools.core.models.MessageModel;
 import gov.nist.healthcare.tools.core.models.XmlMessageElementData;
-import gov.nist.healthcare.tools.core.models.utils.XmlUtils;
+import gov.nist.healthcare.tools.core.models.utils.XmlUtil;
 import gov.nist.healthcare.tools.core.services.exception.XmlParserException;
 
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class XmlMessageParserImpl implements XmlMessageParser {
  	private MessageModel parse(String soapXml)
 			throws XmlParserException {
 		try {
-			Document document = XmlUtils.toDocument(soapXml);
+			Document document = XmlUtil.toDocument(soapXml);
   			Element element = document.getRootElement();
 			MessageModel model = new MessageModel();
 			XmlMessageElementData data = new XmlMessageElementData(element);

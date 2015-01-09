@@ -26,15 +26,15 @@ public class ContextFreeTestContext extends TestCaseContext {
 	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	protected List<TableLibrary> tableLibraries = new ArrayList<TableLibrary>();
 
+	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	protected Set<VocabularyCollection> vocabularyCollections = new HashSet<VocabularyCollection>();
+
 	@JsonIgnore
 	@OneToOne(mappedBy = "testContext", cascade = CascadeType.ALL)
 	protected ValidationContext validationContext;
 
 	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	protected Set<Message> exampleMessages = new HashSet<Message>();
-
-	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	protected Set<VocabularyCollection> vocabularyCollections = new HashSet<VocabularyCollection>();
 
 	public void addMessage(Message exampleMessage) {
 		exampleMessages.add(exampleMessage);

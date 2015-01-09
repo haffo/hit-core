@@ -3,8 +3,16 @@ package gov.nist.healthcare.tools.core.models.utils;
 import gov.nist.healthcare.tools.core.models.XmlCoordinate;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
@@ -15,7 +23,7 @@ import org.jdom2.located.Located;
 import org.jdom2.located.LocatedJDOMFactory;
 import org.jdom2.output.XMLOutputter;
 
-public class XmlUtils {
+public class XmlUtil {
 
 	public static String format(String xml) throws TransformerException,
 			JDOMException, IOException {
@@ -60,6 +68,27 @@ public class XmlUtils {
 		return new XMLOutputter().outputString(element);
 	}
 
+	public static String prettyPrint(String doc) throws IOException,
+			TransformerException {
+
+		Source xmlInput = new StreamSource(new StringReader(doc));
+		StringWriter stringWriter = new StringWriter();
+		StreamResult xmlOutput = new StreamResult(stringWriter);
+
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer transformer = tf.newTransformer();
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		transformer.setOutputProperty(
+				"{http://xml.apache.org/xslt}indent-amount", "4");
+
+		transformer.transform(xmlInput, new StreamResult(stringWriter));
+
+		return stringWriter.toString();
+	}
+
 	public static String toString(Document document) {
 		return new XMLOutputter().outputString(document.getRootElement());
 	}
@@ -74,7 +103,7 @@ public class XmlUtils {
 	}
 
 	private static int getNumberOfLine(Element element) {
-		String content = XmlUtils.toString(element);
+		String content = XmlUtil.toString(element);
 		String[] lines = content.split(System.getProperty("line.separator"));
 		return lines.length;
 	}

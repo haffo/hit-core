@@ -34,11 +34,10 @@ public class ValidationContext {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected Long id;
 
-	@NotNull
-	@Column(nullable = false)
 	protected String title;
 
 	protected String description;
+
 	@NotNull
 	@Column(columnDefinition = "TEXT", nullable = false)
 	protected String content;
@@ -49,13 +48,13 @@ public class ValidationContext {
 
 	@JsonIgnore
 	@OneToOne(optional = true, fetch = FetchType.LAZY)
-	protected TestCaseContext testStepContext;
+	protected TestStepContext testStepContext;
 
-	public TestCaseContext getTestStepContext() {
+	public TestStepContext getTestStepContext() {
 		return testStepContext;
 	}
 
-	public void setTestStepContext(TestCaseContext testStepContext) {
+	public void setTestStepContext(TestStepContext testStepContext) {
 		this.testStepContext = testStepContext;
 	}
 
