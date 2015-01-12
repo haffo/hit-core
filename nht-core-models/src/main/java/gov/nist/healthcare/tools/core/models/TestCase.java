@@ -74,17 +74,17 @@ public class TestCase implements java.io.Serializable {
 
 	@Lob
 	@Basic(fetch = FetchType.EAGER)
-	@Column(length = 100000)
+	@Column(length = 100000, nullable = true)
 	protected byte[] instructionsImage;
 
 	@Lob
 	@Basic(fetch = FetchType.EAGER)
-	@Column(length = 100000)
-	protected byte[] contentImage;
+	@Column(length = 100000, nullable = true)
+	protected byte[] messageContentImage;
 
 	@Lob
 	@Basic(fetch = FetchType.EAGER)
-	@Column(length = 100000)
+	@Column(length = 100000, nullable = true)
 	protected byte[] testDataSpecificationImage;
 
 	@Embedded
@@ -209,12 +209,12 @@ public class TestCase implements java.io.Serializable {
 		this.instructionsImage = instructionsImage;
 	}
 
-	public byte[] getContentImage() {
-		return contentImage;
+	public byte[] getMessageContentImage() {
+		return messageContentImage;
 	}
 
-	public void setContentImage(byte[] contentImage) {
-		this.contentImage = contentImage;
+	public void setMessageContentImage(byte[] messageContentImage) {
+		this.messageContentImage = messageContentImage;
 	}
 
 	public byte[] getTestDataSpecificationImage() {

@@ -70,22 +70,18 @@ public class XmlUtil {
 
 	public static String prettyPrint(String doc) throws IOException,
 			TransformerException {
-
 		Source xmlInput = new StreamSource(new StringReader(doc));
 		StringWriter stringWriter = new StringWriter();
 		StreamResult xmlOutput = new StreamResult(stringWriter);
-
 		TransformerFactory tf = TransformerFactory.newInstance();
 		Transformer transformer = tf.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 		transformer.setOutputProperty(
 				"{http://xml.apache.org/xslt}indent-amount", "4");
-
 		transformer.transform(xmlInput, new StreamResult(stringWriter));
-
 		return stringWriter.toString();
 	}
 
