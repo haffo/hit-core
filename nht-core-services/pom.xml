@@ -23,6 +23,13 @@
 			<version>${parent.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>gov.nist.healthcare.tools.core</groupId>
+			<artifactId>nht-core-repo</artifactId>
+			<version>${parent.version}</version>
+		</dependency>
+		
+		
 	  <dependency>
 			<groupId>org.xhtmlrenderer</groupId>
 			<artifactId>core-renderer</artifactId>

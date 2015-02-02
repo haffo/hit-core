@@ -31,7 +31,7 @@ public class ContextFreeTestContext extends TestCaseContext {
 
 	@JsonIgnore
 	@OneToOne(mappedBy = "testContext", cascade = CascadeType.ALL)
-	protected ValidationContext validationContext;
+	protected Constraints constraints;
 
 	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	protected Set<Message> exampleMessages = new HashSet<Message>();
@@ -46,8 +46,8 @@ public class ContextFreeTestContext extends TestCaseContext {
 				.unmodifiableCollection(tableLibraries);
 	}
 
-	public ValidationContext getValidationContext() {
-		return validationContext;
+	public Constraints getConstraints() {
+		return constraints;
 	}
 
 	public void addTableLibrary(TableLibrary tableLibrary) {
@@ -55,9 +55,9 @@ public class ContextFreeTestContext extends TestCaseContext {
 		tableLibrary.setTestContext(this);
 	}
 
-	public void setValidationContext(ValidationContext validationContext) {
-		this.validationContext = validationContext;
-		this.validationContext.setTestContext(this);
+	public void setConstraints(Constraints constraints) {
+		this.constraints = constraints;
+		this.constraints.setTestContext(this);
 	}
 
 	public void setProfile(Profile profile) {

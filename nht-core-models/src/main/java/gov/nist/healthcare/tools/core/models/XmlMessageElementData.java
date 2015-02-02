@@ -43,7 +43,7 @@ public class XmlMessageElementData extends MessageElementData implements
 	 * @param element
 	 */
 	public XmlMessageElementData(Element element) {
-		this(element, element.getName(), "none", 20000, 20000);
+		this(element, element.getName(), "none", 20000, "20000");
 		if (element.getChildren().isEmpty()) {
 			this.value = element.getValue();
 		} else {
@@ -52,7 +52,7 @@ public class XmlMessageElementData extends MessageElementData implements
 	}
 
 	public XmlMessageElementData(Element element, String name, String usage,
-			Integer minOccurs, Integer maxOccurs) {
+			Integer minOccurs, String maxOccurs) {
 		Located locatedElement = (Located) element;
 		start = XmlUtil.getStartCoordinate(element);
 		end = XmlUtil.getEndCoordinate(element);
@@ -75,8 +75,8 @@ public class XmlMessageElementData extends MessageElementData implements
 			StringBuffer buffer1 = new StringBuffer();
 			buffer1.append(this.path).append(":".charAt(0)).append(this.name)
 					.append(" ".charAt(0)).append(this.usage).append("")
-					.append("[".charAt(0)).append(printMinOccurs())
-					.append(",".charAt(0)).append(printMaxOccurs())
+					.append("[".charAt(0)).append(minOccurs)
+					.append(",".charAt(0)).append(maxOccurs)
 					.append("]".charAt(0));
 			return buffer1.toString();
 		}

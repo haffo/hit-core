@@ -22,4 +22,9 @@ public class MessageModel {
 	public MessageModel() {
 		elements = new ArrayList<MessageElement>();
 	}
+
+	public MessageModel(MessageElement root) {
+		elements = root.getChildren();
+	}
+
 }

@@ -51,7 +51,8 @@ public class MessageElement implements Serializable {
 		if (parent != null) {
 			parent.getChildren().add(this);
 		}
-		label = data != null ? data.toString() : "Unknown";
+		label = data != null ? data.getLabel() : "Unknown";
+		System.out.println(label);
 	}
 
 	public MessageElement(String type, MessageElementData data,

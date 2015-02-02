@@ -21,5 +21,9 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
 	@Query("select profile.content from Profile profile where profile.id = :profileId")
 	String getContent(@Param("profileId") Long profileId);
+	
+//	@Query("select profile.json from Profile profile where profile.id = :profileId")
+//	String getJson(@Param("profileId") Long profileId);
 
+	
 }

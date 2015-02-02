@@ -50,6 +50,7 @@ public class VocabularyLibrary {
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
+	@XmlTransient
 	protected VocabularyCollection vocabularyCollection;
 
 	@XmlTransient

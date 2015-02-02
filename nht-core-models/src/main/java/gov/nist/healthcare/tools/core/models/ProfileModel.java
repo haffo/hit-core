@@ -40,4 +40,8 @@ public class ProfileModel {
 		elements = new ArrayList<ProfileElement>();
 	}
 
+	public ProfileModel(ProfileElement root) {
+		elements = root.getChildren();
+	}
+
 }

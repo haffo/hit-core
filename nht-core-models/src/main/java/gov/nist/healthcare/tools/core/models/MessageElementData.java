@@ -26,85 +26,96 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MessageElementData implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
 	protected String path;
-
 	protected String name;
-
 	protected String usage;
-
 	protected Integer minOccurs;
-
-	protected Integer maxOccurs;
-
+	protected String maxOccurs;
 	protected int lineNumber = 0;
-
 	protected int startIndex;
-
 	protected int endIndex;
-
 	protected int position;
-
 	protected int instanceNumber;
-
 	protected String description;
-
 	protected String value;
-
 	protected String type;
-
 	protected String stringRepresentation;
+
+	public MessageElementData() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public MessageElementData(String path, String name, String usage,
+			Integer minOccurs, String maxOccurs, int lineNumber,
+			int startIndex, int endIndex, int position, int instanceNumber,
+			String description, String value, String type,
+			String stringRepresentation) {
+		init(path, name, usage, minOccurs, maxOccurs, lineNumber, startIndex,
+				endIndex, position, instanceNumber, description, value, type,
+				stringRepresentation);
+	}
+
+	public void init(String path, String name, String usage, Integer minOccurs,
+			String maxOccurs, int lineNumber, int startIndex, int endIndex,
+			int position, int instanceNumber, String description, String value,
+			String type, String stringRepresentation) {
+		this.path = path;
+		this.name = name;
+		this.usage = usage;
+		this.minOccurs = minOccurs;
+		this.maxOccurs = maxOccurs;
+		this.lineNumber = lineNumber;
+		this.startIndex = startIndex;
+		this.endIndex = endIndex;
+		this.position = position;
+		this.instanceNumber = instanceNumber;
+		this.description = description;
+		this.value = value;
+		this.type = type;
+		this.stringRepresentation = stringRepresentation;
+	}
 
 	@JsonProperty("data_can_contain_anything")
 	protected final boolean dataCanContainAnything = true;
 
 	public String getPath() {
-
 		return this.path;
 	}
 
 	public void setPath(String path) {
-
 		this.path = path;
 	}
 
 	public String getName() {
-
 		return this.name;
 	}
 
 	public void setName(String name) {
-
 		this.name = name;
 	}
 
 	public String getUsage() {
-
 		return this.usage;
 	}
 
 	public void setUsage(String usage) {
-
 		this.usage = usage;
 	}
 
 	public Integer getMinOccurs() {
-
 		return this.minOccurs;
 	}
 
 	public void setMinOccurs(Integer minOccurs) {
-
 		this.minOccurs = minOccurs;
 	}
 
-	public Integer getMaxOccurs() {
-
+	public String getMaxOccurs() {
 		return this.maxOccurs;
 	}
 
-	public void setMaxOccurs(Integer maxOccurs) {
-
+	public void setMaxOccurs(String maxOccurs) {
 		this.maxOccurs = maxOccurs;
 	}
 
@@ -122,35 +133,36 @@ public class MessageElementData implements Serializable {
 	 */
 	@Override
 	public String toString() {
+		return getLabel();
+	}
 
+	public String getLabel() {
 		if (this.value != null) {
 			return this.value;
 		} else {
 			StringBuffer buffer1 = new StringBuffer();
 			buffer1.append(this.path).append(":".charAt(0)).append(this.name)
 					.append(" ".charAt(0)).append(this.usage).append("")
-					.append("[".charAt(0)).append(printMinOccurs())
-					.append(",".charAt(0)).append(printMaxOccurs())
+					.append("[".charAt(0)).append(minOccurs)
+					.append(",".charAt(0)).append(maxOccurs)
 					.append("]".charAt(0));
 			return buffer1.toString();
 		}
 	}
 
-	protected String printMaxOccurs() {
-
-		if (this.maxOccurs == 65536) {
-			return "*";
-		}
-		return this.maxOccurs + "";
-	}
-
-	protected String printMinOccurs() {
-
-		if (this.minOccurs == -1) {
-			return "";
-		}
-		return this.minOccurs + "";
-	}
+	// protected String printMaxOccurs() {
+	// if (this.maxOccurs.equals("65536")) {
+	// return "*";
+	// }
+	// return this.maxOccurs + "";
+	// }
+	//
+	// protected String printMinOccurs() {
+	// if (this.minOccurs == -1) {
+	// return "";
+	// }
+	// return this.minOccurs + "";
+	// }
 
 	@Override
 	public int hashCode() {

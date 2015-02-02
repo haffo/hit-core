@@ -10,6 +10,8 @@
  */
 package gov.nist.healthcare.tools.core.services;
 
+import gov.nist.healthcare.tools.core.models.VocabularyLibrary;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -18,9 +20,6 @@ import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import gov.nist.healthcare.tools.core.models.VocabularyLibrary;
-
- 
 /**
  * This class loads the table library definitions for different code systems
  * 
@@ -47,7 +46,7 @@ public abstract class TableLibraryUnmarshaller {
 		return null;
 	}
 
-	public static VocabularyLibrary processUnmarshalling(InputStream istream,
+	public VocabularyLibrary processUnmarshalling(InputStream istream,
 			JaxbWrapper<VocabularyLibrary> jaxbWrapper)
 			throws FileNotFoundException, JAXBException {
 		return jaxbWrapper.xmlToObject(istream);

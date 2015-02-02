@@ -80,7 +80,7 @@ public class XmlUtil {
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 		transformer.setOutputProperty(
-				"{http://xml.apache.org/xslt}indent-amount", "4");
+				"{http://xml.apache.org/xslt}indent-amount", "10");
 		transformer.transform(xmlInput, new StreamResult(stringWriter));
 		return stringWriter.toString();
 	}

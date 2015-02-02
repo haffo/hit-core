@@ -1,8 +1,6 @@
 /**
- * This software was developed at the National Institute of Simport java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-e course of their official duties. Pursuant to title 17 Section 105 of the
+ * This software was developed at the National Institute of Standards and Technology by employees
+ * of the Federal Government in the course of their official duties. Pursuant to title 17 Section 105 of the
  * United States Code this software is not subject to copyright protection and is in the public domain.
  * This is an experimental system. NIST assumes no responsibility whatsoever for its use by other parties,
  * and makes no guarantees, expressed or implied, about its quality, reliability, or any other characteristic.
@@ -12,10 +10,6 @@ e course of their official duties. Pursuant to title 17 Section 105 of the
  */
 package gov.nist.healthcare.tools.core.models;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,8 +17,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
@@ -35,21 +27,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Harold Affo
  * 
  */
-
 @Entity
-public class VocabularyCollection {
-	@NotNull
-	@Column(nullable = false)
-	protected String name;
+public class Constraints {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected Long id;
 
-	protected int position;
+	@NotNull
+	@Column(columnDefinition = "TEXT", nullable = false)
+	protected String content;
 
 	@JsonIgnore
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	protected TestCaseContext testContext;
 
 	@JsonIgnore
@@ -64,19 +54,8 @@ public class VocabularyCollection {
 		this.testStepContext = testStepContext;
 	}
 
-	@OneToMany(mappedBy = "vocabularyCollection", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	protected Set<VocabularyLibrary> vocabularyLibraries = new HashSet<VocabularyLibrary>();
-
-	public String getName() {
-		return name;
-	}
-
-	public VocabularyCollection() {
+	public Constraints() {
 		super();
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public Long getId() {
@@ -87,34 +66,17 @@ public class VocabularyCollection {
 		this.id = id;
 	}
 
-	public VocabularyCollection(String name) {
+	public String getContent() {
+		return content;
+	}
+
+	public Constraints(String content) {
 		super();
-		this.name = name;
+		this.content = content;
 	}
 
-	public VocabularyCollection(String name, Set<VocabularyLibrary> libraries) {
-		super();
-		this.name = name;
-		if (libraries != null && !libraries.isEmpty()) {
-			Iterator<VocabularyLibrary> it = libraries.iterator();
-			while (it.hasNext()) {
-				addVocabularyLibrary(it.next());
-			}
-		}
-	}
-
-	public void addVocabularyLibrary(VocabularyLibrary library) {
-		vocabularyLibraries.add(library);
-		library.setVocabularyCollection(this);
-	}
-
-	public Set<VocabularyLibrary> getVocabularyLibraries() {
-		return vocabularyLibraries;
-	}
-
-	public void setVocabularyLibraries(
-			Set<VocabularyLibrary> vocabularyLibraries) {
-		this.vocabularyLibraries = vocabularyLibraries;
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public TestCaseContext getTestContext() {
@@ -123,14 +85,6 @@ public class VocabularyCollection {
 
 	public void setTestContext(TestCaseContext testContext) {
 		this.testContext = testContext;
-	}
-
-	public int getPosition() {
-		return position;
-	}
-
-	public void setPosition(int position) {
-		this.position = position;
 	}
 
 }

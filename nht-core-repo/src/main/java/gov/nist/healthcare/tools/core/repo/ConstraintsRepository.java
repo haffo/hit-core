@@ -11,19 +11,16 @@
 
 package gov.nist.healthcare.tools.core.repo;
 
- 
-import gov.nist.healthcare.tools.core.models.VocabularyCollection;
-
-import java.util.List;
+import gov.nist.healthcare.tools.core.models.Constraints;
+import gov.nist.healthcare.tools.core.models.Profile;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface VocabularyCollectionRepository extends
-		JpaRepository<VocabularyCollection, Long> {
+public interface ConstraintsRepository extends JpaRepository<Constraints, Long> {
 
-	@Query("select vocabCollection from VocabularyCollection vocabCollection where vocabCollection.testContext.id = :testContextId ORDER BY vocabCollection.position")
-	List<VocabularyCollection> findAllByTestContextId(
-			@Param("testContextId") Long textContextId);
+	@Query("select constraints.content from Constraints constraints where constraints.id = :constraintId")
+	String getContent(@Param("constraintId") Long constraintId);
+
 }
