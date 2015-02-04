@@ -57,7 +57,11 @@ public class Profile implements java.io.Serializable {
 
 	@NotNull
 	@Column(columnDefinition = "LONGTEXT")
-	protected String content;
+	protected String xml;
+
+	@NotNull
+	@Column(columnDefinition = "LONGTEXT")
+	protected String json;
 
 	@Column(nullable = true)
 	protected String name;
@@ -77,18 +81,18 @@ public class Profile implements java.io.Serializable {
 		super();
 	}
 
-	public Profile(String name, String description, String content) {
+	public Profile(String name, String description, String xml) {
 		super();
 		this.name = name;
 		this.description = description;
-		this.content = content;
+		this.xml = xml;
 	}
 
-	public Profile(String content) {
+	public Profile(String xml) {
 		super();
 		this.name = null;
 		this.description = null;
-		this.content = content;
+		this.xml = xml;
 	}
 
 	public String getName() {
@@ -107,12 +111,12 @@ public class Profile implements java.io.Serializable {
 		this.description = description;
 	}
 
-	public String getContent() {
-		return content;
+	public String getXml() {
+		return xml;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
+	public void setXml(String xml) {
+		this.xml = xml;
 	}
 
 	public TestCaseContext getTestContext() {
@@ -121,6 +125,14 @@ public class Profile implements java.io.Serializable {
 
 	public void setTestContext(TestCaseContext testContext) {
 		this.testContext = testContext;
+	}
+
+	public String getJson() {
+		return json;
+	}
+
+	public void setJson(String json) {
+		this.json = json;
 	}
 
 }

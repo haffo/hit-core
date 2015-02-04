@@ -29,7 +29,7 @@ public interface ContextBasedTestStepContextRepository extends
 	@Query("select profile from Profile profile where profile.testStepContext.testStep.id = :testStepId")
 	Profile findProfileByTestStepId(@Param("testStepId") Long testStepId);
 
-	@Query("select profile.content from Profile profile where profile.testStepContext.testStep.id = :testStepId")
-	String getProfileContentByTestStepId(@Param("testStepId") Long testStepId);
+	@Query("select profile.xml from Profile profile where profile.testStepContext.testStep.id = :testStepId")
+	String getProfileXmlByTestStepId(@Param("testStepId") Long testStepId);
 
 }

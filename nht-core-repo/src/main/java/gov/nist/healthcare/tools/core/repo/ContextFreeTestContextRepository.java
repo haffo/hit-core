@@ -28,7 +28,7 @@ public interface ContextFreeTestContextRepository extends
 	@Query("select profile from Profile profile where profile.testContext.testCase.id = :testCaseId")
 	Profile findProfileByTestCaseId(@Param("testCaseId") Long testCaseId);
 
-	@Query("select profile.content from Profile profile where profile.testContext.testCase.id = :testCaseId")
-	String getProfileContentByTestCaseId(@Param("testCaseId") Long testCaseId);
+	@Query("select profile.xml from Profile profile where profile.testContext.testCase.id = :testCaseId")
+	String getProfileXmlByTestCaseId(@Param("testCaseId") Long testCaseId);
 
 }

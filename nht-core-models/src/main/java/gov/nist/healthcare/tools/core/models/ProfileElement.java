@@ -14,23 +14,23 @@
 package gov.nist.healthcare.tools.core.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ProfileElement {
 
+	protected String id;
+
 	protected String name;
 
-	protected String cardinality;
+	// protected String cardinality;
 
 	protected String longName;
 
 	protected String path;
 
-	protected String title;
-
 	protected String usage;
-
-	protected String length;
 
 	protected String maxLength;
 
@@ -42,11 +42,10 @@ public class ProfileElement {
 
 	protected List<ProfileElement> children;
 
-	protected String predicate;
-	protected String implementationNote;
-	protected String reference;
+	protected ProfileRef reference;
 
-	protected Object conformanceStatement;
+	protected Set<Constraint> conformanceStatements = new HashSet<Constraint>();
+	protected Set<Constraint> predicates = new HashSet<Constraint>();
 
 	protected String dataType;
 
@@ -54,13 +53,9 @@ public class ProfileElement {
 
 	protected Object maxOccurs;
 
-	protected String predicateTrueUsage;
-
-	protected String predicateFalseUsage;
-
-	protected String dataTypeDescription;
-
-	protected String dataTypeUsage;
+	// protected String dataTypeDescription;
+	//
+	// protected String dataTypeUsage;
 
 	protected String icon;
 
@@ -68,46 +63,6 @@ public class ProfileElement {
 
 	protected int order;
 	protected String lenght;
-
-	public ProfileElement(String name, String cardinality, String longName,
-			String path, String title, String usage, String length,
-			String maxLength, String minLength, String table, String type,
-			List<ProfileElement> children, String predicate,
-			String implementationNote, String reference,
-			Object conformanceStatement, String dataType, Object minOccurs,
-			Object maxOccurs, String predicateTrueUsage,
-			String predicateFalseUsage, String dataTypeDescription,
-			String dataTypeUsage, String icon, String position, int order,
-			String lenght) {
-		super();
-		this.name = name;
-		this.cardinality = cardinality;
-		this.longName = longName;
-		this.path = path;
-		this.title = title;
-		this.usage = usage;
-		this.length = length;
-		this.maxLength = maxLength;
-		this.minLength = minLength;
-		this.table = table;
-		this.type = type;
-		this.children = children;
-		this.predicate = predicate;
-		this.implementationNote = implementationNote;
-		this.reference = reference;
-		this.conformanceStatement = conformanceStatement;
-		this.dataType = dataType;
-		this.minOccurs = minOccurs;
-		this.maxOccurs = maxOccurs;
-		this.predicateTrueUsage = predicateTrueUsage;
-		this.predicateFalseUsage = predicateFalseUsage;
-		this.dataTypeDescription = dataTypeDescription;
-		this.dataTypeUsage = dataTypeUsage;
-		this.icon = icon;
-		this.position = position;
-		this.order = order;
-		this.lenght = lenght;
-	}
 
 	public String getName() {
 		return name;
@@ -133,28 +88,12 @@ public class ProfileElement {
 		this.path = path;
 	}
 
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public String getUsage() {
 		return usage;
 	}
 
 	public void setUsage(String usage) {
 		this.usage = usage;
-	}
-
-	public String getLength() {
-		return length;
-	}
-
-	public void setLength(String length) {
-		this.length = length;
 	}
 
 	public String getMaxLength() {
@@ -181,38 +120,6 @@ public class ProfileElement {
 		this.table = table;
 	}
 
-	public String getPredicate() {
-		return predicate;
-	}
-
-	public void setPredicate(String predicate) {
-		this.predicate = predicate;
-	}
-
-	public String getImplementationNote() {
-		return implementationNote;
-	}
-
-	public void setImplementationNote(String implementationNote) {
-		this.implementationNote = implementationNote;
-	}
-
-	public String getReference() {
-		return reference;
-	}
-
-	public void setReference(String reference) {
-		this.reference = reference;
-	}
-
-	public Object getConformanceStatement() {
-		return conformanceStatement;
-	}
-
-	public void setConformanceStatement(Object conformanceStatement) {
-		this.conformanceStatement = conformanceStatement;
-	}
-
 	public String getDataType() {
 		return dataType;
 	}
@@ -237,37 +144,21 @@ public class ProfileElement {
 		this.maxOccurs = maxOccurs;
 	}
 
-	public String getPredicateTrueUsage() {
-		return predicateTrueUsage;
-	}
+	// public String getDataTypeDescription() {
+	// return dataTypeDescription;
+	// }
+	//
+	// public void setDataTypeDescription(String dataTypeDescription) {
+	// this.dataTypeDescription = dataTypeDescription;
+	// }
+	//
+	// public String getDataTypeUsage() {
+	// return dataTypeUsage;
+	// }
 
-	public void setPredicateTrueUsage(String predicateTrueUsage) {
-		this.predicateTrueUsage = predicateTrueUsage;
-	}
-
-	public String getPredicateFalseUsage() {
-		return predicateFalseUsage;
-	}
-
-	public void setPredicateFalseUsage(String predicateFalseUsage) {
-		this.predicateFalseUsage = predicateFalseUsage;
-	}
-
-	public String getDataTypeDescription() {
-		return dataTypeDescription;
-	}
-
-	public void setDataTypeDescription(String dataTypeDescription) {
-		this.dataTypeDescription = dataTypeDescription;
-	}
-
-	public String getDataTypeUsage() {
-		return dataTypeUsage;
-	}
-
-	public void setDataTypeUsage(String dataTypeUsage) {
-		this.dataTypeUsage = dataTypeUsage;
-	}
+	// public void setDataTypeUsage(String dataTypeUsage) {
+	// this.dataTypeUsage = dataTypeUsage;
+	// }
 
 	public String getIcon() {
 		return icon;
@@ -317,13 +208,13 @@ public class ProfileElement {
 		children = new ArrayList<ProfileElement>();
 	}
 
-	public String getCardinality() {
-		return cardinality;
-	}
-
-	public void setCardinality(String cardinality) {
-		this.cardinality = cardinality;
-	}
+	// public String getCardinality() {
+	// return cardinality;
+	// }
+	//
+	// public void setCardinality(String cardinality) {
+	// this.cardinality = cardinality;
+	// }
 
 	public String getType() {
 		return type;
@@ -339,6 +230,38 @@ public class ProfileElement {
 
 	public void setChildren(List<ProfileElement> children) {
 		this.children = children;
+	}
+
+	public Set<Constraint> getConformanceStatements() {
+		return conformanceStatements;
+	}
+
+	public void setConformanceStatements(Set<Constraint> conformanceStatements) {
+		this.conformanceStatements = conformanceStatements;
+	}
+
+	public Set<Constraint> getPredicates() {
+		return predicates;
+	}
+
+	public void setPredicates(Set<Constraint> predicates) {
+		this.predicates = predicates;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public ProfileRef getReference() {
+		return reference;
+	}
+
+	public void setReference(ProfileRef reference) {
+		this.reference = reference;
 	}
 
 }
