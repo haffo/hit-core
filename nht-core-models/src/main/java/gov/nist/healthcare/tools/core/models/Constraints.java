@@ -35,7 +35,7 @@ public class Constraints {
 	protected Long id;
 
 	@NotNull
-	@Column(columnDefinition = "TEXT", nullable = false)
+	@Column(columnDefinition = "LONGTEXT", nullable = false)
 	protected String content;
 
 	@JsonIgnore
