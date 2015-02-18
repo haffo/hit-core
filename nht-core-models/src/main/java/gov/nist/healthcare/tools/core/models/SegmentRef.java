@@ -1,6 +1,6 @@
 package gov.nist.healthcare.tools.core.models;
 
-public class ProfileRef {
+public class SegmentRef {
 
 	private String id;
 
@@ -8,7 +8,7 @@ public class ProfileRef {
 
 	private String name;
 
-	public ProfileRef(String id, String type, String name) {
+	public SegmentRef(String id, String type, String name) {
 		super();
 		this.id = id;
 		this.type = type;

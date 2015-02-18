@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class ProfileElement {
 
 	protected String id;
@@ -42,7 +44,9 @@ public class ProfileElement {
 
 	protected List<ProfileElement> children;
 
-	protected ProfileRef reference;
+	protected Set<String> usages;
+
+	protected SegmentRef reference;
 
 	protected Set<Constraint> conformanceStatements = new HashSet<Constraint>();
 	protected Set<Constraint> predicates = new HashSet<Constraint>();
@@ -61,8 +65,15 @@ public class ProfileElement {
 
 	protected String position;
 
+	protected boolean relevent;
+
 	protected int order;
 	protected String lenght;
+
+	protected String constraintPath;
+
+	@JsonIgnore
+	protected ProfileElement parent;
 
 	public String getName() {
 		return name;
@@ -256,12 +267,46 @@ public class ProfileElement {
 		this.id = id;
 	}
 
-	public ProfileRef getReference() {
+	public SegmentRef getReference() {
 		return reference;
 	}
 
-	public void setReference(ProfileRef reference) {
+	public void setReference(SegmentRef reference) {
 		this.reference = reference;
+	}
+
+	public String getConstraintPath() {
+		return constraintPath;
+	}
+
+	public void setConstraintPath(String constraintPath) {
+		this.constraintPath = constraintPath;
+	}
+
+	public ProfileElement getParent() {
+		return parent;
+	}
+
+	public void setParent(ProfileElement parent) {
+		this.parent = parent;
+	}
+
+	public Set<String> getUsages() {
+		if (usages == null)
+			usages = new HashSet<String>();
+		return usages;
+	}
+
+	public void setUsages(Set<String> usages) {
+		this.usages = usages;
+	}
+
+	public boolean isRelevent() {
+		return relevent;
+	}
+
+	public void setRelevent(boolean relevent) {
+		this.relevent = relevent;
 	}
 
 }
