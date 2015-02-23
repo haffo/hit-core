@@ -20,6 +20,9 @@ public class User implements java.io.Serializable {
 	@Column(nullable = true)
 	protected String password;
 
+	@Column(nullable = true)
+	protected String facilityID;
+
 	public Long getId() {
 		return id;
 	}
@@ -42,6 +45,14 @@ public class User implements java.io.Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getFacilityID() {
+		return facilityID;
+	}
+
+	public void setFacilityID(String facilityID) {
+		this.facilityID = facilityID;
 	}
 
 }

@@ -49,7 +49,7 @@ public class ProfileElement {
 	protected SegmentRef reference;
 
 	protected Set<Constraint> conformanceStatements = new HashSet<Constraint>();
-	protected Set<Constraint> predicates = new HashSet<Constraint>();
+	protected Set<Predicate> predicates = new HashSet<Predicate>();
 
 	protected String dataType;
 
@@ -251,11 +251,11 @@ public class ProfileElement {
 		this.conformanceStatements = conformanceStatements;
 	}
 
-	public Set<Constraint> getPredicates() {
+	public Set<Predicate> getPredicates() {
 		return predicates;
 	}
 
-	public void setPredicates(Set<Constraint> predicates) {
+	public void setPredicates(Set<Predicate> predicates) {
 		this.predicates = predicates;
 	}
 

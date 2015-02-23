@@ -17,8 +17,8 @@ public interface ConnectivityTransactionRepository extends
 	@Query("select outgoing from ConnectivityTransaction transaction where transaction.user.id = :userId")
 	String getOutgoingMessageByTokenId(@Param("userId") Long userId);
 	
- 	@Query("select transaction from ConnectivityTransaction transaction where transaction.user.username = :username and transaction.user.password = :password")
- 	ConnectivityTransaction findByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
+ 	@Query("select transaction from ConnectivityTransaction transaction where transaction.user.username = :username and transaction.user.password = :password and transaction.user.facilityID = :facilityID")
+ 	ConnectivityTransaction findByUsernameAndPasswordAndFacilityID(@Param("username") String username, @Param("password") String password,@Param("facilityID") String facilityID );
 
 	@Query("select transaction from ConnectivityTransaction transaction where transaction.user.id = :userId")
 	ConnectivityTransaction findOneByUserId(@Param("userId") Long userId);

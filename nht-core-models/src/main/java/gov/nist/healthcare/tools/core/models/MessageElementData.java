@@ -39,7 +39,6 @@ public class MessageElementData implements Serializable {
 	protected String description;
 	protected String value;
 	protected String type;
-	protected String stringRepresentation;
 
 	public MessageElementData() {
 		super();
@@ -49,17 +48,15 @@ public class MessageElementData implements Serializable {
 	public MessageElementData(String path, String name, String usage,
 			Integer minOccurs, String maxOccurs, int lineNumber,
 			int startIndex, int endIndex, int position, int instanceNumber,
-			String description, String value, String type,
-			String stringRepresentation) {
+			String description, String value, String type) {
 		init(path, name, usage, minOccurs, maxOccurs, lineNumber, startIndex,
-				endIndex, position, instanceNumber, description, value, type,
-				stringRepresentation);
+				endIndex, position, instanceNumber, description, value, type);
 	}
 
 	public void init(String path, String name, String usage, Integer minOccurs,
 			String maxOccurs, int lineNumber, int startIndex, int endIndex,
 			int position, int instanceNumber, String description, String value,
-			String type, String stringRepresentation) {
+			String type) {
 		this.path = path;
 		this.name = name;
 		this.usage = usage;
@@ -73,7 +70,6 @@ public class MessageElementData implements Serializable {
 		this.description = description;
 		this.value = value;
 		this.type = type;
-		this.stringRepresentation = stringRepresentation;
 	}
 
 	@JsonProperty("data_can_contain_anything")
@@ -141,11 +137,14 @@ public class MessageElementData implements Serializable {
 			return this.value;
 		} else {
 			StringBuffer buffer1 = new StringBuffer();
-			buffer1.append(this.path).append(":".charAt(0)).append(this.name)
-					.append(" ".charAt(0)).append(this.usage).append("")
-					.append("[".charAt(0)).append(minOccurs)
-					.append(",".charAt(0)).append(maxOccurs)
-					.append("]".charAt(0));
+			buffer1.append(this.path)
+					.append(":".charAt(0))
+					.append(this.name)
+					.append(" ".charAt(0))
+					.append(this.usage)
+					.append("")
+					.append(minOccurs != -1 && maxOccurs != null ? "["
+							+ minOccurs + "," + maxOccurs + "]" : "");
 			return buffer1.toString();
 		}
 	}
@@ -243,16 +242,6 @@ public class MessageElementData implements Serializable {
 		this.lineNumber = lineNumber;
 	}
 
-	public int getPosition() {
-
-		return this.position;
-	}
-
-	public void setPosition(int position) {
-
-		this.position = position;
-	}
-
 	public int getInstanceNumber() {
 
 		return this.instanceNumber;
@@ -268,14 +257,6 @@ public class MessageElementData implements Serializable {
 
 	public void setValue(String value) {
 		this.value = value;
-	}
-
-	public String getStringRepresentation() {
-		return stringRepresentation;
-	}
-
-	public void setStringRepresentation(String stringRepresentation) {
-		this.stringRepresentation = stringRepresentation;
 	}
 
 	public int getStartIndex() {
@@ -304,6 +285,14 @@ public class MessageElementData implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
 	}
 
 }

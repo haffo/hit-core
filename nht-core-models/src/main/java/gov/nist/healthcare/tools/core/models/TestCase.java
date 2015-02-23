@@ -36,6 +36,7 @@ import javax.persistence.OrderBy;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -65,8 +66,9 @@ public class TestCase implements java.io.Serializable {
 
 	transient protected TestClassType type = TestClassType.TestCase;
 
-	@NotNull
-	@Column(nullable = false)
+	protected int position;
+
+	@Column(nullable = true)
 	protected String parentName;
 
 	@Column(columnDefinition = "TEXT")
@@ -94,8 +96,10 @@ public class TestCase implements java.io.Serializable {
 	@OneToOne(mappedBy = "testCase", cascade = CascadeType.PERSIST)
 	protected TestCaseContext testContext;
 
+	@JsonIgnoreProperties({ "id", "description", "testProcedurePath",
+			"testCases", })
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	protected TestPlan testPlan;
 
 	@JsonProperty("children")
@@ -241,6 +245,14 @@ public class TestCase implements java.io.Serializable {
 
 	public TestClassType getType() {
 		return type;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
 	}
 
 }
