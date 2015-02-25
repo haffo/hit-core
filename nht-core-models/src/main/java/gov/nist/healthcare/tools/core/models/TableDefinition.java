@@ -53,12 +53,12 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = { "comment", "tableElement" })
-@XmlRootElement(name = "TableDefinition")
+@XmlRootElement(name = "TableDefinition", namespace = "http://www.nist.gov/healthcare/data")
 public class TableDefinition {
 
-	@XmlElement(name = "Comment")
+	@XmlElement(name = "Comment", namespace = "http://www.nist.gov/healthcare/data")
 	protected String comment;
-	@XmlElement(name = "TableElement")
+	@XmlElement(name = "TableElement", namespace = "http://www.nist.gov/healthcare/data")
 	protected List<TableElement> tableElement;
 	@XmlAttribute(name = "Codesys", required = true)
 	protected String codesys;

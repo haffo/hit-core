@@ -39,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = { "tableDefinition" })
-@XmlRootElement(name = "TableLibrary")
+@XmlRootElement(name = "TableLibrary", namespace = "http://www.nist.gov/healthcare/data")
 @Entity
 public class VocabularyLibrary {
 
@@ -71,7 +71,7 @@ public class VocabularyLibrary {
 	protected List<TableDefinition> tableList;
 
 	@JsonIgnore
-	@XmlElement(name = "TableDefinition", required = true)
+	@XmlElement(name = "TableDefinition", namespace = "http://www.nist.gov/healthcare/data", required = true)
 	@Transient
 	protected List<TableDefinition> tableDefinition;
 
