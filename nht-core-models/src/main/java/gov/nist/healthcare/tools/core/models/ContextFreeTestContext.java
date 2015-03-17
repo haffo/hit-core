@@ -1,9 +1,7 @@
 package gov.nist.healthcare.tools.core.models;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -23,8 +21,8 @@ public class ContextFreeTestContext extends TestCaseContext {
 	protected Profile profile;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	protected List<TableLibrary> tableLibraries = new ArrayList<TableLibrary>();
+	@OneToOne(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	protected TableLibrary tableLibrary;
 
 	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	protected Set<VocabularyCollection> vocabularyCollections = new HashSet<VocabularyCollection>();
@@ -41,18 +39,17 @@ public class ContextFreeTestContext extends TestCaseContext {
 		exampleMessage.setTestContext(this);
 	}
 
-	public List<TableLibrary> getTableLibraries() {
-		return (List<TableLibrary>) Collections
-				.unmodifiableCollection(tableLibraries);
-	}
-
 	public Constraints getConstraints() {
 		return constraints;
 	}
 
-	public void addTableLibrary(TableLibrary tableLibrary) {
-		tableLibraries.add(tableLibrary);
-		tableLibrary.setTestContext(this);
+	public TableLibrary getTableLibrary() {
+		return tableLibrary;
+	}
+
+	public void setTableLibrary(TableLibrary tableLibrary) {
+		this.tableLibrary = tableLibrary;
+		this.tableLibrary.setTestContext(this);
 	}
 
 	public void setConstraints(Constraints constraints) {

@@ -10,13 +10,15 @@
  */
 package gov.nist.healthcare.tools.core.models;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -49,15 +51,17 @@ public class TableLibrary implements java.io.Serializable {
 	protected String description;
 
 	@NotNull
-	@Column(columnDefinition = "LONGTEXT")
-	protected String content;
+	@Column(columnDefinition = "LONGTEXT", nullable = false)
+	protected String xml;
 
 	@JsonIgnore
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(unique = true)
 	protected TestCaseContext testContext;
 
 	@JsonIgnore
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(unique = true)
 	protected TestStepContext testStepContext;
 
 	public TestStepContext getTestStepContext() {
@@ -76,14 +80,14 @@ public class TableLibrary implements java.io.Serializable {
 		super();
 		this.name = name;
 		this.description = description;
-		this.content = content;
+		this.xml = content;
 	}
 
 	public TableLibrary(String content) {
 		super();
 		this.name = null;
 		this.description = null;
-		this.content = content;
+		this.xml = content;
 	}
 
 	public String getName() {
@@ -102,12 +106,12 @@ public class TableLibrary implements java.io.Serializable {
 		this.description = description;
 	}
 
-	public String getContent() {
-		return content;
+	public String getXml() {
+		return xml;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
+	public void setXml(String xml) {
+		this.xml = xml;
 	}
 
 	public TestCaseContext getTestContext() {

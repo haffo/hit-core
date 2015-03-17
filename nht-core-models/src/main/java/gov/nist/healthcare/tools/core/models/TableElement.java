@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "TableElement", namespace = "http://www.nist.gov/healthcare/data")
+@XmlRootElement(name = "TableElement")
 public class TableElement {
 
 	@XmlAttribute(name = "Code", required = true)

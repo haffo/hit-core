@@ -25,9 +25,9 @@ public interface TableLibraryRepository extends
 	@Query("select tableLibrary from TableLibrary tableLibrary where tableLibrary.testContext.testCase.id = :testCaseId")
 	List<TableLibrary> findAllByTestCaseId(@Param("testCaseId") Long testCaseId);
 
-	@Query("select tableLibrary.content from TableLibrary tableLibrary where tableLibrary.testContext.testCase.id = :testCaseId")
-	List<String> findAllContentByTestCaseId(@Param("testCaseId") Long testCaseId);
+	@Query("select tableLibrary.xml from TableLibrary tableLibrary where tableLibrary.testContext.testCase.id = :testCaseId")
+	List<String> getContentByTestCaseId(@Param("testCaseId") Long testCaseId);
 
-	@Query("select tableLibrary.content from TableLibrary tableLibrary where tableLibrary.id = :tableLibraryId order by tableLibrary.id")
+	@Query("select tableLibrary.xml from TableLibrary tableLibrary where tableLibrary.id = :tableLibraryId order by tableLibrary.id")
 	String getContent(@Param("tableLibraryId") Long tableLibraryId);
 }
