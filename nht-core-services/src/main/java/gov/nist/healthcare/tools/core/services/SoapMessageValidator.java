@@ -10,18 +10,7 @@
  */
 package gov.nist.healthcare.tools.core.services;
 
-import gov.nist.healthcare.tools.core.models.ValidationResult;
-
-
 
 public interface SoapMessageValidator extends Validator {
-	
-	/**
-	 * message: soap content 
-	 * title: title of the testcase 
-	 * options: schema, wsdl etc...
-	 */
-	public ValidationResult validate(String message, String title,Object ... options);
-
 
 }

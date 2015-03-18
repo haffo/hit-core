@@ -12,10 +12,9 @@ package gov.nist.healthcare.tools.core.services;
 
 import gov.nist.healthcare.tools.core.models.ValidationResult;
 
-
 public interface Validator {
- 
-	public ValidationResult validate(String message, String title,Object ... options);
 
+	public ValidationResult validate(String message, String title,
+			String... options);
 
 }

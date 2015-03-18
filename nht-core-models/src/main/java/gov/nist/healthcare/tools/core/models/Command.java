@@ -25,6 +25,7 @@ public class Command implements Serializable {
 	protected Long testCaseId;
 	protected Long userId;
 	protected String type;
+	protected String requestMessage;
 
 	public String getContent() {
 		return content;
@@ -80,6 +81,14 @@ public class Command implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getRequestMessage() {
+		return requestMessage;
+	}
+
+	public void setRequestMessage(String requestMessage) {
+		this.requestMessage = requestMessage;
 	}
 
 }
