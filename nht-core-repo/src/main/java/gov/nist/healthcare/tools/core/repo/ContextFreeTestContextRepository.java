@@ -18,17 +18,17 @@ public interface ContextFreeTestContextRepository extends
 	ContextFreeTestContext findOneByTestCaseId(
 			@Param("testCaseId") Long testCaseId);
 
-	@Query("select testContext.exampleMessages from ContextFreeTestContext testContext where testContext.testCase.id = :testCaseId")
-	List<Message> findExampleMessagesByTestCaseId(
-			@Param("testCaseId") Long testCaseId);
+//	@Query("select testContext.exampleMessages from ContextFreeTestContext testContext where testContext.testCase.id = :testCaseId")
+//	List<Message> findExampleMessagesByTestCaseId(
+//			@Param("testCaseId") Long testCaseId);
 
 	@Query("select distinct testContext.testCase from ContextFreeTestContext testContext order by testContext.testCase.name ASC")
 	List<TestCase> findAllTestCases();
+//
+//	@Query("select profile from Profile profile where profile.testContext.testCase.id = :testCaseId")
+//	Profile findProfileByTestCaseId(@Param("testCaseId") Long testCaseId);
 
-	@Query("select profile from Profile profile where profile.testContext.testCase.id = :testCaseId")
-	Profile findProfileByTestCaseId(@Param("testCaseId") Long testCaseId);
-
-	@Query("select profile.xml from Profile profile where profile.testContext.testCase.id = :testCaseId")
+	@Query("select testContext.profile.profileXml from ContextFreeTestContext testContext where testContext.testCase.id = :testCaseId")
 	String getProfileXmlByTestCaseId(@Param("testCaseId") Long testCaseId);
 
 }

@@ -19,17 +19,17 @@ public interface ContextBasedTestStepContextRepository extends
 	ContextBasedTestStepContext findOneByTestStepId(
 			@Param("testStepId") Long testStepId);
 
-	@Query("select testContext.message from ContextBasedTestStepContext testContext where testContext.testStep.id = :testStepId")
-	Message findExampleMessageByTestStepId(
-			@Param("testStepId") Long testStepId);
+//	@Query("select testContext.message from ContextBasedTestStepContext testContext where testContext.testStep.id = :testStepId")
+//	Message findExampleMessageByTestStepId(
+//			@Param("testStepId") Long testStepId);
 
 	@Query("select distinct testContext.testStep.testCase.testPlan from ContextBasedTestStepContext testContext order by testContext.testStep.testCase.testPlan.name ASC")
 	List<TestPlan> findAllTestPlans();
 
-	@Query("select profile from Profile profile where profile.testStepContext.testStep.id = :testStepId")
-	Profile findProfileByTestStepId(@Param("testStepId") Long testStepId);
-
-	@Query("select profile.xml from Profile profile where profile.testStepContext.testStep.id = :testStepId")
-	String getProfileXmlByTestStepId(@Param("testStepId") Long testStepId);
+//	@Query("select profile from Profile profile where profile.testStepContext.testStep.id = :testStepId")
+//	Profile findProfileByTestStepId(@Param("testStepId") Long testStepId);
+//
+//	@Query("select profile.xml from Profile profile where profile.testStepContext.testStep.id = :testStepId")
+//	String getProfileXmlByTestStepId(@Param("testStepId") Long testStepId);
 
 }

@@ -14,114 +14,70 @@
 package gov.nist.healthcare.tools.core.models;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.Embeddable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-@Entity
+@Embeddable
 public class Message implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
+	@Column(nullable = true)
+	protected String messageName;
 
 	@Column(nullable = true)
-	protected String name;
-
-	@Column(nullable = true)
-	protected String description;
+	protected String messageDescription;
 
 	@Column(columnDefinition = "LONGTEXT")
-	protected String content;
-
-	@JsonIgnore
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	protected TestCaseContext testContext;
-
-	@JsonIgnore
-	@OneToOne(fetch = FetchType.LAZY)
-	protected TestStepContext testStepContext;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	protected String messageContent;
 
 	public Message() {
 	}
 
 	public Message(String name, String description, String content) {
 		super();
-		this.name = name;
-		this.description = description;
-		this.content = content;
+		this.messageName = name;
+		this.messageDescription = description;
+		this.messageContent = content;
 	}
 
 	public Message(String content) {
 		super();
-		this.name = null;
-		this.description = null;
-		this.content = content;
+		this.messageName = null;
+		this.messageDescription = null;
+		this.messageContent = content;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Name: ").append(getName()).append(", ");
-		sb.append("Description: ").append(getDescription()).append(", ");
-		sb.append("Content: ").append(getContent());
+		sb.append("Name: ").append(getMessageName()).append(", ");
+		sb.append("Description: ").append(getMessageDescription()).append(", ");
+		sb.append("Content: ").append(getMessageContent());
 		return sb.toString();
 	}
 
-	public String getName() {
-		return this.name;
+	public String getMessageName() {
+		return messageName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setMessageName(String messageName) {
+		this.messageName = messageName;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getMessageDescription() {
+		return messageDescription;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setMessageDescription(String messageDescription) {
+		this.messageDescription = messageDescription;
 	}
 
-	public String getContent() {
-		return content;
+	public String getMessageContent() {
+		return messageContent;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public TestCaseContext getTestContext() {
-		return testContext;
-	}
-
-	public void setTestContext(TestCaseContext testContext) {
-		this.testContext = testContext;
-	}
-
-	public TestStepContext getTestStepContext() {
-		return testStepContext;
-	}
-
-	public void setTestStepContext(TestStepContext testStepContext) {
-		this.testStepContext = testStepContext;
+	public void setMessageContent(String messageContent) {
+		this.messageContent = messageContent;
 	}
 
 }

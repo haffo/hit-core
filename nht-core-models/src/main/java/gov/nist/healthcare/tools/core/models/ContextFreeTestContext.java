@@ -4,11 +4,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -17,49 +15,30 @@ public class ContextFreeTestContext extends TestCaseContext {
 
 	protected static final long serialVersionUID = 1L;
 
-	@OneToOne(mappedBy = "testContext", cascade = CascadeType.ALL)
 	protected Profile profile;
 
-	@JsonIgnore
-	@OneToOne(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	protected TableLibrary tableLibrary;
-
-	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	protected Set<VocabularyCollection> vocabularyCollections = new HashSet<VocabularyCollection>();
+	protected ValueSetLibrary valueSetLibrary;
 
 	@JsonIgnore
-	@OneToOne(mappedBy = "testContext", cascade = CascadeType.ALL)
 	protected Constraints constraints;
 
-	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ElementCollection(fetch = FetchType.EAGER)
 	protected Set<Message> exampleMessages = new HashSet<Message>();
 
 	public void addMessage(Message exampleMessage) {
 		exampleMessages.add(exampleMessage);
-		exampleMessage.setTestContext(this);
 	}
 
 	public Constraints getConstraints() {
 		return constraints;
 	}
 
-	public TableLibrary getTableLibrary() {
-		return tableLibrary;
-	}
-
-	public void setTableLibrary(TableLibrary tableLibrary) {
-		this.tableLibrary = tableLibrary;
-		this.tableLibrary.setTestContext(this);
-	}
-
 	public void setConstraints(Constraints constraints) {
 		this.constraints = constraints;
-		this.constraints.setTestContext(this);
 	}
 
 	public void setProfile(Profile profile) {
 		this.profile = profile;
-		this.profile.setTestContext(this);
 	}
 
 	public Set<Message> getExampleMessages() {
@@ -70,14 +49,16 @@ public class ContextFreeTestContext extends TestCaseContext {
 		return profile;
 	}
 
-	public Set<VocabularyCollection> getVocabularyCollections() {
-		return Collections.unmodifiableSet(vocabularyCollections);
+	public ValueSetLibrary getValueSetLibrary() {
+		return valueSetLibrary;
 	}
 
-	public void addVocabularyCollection(
-			VocabularyCollection vocabularyCollection) {
-		vocabularyCollections.add(vocabularyCollection);
-		vocabularyCollection.setTestContext(this);
+	public void setValueSetLibrary(ValueSetLibrary valueSetLibrary) {
+		this.valueSetLibrary = valueSetLibrary;
+	}
+
+	public void setExampleMessages(Set<Message> exampleMessages) {
+		this.exampleMessages = exampleMessages;
 	}
 
 }

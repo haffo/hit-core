@@ -4,11 +4,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 
 @Entity
 public class EnvelopeTestContext extends TestCaseContext {
@@ -18,7 +17,7 @@ public class EnvelopeTestContext extends TestCaseContext {
 	@Column(nullable = true)
 	private String validationPhase;
 
-	@OneToMany(mappedBy = "testContext", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ElementCollection(fetch = FetchType.EAGER)
 	protected Set<Message> exampleMessages = new HashSet<Message>();
 
 	public Set<Message> getExampleMessages() {
@@ -27,7 +26,6 @@ public class EnvelopeTestContext extends TestCaseContext {
 
 	public void addMessage(Message exampleMessage) {
 		exampleMessages.add(exampleMessage);
-		exampleMessage.setTestContext(this);
 	}
 
 	public String getValidationPhase() {

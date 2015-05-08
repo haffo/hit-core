@@ -1,137 +1,37 @@
-/**
- * This software was developed at the National Institute of Standards and Technology by employees
- * of the Federal Government in the course of their official duties. Pursuant to title 17 Section 105 of the
- * United States Code this software is not subject to copyright protection and is in the public domain.
- * This is an experimental system. NIST assumes no responsibility whatsoever for its use by other parties,
- * and makes no guarantees, expressed or implied, about its quality, reliability, or any other characteristic.
- * We would appreciate acknowledgement if the software is used. This software can be redistributed and/or
- * modified freely provided that any derivative works bear some notice that they are derived from it, and any
- * modified versions bear some notice that they have been modified.
- */
 package gov.nist.healthcare.tools.core.models;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+public class TableDefinition implements java.io.Serializable {
 
-/**
- * <p>
- * Java class for anonymous complex type.
- * <p>
- * The following schema fragment specifies the expected content contained within
- * this class.
- * 
- * <pre>
- * &lt;complexType> 
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{http://www.nist.gov/healthcare/data}TableElement" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="Codesys" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="Id" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
- *       &lt;attribute name="Name" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
- *       &lt;attribute name="Type" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
- *       &lt;attribute name="TestCategory" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
- *       &lt;attribute name="IdNumber" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
- *       &lt;attribute name="AlternateId" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="Oid" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;sequence>
- *         &lt;element name="Comment" type="xs:string" maxOccurs="1" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
- * </pre>
- */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "comment", "tableElement" })
-@XmlRootElement(name = "TableDefinition")
-public class TableDefinition {
+	private static final long serialVersionUID = 1L;
 
-	@XmlElement(name = "Comment")
-	protected String comment;
-	@XmlElement(name = "TableElement")
-	protected List<TableElement> tableElement;
-	@XmlAttribute(name = "Codesys", required = true)
-	protected String codesys;
-	@XmlAttribute(name = "Id")
-	@XmlSchemaType(name = "anySimpleType")
-	protected String id;
-	@XmlAttribute(name = "Name")
-	@XmlSchemaType(name = "anySimpleType")
+	protected Set<TableElement> tableElements = new HashSet<TableElement>();
+
+	protected String tdId;
 	protected String name;
-	@XmlAttribute(name = "Type")
-	@XmlSchemaType(name = "anySimpleType")
-	protected String type;
-	@XmlAttribute(name = "TestCategory")
-	@XmlSchemaType(name = "anySimpleType")
-	protected String testCategory;
-	@XmlAttribute(name = "IdNumber")
-	@XmlSchemaType(name = "anySimpleType")
-	protected String idNumber;
-	@XmlAttribute(name = "AlternateId")
-	protected String alternateId;
-	@XmlAttribute(name = "Oid")
+	protected TableType type;
+	protected String version;
+	protected String codesys;
 	protected String oid;
+	protected String alternateId;
 
-	/**
-	 * Gets the value of the tableElement property.
-	 * <p>
-	 * This accessor method returns a reference to the live list, not a
-	 * snapshot. Therefore any modification you make to the returned list will
-	 * be present inside the JAXB object. This is why there is not a
-	 * <CODE>set</CODE> method for the tableElement property.
-	 * <p>
-	 * For example, to add a new item, do as follows:
-	 * 
-	 * <pre>
-	 * getTableElement().add(newItem);
-	 * </pre>
-	 * <p>
-	 * Objects of the following type(s) are allowed in the list
-	 * {@link TableElement }
-	 */
-	public List<TableElement> getTableElement() {
-		if (tableElement == null) {
-			tableElement = new ArrayList<TableElement>();
-		}
-		return this.tableElement;
-	}
+	protected StabilityType stability;
+	protected ExtensibilityType extensibility;
 
-	/**
-	 * Gets the value of the codesys property.
-	 * 
-	 * @return possible object is {@link String }
-	 */
-	public String getCodesys() {
-		return codesys;
-	}
-
-	/**
-	 * Sets the value of the codesys property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link String }
-	 */
-	public void setCodesys(String value) {
-		this.codesys = value;
+	public Set<TableElement> getTableElements() {
+		return this.tableElements;
 	}
 
 	/**
 	 * Gets the value of the id property.
 	 * 
 	 * @return possible object is {@link String }
+	 * 
 	 */
-	public String getId() {
-		return id;
+	public String getTdId() {
+		return tdId;
 	}
 
 	/**
@@ -139,15 +39,17 @@ public class TableDefinition {
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
+	 * 
 	 */
-	public void setId(String value) {
-		this.id = value;
+	public void setTdId(String tdId) {
+		this.tdId = tdId;
 	}
 
 	/**
 	 * Gets the value of the name property.
 	 * 
 	 * @return possible object is {@link String }
+	 * 
 	 */
 	public String getName() {
 		return name;
@@ -158,6 +60,7 @@ public class TableDefinition {
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
+	 * 
 	 */
 	public void setName(String value) {
 		this.name = value;
@@ -166,9 +69,10 @@ public class TableDefinition {
 	/**
 	 * Gets the value of the type property.
 	 * 
-	 * @return possible object is {@link String }
+	 * @return possible object is {@link TableType }
+	 * 
 	 */
-	public String getType() {
+	public TableType getType() {
 		return type;
 	}
 
@@ -176,73 +80,60 @@ public class TableDefinition {
 	 * Sets the value of the type property.
 	 * 
 	 * @param value
-	 *            allowed object is {@link String }
+	 *            allowed object is {@link TableType }
+	 * 
 	 */
-	public void setType(String value) {
+	public void setType(TableType value) {
 		this.type = value;
 	}
 
 	/**
-	 * Gets the value of the testCategory property.
+	 * Gets the value of the version property.
 	 * 
 	 * @return possible object is {@link String }
+	 * 
 	 */
-	public String getTestCategory() {
-		return testCategory;
+	public String getVersion() {
+		return version;
 	}
 
 	/**
-	 * Sets the value of the testCategory property.
+	 * Sets the value of the version property.
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
+	 * 
 	 */
-	public void setTestCategory(String value) {
-		this.testCategory = value;
+	public void setVersion(String value) {
+		this.version = value;
 	}
 
 	/**
-	 * Gets the value of the idNumber property.
+	 * Gets the value of the codesys property.
 	 * 
 	 * @return possible object is {@link String }
+	 * 
 	 */
-	public String getIdNumber() {
-		return idNumber;
+	public String getCodesys() {
+		return codesys;
 	}
 
 	/**
-	 * Sets the value of the idNumber property.
+	 * Sets the value of the codesys property.
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
-	 */
-	public void setIdNumber(String value) {
-		this.idNumber = value;
-	}
-
-	/**
-	 * Gets the value of the alternateId property.
 	 * 
-	 * @return possible object is {@link String }
 	 */
-	public String getAlternateId() {
-		return alternateId;
-	}
-
-	/**
-	 * Sets the value of the alternateId property.
-	 * 
-	 * @param value
-	 *            allowed object is {@link String }
-	 */
-	public void setAlternateId(String value) {
-		this.alternateId = value;
+	public void setCodesys(String value) {
+		this.codesys = value;
 	}
 
 	/**
 	 * Gets the value of the oid property.
 	 * 
 	 * @return possible object is {@link String }
+	 * 
 	 */
 	public String getOid() {
 		return oid;
@@ -253,17 +144,77 @@ public class TableDefinition {
 	 * 
 	 * @param value
 	 *            allowed object is {@link String }
+	 * 
 	 */
 	public void setOid(String value) {
 		this.oid = value;
 	}
 
-	public String getComment() {
-		return comment;
+	/**
+	 * Gets the value of the alternateId property.
+	 * 
+	 * @return possible object is {@link String }
+	 * 
+	 */
+	public String getAlternateId() {
+		return alternateId;
 	}
 
-	public void setComment(String comment) {
-		this.comment = comment;
+	/**
+	 * Sets the value of the alternateId property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link String }
+	 * 
+	 */
+	public void setAlternateId(String value) {
+		this.alternateId = value;
+	}
+
+	/**
+	 * Gets the value of the stability property.
+	 * 
+	 * @return possible object is {@link StabilityType }
+	 * 
+	 */
+	public StabilityType getStability() {
+		return stability;
+	}
+
+	/**
+	 * Sets the value of the stability property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link StabilityType }
+	 * 
+	 */
+	public void setStability(StabilityType value) {
+		this.stability = value;
+	}
+
+	/**
+	 * Gets the value of the extensibility property.
+	 * 
+	 * @return possible object is {@link ExtensibilityType }
+	 * 
+	 */
+	public ExtensibilityType getExtensibility() {
+		return extensibility;
+	}
+
+	/**
+	 * Sets the value of the extensibility property.
+	 * 
+	 * @param value
+	 *            allowed object is {@link ExtensibilityType }
+	 * 
+	 */
+	public void setExtensibility(ExtensibilityType value) {
+		this.extensibility = value;
+	}
+
+	public void addTableElement(TableElement te) {
+		getTableElements().add(te);
 	}
 
 }

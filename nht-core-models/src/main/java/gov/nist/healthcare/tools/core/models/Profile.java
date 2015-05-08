@@ -11,71 +11,38 @@
 
 package gov.nist.healthcare.tools.core.models;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Harold Affo (NIST)
  * 
  */
 
-@Entity
+@Embeddable
 public class Profile implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
-
-	@JsonIgnore
-	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	@JoinColumn(unique = true)
-	protected TestCaseContext testContext;
-
-	@JsonIgnore
-	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	@JoinColumn(unique = true)
-	protected TestStepContext testStepContext;
-
-	public TestStepContext getTestStepContext() {
-		return testStepContext;
-	}
-
-	public void setTestStepContext(TestStepContext testStepContext) {
-		this.testStepContext = testStepContext;
-	}
 
 	@NotNull
+	@JsonIgnore
 	@Column(columnDefinition = "LONGTEXT")
-	protected String xml;
+	protected String profileXml;
 
 	@NotNull
+	@JsonProperty("json")
 	@Column(columnDefinition = "LONGTEXT")
-	protected String json;
+	protected String profileJson;
 
 	@Column(nullable = true)
 	protected String name;
 
 	@Column(nullable = true)
 	protected String description;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public Profile() {
 		super();
@@ -85,14 +52,14 @@ public class Profile implements java.io.Serializable {
 		super();
 		this.name = name;
 		this.description = description;
-		this.xml = xml;
+		this.profileXml = xml;
 	}
 
 	public Profile(String xml) {
 		super();
 		this.name = null;
 		this.description = null;
-		this.xml = xml;
+		this.profileXml = xml;
 	}
 
 	public String getName() {
@@ -111,28 +78,20 @@ public class Profile implements java.io.Serializable {
 		this.description = description;
 	}
 
-	public String getXml() {
-		return xml;
+	public String getProfileXml() {
+		return profileXml;
 	}
 
-	public void setXml(String xml) {
-		this.xml = xml;
+	public void setProfileXml(String profileXml) {
+		this.profileXml = profileXml;
 	}
 
-	public TestCaseContext getTestContext() {
-		return testContext;
+	public String getProfileJson() {
+		return profileJson;
 	}
 
-	public void setTestContext(TestCaseContext testContext) {
-		this.testContext = testContext;
-	}
-
-	public String getJson() {
-		return json;
-	}
-
-	public void setJson(String json) {
-		this.json = json;
+	public void setProfileJson(String profileJson) {
+		this.profileJson = profileJson;
 	}
 
 }

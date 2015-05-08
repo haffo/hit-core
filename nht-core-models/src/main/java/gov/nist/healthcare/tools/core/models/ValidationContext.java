@@ -10,110 +10,29 @@
  */
 package gov.nist.healthcare.tools.core.models;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.Embeddable;
 
 /**
  * 
  * @author Harold Affo
  * 
  */
-@Entity
+@Embeddable
 public class ValidationContext {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
+	protected String validationContextContent;
 
-	protected String title;
-
-	protected String description;
-
-	@NotNull
-	@Column(columnDefinition = "TEXT", nullable = false)
-	protected String content;
-
-	@JsonIgnore
-	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	protected TestCaseContext testContext;
-
-	@JsonIgnore
-	@OneToOne(optional = true, fetch = FetchType.LAZY)
-	protected TestStepContext testStepContext;
-
-	public TestStepContext getTestStepContext() {
-		return testStepContext;
+	public String getValidationContextContent() {
+		return validationContextContent;
 	}
 
-	public void setTestStepContext(TestStepContext testStepContext) {
-		this.testStepContext = testStepContext;
+	public void setValidationContextContent(String validationContextContent) {
+		this.validationContextContent = validationContextContent;
 	}
 
-	public ValidationContext() {
+	public ValidationContext(String validationContextContent) {
 		super();
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public ValidationContext(String title, String description, String content) {
-		super();
-		this.title = title;
-		this.description = description;
-		this.content = content;
-	}
-
-	public ValidationContext(String content) {
-		super();
-		this.title = null;
-		this.description = null;
-		this.content = content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public TestCaseContext getTestContext() {
-		return testContext;
-	}
-
-	public void setTestContext(TestCaseContext testContext) {
-		this.testContext = testContext;
+		this.validationContextContent = validationContextContent;
 	}
 
 }

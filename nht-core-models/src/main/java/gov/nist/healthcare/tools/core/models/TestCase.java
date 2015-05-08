@@ -89,6 +89,11 @@ public class TestCase implements java.io.Serializable {
 	@Column(length = 100000, nullable = true)
 	protected byte[] testDataSpecificationImage;
 
+	@Lob
+	@Basic(fetch = FetchType.EAGER)
+	@Column(length = 100000, nullable = true)
+	protected byte[] testDataSpecificationImage2;
+
 	@Embedded
 	protected TestStory testStory;
 
@@ -227,6 +232,15 @@ public class TestCase implements java.io.Serializable {
 
 	public void setTestDataSpecificationImage(byte[] testDataSpecificationImage) {
 		this.testDataSpecificationImage = testDataSpecificationImage;
+	}
+
+	public byte[] getTestDataSpecificationImage2() {
+		return testDataSpecificationImage2;
+	}
+
+	public void setTestDataSpecificationImage2(
+			byte[] testDataSpecificationImage2) {
+		this.testDataSpecificationImage2 = testDataSpecificationImage2;
 	}
 
 	public Set<TestStep> getTestSteps() {

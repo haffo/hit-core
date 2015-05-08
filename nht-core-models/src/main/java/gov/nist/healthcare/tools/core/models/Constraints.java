@@ -10,81 +10,37 @@
  */
 package gov.nist.healthcare.tools.core.models;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * 
  * @author Harold Affo
  * 
  */
-@Entity
+@Embeddable
 public class Constraints {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
 
 	@NotNull
 	@Column(columnDefinition = "LONGTEXT", nullable = false)
-	protected String content;
-
-	@JsonIgnore
-	@OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	protected TestCaseContext testContext;
-
-	@JsonIgnore
-	@OneToOne(optional = true, fetch = FetchType.LAZY)
-	protected TestStepContext testStepContext;
-
-	public TestStepContext getTestStepContext() {
-		return testStepContext;
-	}
-
-	public void setTestStepContext(TestStepContext testStepContext) {
-		this.testStepContext = testStepContext;
-	}
+	protected String constraintContent;
 
 	public Constraints() {
 		super();
 	}
 
-	public Long getId() {
-		return id;
+	public String getConstraintContent() {
+		return constraintContent;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setConstraintContent(String constraintContent) {
+		this.constraintContent = constraintContent;
 	}
 
-	public String getContent() {
-		return content;
-	}
-
-	public Constraints(String content) {
+	public Constraints(String constraintContent) {
 		super();
-		this.content = content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public TestCaseContext getTestContext() {
-		return testContext;
-	}
-
-	public void setTestContext(TestCaseContext testContext) {
-		this.testContext = testContext;
+		this.constraintContent = constraintContent;
 	}
 
 }
