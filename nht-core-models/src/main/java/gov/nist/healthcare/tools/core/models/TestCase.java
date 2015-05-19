@@ -64,7 +64,7 @@ public class TestCase implements java.io.Serializable {
 
 	protected String testPackagePath;
 
-	transient protected TestClassType type = TestClassType.TestCase;
+	transient protected TestType type = TestType.TestCase;
 
 	protected int position;
 
@@ -257,7 +257,7 @@ public class TestCase implements java.io.Serializable {
 		testStep.setParentName(this.name);
 	}
 
-	public TestClassType getType() {
+	public TestType getType() {
 		return type;
 	}
 

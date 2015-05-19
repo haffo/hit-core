@@ -13,7 +13,21 @@
  */
 package gov.nist.healthcare.tools.core.models;
 
-public class Actor {
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Actor implements Serializable {
+
+	private static final long serialVersionUID = 8805967508478985159L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	protected Long id;
 
 	private String name;
 

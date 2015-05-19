@@ -58,7 +58,7 @@ public class TestPlan implements java.io.Serializable {
 	@OneToMany(mappedBy = "testPlan", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	protected Set<TestCase> testCases = new HashSet<TestCase>();
 
-	transient protected final TestClassType type = TestClassType.TestPlan;
+	transient protected final TestType type = TestType.TestPlan;
 
 	public TestPlan() {
 		super();
@@ -128,7 +128,7 @@ public class TestPlan implements java.io.Serializable {
 		this.testProcedurePath = testProcedurePath;
 	}
 
-	public TestClassType getType() {
+	public TestType getType() {
 		return type;
 	}
 

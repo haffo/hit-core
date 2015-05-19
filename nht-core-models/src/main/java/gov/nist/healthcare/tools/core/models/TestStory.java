@@ -20,6 +20,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class TestStory implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
+
 	@Column(columnDefinition = "TEXT")
 	private String comments;
 

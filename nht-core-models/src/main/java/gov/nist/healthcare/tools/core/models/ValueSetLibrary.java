@@ -33,4 +33,14 @@ public class ValueSetLibrary {
 		this.valueSetJson = valueSetJson;
 	}
 
+	public ValueSetLibrary(String valueSetXml) {
+		super();
+		this.valueSetXml = valueSetXml;
+	}
+
+	public ValueSetLibrary() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 }

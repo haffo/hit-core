@@ -60,7 +60,7 @@ public class TestStep implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	protected TestCase testCase;
 
-	transient protected final TestClassType type = TestClassType.TestStep;
+	transient protected final TestType type = TestType.TestStep;
 
 	public TestStep() {
 		super();
@@ -143,7 +143,7 @@ public class TestStep implements Serializable {
 		this.dataSheetPdfPath = dataSheetPdfPath;
 	}
 
-	public TestClassType getType() {
+	public TestType getType() {
 		return type;
 	}
 
