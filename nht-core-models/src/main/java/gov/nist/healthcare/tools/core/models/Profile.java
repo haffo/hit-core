@@ -55,6 +55,12 @@ public class Profile implements java.io.Serializable {
 		this.profileXml = xml;
 	}
 
+	public Profile(String profileXml, String profileJson) {
+		super();
+		this.profileXml = profileJson;
+		this.profileJson = profileJson;
+	}
+
 	public Profile(String xml) {
 		super();
 		this.name = null;

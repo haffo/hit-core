@@ -15,7 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
 @Entity
-public class IsolatedTestCase extends NewTestCase implements Serializable {
+public class IsolatedTestCase extends TestObject implements Serializable {
 
 	private static final long serialVersionUID = 8805967508478985159L;
 
@@ -24,7 +24,7 @@ public class IsolatedTestCase extends NewTestCase implements Serializable {
 	protected Long id;
 
 	public IsolatedTestCase() {
-		type = TestType.IsolatedTestCase;
+		category = TestCategory.Isolated;
 	}
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })

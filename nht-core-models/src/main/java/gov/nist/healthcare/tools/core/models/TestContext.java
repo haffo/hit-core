@@ -7,6 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class TestContext implements Serializable {
 
@@ -23,10 +25,12 @@ public class TestContext implements Serializable {
 
 	protected ValueSetLibrary valueSetLibrary;
 
+	@JsonIgnore
 	protected ValidationContext validationContext;
 
 	protected Message message;
 
+	@JsonIgnore
 	protected Constraints constraints;
 
 	public TestContext() {

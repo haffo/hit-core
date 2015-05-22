@@ -15,8 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
 @Entity
-public class IsolatedTestCaseGroup extends TestCaseGroup implements
-		Serializable {
+public class IsolatedTestCaseGroup extends TestObject implements Serializable {
 
 	private static final long serialVersionUID = 2555650104975908781L;
 
@@ -26,15 +25,7 @@ public class IsolatedTestCaseGroup extends TestCaseGroup implements
 
 	public IsolatedTestCaseGroup() {
 		super();
-		type = TestType.IsolatedTestCaseGroup;
-	}
-
-	public TestType getType() {
-		return type;
-	}
-
-	public void setType(TestType type) {
-		this.type = type;
+		category = TestCategory.Isolated;
 	}
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
@@ -47,30 +38,6 @@ public class IsolatedTestCaseGroup extends TestCaseGroup implements
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Integer getVersion() {
-		return version;
-	}
-
-	public void setVersion(Integer version) {
-		this.version = version;
 	}
 
 	public List<IsolatedTestCase> getTestCases() {

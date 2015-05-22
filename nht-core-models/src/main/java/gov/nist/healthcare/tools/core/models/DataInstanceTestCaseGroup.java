@@ -15,7 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
 @Entity
-public class DataInstanceTestCaseGroup extends TestCaseGroup implements
+public class DataInstanceTestCaseGroup extends TestObject implements
 		Serializable {
 
 	private static final long serialVersionUID = 2555650104975908781L;
@@ -26,13 +26,16 @@ public class DataInstanceTestCaseGroup extends TestCaseGroup implements
 
 	public DataInstanceTestCaseGroup() {
 		super();
-		type = TestType.DataInstanceTestCaseGroup;
+		this.type = TestType.TestCaseGroup;
+		category = TestCategory.DataInstance;
 	}
 
+	@Override
 	public TestType getType() {
 		return type;
 	}
 
+	@Override
 	public void setType(TestType type) {
 		this.type = type;
 	}

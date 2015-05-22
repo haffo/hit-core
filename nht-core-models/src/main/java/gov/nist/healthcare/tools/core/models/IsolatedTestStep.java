@@ -2,15 +2,18 @@ package gov.nist.healthcare.tools.core.models;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
-public class IsolatedTestStep extends NewTestStep implements Cloneable,
+public class IsolatedTestStep extends TestObject implements Cloneable,
 		Serializable {
 
 	private static final long serialVersionUID = -5928301465572845004L;
@@ -27,23 +30,17 @@ public class IsolatedTestStep extends NewTestStep implements Cloneable,
 	@JoinColumn(name = "r_actor_id")
 	private Actor rActor;
 
-	@ManyToOne
-	@JoinColumn(name = "testcontext_id")
+	@OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
 	private TestContext testContext;
 
-	public IsolatedTestStep(long id, String name, String description,
-			Integer version) {
+	public IsolatedTestStep(String name) {
 		super();
-		this.id = id;
 		this.name = name;
-		this.description = description;
-		this.setVersion(version);
 	}
 
 	public IsolatedTestStep() {
 		super();
-		this.testContext = new TestContext();
-		type = TestType.IsolatedTestStep;
+		category = TestCategory.Isolated;
 	}
 
 	public long getId() {

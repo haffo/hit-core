@@ -2,15 +2,16 @@ package gov.nist.healthcare.tools.core.models;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
-public class DataInstanceTestStep extends NewTestStep implements Serializable {
+public class DataInstanceTestStep extends TestObject implements Serializable {
 
 	private static final long serialVersionUID = 8805967508478985159L;
 
@@ -20,21 +21,17 @@ public class DataInstanceTestStep extends NewTestStep implements Serializable {
 
 	public DataInstanceTestStep() {
 		super();
+		this.type = TestType.TestStep;
 		this.testContext = new TestContext();
-		type = TestType.DataInstanceTestCase;
+		category = TestCategory.DataInstance;
 	}
 
-	@ManyToOne
-	@JoinColumn(name = "testcontext_id")
+	@OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
 	private TestContext testContext;
 
-	public DataInstanceTestStep(long id, String name, String description,
-			Integer version) {
+	public DataInstanceTestStep(String name) {
 		super();
-		this.id = id;
 		this.name = name;
-		this.description = description;
-		this.setVersion(version);
 	}
 
 	public Long getId() {

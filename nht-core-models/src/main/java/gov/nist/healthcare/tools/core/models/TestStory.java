@@ -13,9 +13,6 @@ package gov.nist.healthcare.tools.core.models;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 @Embeddable
 public class TestStory implements java.io.Serializable {
 
@@ -29,9 +26,6 @@ public class TestStory implements java.io.Serializable {
 
 	@Column(columnDefinition = "TEXT")
 	private String description;
-
-	@Column(columnDefinition = "TEXT")
-	private String comment;
 
 	@Column(columnDefinition = "TEXT")
 	private String preCondition;
@@ -112,14 +106,6 @@ public class TestStory implements java.io.Serializable {
 		this.notes = notes;
 	}
 
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-
 	public String getNoteToTesters() {
 		return noteToTesters;
 	}
@@ -142,20 +128,6 @@ public class TestStory implements java.io.Serializable {
 
 	public void setHtmlPath(String htmlPath) {
 		this.htmlPath = htmlPath;
-	}
-
-	@Override
-	public boolean equals(Object that) {
-		return EqualsBuilder.reflectionEquals(this, that, "description",
-				"comment", "preCondition", "postCondition", "testObjectives",
-				"noteToTesters");
-	}
-
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this, "description",
-				"comment", "preCondition", "postCondition", "testObjectives",
-				"noteToTesters");
 	}
 
 }

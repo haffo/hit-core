@@ -11,17 +11,23 @@
 
 package gov.nist.healthcare.tools.core.repo;
 
+import java.util.List;
+
 import gov.nist.healthcare.tools.core.models.DataInstanceTestPlan;
 import gov.nist.healthcare.tools.core.models.IsolatedTestCase;
 import gov.nist.healthcare.tools.core.models.IsolatedTestCaseGroup;
 import gov.nist.healthcare.tools.core.models.IsolatedTestPlan;
 import gov.nist.healthcare.tools.core.models.IsolatedTestStep;
+import gov.nist.healthcare.tools.core.models.Stage;
 import gov.nist.healthcare.tools.core.models.TestCase;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface DataIntanceTestPlanRepository extends JpaRepository<DataInstanceTestPlan, Long> {
- 
+public interface DataInstanceTestPlanRepository extends JpaRepository<DataInstanceTestPlan, Long> {
+	
+	@Query("select tp from DataInstanceTestPlan tp where tp.stage = :stage")
+	public List<DataInstanceTestPlan> findAllByStage(@Param("stage") Stage stage);
+
 }

@@ -15,7 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
 @Entity
-public class IsolatedTestPlan extends NewTestPlan implements Serializable {
+public class IsolatedTestPlan extends TestObject implements Serializable {
 
 	private static final long serialVersionUID = 8324105895492403037L;
 
@@ -33,7 +33,7 @@ public class IsolatedTestPlan extends NewTestPlan implements Serializable {
 
 	public IsolatedTestPlan() {
 		super();
-		type = TestType.IsolatedTestPlan;
+		category = TestCategory.Isolated;
 	}
 
 	public long getId() {
