@@ -130,4 +130,84 @@ public class TestStory implements java.io.Serializable {
 		this.htmlPath = htmlPath;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((comments == null) ? 0 : comments.hashCode());
+		result = prime * result
+				+ ((description == null) ? 0 : description.hashCode());
+		result = prime * result
+				+ ((htmlPath == null) ? 0 : htmlPath.hashCode());
+		result = prime * result
+				+ ((noteToTesters == null) ? 0 : noteToTesters.hashCode());
+		result = prime * result + ((notes == null) ? 0 : notes.hashCode());
+		result = prime * result + ((pdfPath == null) ? 0 : pdfPath.hashCode());
+		result = prime * result
+				+ ((postCondition == null) ? 0 : postCondition.hashCode());
+		result = prime * result
+				+ ((preCondition == null) ? 0 : preCondition.hashCode());
+		result = prime * result
+				+ ((testObjectives == null) ? 0 : testObjectives.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TestStory other = (TestStory) obj;
+		if (comments == null) {
+			if (other.comments != null)
+				return false;
+		} else if (!comments.equals(other.comments))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (htmlPath == null) {
+			if (other.htmlPath != null)
+				return false;
+		} else if (!htmlPath.equals(other.htmlPath))
+			return false;
+		if (noteToTesters == null) {
+			if (other.noteToTesters != null)
+				return false;
+		} else if (!noteToTesters.equals(other.noteToTesters))
+			return false;
+		if (notes == null) {
+			if (other.notes != null)
+				return false;
+		} else if (!notes.equals(other.notes))
+			return false;
+		if (pdfPath == null) {
+			if (other.pdfPath != null)
+				return false;
+		} else if (!pdfPath.equals(other.pdfPath))
+			return false;
+		if (postCondition == null) {
+			if (other.postCondition != null)
+				return false;
+		} else if (!postCondition.equals(other.postCondition))
+			return false;
+		if (preCondition == null) {
+			if (other.preCondition != null)
+				return false;
+		} else if (!preCondition.equals(other.preCondition))
+			return false;
+		if (testObjectives == null) {
+			if (other.testObjectives != null)
+				return false;
+		} else if (!testObjectives.equals(other.testObjectives))
+			return false;
+		return true;
+	}
+
 }

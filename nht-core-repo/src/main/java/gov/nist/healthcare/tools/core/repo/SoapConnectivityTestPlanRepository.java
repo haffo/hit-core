@@ -11,14 +11,15 @@
 
 package gov.nist.healthcare.tools.core.repo;
 
-import gov.nist.healthcare.tools.core.models.TestPlan;
+import gov.nist.healthcare.tools.core.models.SoapConnectivityTestPlan;
+import gov.nist.healthcare.tools.core.models.SoapTestPlan;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
+public interface SoapConnectivityTestPlanRepository extends JpaRepository<SoapConnectivityTestPlan, Long> {
 	
-	@Query("select testPlan.testProcedurePath from TestPlan testPlan where testPlan.id = :testPlanId")
+	@Query("select testPlan.testProcedurePath from SoapConnectivityTestPlan testPlan where testPlan.id = :testPlanId")
 	String getTestProcedurePathByTestPlanId(@Param("testPlanId") Long testPlanId);
 }

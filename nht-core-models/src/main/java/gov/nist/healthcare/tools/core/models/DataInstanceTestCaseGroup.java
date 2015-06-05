@@ -1,8 +1,8 @@
 package gov.nist.healthcare.tools.core.models;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -30,19 +30,9 @@ public class DataInstanceTestCaseGroup extends TestObject implements
 		category = TestCategory.DataInstance;
 	}
 
-	@Override
-	public TestType getType() {
-		return type;
-	}
-
-	@Override
-	public void setType(TestType type) {
-		this.type = type;
-	}
-
 	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
 	@JoinTable(name = "ditcg_ditc", joinColumns = { @JoinColumn(name = "testcasegroup_id") }, inverseJoinColumns = { @JoinColumn(name = "testcase_id") })
-	private final List<DataInstanceTestCase> testCases = new ArrayList<DataInstanceTestCase>();
+	private Set<DataInstanceTestCase> testCases = new HashSet<DataInstanceTestCase>();
 
 	public Long getId() {
 		return id;
@@ -52,8 +42,38 @@ public class DataInstanceTestCaseGroup extends TestObject implements
 		this.id = id;
 	}
 
-	public List<DataInstanceTestCase> getTestCases() {
+	public Set<DataInstanceTestCase> getTestCases() {
 		return testCases;
 	}
+
+	public void setTestCases(Set<DataInstanceTestCase> testCases) {
+		this.testCases = testCases;
+	}
+
+	// @Override
+	// public int hashCode() {
+	// final int prime = 31;
+	// int result = super.hashCode();
+	// result = prime * result
+	// + ((testCases == null) ? 0 : testCases.hashCode());
+	// return result;
+	// }
+	//
+	// @Override
+	// public boolean equals(Object obj) {
+	// if (this == obj)
+	// return true;
+	// if (!super.equals(obj))
+	// return false;
+	// if (getClass() != obj.getClass())
+	// return false;
+	// DataInstanceTestCaseGroup other = (DataInstanceTestCaseGroup) obj;
+	// if (testCases == null) {
+	// if (other.testCases != null)
+	// return false;
+	// } else if (!testCases.equals(other.testCases))
+	// return false;
+	// return true;
+	// }
 
 }

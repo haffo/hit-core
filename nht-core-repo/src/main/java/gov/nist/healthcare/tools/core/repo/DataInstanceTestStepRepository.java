@@ -18,7 +18,7 @@ import gov.nist.healthcare.tools.core.models.DataInstanceTestPlan;
 import gov.nist.healthcare.tools.core.models.DataInstanceTestStep;
 import gov.nist.healthcare.tools.core.models.IsolatedTestCase;
 import gov.nist.healthcare.tools.core.models.Stage;
-import gov.nist.healthcare.tools.core.models.TestCase;
+import gov.nist.healthcare.tools.core.models.SoapTestCase;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

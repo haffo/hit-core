@@ -75,4 +75,42 @@ public class IsolatedTestStep extends TestObject implements Cloneable,
 		this.testContext = testContext;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((rActor == null) ? 0 : rActor.hashCode());
+		result = prime * result + ((sActor == null) ? 0 : sActor.hashCode());
+		result = prime * result
+				+ ((testContext == null) ? 0 : testContext.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IsolatedTestStep other = (IsolatedTestStep) obj;
+		if (rActor == null) {
+			if (other.rActor != null)
+				return false;
+		} else if (!rActor.equals(other.rActor))
+			return false;
+		if (sActor == null) {
+			if (other.sActor != null)
+				return false;
+		} else if (!sActor.equals(other.sActor))
+			return false;
+		if (testContext == null) {
+			if (other.testContext != null)
+				return false;
+		} else if (!testContext.equals(other.testContext))
+			return false;
+		return true;
+	}
+
 }

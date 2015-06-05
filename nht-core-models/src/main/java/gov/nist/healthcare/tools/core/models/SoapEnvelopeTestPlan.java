@@ -19,15 +19,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
-import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -35,7 +35,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @(#) TestPlan.java
  */
 @Entity
-public class TestPlan implements java.io.Serializable {
+public class SoapEnvelopeTestPlan extends SoapTestPlan implements
+		java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -43,32 +44,22 @@ public class TestPlan implements java.io.Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected Long id;
 
-	@NotNull
-	@Column(nullable = false)
-	@JsonProperty("label")
-	protected String name;
-
-	@Column(nullable = true)
-	protected String description;
-
-	protected String testProcedurePath;
-
 	@JsonProperty("children")
 	@OrderBy("name ASC")
-	@OneToMany(mappedBy = "testPlan", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	protected Set<TestCase> testCases = new HashSet<TestCase>();
+	@OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
+			CascadeType.REMOVE })
+	@JoinTable(name = "soapenv_tp_tc", joinColumns = { @JoinColumn(name = "testplan_id") }, inverseJoinColumns = { @JoinColumn(name = "testcase_id") })
+	protected Set<SoapEnvelopeTestCase> testCases = new HashSet<SoapEnvelopeTestCase>();
 
-	transient protected final TestType type = TestType.TestPlan;
-
-	public TestPlan() {
+	public SoapEnvelopeTestPlan() {
 		super();
 	}
 
-	public TestPlan(String name) {
+	public SoapEnvelopeTestPlan(String name) {
 		setName(name);
 	}
 
-	public TestPlan(TestPlan testPlan) {
+	public SoapEnvelopeTestPlan(SoapEnvelopeTestPlan testPlan) {
 		setName(testPlan.getName());
 		setDescription(testPlan.getDescription());
 	}
@@ -79,14 +70,6 @@ public class TestPlan implements java.io.Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	@Override
@@ -102,34 +85,13 @@ public class TestPlan implements java.io.Serializable {
 		return sb.toString();
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public void addTestCase(TestCase testCase) {
+	public void addTestCase(SoapEnvelopeTestCase testCase) {
 		testCases.add(testCase);
-		testCase.setTestPlan(this);
 		testCase.setParentName(this.name);
 	}
 
-	public Set<TestCase> getTestCases() {
+	public Set<SoapEnvelopeTestCase> getTestCases() {
 		return Collections.unmodifiableSet(testCases);
-	}
-
-	public String getTestProcedurePath() {
-		return testProcedurePath;
-	}
-
-	public void setTestProcedurePath(String testProcedurePath) {
-		this.testProcedurePath = testProcedurePath;
-	}
-
-	public TestType getType() {
-		return type;
 	}
 
 }

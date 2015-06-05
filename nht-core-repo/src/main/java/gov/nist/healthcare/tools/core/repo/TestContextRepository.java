@@ -2,7 +2,7 @@ package gov.nist.healthcare.tools.core.repo;
 
 import gov.nist.healthcare.tools.core.models.Message;
 import gov.nist.healthcare.tools.core.models.Profile;
-import gov.nist.healthcare.tools.core.models.TestCase;
+import gov.nist.healthcare.tools.core.models.SoapTestCase;
 import gov.nist.healthcare.tools.core.models.TestContext;
 
 import java.util.List;

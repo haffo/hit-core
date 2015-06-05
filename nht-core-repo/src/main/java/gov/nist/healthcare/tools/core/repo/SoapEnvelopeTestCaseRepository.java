@@ -11,16 +11,16 @@
 
 package gov.nist.healthcare.tools.core.repo;
 
-import gov.nist.healthcare.tools.core.models.IsolatedTestCase;
-import gov.nist.healthcare.tools.core.models.IsolatedTestCaseGroup;
-import gov.nist.healthcare.tools.core.models.IsolatedTestPlan;
-import gov.nist.healthcare.tools.core.models.IsolatedTestStep;
+import gov.nist.healthcare.tools.core.models.SoapEnvelopeTestCase;
 import gov.nist.healthcare.tools.core.models.SoapTestCase;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface IsolatedTestPlanRepository extends JpaRepository<IsolatedTestPlan, Long> {
- 
-}
+public interface SoapEnvelopeTestCaseRepository extends JpaRepository<SoapEnvelopeTestCase, Long> {
+	
+	@Query("select testCase.testPackagePath from SoapEnvelopeTestCase testCase where testCase.id = :testCaseId")
+	String getTestPackagePathByTestCaseId(@Param("testCaseId") Long testCaseId);
+	
+ }

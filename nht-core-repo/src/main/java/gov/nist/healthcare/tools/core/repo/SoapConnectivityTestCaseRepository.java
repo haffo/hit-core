@@ -11,13 +11,16 @@
 
 package gov.nist.healthcare.tools.core.repo;
 
-import gov.nist.healthcare.tools.core.models.TestCase;
-import gov.nist.healthcare.tools.core.models.TestStep;
+import gov.nist.healthcare.tools.core.models.SoapConnectivityTestCase;
+import gov.nist.healthcare.tools.core.models.SoapTestCase;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface TestStepRepository extends JpaRepository<TestStep, Long> {
-	 
+public interface SoapConnectivityTestCaseRepository extends JpaRepository<SoapConnectivityTestCase, Long> {
+	
+	@Query("select testCase.testPackagePath from SoapConnectivityTestCase testCase where testCase.id = :testCaseId")
+	String getTestPackagePathByTestCaseId(@Param("testCaseId") Long testCaseId);
+	
  }

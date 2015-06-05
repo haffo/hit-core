@@ -49,4 +49,30 @@ public class DataInstanceTestCase extends TestObject implements Serializable {
 		this.testSteps = testSteps;
 	}
 
+	// @Override
+	// public int hashCode() {
+	// final int prime = 31;
+	// int result = super.hashCode();
+	// result = prime * result
+	// + ((testSteps == null) ? 0 : testSteps.hashCode());
+	// return result;
+	// }
+	//
+	// @Override
+	// public boolean equals(Object obj) {
+	// if (this == obj)
+	// return true;
+	// if (!super.equals(obj))
+	// return false;
+	// if (getClass() != obj.getClass())
+	// return false;
+	// DataInstanceTestCase other = (DataInstanceTestCase) obj;
+	// if (testSteps == null) {
+	// if (other.testSteps != null)
+	// return false;
+	// } else if (!testSteps.equals(other.testSteps))
+	// return false;
+	// return true;
+	// }
+
 }

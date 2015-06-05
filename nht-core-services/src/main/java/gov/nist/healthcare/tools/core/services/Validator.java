@@ -11,10 +11,11 @@
 package gov.nist.healthcare.tools.core.services;
 
 import gov.nist.healthcare.tools.core.models.ValidationResult;
+import gov.nist.healthcare.tools.core.services.exception.ValidationException;
 
 public interface Validator {
 
 	public ValidationResult validate(String message, String title,
-			String... options);
+			String... options) throws ValidationException;
 
 }

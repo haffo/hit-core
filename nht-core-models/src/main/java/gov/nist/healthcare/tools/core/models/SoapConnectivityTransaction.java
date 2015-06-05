@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @(#) UserTransaction.java
  */
 @Entity
-public class ConnectivityTransaction implements java.io.Serializable {
+public class SoapConnectivityTransaction implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -54,7 +54,7 @@ public class ConnectivityTransaction implements java.io.Serializable {
 	@JoinColumn(unique = true)
 	protected User user;
 
-	public ConnectivityTransaction() {
+	public SoapConnectivityTransaction() {
 		super();
 		status = TransactionStatus.CLOSE;
 	}
@@ -67,7 +67,7 @@ public class ConnectivityTransaction implements java.io.Serializable {
 		this.id = id;
 	}
 
-	public ConnectivityTransaction(String incoming, String outgoing) {
+	public SoapConnectivityTransaction(String incoming, String outgoing) {
 		this.incoming = incoming;
 		this.outgoing = outgoing;
 	}

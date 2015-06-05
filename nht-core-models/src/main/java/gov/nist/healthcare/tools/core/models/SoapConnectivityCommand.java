@@ -15,7 +15,7 @@ package gov.nist.healthcare.tools.core.models;
  * @author Harold Affo (NIST)
  * 
  */
-public class ConnectivityCommand extends Command {
+public class SoapConnectivityCommand extends Command {
 
 	private static final long serialVersionUID = 1L;
 	protected String incoming;
@@ -24,11 +24,11 @@ public class ConnectivityCommand extends Command {
 	protected String p; // password
 	protected String facilityId;
 
-	public ConnectivityCommand() {
+	public SoapConnectivityCommand() {
 		super();
 	}
 
-	public ConnectivityCommand(String outgoing, String incoming) {
+	public SoapConnectivityCommand(String outgoing, String incoming) {
 		this.incoming = incoming;
 		this.outgoing = outgoing;
 	}

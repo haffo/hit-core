@@ -14,42 +14,25 @@
 
 package gov.nist.healthcare.tools.core.models;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
-import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @(#) TestPlan.java
  */
-@Entity
-public class TestCase implements java.io.Serializable {
+@MappedSuperclass
+public class SoapTestCase implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
 
 	@Column(nullable = true)
 	@Enumerated(EnumType.STRING)
@@ -97,22 +80,7 @@ public class TestCase implements java.io.Serializable {
 	@Embedded
 	protected TestStory testStory;
 
-	@JsonIgnore
-	@OneToOne(mappedBy = "testCase", cascade = CascadeType.PERSIST)
-	protected TestCaseContext testContext;
-
-	@JsonIgnoreProperties({ "id", "description", "testProcedurePath",
-			"testCases", })
-	@JsonIgnore
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	protected TestPlan testPlan;
-
-	@JsonProperty("children")
-	@OrderBy("name ASC")
-	@OneToMany(mappedBy = "testCase", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	protected Set<TestStep> testSteps = new HashSet<TestStep>();
-
-	public TestCase() {
+	public SoapTestCase() {
 		super();
 		testStory = new TestStory();
 	}
@@ -121,16 +89,8 @@ public class TestCase implements java.io.Serializable {
 		this.name = name;
 	}
 
-	public TestCase(String name) {
+	public SoapTestCase(String name) {
 		setName(name);
-	}
-
-	public Long getId() {
-		return this.id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getName() {
@@ -140,7 +100,6 @@ public class TestCase implements java.io.Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Id: ").append(getId()).append(", ");
 		sb.append("Name: ").append(getName()).append(", ");
 		return sb.toString();
 	}
@@ -159,23 +118,6 @@ public class TestCase implements java.io.Serializable {
 
 	public void setSutType(SutType sutType) {
 		this.sutType = sutType;
-	}
-
-	public TestCaseContext getTestContext() {
-		return testContext;
-	}
-
-	public void setTestContext(TestCaseContext testContext) {
-		this.testContext = testContext;
-		this.testContext.setTestCase(this);
-	}
-
-	public TestPlan getTestPlan() {
-		return testPlan;
-	}
-
-	public void setTestPlan(TestPlan testPlan) {
-		this.testPlan = testPlan;
 	}
 
 	public String getParentName() {
@@ -241,20 +183,6 @@ public class TestCase implements java.io.Serializable {
 	public void setTestDataSpecificationImage2(
 			byte[] testDataSpecificationImage2) {
 		this.testDataSpecificationImage2 = testDataSpecificationImage2;
-	}
-
-	public Set<TestStep> getTestSteps() {
-		return testSteps;
-	}
-
-	public void setTestSteps(Set<TestStep> testSteps) {
-		this.testSteps = testSteps;
-	}
-
-	public void addTestStep(TestStep testStep) {
-		testSteps.add(testStep);
-		testStep.setTestCase(this);
-		testStep.setParentName(this.name);
 	}
 
 	public TestType getType() {

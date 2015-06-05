@@ -64,4 +64,37 @@ public class IsolatedTestPlan extends TestObject implements Serializable {
 		this.testCaseGroups = testCaseGroups;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result
+				+ ((testCaseGroups == null) ? 0 : testCaseGroups.hashCode());
+		result = prime * result
+				+ ((testCases == null) ? 0 : testCases.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IsolatedTestPlan other = (IsolatedTestPlan) obj;
+		if (testCaseGroups == null) {
+			if (other.testCaseGroups != null)
+				return false;
+		} else if (!testCaseGroups.equals(other.testCaseGroups))
+			return false;
+		if (testCases == null) {
+			if (other.testCases != null)
+				return false;
+		} else if (!testCases.equals(other.testCases))
+			return false;
+		return true;
+	}
+
 }

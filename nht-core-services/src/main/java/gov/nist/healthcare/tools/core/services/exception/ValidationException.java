@@ -7,7 +7,7 @@
  * We would appreciate acknowledgement if the software is used. This software can be redistributed and/or
  * modified freely provided that any derivative works bear some notice that they are derived from it, and any
  * modified versions bear some notice that they have been modified.
- */ 
+ */
 
 package gov.nist.healthcare.tools.core.services.exception;
 
@@ -16,7 +16,7 @@ package gov.nist.healthcare.tools.core.services.exception;
  * @author Harold Affo (NIST)
  * 
  */
-public class ValidationException extends RuntimeException {
+public class ValidationException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	public ValidationException(String message) {

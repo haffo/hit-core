@@ -14,7 +14,7 @@ package gov.nist.healthcare.tools.core.repo;
 import gov.nist.healthcare.tools.core.models.IsolatedTestCase;
 import gov.nist.healthcare.tools.core.models.IsolatedTestCaseGroup;
 import gov.nist.healthcare.tools.core.models.IsolatedTestStep;
-import gov.nist.healthcare.tools.core.models.TestCase;
+import gov.nist.healthcare.tools.core.models.SoapTestCase;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

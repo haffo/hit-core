@@ -57,7 +57,7 @@ public class Profile implements java.io.Serializable {
 
 	public Profile(String profileXml, String profileJson) {
 		super();
-		this.profileXml = profileJson;
+		this.profileXml = profileXml;
 		this.profileJson = profileJson;
 	}
 

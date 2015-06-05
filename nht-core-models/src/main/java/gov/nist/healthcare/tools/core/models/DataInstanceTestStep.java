@@ -50,4 +50,30 @@ public class DataInstanceTestStep extends TestObject implements Serializable {
 		this.testContext = testContext;
 	}
 
+	// @Override
+	// public int hashCode() {
+	// final int prime = 31;
+	// int result = super.hashCode();
+	// result = prime * result
+	// + ((testContext == null) ? 0 : testContext.hashCode());
+	// return result;
+	// }
+	//
+	// @Override
+	// public boolean equals(Object obj) {
+	// if (this == obj)
+	// return true;
+	// if (!super.equals(obj))
+	// return false;
+	// if (getClass() != obj.getClass())
+	// return false;
+	// DataInstanceTestStep other = (DataInstanceTestStep) obj;
+	// if (testContext == null) {
+	// if (other.testContext != null)
+	// return false;
+	// } else if (!testContext.equals(other.testContext))
+	// return false;
+	// return true;
+	// }
+
 }
