@@ -6,5 +6,5 @@ package gov.nist.hit.core.domain;
  * 
  */
 public enum SutType {
-	SENDER, RECEIVER, GENERIC
+  SENDER, RECEIVER, GENERIC
 }

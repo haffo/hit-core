@@ -11,6 +11,6 @@
 package gov.nist.hit.core.service;
 
 
-public interface SoapMessageValidator extends Validator {
+public interface SoapMessageValidator extends MessageValidator {
 
 }

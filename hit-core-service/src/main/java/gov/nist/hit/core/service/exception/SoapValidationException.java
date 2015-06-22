@@ -1,7 +1,7 @@
 package gov.nist.hit.core.service.exception;
 
 
-public class SoapValidationException extends ValidationException {
+public class SoapValidationException extends MessageValidationException {
 
 	/**
 	 * 
@@ -16,7 +16,7 @@ public class SoapValidationException extends ValidationException {
 		super(exception);
 	}
 
-	public SoapValidationException(ValidationException e) {
+	public SoapValidationException(MessageValidationException e) {
 		super(e);
 	}
 	

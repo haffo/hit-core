@@ -6,136 +6,98 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class TestContext implements Serializable {
+ 
+  private static final long serialVersionUID = -7669461668488662066L;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7669461668488662066L;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  protected Long id;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
+  @JsonIgnore
+  @ManyToOne
+  protected Profile profile;
 
-	protected Profile profile;
+  @ManyToOne
+  @JsonIgnore
+  protected VocabularyLibrary vocabularyLibrary;
 
-	protected ValueSetLibrary valueSetLibrary;
+  @ManyToOne
+  @JsonIgnore
+  protected Message message;
 
-	@JsonIgnore
-	protected ValidationContext validationContext;
+  @JsonIgnore
+  @ManyToOne
+  protected Constraints constraints; 
+  
+  @JsonIgnore
+  @ManyToOne
+  protected Constraints addditionalConstraints;
+  
 
-	protected Message message;
+  public TestContext() {}
 
-	@JsonIgnore
-	protected Constraints constraints;
+  public long getId() {
+    return id;
+  }
 
-	public TestContext() {
-	}
+  public void setId(long id) {
+    this.id = id;
+  }
 
-	public long getId() {
-		return id;
-	}
+  public Profile getProfile() {
+    return profile;
+  }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+  public void setProfile(Profile profile) {
+    this.profile = profile;
+  }
 
-	public Profile getProfile() {
-		return profile;
-	}
+ 
+ 
+  public Message getMessage() {
+    return message;
+  }
 
-	public void setProfile(Profile profile) {
-		this.profile = profile;
-	}
+  public void setMessage(Message message) {
+    this.message = message;
+  }
 
-	public ValueSetLibrary getValueSetLibrary() {
-		return valueSetLibrary;
-	}
+  public Constraints getConstraints() {
+    return constraints;
+  }
 
-	public void setValueSetLibrary(ValueSetLibrary valueSetLibrary) {
-		this.valueSetLibrary = valueSetLibrary;
-	}
+  public void setConstraints(Constraints constraints) {
+    this.constraints = constraints;
+  }
 
-	public ValidationContext getValidationContext() {
-		return validationContext;
-	}
+  public VocabularyLibrary getVocabularyLibrary() {
+    return vocabularyLibrary;
+  }
 
-	public void setValidationContext(ValidationContext validationContext) {
-		this.validationContext = validationContext;
-	}
+  public void setVocabularyLibrary(VocabularyLibrary vocabularyLibrary) {
+    this.vocabularyLibrary = vocabularyLibrary;
+  }
 
-	public Message getMessage() {
-		return message;
-	}
+  public Constraints getAddditionalConstraints() {
+    return addditionalConstraints;
+  }
 
-	public void setMessage(Message message) {
-		this.message = message;
-	}
+  public void setAddditionalConstraints(Constraints addditionalConstraints) {
+    this.addditionalConstraints = addditionalConstraints;
+  }
 
-	public Constraints getConstraints() {
-		return constraints;
-	}
-
-	public void setConstraints(Constraints constraints) {
-		this.constraints = constraints;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((constraints == null) ? 0 : constraints.hashCode());
-		result = prime * result + ((message == null) ? 0 : message.hashCode());
-		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
-		result = prime
-				* result
-				+ ((validationContext == null) ? 0 : validationContext
-						.hashCode());
-		result = prime * result
-				+ ((valueSetLibrary == null) ? 0 : valueSetLibrary.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TestContext other = (TestContext) obj;
-		if (constraints == null) {
-			if (other.constraints != null)
-				return false;
-		} else if (!constraints.equals(other.constraints))
-			return false;
-		if (message == null) {
-			if (other.message != null)
-				return false;
-		} else if (!message.equals(other.message))
-			return false;
-		if (profile == null) {
-			if (other.profile != null)
-				return false;
-		} else if (!profile.equals(other.profile))
-			return false;
-		if (validationContext == null) {
-			if (other.validationContext != null)
-				return false;
-		} else if (!validationContext.equals(other.validationContext))
-			return false;
-		if (valueSetLibrary == null) {
-			if (other.valueSetLibrary != null)
-				return false;
-		} else if (!valueSetLibrary.equals(other.valueSetLibrary))
-			return false;
-		return true;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
+ 
+  
+  
+  
 
 }

@@ -25,90 +25,86 @@ import org.jdom2.output.XMLOutputter;
 
 public class XmlUtil {
 
-	public static String format(String xml) throws TransformerException,
-			JDOMException, IOException {
-		return prettyFormat(xml, 2);
-	}
+  public static String format(String xml) throws TransformerException, JDOMException, IOException {
+    return prettyFormat(xml, 2);
+  }
 
-	public static String prettyFormat(String input, int indent)
-			throws TransformerException, JDOMException, IOException {
+  public static String prettyFormat(String input, int indent) throws TransformerException,
+      JDOMException, IOException {
 
-		// Source xmlInput = new StreamSource(new StringReader(input));
-		// StringWriter stringWriter = new StringWriter();
-		// StreamResult xmlOutput = new StreamResult(stringWriter);
-		// TransformerFactory transformerFactory = TransformerFactory
-		// .newInstance();
-		// Transformer transformer = transformerFactory.newTransformer();
-		// transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		// // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
-		// // "yes");
-		// transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-		// transformer.setOutputProperty(
-		// "{http://xml.apache.org/xslt}indent-amount", "4");
-		// transformer.transform(xmlInput, xmlOutput);
-		// String res = xmlOutput.getWriter().toString();
-		// System.out.println(res);
-		// System.setProperty("javax.xml.parsers.SAXParserFactory",
-		// "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
-		Document doc = toDocument(input);
-		String res = toString(doc.getRootElement());
+    // Source xmlInput = new StreamSource(new StringReader(input));
+    // StringWriter stringWriter = new StringWriter();
+    // StreamResult xmlOutput = new StreamResult(stringWriter);
+    // TransformerFactory transformerFactory = TransformerFactory
+    // .newInstance();
+    // Transformer transformer = transformerFactory.newTransformer();
+    // transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    // // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
+    // // "yes");
+    // transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+    // transformer.setOutputProperty(
+    // "{http://xml.apache.org/xslt}indent-amount", "4");
+    // transformer.transform(xmlInput, xmlOutput);
+    // String res = xmlOutput.getWriter().toString();
+    // System.out.println(res);
+    // System.setProperty("javax.xml.parsers.SAXParserFactory",
+    // "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
+    Document doc = toDocument(input);
+    String res = toString(doc.getRootElement());
 
-		return res;
-	}
+    return res;
+  }
 
-	public static Document toDocument(String content) throws JDOMException,
-			IOException {
-		SAXBuilder builder = new SAXBuilder();
-		builder.setJDOMFactory(new LocatedJDOMFactory());
-		builder.setExpandEntities(false);
-		return builder.build(IOUtils.toInputStream(content));
-	}
+  public static Document toDocument(String content) throws JDOMException, IOException {
+    SAXBuilder builder = new SAXBuilder();
+    builder.setJDOMFactory(new LocatedJDOMFactory());
+    builder.setExpandEntities(false);
+    return builder.build(IOUtils.toInputStream(content));
+  }
 
-	public static String toString(Element element) {
-		return new XMLOutputter().outputString(element);
-	}
+  public static String toString(Element element) {
+    return new XMLOutputter().outputString(element);
+  }
 
-	public static String prettyPrint(String doc) throws IOException,
-			TransformerException {
-		Source xmlInput = new StreamSource(new StringReader(doc));
-		StringWriter stringWriter = new StringWriter();
-		StreamResult xmlOutput = new StreamResult(stringWriter);
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer transformer = tf.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-		transformer.setOutputProperty(
-				"{http://xml.apache.org/xslt}indent-amount", "10");
-		transformer.transform(xmlInput, new StreamResult(stringWriter));
-		return stringWriter.toString();
-	}
+  public static String prettyPrint(String doc) throws IOException, TransformerException {
+    Source xmlInput = new StreamSource(new StringReader(doc));
+    StringWriter stringWriter = new StringWriter();
+    StreamResult xmlOutput = new StreamResult(stringWriter);
+    TransformerFactory tf = TransformerFactory.newInstance();
+    Transformer transformer = tf.newTransformer();
+    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+    transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "10");
+    transformer.transform(xmlInput, new StreamResult(stringWriter));
+    return stringWriter.toString();
+  }
 
-	public static String toString(Document document) {
-		return new XMLOutputter().outputString(document.getRootElement());
-	}
+  public static String toString(Document document) {
+    return new XMLOutputter().outputString(document.getRootElement());
+  }
 
-	public static XmlCoordinate getStartCoordinate(Element element) {
-		Located locatedElement = (Located) element;
-		return new XmlCoordinate(locatedElement.getLine(), 0);
-	}
+  public static XmlCoordinate getStartCoordinate(Element element) {
+    Located locatedElement = (Located) element;
+    return new XmlCoordinate(locatedElement.getLine(), 0);
+  }
 
-	public static XmlCoordinate getEndCoordinate(Element element) {
-		return new XmlCoordinate(getEndLine(element), 1000);
-	}
+  public static XmlCoordinate getEndCoordinate(Element element) {
+    return new XmlCoordinate(getEndLine(element), 1000);
+  }
 
-	private static int getNumberOfLine(Element element) {
-		String content = XmlUtil.toString(element);
-		String[] lines = content.split(System.getProperty("line.separator"));
-		return lines.length;
-	}
+  private static int getNumberOfLine(Element element) {
+    String content = XmlUtil.toString(element);
+    String[] lines = content.split(System.getProperty("line.separator"));
+    return lines.length;
+  }
 
-	public static int getEndLine(Element element) {
-		return getStartLine(element) + getNumberOfLine(element) - 1;
-	}
+  public static int getEndLine(Element element) {
+    return getStartLine(element) + getNumberOfLine(element) - 1;
+  }
 
-	public static int getStartLine(Element element) {
-		return ((Located) element).getLine();
-	}
+  public static int getStartLine(Element element) {
+    return ((Located) element).getLine();
+  }
 }

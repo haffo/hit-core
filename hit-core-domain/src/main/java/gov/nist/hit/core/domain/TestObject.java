@@ -1,129 +1,119 @@
 package gov.nist.hit.core.domain;
 
+import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+
+//@Entity
+//@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 
 @MappedSuperclass
 public abstract class TestObject {
 
-	protected String name;
-	protected String objDescription;
-	@Enumerated(EnumType.STRING)
-	protected TestType type;
-	@Enumerated(EnumType.STRING)
-	protected TestCategory category;
-	@Enumerated(EnumType.STRING)
-	protected Stage stage;
-	protected int position;
-	protected TestStory testStory = new TestStory();
+  protected String name;
+  protected String description;
+  @Enumerated(EnumType.STRING)
+  protected TestType type;
+  @Enumerated(EnumType.STRING)
+  protected TestCategory category;
+  @Enumerated(EnumType.STRING)
+  protected Stage stage;
+  protected int position;
+   
 
-	public String getName() {
-		return name;
-	}
+  @OneToOne(cascade = CascadeType.PERSIST)
+  protected TestArtifact testPackage; 
+  
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  @OneToOne(cascade = CascadeType.PERSIST)
+  protected TestStory TestStory; 
+  
+ 
+  @OneToOne(cascade = CascadeType.PERSIST)
+  protected TestArtifact jurorDocument;
+  
+  
+  public String getName() {
+    return name;
+  }
 
-	public String getObjDescription() {
-		return objDescription;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setObjDescription(String objDescription) {
-		this.objDescription = objDescription;
-	}
+  public String getDescription() {
+    return description;
+  }
 
-	public TestType getType() {
-		return type;
-	}
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	public void setType(TestType type) {
-		this.type = type;
-	}
+  public TestType getType() {
+    return type;
+  }
 
-	public TestCategory getCategory() {
-		return category;
-	}
+  public void setType(TestType type) {
+    this.type = type;
+  }
 
-	public void setCategory(TestCategory category) {
-		this.category = category;
-	}
+  public TestCategory getCategory() {
+    return category;
+  }
 
-	public int getPosition() {
-		return position;
-	}
+  public void setCategory(TestCategory category) {
+    this.category = category;
+  }
 
-	public void setPosition(int position) {
-		this.position = position;
-	}
+  public int getPosition() {
+    return position;
+  }
 
-	public Stage getStage() {
-		return stage;
-	}
+  public void setPosition(int position) {
+    this.position = position;
+  }
 
-	public void setStage(Stage stage) {
-		this.stage = stage;
-	}
+  public Stage getStage() {
+    return stage;
+  }
 
-	public TestStory getTestStory() {
-		return testStory;
-	}
+  public void setStage(Stage stage) {
+    this.stage = stage;
+  }
 
-	public void setTestStory(TestStory testStory) {
-		this.testStory = testStory;
-	}
+  public TestStory getTestStory() {
+    return TestStory;
+  }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((category == null) ? 0 : category.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((objDescription == null) ? 0 : objDescription.hashCode());
-		result = prime * result + position;
-		result = prime * result + ((stage == null) ? 0 : stage.hashCode());
-		result = prime * result
-				+ ((testStory == null) ? 0 : testStory.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
-		return result;
-	}
+  public void setTestStory(TestStory testStory) {
+    TestStory = testStory;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TestObject other = (TestObject) obj;
-		if (category != other.category)
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (objDescription == null) {
-			if (other.objDescription != null)
-				return false;
-		} else if (!objDescription.equals(other.objDescription))
-			return false;
-		if (position != other.position)
-			return false;
-		if (stage != other.stage)
-			return false;
-		if (testStory == null) {
-			if (other.testStory != null)
-				return false;
-		} else if (!testStory.equals(other.testStory))
-			return false;
-		if (type != other.type)
-			return false;
-		return true;
-	}
+  public TestArtifact getTestPackage() {
+    return testPackage;
+  }
+
+  public void setTestPackage(TestArtifact testPackage) {
+    this.testPackage = testPackage;
+  }
+
+  public TestArtifact getJurorDocument() {
+    return jurorDocument;
+  }
+
+  public void setJurorDocument(TestArtifact jurorDocument) {
+    this.jurorDocument = jurorDocument;
+  }
+
+  
+  
 
 }
