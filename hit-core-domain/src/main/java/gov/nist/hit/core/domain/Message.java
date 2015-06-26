@@ -31,61 +31,70 @@ public class Message implements Serializable {
   protected Long id;
 
   @Column(nullable = true)
-  protected String messageName;
+  protected String name;
 
   @Column(nullable = true)
-  protected String messageDescription;
+  protected String description;
 
   @Column(columnDefinition = "LONGTEXT")
-  protected String messageContent;
+  protected String content;
 
   public Message() {}
 
   public Message(String name, String description, String content) {
     super();
-    this.messageName = name;
-    this.messageDescription = description;
-    this.messageContent = content;
+    this.name = name;
+    this.description = description;
+    this.content = content;
   }
 
   public Message(String content) {
     super();
-    this.messageName = null;
-    this.messageDescription = null;
-    this.messageContent = content;
+    this.name = null;
+    this.description = null;
+    this.content = content;
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("Name: ").append(getMessageName()).append(", ");
-    sb.append("Description: ").append(getMessageDescription()).append(", ");
-    sb.append("Content: ").append(getMessageContent());
+    sb.append("Name: ").append(getName()).append(", ");
+    sb.append("Description: ").append(getDescription()).append(", ");
+    sb.append("Content: ").append(getContent());
     return sb.toString();
   }
 
-  public String getMessageName() {
-    return messageName;
+  public String getName() {
+    return name;
   }
 
-  public void setMessageName(String messageName) {
-    this.messageName = messageName;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public String getMessageDescription() {
-    return messageDescription;
+  public String getDescription() {
+    return description;
   }
 
-  public void setMessageDescription(String messageDescription) {
-    this.messageDescription = messageDescription;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
-  public String getMessageContent() {
-    return messageContent;
+  public String getContent() {
+    return content;
   }
 
-  public void setMessageContent(String messageContent) {
-    this.messageContent = messageContent;
+  public void setContent(String content) {
+    this.content = content;
   }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+  
 
 }

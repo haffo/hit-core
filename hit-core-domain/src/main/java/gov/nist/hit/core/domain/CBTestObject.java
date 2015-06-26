@@ -16,7 +16,7 @@ import javax.persistence.OneToOne;
 //@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 
 @MappedSuperclass
-public abstract class TestObject {
+public abstract class CBTestObject {
 
   protected String name;
   protected String description;

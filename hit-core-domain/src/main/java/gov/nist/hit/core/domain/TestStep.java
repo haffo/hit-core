@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
-public class TestStep extends TestObject implements Serializable {
+public class TestStep extends CBTestObject implements Serializable {
 
   private static final long serialVersionUID = 8805967508478985159L;
 

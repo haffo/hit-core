@@ -77,8 +77,8 @@ public class ValueSetLibrarySerializerImpl implements ValueSetLibrarySerializer 
 
       elmTableLibrary.appendChild(elmTableDefinition);
 
-      if (t.getTableElements() != null) {
-        for (ValueSetElement c : t.getTableElements()) {
+      if (t.getValueSetElements() != null) {
+        for (ValueSetElement c : t.getValueSetElements()) {
           nu.xom.Element elmTableElement = new nu.xom.Element("ValueSetElement");
           elmTableElement.addAttribute(new Attribute("Value", c.getValue() == null ? "" : c
               .getValue()));
@@ -140,7 +140,7 @@ public class ValueSetLibrarySerializerImpl implements ValueSetLibrarySerializer 
       for (int i = 0; i < nodes.getLength(); i++) {
         Element elmTable = (Element) nodes.item(i);
         ValueSetDefinition tableObj = new ValueSetDefinition();
-        tableObj.setBindingIdentifier(elmTable.getAttribute(""));
+        tableObj.setBindingIdentifier(elmTable.getAttribute("BindingIdentifier"));
         tableObj.setName(elmTable.getAttribute("Name"));
         tableObj.setDisplayClassifier(elmTable.getAttribute("DisplayClassifier"));
 

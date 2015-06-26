@@ -17,7 +17,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 
 @Entity
-public class TestCase extends TestObject implements Serializable {
+public class TestCase extends CBTestObject implements Serializable {
 
   private static final long serialVersionUID = 8805967508478985159L;
 

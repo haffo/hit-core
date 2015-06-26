@@ -7,7 +7,7 @@ public class ValueSetDefinition implements java.io.Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected Set<ValueSetElement> tableElements = new HashSet<ValueSetElement>();
+  protected Set<ValueSetElement> valueSetElements = new HashSet<ValueSetElement>();
 
   protected String bindingIdentifier;
   protected String name;
@@ -20,7 +20,7 @@ public class ValueSetDefinition implements java.io.Serializable {
   protected ContentDefinitionType contentDefinition;
   
   public Set<ValueSetElement> getValueSetElements() {
-    return this.tableElements;
+    return this.valueSetElements;
   }
 
  
@@ -133,14 +133,10 @@ public class ValueSetDefinition implements java.io.Serializable {
     getValueSetElements().add(te);
   }
 
+  
 
-  public Set<ValueSetElement> getTableElements() {
-    return tableElements;
-  }
-
-
-  public void setTableElements(Set<ValueSetElement> tableElements) {
-    this.tableElements = tableElements;
+  public void setValueSetElements(Set<ValueSetElement> valueSetElements) {
+    this.valueSetElements = valueSetElements;
   }
 
 

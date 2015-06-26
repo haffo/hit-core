@@ -30,14 +30,19 @@ public class TestCaseGroup implements Serializable {
   @Enumerated(EnumType.STRING)
   protected TestType type;
   @Enumerated(EnumType.STRING)
-  protected TestCategory category;
- 
-
+  protected TestCategory category;  
+  
   public TestCaseGroup() {
     super();
     this.type = TestType.TestCaseGroup;
     category = TestCategory.DataInstance;
   }
+    
+  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @JoinTable(name = "tcg_tcg", joinColumns = {@JoinColumn(name = "parent_id")},
+      inverseJoinColumns = {@JoinColumn(name = "child_id")})
+  private Set<TestCaseGroup> testCaseGroups = new HashSet<TestCaseGroup>();
+  
 
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tcg_tc", joinColumns = {@JoinColumn(name = "testcasegroup_id")},
@@ -92,6 +97,17 @@ public class TestCaseGroup implements Serializable {
     this.category = category;
   }
 
+  public Set<TestCaseGroup> getTestCaseGroups() {
+    return testCaseGroups;
+  }
+
+  public void setTestCaseGroups(Set<TestCaseGroup> testCaseGroups) {
+    this.testCaseGroups = testCaseGroups;
+  }
+
+  
+  
+  
  
 
 }

@@ -45,8 +45,8 @@ public class Profile implements Serializable {
   @Column(columnDefinition = "LONGTEXT")
   protected String xml;
 
-//  @Column(columnDefinition = "LONGTEXT")
-  @Transient
+  @NotNull
+  @Column(columnDefinition = "LONGTEXT")
   protected String json;
 
   @Column(nullable = true)

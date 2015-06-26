@@ -26,7 +26,9 @@ public class FileUtil {
 
   public static String getContent(Resource resource) {
     try {
-      return IOUtils.toString(resource.getInputStream());
+      if (resource != null)
+        return IOUtils.toString(resource.getInputStream());
+      return null;
     } catch (RuntimeException e) {
       return null;
     } catch (Exception e) {
