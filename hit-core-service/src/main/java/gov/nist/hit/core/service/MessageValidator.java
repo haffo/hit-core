@@ -11,12 +11,11 @@
  */
 package gov.nist.hit.core.service;
 
-import gov.nist.hit.core.domain.ValidationResult;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 
 public interface MessageValidator {
 
-  public ValidationResult validate(String title, String message, String... options)
+  public String validate(String title, String message, String... options)
       throws MessageValidationException;
 
 }
