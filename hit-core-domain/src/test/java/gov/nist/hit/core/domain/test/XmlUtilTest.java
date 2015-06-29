@@ -12,8 +12,7 @@ package gov.nist.hit.core.domain.test;
  * that they have been modified.
  */
 
-import gov.nist.hit.core.service.util.XmlUtil;
-
+ 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -23,12 +22,12 @@ import org.junit.Test;
  */
 public class XmlUtilTest {
 
-  @Test
-  public void testUpdateContent() throws Exception {
-    String content =
-        IOUtils.toString(XmlUtilTest.class.getResourceAsStream("/submitSingleMessageResponse.xml"));
-    String updated = XmlUtil.prettyPrint(content);
-    System.out.print(updated);
-
-  }
+//  @Test
+//  public void testUpdateContent() throws Exception {
+//    String content =
+//        IOUtils.toString(XmlUtilTest.class.getResourceAsStream("/submitSingleMessageResponse.xml"));
+//    String updated = XmlUtil.prettyPrint(content);
+//    System.out.print(updated);
+//
+//  }
 }
