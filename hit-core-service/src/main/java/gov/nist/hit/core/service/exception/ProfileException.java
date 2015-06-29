@@ -20,7 +20,7 @@ public class ProfileException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	public ProfileException(Long tcaseId) {
-		super("Profile '" + tcaseId + "' not found.");
+		super("IntegrationProfile '" + tcaseId + "' not found.");
 	}
 
 	public ProfileException(String error) {

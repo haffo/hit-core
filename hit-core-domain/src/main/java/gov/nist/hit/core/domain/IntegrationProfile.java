@@ -13,6 +13,8 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -20,6 +22,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
@@ -32,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 
 @Entity
-public class Profile implements Serializable {
+public class IntegrationProfile implements Serializable {
  
   private static final long serialVersionUID = 1L;
 
@@ -43,12 +46,9 @@ public class Profile implements Serializable {
   @NotNull
   @JsonIgnore
   @Column(columnDefinition = "LONGTEXT")
-  protected String xml;
-
-  @NotNull
-  @Column(columnDefinition = "LONGTEXT")
-  protected String json;
-
+  protected String xml; 
+  
+ 
   @Column(nullable = true)
   protected String sourceId;
   
@@ -71,24 +71,19 @@ public class Profile implements Serializable {
   protected String hl7Version;
   
    
-  public Profile() {
+  public IntegrationProfile() {
     super();
   }
 
-  public Profile(String name, String description, String xml) {
+  public IntegrationProfile(String name, String description, String xml) {
     super();
     this.name = name;
     this.description = description;
     this.xml = xml;
   }
 
-  public Profile(String xml, String json) {
-    super();
-    this.xml = xml;
-    this.json = json;
-  }
-
-  public Profile(String xml) {
+ 
+  public IntegrationProfile(String xml) {
     super();
     this.name = null;
     this.description = null;
@@ -155,11 +150,6 @@ public class Profile implements Serializable {
   public void setHl7Version(String hl7Version) {
     this.hl7Version = hl7Version;
   }  
-  
-  
-  
-  
- 
 
   public String getXml() {
     return xml;
@@ -169,13 +159,7 @@ public class Profile implements Serializable {
     this.xml = xml;
   }
 
-  public String getJson() {
-    return json;
-  }
-
-  public void setJson(String json) {
-    this.json = json;
-  }
+ 
 
   public String getSourceId() {
     return sourceId;
@@ -184,14 +168,7 @@ public class Profile implements Serializable {
   public void setSourceId(String sourceId) {
     this.sourceId = sourceId;
   }
-
-  @Override
-  public String toString() {
-    return "Profile [\nid=" + id + "\n, profileXml=" + xml + "\n, json=" + json
-        + "\n, name=" + name + "\n, description=" + description + "\n, key=" + key + "]";
-  }
-  
-  
-  
+   
+ 
   
 }

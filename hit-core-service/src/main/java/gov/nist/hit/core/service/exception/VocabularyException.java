@@ -20,7 +20,7 @@ public class VocabularyException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	public VocabularyException(Long tcaseId) {
-		super("Profile '" + tcaseId + "' not found.");
+		super("IntegrationProfile '" + tcaseId + "' not found.");
 	}
 
 	public VocabularyException(String error) {

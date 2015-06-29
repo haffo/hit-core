@@ -12,15 +12,11 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.IntegrationProfile;
-import gov.nist.hit.core.domain.VocabularyLibrary;
+import gov.nist.hit.core.domain.ConformanceProfile;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-public interface VocabularyLibraryRepository extends JpaRepository<VocabularyLibrary, Long> {
+public interface ConformanceProfileRepository extends JpaRepository<ConformanceProfile, Long> {
 
-  @Query("select vocab from VocabularyLibrary vocab where vocab.sourceId = :sourceId")
-  IntegrationProfile findOneBySourceId(@Param("sourceId") String sourceId);
+
 }

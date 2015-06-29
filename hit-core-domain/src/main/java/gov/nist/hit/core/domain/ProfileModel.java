@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tree representation of a profile
+ * Tree representation of a integrationProfile
  * 
  * @author Harold Affo (NIST)
  */

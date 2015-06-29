@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class TestContext implements Serializable { 
@@ -24,13 +25,17 @@ public class TestContext implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
 
-  @ManyToOne
-  protected Profile profile;
+
+  @OneToOne (cascade=CascadeType.ALL)
+  @JoinColumn(unique= true, nullable=false, insertable=true, updatable=true)  
+  @JsonProperty(value = "profile")
+  protected ConformanceProfile conformanceProfile;
 
   @ManyToOne
   protected VocabularyLibrary vocabularyLibrary;
 
-  @ManyToOne
+  @OneToOne (cascade=CascadeType.ALL)
+  @JoinColumn(unique= true, nullable=true, insertable=true, updatable=true)  
   protected Message message;
 
   @JsonIgnore
@@ -38,7 +43,8 @@ public class TestContext implements Serializable {
   protected Constraints constraints; 
   
   @JsonIgnore
-  @ManyToOne
+  @OneToOne (cascade=CascadeType.ALL)
+  @JoinColumn(unique= true, nullable=true, insertable=true, updatable=true)  
   protected Constraints addditionalConstraints;
   
 
@@ -52,16 +58,15 @@ public class TestContext implements Serializable {
     this.id = id;
   }
 
-  public Profile getProfile() {
-    return profile;
+ 
+  public ConformanceProfile getConformanceProfile() {
+    return conformanceProfile;
   }
 
-  public void setProfile(Profile profile) {
-    this.profile = profile;
+  public void setConformanceProfile(ConformanceProfile conformanceProfile) {
+    this.conformanceProfile = conformanceProfile;
   }
 
- 
- 
   public Message getMessage() {
     return message;
   }

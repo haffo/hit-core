@@ -12,14 +12,10 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.Profile;
+import gov.nist.hit.core.domain.IntegrationProfile;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-public interface ProfileRepository extends JpaRepository<Profile, Long> {
+public interface IntegrationProfileRepository extends JpaRepository<IntegrationProfile, Long> {
 
-  @Query("select profile from Profile profile where profile.sourceId = :sourceId")
-  Profile findOneBySourceId(@Param("sourceId") String sourceId);
 }
