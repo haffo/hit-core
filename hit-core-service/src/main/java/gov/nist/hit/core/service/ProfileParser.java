@@ -11,11 +11,8 @@
  */
 package gov.nist.hit.core.service;
 
-import gov.nist.hit.core.domain.ProfileElement;
 import gov.nist.hit.core.domain.ProfileModel;
 import gov.nist.hit.core.service.exception.ProfileParserException;
-
-import java.util.Map;
 
 
 
@@ -39,8 +36,7 @@ public abstract class ProfileParser {
   protected final static String ICON_SUBCOMPONENT = "subcomponent.png";
 
   protected ProfileModel model;
-  protected Map<String, ProfileElement> segmentTracker;
-  protected Map<String, ProfileElement> datatypeTracker;
+
 
   public abstract ProfileModel parse(String integrationProfileXml, String conformanceProfileId,
       String... constraints) throws ProfileParserException;
