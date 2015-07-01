@@ -23,6 +23,7 @@ import gov.nist.hit.core.domain.Stage;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseGroup;
+import gov.nist.hit.core.domain.TestCategory;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
@@ -129,11 +130,13 @@ public abstract class ResourcebundleLoader {
   ConstraintsRepository constraintsRepository;
 
 
-  ObjectMapper obm;
+  com.fasterxml.jackson.databind.ObjectMapper obm;
 
 
   public ResourcebundleLoader() {
-    obm = new ObjectMapper();
+    obm = new com.fasterxml.jackson.databind.ObjectMapper();
+    obm.setSerializationInclusion(Include.NON_NULL);
+
   }
 
   // private void documentations() throws IOException {
@@ -410,11 +413,10 @@ public abstract class ResourcebundleLoader {
       try {
         ConformanceProfile conformanceProfile = new ConformanceProfile();
         IntegrationProfile integrationProfile = getIntegrationProfile(messageId.getTextValue());
-        conformanceProfile.setJson(generateJsonConformanceProfile(integrationProfile.getXml(),
-            messageId.getTextValue(), testContext.getConstraints() != null ? testContext
-                .getConstraints().getXml() : null,
-            testContext.getAddditionalConstraints() != null ? testContext
-                .getAddditionalConstraints().getXml() : null));
+        conformanceProfile.setJson(jsonConformanceProfile(integrationProfile.getXml(), messageId
+            .getTextValue(), testContext.getConstraints() != null ? testContext.getConstraints()
+            .getXml() : null, testContext.getAddditionalConstraints() != null ? testContext
+            .getAddditionalConstraints().getXml() : null));
         conformanceProfile.setIntegrationProfile(integrationProfile);
         testContext.setConformanceProfile(conformanceProfile);
       } catch (ProfileParserException e) {
@@ -424,16 +426,12 @@ public abstract class ResourcebundleLoader {
     return testContext;
   }
 
-  public String generateJsonConformanceProfile(String integrationProfileXml,
-      String conformanceProfileId, String constraintsXml, String additionalConstraintsXml)
-      throws ProfileParserException, JsonProcessingException,
-      com.fasterxml.jackson.core.JsonProcessingException {
+  public String jsonConformanceProfile(String integrationProfileXml, String conformanceProfileId,
+      String constraintsXml, String additionalConstraintsXml) throws ProfileParserException,
+      JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {
     ProfileModel profileModel =
         getProfileParser().parse(integrationProfileXml, conformanceProfileId, constraintsXml,
             additionalConstraintsXml);
-    com.fasterxml.jackson.databind.ObjectMapper obm =
-        new com.fasterxml.jackson.databind.ObjectMapper();
-    obm.setSerializationInclusion(Include.NON_NULL);
     String json = obm.writeValueAsString(profileModel);
     return json;
   }
@@ -450,12 +448,15 @@ public abstract class ResourcebundleLoader {
       throw new IllegalArgumentException("No TestCase.json found at " + location);
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
-    JsonNode testPlanObj = mapper.readTree(descriptorContent);
-    tc.setName(testPlanObj.findValue("name").getTextValue());
-    tc.setDescription(testPlanObj.findValue("description").getTextValue());
+    JsonNode testCaseObj = mapper.readTree(descriptorContent);
+    tc.setName(testCaseObj.findValue("name").getTextValue());
+    tc.setDescription(testCaseObj.findValue("description").getTextValue());
     tc.setTestStory(testStory(location));
     tc.setTestPackage(testPackage(location));
     tc.setJurorDocument(jurorDocument(location));
+    if (testCaseObj.findValue("type") != null) {
+      tc.setCategory(TestCategory.valueOf(testCaseObj.findValue("type").getTextValue()));
+    }
     List<Resource> resources = resourceBundleHelper.getDirectories(location + "*");
     for (Resource resource : resources) {
       String fileName = fileName(resource);
@@ -472,13 +473,19 @@ public abstract class ResourcebundleLoader {
       throw new IllegalArgumentException("No TestStep.json found at " + location);
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
-    JsonNode testPlanObj = mapper.readTree(descriptorContent);
-    testStep.setName(testPlanObj.findValue("name").getTextValue());
-    testStep.setDescription(testPlanObj.findValue("description").getTextValue());
-    testStep.setTestContext(testContext(location, testPlanObj));
+    JsonNode testStepObj = mapper.readTree(descriptorContent);
+    testStep.setName(testStepObj.findValue("name").getTextValue());
+    testStep.setDescription(testStepObj.findValue("description").getTextValue());
+    testStep.setTestContext(testContext(location, testStepObj));
     testStep.setTestStory(testStory(location));
     testStep.setTestPackage(testPackage(location));
     testStep.setJurorDocument(jurorDocument(location));
+    if (testStepObj.findValue("position") != null) {
+      testStep.setPosition(testStepObj.findValue("position").getIntValue());
+    }
+    if (testStepObj.findValue("connectionType") != null) {
+      testStep.setPosition(testStepObj.findValue("position").getIntValue());
+    }
     return testStep;
   }
 

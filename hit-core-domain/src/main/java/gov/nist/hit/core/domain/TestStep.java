@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -34,9 +36,11 @@ public class TestStep extends CBTestObject implements Serializable {
   protected TestArtifact messageContent;
  
   @OneToOne(cascade = CascadeType.PERSIST)
-   protected TestArtifact testDataSpecification;
- 
-
+  protected TestArtifact testDataSpecification;
+  
+  @Enumerated(EnumType.STRING)
+  private ConnectionType connectionType; 
+  
   public TestStep() {
     super();
     this.type = TestType.TestStep;
@@ -101,6 +105,15 @@ public class TestStep extends CBTestObject implements Serializable {
     this.testDataSpecification = testDataSpecification;
   }
 
+  public ConnectionType getConnectionType() {
+    return connectionType;
+  }
+
+  public void setConnectionType(ConnectionType connectionType) {
+    this.connectionType = connectionType;
+  }
+
+ 
 
 
 }
