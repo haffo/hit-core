@@ -75,7 +75,7 @@ public abstract class ValueSetLibrarySerializer {
 
       if (t.getValueSetElements() != null) {
         for (ValueSetElement c : t.getValueSetElements()) {
-          nu.xom.Element elmTableElement = new nu.xom.Element("ValueSetElement");
+          nu.xom.Element elmTableElement = new nu.xom.Element("ValueElement");
           elmTableElement.addAttribute(new Attribute("Value", c.getValue() == null ? "" : c
               .getValue()));
           elmTableElement.addAttribute(new Attribute("DisplayName",
@@ -164,7 +164,7 @@ public abstract class ValueSetLibrarySerializer {
               .getAttribute("ContentDefinition")));
         }
 
-        NodeList tableElements = elmTable.getElementsByTagName("ValueSetElement");
+        NodeList tableElements = elmTable.getElementsByTagName("ValueElement");
 
         for (int j = 0; j < tableElements.getLength(); j++) {
           Element elmCode = (Element) tableElements.item(j);
