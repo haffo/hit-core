@@ -178,7 +178,7 @@ public abstract class ValueSetLibrarySerializer {
           }
 
           if (StringUtils.isNotEmpty(elmCode.getAttribute("Usage"))) {
-            codeObj.setUsage(UsageType.fromValue(elmTable.getAttribute("Usage")));
+            codeObj.setUsage(UsageType.fromValue(elmCode.getAttribute("Usage")));
           }
           codeObj.setComments(elmCode.getAttribute("Comments"));
 

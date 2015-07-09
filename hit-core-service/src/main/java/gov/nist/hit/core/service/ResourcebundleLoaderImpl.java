@@ -367,7 +367,7 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
       Element elmCode = (Element) messages.item(j);
       String id = elmCode.getAttribute("ID");
       if (profileMap.containsKey(id)) {
-        throw new RuntimeException("Found duplicate conformance profile ID " + id);
+        throw new RuntimeException("Found duplicate conformance profile id " + id);
       }
       profileMap.put(id, integrationProfile);
     }
