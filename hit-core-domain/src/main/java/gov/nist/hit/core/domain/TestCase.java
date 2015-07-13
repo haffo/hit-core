@@ -17,7 +17,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 
 @Entity
-public class TestCase extends CBTestObject implements Serializable {
+public class TestCase extends AbstractTestCase implements Serializable {
 
   private static final long serialVersionUID = 8805967508478985159L;
 
@@ -29,8 +29,7 @@ public class TestCase extends CBTestObject implements Serializable {
   public TestCase() {
     super();
     this.type = TestType.TestCase;
-    category = TestCategory.DataInstance;
-  }
+   }
 
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tc_ts", joinColumns = {@JoinColumn(name = "testcase_id")},

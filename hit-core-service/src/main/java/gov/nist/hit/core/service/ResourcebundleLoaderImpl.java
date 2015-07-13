@@ -13,8 +13,9 @@
 package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.AppInfo;
-import gov.nist.hit.core.domain.CFTestObject;
+import gov.nist.hit.core.domain.TestObject;
 import gov.nist.hit.core.domain.ConformanceProfile;
+import gov.nist.hit.core.domain.ConnectionType;
 import gov.nist.hit.core.domain.Constraints;
 import gov.nist.hit.core.domain.IntegrationProfile;
 import gov.nist.hit.core.domain.Message;
@@ -27,10 +28,9 @@ import gov.nist.hit.core.domain.TestCategory;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStory;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.AppInfoRepository;
-import gov.nist.hit.core.repo.CFTestObjectRepository;
+import gov.nist.hit.core.repo.TestObjectRepository;
 import gov.nist.hit.core.repo.ConstraintsRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.MessageRepository;
@@ -81,6 +81,7 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
   final static String CONSTRAINT_PATTERN = "Global/Constraints/";
   final static String CONTEXTBASED_PATTERN = "Contextbased/";
   final static String CONTEXTFREE_PATTERN = "Contextfree/";
+  final static String ISOLATED_PATTERN = "Isolated/";
   final static String DOCUMENTATION_PATTERN = "Documentation/";
   final static String TEST_PLAN_FILE_PATTERN = "TestPlan.json";
   final static String TEST_CASE_FILE_PATTERN = "TestCase.json";
@@ -106,7 +107,7 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
   TestPlanRepository testPlanRepository;
 
   @Autowired
-  CFTestObjectRepository cfTestObjectRepository;
+  TestObjectRepository cfTestObjectRepository;
 
   @Autowired
   TestStepRepository testStepRepository;
@@ -172,11 +173,11 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     this.testPlanRepository = testPlanRepository;
   }
 
-  public CFTestObjectRepository getCfTestObjectRepository() {
+  public TestObjectRepository getCfTestObjectRepository() {
     return cfTestObjectRepository;
   }
 
-  public void setCfTestObjectRepository(CFTestObjectRepository cfTestObjectRepository) {
+  public void setCfTestObjectRepository(TestObjectRepository cfTestObjectRepository) {
     this.cfTestObjectRepository = cfTestObjectRepository;
   }
 
@@ -416,6 +417,17 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
   }
 
   @Override
+  public void isolated() throws IOException {
+    List<Resource> resources = resourceBundleHelper.getDirectories(ISOLATED_PATTERN + "*/");
+    for (Resource resource : resources) {
+      String fileName = fileName(resource);
+      String location = fileName.substring(fileName.indexOf(ISOLATED_PATTERN), fileName.length());
+      TestPlan testPlan = testPlan(location, Stage.ISOLATED);
+      testPlanRepository.save(testPlan);
+    }
+  }
+
+  @Override
   public void cb() throws IOException {
     List<Resource> resources = resourceBundleHelper.getDirectories(CONTEXTBASED_PATTERN + "*/");
     for (Resource resource : resources) {
@@ -432,10 +444,10 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     List<Resource> resources = resourceBundleHelper.getDirectories(CONTEXTFREE_PATTERN + "*/");
     for (Resource resource : resources) {
       String fileName = fileName(resource);
-      CFTestObject to =
+      TestObject testObject =
           cfTestObject(fileName.substring(fileName.indexOf(CONTEXTFREE_PATTERN), fileName.length()));
-      to.setRoot(true);
-      cfTestObjectRepository.save(to);
+      testObject.setRoot(true);
+      cfTestObjectRepository.save(testObject);
     }
   }
 
@@ -451,17 +463,10 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     tp.setName(testPlanObj.findValue("name").getTextValue());
     tp.setDescription(testPlanObj.findValue("description").getTextValue());
     tp.setStage(stage);
-
-    if (resourceBundleHelper.getResource(testPlanPath + "TestProcedure.pdf") != null) {
-      TestArtifact testProcedure = new TestArtifact();
-      testProcedure.setPdfPath(testPlanPath + "TestProcedure.pdf");
+    if (testPlanObj.findValue("position") != null) {
+      tp.setPosition(testPlanObj.findValue("position").getIntValue());
     }
-
-    if (resourceBundleHelper.getResource(testPlanPath + "TestProcedure.json") != null) {
-      TestArtifact testProcedure = new TestArtifact();
-      testProcedure.setJsonPath(testPlanPath + "TestProcedure.json");
-    }
-
+    tp.setTestProcedure(testProcedure(testPlanPath));
     List<Resource> resources = resourceBundleHelper.getDirectories(testPlanPath + "*/");
     for (Resource resource : resources) {
       String fileName = fileName(resource);
@@ -479,9 +484,9 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     return tp;
   }
 
-  private CFTestObject cfTestObject(String testObjectPath) throws IOException {
+  private TestObject cfTestObject(String testObjectPath) throws IOException {
     logger.info("Processing context-free test object at:" + testObjectPath);
-    CFTestObject parent = new CFTestObject();
+    TestObject parent = new TestObject();
     Resource res = resourceBundleHelper.getResource(testObjectPath + "TestObject.json");
     if (res == null)
       throw new IllegalArgumentException("No TestObject.json found at " + testObjectPath);
@@ -489,6 +494,9 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
     parent.setName(testPlanObj.findValue("name").getTextValue());
+    if (testPlanObj.findValue("position") != null) {
+      parent.setPosition(testPlanObj.findValue("position").getIntValue());
+    }
     parent.setDescription(testPlanObj.findValue("description").getTextValue());
     JsonNode messageId = testPlanObj.findValue("messageId");
     JsonNode constraintId = testPlanObj.findValue("constraintId");
@@ -500,9 +508,10 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     for (Resource resource : resources) {
       String fileName = fileName(resource);
       String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
-      CFTestObject testObject = cfTestObject(location);
+      TestObject testObject = cfTestObject(location);
       parent.getChildren().add(testObject);
     }
+
     return parent;
   }
 
@@ -519,6 +528,11 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
       testContext.setAddditionalConstraints(additionalConstraints(path));
       testContext.setMessage(message(FileUtil.getContent(resourceBundleHelper.getResource(path
           + "Message.txt"))));
+      // TODO: Ask Woo to change Message.text to Message.txt
+      if (testContext.getMessage() == null) {
+        testContext.setMessage(message(FileUtil.getContent(resourceBundleHelper.getResource(path
+            + "Message.text"))));
+      }
       try {
         ConformanceProfile conformanceProfile = new ConformanceProfile();
         IntegrationProfile integrationProfile = getIntegrationProfile(messageId.getTextValue());
@@ -564,6 +578,11 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     tc.setTestStory(testStory(location));
     tc.setTestPackage(testPackage(location));
     tc.setJurorDocument(jurorDocument(location));
+    tc.setMessageContent(messageContent(location));
+    tc.setTestDataSpecification(testDataSpecification(location));
+    if (testCaseObj.findValue("position") != null) {
+      tc.setPosition(testCaseObj.findValue("position").getIntValue());
+    }
     if (testCaseObj.findValue("type") != null) {
       tc.setCategory(TestCategory.valueOf(testCaseObj.findValue("type").getTextValue()));
     }
@@ -587,75 +606,106 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     JsonNode testStepObj = mapper.readTree(descriptorContent);
     testStep.setName(testStepObj.findValue("name").getTextValue());
     testStep.setDescription(testStepObj.findValue("description").getTextValue());
-    testStep.setTestContext(testContext(location, testStepObj));
+    ConnectionType connType = null;
+    if (testStepObj.findValue("type") != null) {
+      String type = testStepObj.findValue("type").getTextValue();
+      connType = type != null ? ConnectionType.valueOf(type) : null;
+      testStep.setConnectionType(connType);
+    }
+    if (connType == null
+        || (!connType.equals(ConnectionType.SUT_MANUAL) && !connType
+            .equals(ConnectionType.TA_MANUAL))) {
+      testStep.setTestContext(testContext(location, testStepObj));
+    }
     testStep.setTestStory(testStory(location));
     testStep.setTestPackage(testPackage(location));
     testStep.setJurorDocument(jurorDocument(location));
+    testStep.setMessageContent(messageContent(location));
+    testStep.setTestDataSpecification(testDataSpecification(location));
     if (testStepObj.findValue("position") != null) {
-      testStep.setPosition(testStepObj.findValue("position").getIntValue());
-    }
-    if (testStepObj.findValue("connectionType") != null) {
       testStep.setPosition(testStepObj.findValue("position").getIntValue());
     }
     return testStep;
   }
 
-  private TestStory testStory(String location) throws IOException {
-    logger.info("Processing test story at:" + location);
-    TestStory tStory = new TestStory();
-    Resource json = resourceBundleHelper.getResource(location + "TestStory.json");
-    if (json != null) {
-      String descriptorContent = FileUtil.getContent(json);
-      ObjectMapper mapper = new ObjectMapper();
-      JsonNode tStoryObj = mapper.readTree(descriptorContent);
-      tStory.setDescription(tStoryObj.findValue("teststorydesc") != null ? tStoryObj.findValue(
-          "teststorydesc").getTextValue() : null);
-      tStory.setHtmlPath(location + "TestStory.html");
-      tStory.setNotes(tStoryObj.findValue("notes") != null ? tStoryObj.findValue("notes")
-          .getTextValue() : null);
-      tStory.setPdfPath(location + "TestStory.pdf");
-      tStory.setPostCondition(tStoryObj.findValue("postCondition") != null ? tStoryObj.findValue(
-          "postCondition").getTextValue() : null);
-      tStory.setPreCondition(tStoryObj.findValue("preCondition") != null ? tStoryObj.findValue(
-          "preCondition").getTextValue() : null);
-      tStory.setTestObjectives(tStoryObj.findValue("testObjectives") != null ? tStoryObj.findValue(
-          "testObjectives").getTextValue() : null);
-      tStory.setComments(tStoryObj.findValue("comments") != null ? tStoryObj.findValue("comments")
-          .getTextValue() : null);
-      return tStory;
-    }
-    return null;
+  // private TestStory testStory(String location) throws IOException {
+  // logger.info("Processing test story at:" + location);
+  // TestStory tStory = new TestStory();
+  // Resource json = resourceBundleHelper.getResource(location + "TestStory.json");
+  // if (json != null) {
+  // String descriptorContent = FileUtil.getContent(json);
+  // ObjectMapper mapper = new ObjectMapper();
+  // JsonNode tStoryObj = mapper.readTree(descriptorContent);
+  // tStory.setDescription(tStoryObj.findValue("teststorydesc") != null ? tStoryObj.findValue(
+  // "teststorydesc").getTextValue() : null);
+  // tStory.setHtmlPath(location + "TestStory.html");
+  // tStory.setNotes(tStoryObj.findValue("notes") != null ? tStoryObj.findValue("notes")
+  // .getTextValue() : null);
+  // tStory.setPdfPath(location + "TestStory.pdf");
+  // tStory.setPostCondition(tStoryObj.findValue("postCondition") != null ? tStoryObj.findValue(
+  // "postCondition").getTextValue() : null);
+  // tStory.setPreCondition(tStoryObj.findValue("preCondition") != null ? tStoryObj.findValue(
+  // "preCondition").getTextValue() : null);
+  // tStory.setTestObjectives(tStoryObj.findValue("testObjectives") != null ? tStoryObj.findValue(
+  // "testObjectives").getTextValue() : null);
+  // tStory.setComments(tStoryObj.findValue("comments") != null ? tStoryObj.findValue("comments")
+  // .getTextValue() : null);
+  // return tStory;
+  // }
+  // return null;
+  // }
+
+
+  private TestArtifact testStory(String location) throws IOException {
+    return artifact(location, "TestStory");
+  }
+
+
+  private TestArtifact testProcedure(String location) throws IOException {
+    return artifact(location, "TestProcedure");
   }
 
   private TestArtifact jurorDocument(String location) throws IOException {
+    return artifact(location, "JurorDocument");
+  }
+
+  private TestArtifact artifact(String location, String type) throws IOException {
     TestArtifact doc = null;
-    Resource pdf = resourceBundleHelper.getResource(location + "JurorDocument.pdf");
-    if (pdf != null) {
-      doc = new TestArtifact();
-      doc.setPdfPath(location + "JurorDocument.pdf");
+    String path = location + type + ".pdf";
+    Resource resource = resourceBundleHelper.getResource(path);
+    if (resource != null) {
+      doc = new TestArtifact(type);
+      doc.setPdfPath(path);
+    }
+    path = location + type + ".html";
+    resource = resourceBundleHelper.getResource(path);
+    if (resource != null) {
+      doc = doc == null ? new TestArtifact(type) : doc;
+      doc.setHtml(FileUtil.getContent(resource));
     }
 
-    Resource html = resourceBundleHelper.getResource(location + "JurorDocument.html");
-    if (html != null) {
-      doc = doc == null ? new TestArtifact() : doc;
-      doc.setHtmlPath(location + "JurorDocument.html");
+    path = location + type + ".json";
+    resource = resourceBundleHelper.getResource(path);
+    if (resource != null) {
+      doc = doc == null ? new TestArtifact(type) : doc;
+      doc.setJson(FileUtil.getContent(resource));
     }
     return doc;
   }
 
-  private TestArtifact testPackage(String location) throws IOException {
-    TestArtifact doc = null;
-    Resource pdf = resourceBundleHelper.getResource(location + "TestPackage.pdf");
-    if (pdf != null) {
-      doc = new TestArtifact();
-      doc.setPdfPath(location + "TestPackage.pdf");
-    }
 
-    Resource html = resourceBundleHelper.getResource(location + "TestPackage.html");
-    if (html != null) {
-      doc.setHtmlPath(location + "TestPackage.html");
-    }
-    return doc;
+  private TestArtifact messageContent(String location) throws IOException {
+    return artifact(location, "MessageContent");
+  }
+
+  private TestArtifact testDataSpecification(String location) throws IOException {
+    return artifact(location, "TestDataSpecification");
+  }
+
+
+
+  private TestArtifact testPackage(String location) throws IOException {
+    return artifact(location, "TestPackage");
   }
 
 
@@ -670,6 +720,9 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
     tcg.setName(testPlanObj.findValue("name").getTextValue());
     tcg.setDescription(testPlanObj.findValue("description").getTextValue());
+    if (testPlanObj.findValue("position") != null) {
+      tcg.setPosition(testPlanObj.findValue("position").getIntValue());
+    }
     List<Resource> resources = resourceBundleHelper.getDirectories(location + "*/");
     for (Resource resource : resources) {
       String fileName = fileName(resource);

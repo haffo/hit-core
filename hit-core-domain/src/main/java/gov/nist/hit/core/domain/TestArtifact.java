@@ -1,5 +1,7 @@
 package gov.nist.hit.core.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,28 +12,33 @@ import javax.persistence.PrimaryKeyJoinColumn;
 
 
 @Entity
-public class TestArtifact {
-  
+public class TestArtifact implements Serializable {
+ 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
   
+  private String name;
+  
   @Column(columnDefinition = "TEXT")
-  private String htmlPath;
+  private String html;
   
   @Column(columnDefinition = "TEXT")
   private String pdfPath;
   
   @Column(columnDefinition = "TEXT")
-  private String jsonPath;
+  private String json;
 
-  
-  public String getHtmlPath() {
-    return htmlPath;
+  public TestArtifact() {
+    super();
+    this.name = null;
   }
 
-  public void setHtmlPath(String htmlPath) {
-    this.htmlPath = htmlPath;
+  public TestArtifact(String name) {
+    super();
+    this.name = name;
   }
 
   public String getPdfPath() {
@@ -42,13 +49,31 @@ public class TestArtifact {
     this.pdfPath = pdfPath;
   }
 
-  public String getJsonPath() {
-    return jsonPath;
+  public String getHtml() {
+    return html;
   }
 
-  public void setJsonPath(String jsonPath) {
-    this.jsonPath = jsonPath;
-  } 
+  public void setHtml(String html) {
+    this.html = html;
+  }
+
+  public String getJson() {
+    return json;
+  }
+
+  public void setJson(String json) {
+    this.json = json;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  
   
   
 }

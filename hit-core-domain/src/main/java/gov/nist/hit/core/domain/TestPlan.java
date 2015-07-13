@@ -18,7 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
-public class TestPlan  implements Serializable {
+public class TestPlan extends AbstractTestCase  implements Serializable {
 
   private static final long serialVersionUID = 8324105895492403037L;
 
@@ -26,25 +26,13 @@ public class TestPlan  implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id; 
   
-  protected String name;
-  protected String description;
-  @Enumerated(EnumType.STRING)
-  protected TestType type;
-  @Enumerated(EnumType.STRING)
-  protected TestCategory category; 
-  @Enumerated(EnumType.STRING)
-  protected Stage stage;
-
   @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(unique = true)
   protected TestArtifact testProcedure; 
 
   public TestPlan() {
     this.type = TestType.TestPlan;
-    category = TestCategory.DataInstance;
   }
- 
- 
   
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JoinTable(name = "tp_tc", joinColumns = {@JoinColumn(name = "testplan_id")},
@@ -92,48 +80,7 @@ public class TestPlan  implements Serializable {
     this.testProcedure = testProcedure;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public TestType getType() {
-    return type;
-  }
-
-  public void setType(TestType type) {
-    this.type = type;
-  }
-
-  public TestCategory getCategory() {
-    return category;
-  }
-
-  public void setCategory(TestCategory category) {
-    this.category = category;
-  }
-
-  public Stage getStage() {
-    return stage;
-  }
-
-  public void setStage(Stage stage) {
-    this.stage = stage;
-  }
-
   
-  
-  
+ 
 
 }

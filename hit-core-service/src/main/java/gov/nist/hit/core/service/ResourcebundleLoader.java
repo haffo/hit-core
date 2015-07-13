@@ -40,6 +40,8 @@ public interface ResourcebundleLoader {
 
   public void cb() throws IOException;
 
+  public void isolated() throws IOException;
+
   public void cf() throws IOException, ProfileParserException;
 
 

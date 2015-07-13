@@ -19,30 +19,27 @@ import javax.persistence.OneToOne;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class CFTestObject  implements Serializable {
+public class TestObject extends AbstractTestCase implements Serializable{
 
   private static final long serialVersionUID = 8805967508478985159L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id; 
-  
-  private String name; 
-  
-  private String description; 
-  
+   
   @JsonIgnore
   private boolean root;
   
-  public CFTestObject() {
+  public TestObject() {
     super();
+    category = TestCategory.DataInstance;
   }
 
   @OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER,
       orphanRemoval = true)
   private TestContext testContext;
 
-  public CFTestObject(String name) {
+  public TestObject(String name) {
     super();
     this.name = name;
   } 
@@ -50,7 +47,7 @@ public class CFTestObject  implements Serializable {
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "cf_tc", joinColumns = {@JoinColumn(name = "parent_id")},
       inverseJoinColumns = {@JoinColumn(name = "child_id")})
-  private Set<CFTestObject> children = new HashSet<CFTestObject>();
+  private Set<TestObject> children = new HashSet<TestObject>();
 
   public Long getId() {
     return id;
@@ -68,40 +65,23 @@ public class CFTestObject  implements Serializable {
     this.testContext = testContext;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Set<CFTestObject> getChildren() {
+   
+  public Set<TestObject> getChildren() {
     return children;
   }
 
-  public void setChildren(Set<CFTestObject> children) {
+  public void setChildren(Set<TestObject> children) {
     this.children = children;
   }
 
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
+  
   public boolean isRoot() {
     return root;
   }
 
   public void setRoot(boolean root) {
     this.root = root;
-  } 
+  }
   
-  
-  
-
-  
+ 
 }

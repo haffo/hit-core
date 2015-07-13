@@ -12,16 +12,16 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.CFTestObject;
+import gov.nist.hit.core.domain.TestObject;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface CFTestObjectRepository extends JpaRepository<CFTestObject, Long> {
+public interface TestObjectRepository extends JpaRepository<TestObject, Long> {
 
-  @Query("select to from CFTestObject to where to.root = true")
-  public List<CFTestObject> findAllAsRoot();
+  @Query("select to from TestObject to where to.root = true")
+  public List<TestObject> findAllAsRoot();
 
 }
