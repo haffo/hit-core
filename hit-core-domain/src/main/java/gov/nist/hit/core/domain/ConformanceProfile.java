@@ -44,7 +44,12 @@ public class ConformanceProfile implements Serializable {
   
   @JsonIgnore
   @ManyToOne
-  IntegrationProfile integrationProfile;
+  IntegrationProfile integrationProfile; 
+  
+  @NotNull
+  @JsonIgnore
+  @Column(nullable = false)
+  protected String sourceId;
 
   @NotNull
   @JsonIgnore
@@ -60,20 +65,15 @@ public class ConformanceProfile implements Serializable {
     this.integrationProfile = integrationProfile;
   }
 
-
-
   public ConformanceProfile() {
     super();
-  }
-
-  
+  }  
 
   public ConformanceProfile(String json) {
     super();
      this.json = json;
   }
 
- 
   public Long getId() {
     return id;
   }
@@ -92,6 +92,14 @@ public class ConformanceProfile implements Serializable {
 
   public void setJson(String json) {
     this.json = json;
+  }
+
+  public String getSourceId() {
+    return sourceId;
+  }
+
+  public void setSourceId(String sourceId) {
+    this.sourceId = sourceId;
   }
  
  

@@ -31,7 +31,7 @@ public class TestArtifact implements Serializable {
   @Column(columnDefinition = "TEXT")
   private String pdfPath;
   
-  @JsonIgnore
+//  @JsonIgnore
   @Column(columnDefinition = "TEXT")
   private String json;
 

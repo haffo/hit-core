@@ -524,7 +524,7 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
         testContext.setConstraints(getConstraints(constraintId.getTextValue()));
       }
       testContext.setVocabularyLibrary((getVocabularyLibrary(valueSetLibraryId.getTextValue())));
-      testContext.setAddditionalConstraints(additionalConstraints(path));
+      testContext.setAddditionalConstraints(additionalConstraints(path + CONSTRAINTS_FILE_PATTERN));
       testContext.setMessage(message(FileUtil.getContent(resourceBundleHelper.getResource(path
           + "Message.txt"))));
       // TODO: Ask Woo to change Message.text to Message.txt
@@ -540,6 +540,7 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
             .getXml() : null, testContext.getAddditionalConstraints() != null ? testContext
             .getAddditionalConstraints().getXml() : null));
         conformanceProfile.setIntegrationProfile(integrationProfile);
+        conformanceProfile.setSourceId(messageId.getTextValue());
         testContext.setConformanceProfile(conformanceProfile);
       } catch (ProfileParserException e) {
         throw new RuntimeException("Failed to parse integrationProfile at " + path);
@@ -683,12 +684,15 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
       doc.setHtml(FileUtil.getContent(resource));
     }
 
-    path = location + type + ".json";
-    resource = resourceBundleHelper.getResource(path);
-    if (resource != null) {
-      doc = doc == null ? new TestArtifact(type) : doc;
-      doc.setJson(FileUtil.getContent(resource));
+    if (type.equals("TestStory")) { // TODO: Temporary hack
+      path = location + type + ".json";
+      resource = resourceBundleHelper.getResource(path);
+      if (resource != null) {
+        doc = doc == null ? new TestArtifact(type) : doc;
+        doc.setJson(FileUtil.getContent(resource));
+      }
     }
+
     return doc;
   }
 
