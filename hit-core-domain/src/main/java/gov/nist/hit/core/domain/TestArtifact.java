@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 public class TestArtifact implements Serializable {
@@ -22,12 +24,14 @@ public class TestArtifact implements Serializable {
   
   private String name;
   
+//  @JsonIgnore
   @Column(columnDefinition = "TEXT")
   private String html;
   
   @Column(columnDefinition = "TEXT")
   private String pdfPath;
   
+//  @JsonIgnore
   @Column(columnDefinition = "TEXT")
   private String json;
 

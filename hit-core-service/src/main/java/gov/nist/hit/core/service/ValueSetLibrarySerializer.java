@@ -34,7 +34,7 @@ public abstract class ValueSetLibrarySerializer {
     elmTableLibrary.setNamespaceURI("http://www.nist.gov/healthcare/data");
     elmTableLibrary.addAttribute(new Attribute("ValueSetIdentifier", valueSetLibrary
         .getValueSetIdentifier()));
-    elmTableLibrary.addAttribute(new Attribute("Status", valueSetLibrary.getStatus().value()));
+    elmTableLibrary.addAttribute(new Attribute("Status", valueSetLibrary.getStatus().toString()));
     elmTableLibrary.addAttribute(new Attribute("ValueSetVersion", valueSetLibrary
         .getValueSetVersion()));
     elmTableLibrary.addAttribute(new Attribute("OrganizationName", valueSetLibrary
@@ -108,10 +108,13 @@ public abstract class ValueSetLibrarySerializer {
     valueSetLibrary.setDescription(elmTableLibrary.getAttribute("Description"));
     valueSetLibrary.setName(elmTableLibrary.getAttribute("Name"));
     valueSetLibrary.setOrganizationName(elmTableLibrary.getAttribute("OrganizationName"));
-    valueSetLibrary.setStatus(StatusType.fromValue(elmTableLibrary.getAttribute("Status")));
+    String t = elmTableLibrary.getAttribute("Status");
     valueSetLibrary.setValueSetIdentifier(elmTableLibrary.getAttribute("ValueSetIdentifier"));
     valueSetLibrary.setValueSetVersion(elmTableLibrary.getAttribute("ValueSetVersion"));
-
+    System.out.println(valueSetLibrary.getName() + "--" + t);
+    if (StringUtils.isNotEmpty(elmTableLibrary.getAttribute("Status"))) {
+      valueSetLibrary.setStatus(StatusType.valueOf(elmTableLibrary.getAttribute("Status")));
+    }
     NodeList noValidationElements = elmTableLibrary.getElementsByTagName("NoValidation");
     if (noValidationElements != null && noValidationElements.getLength() > 0) {
       Element noValidationElement = (Element) noValidationElements.item(0);

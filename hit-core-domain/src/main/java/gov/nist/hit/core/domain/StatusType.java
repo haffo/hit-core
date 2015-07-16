@@ -9,25 +9,6 @@
 package gov.nist.hit.core.domain;
 
 public enum StatusType {
-
-  ACTIVE("Active"), DRAFT("Draft"), SUPERCEDED("Superceded");
-  private final String value;
-
-  StatusType(String v) {
-    value = v;
-  }
-
-  public String value() {
-    return value;
-  }
-
-  public static StatusType fromValue(String v) {
-    for (StatusType c : StatusType.values()) {
-      if (c.value.equals(v)) {
-        return c;
-      }
-    }
-    throw new IllegalArgumentException(v);
-  }
+  Active , Draft , Superceded;
 
 }

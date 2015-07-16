@@ -13,7 +13,6 @@
 package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.AppInfo;
-import gov.nist.hit.core.domain.TestObject;
 import gov.nist.hit.core.domain.ConformanceProfile;
 import gov.nist.hit.core.domain.ConnectionType;
 import gov.nist.hit.core.domain.Constraints;
@@ -26,14 +25,15 @@ import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.domain.TestCategory;
 import gov.nist.hit.core.domain.TestContext;
+import gov.nist.hit.core.domain.TestObject;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.AppInfoRepository;
-import gov.nist.hit.core.repo.TestObjectRepository;
 import gov.nist.hit.core.repo.ConstraintsRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.MessageRepository;
+import gov.nist.hit.core.repo.TestObjectRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
@@ -69,7 +69,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.ibm.icu.text.SimpleDateFormat;
 
 @Service
 public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
@@ -283,7 +282,7 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     appInfo.setName(appInfoJson.get("name").getTextValue());
     appInfo.setVersion(appInfoJson.get("version").getTextValue());
 
-    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     Date date = new Date();
     appInfo.setDate(dateFormat.format(date));
 
