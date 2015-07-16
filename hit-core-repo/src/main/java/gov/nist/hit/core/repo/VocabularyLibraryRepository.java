@@ -23,4 +23,10 @@ public interface VocabularyLibraryRepository extends JpaRepository<VocabularyLib
 
   @Query("select vocab from VocabularyLibrary vocab where vocab.sourceId = :sourceId")
   IntegrationProfile findOneBySourceId(@Param("sourceId") String sourceId);
+
+  @Query("select vocab.json from VocabularyLibrary vocab where vocab.id = :valueSetLibraryId")
+  public String getJson(@Param("valueSetLibraryId") Long valueSetLibraryId);
+
+
+
 }

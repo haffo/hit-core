@@ -37,6 +37,7 @@ public class VocabularyLibrary implements Serializable {
   @Column(columnDefinition = "LONGTEXT")
   protected String xml;
 
+  @JsonIgnore
   @Column(columnDefinition = "LONGTEXT")
   protected String json; 
   

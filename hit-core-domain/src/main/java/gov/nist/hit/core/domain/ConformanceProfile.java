@@ -42,10 +42,12 @@ public class ConformanceProfile implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id; 
   
+  @JsonIgnore
   @ManyToOne
   IntegrationProfile integrationProfile;
 
   @NotNull
+  @JsonIgnore
   @Column(columnDefinition = "LONGTEXT")
   protected String json;
 
