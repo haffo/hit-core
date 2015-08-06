@@ -68,8 +68,6 @@ public class ProfileElement {
   protected int order;
   protected String lenght;
 
-  protected String constraintPath;
-
   @JsonIgnore
   protected ProfileElement parent;
 
@@ -273,13 +271,13 @@ public class ProfileElement {
     this.reference = reference;
   }
 
-  public String getConstraintPath() {
-    return constraintPath;
-  }
-
-  public void setConstraintPath(String constraintPath) {
-    this.constraintPath = constraintPath;
-  }
+//  public String getConstraintPath() {
+//    return constraintPath;
+//  }
+//
+//  public void setConstraintPath(String constraintPath) {
+//    this.constraintPath = constraintPath;
+//  }
 
   public ProfileElement getParent() {
     return parent;
