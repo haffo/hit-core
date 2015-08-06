@@ -47,7 +47,8 @@ public class Transaction implements java.io.Serializable {
 	protected String incoming;
 
 	@Column(nullable = true, columnDefinition = "LONGTEXT")
-	protected String outgoing;
+	protected String outgoing; 
+	
 
 	@JsonIgnore
 	@OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
@@ -107,16 +108,17 @@ public class Transaction implements java.io.Serializable {
 	public void close() {
 		clear();
 		this.status = TransactionStatus.CLOSE;
-	}
+ 	}
 
 	private void clear() {
 		this.incoming = null;
 		this.outgoing = null;
-	}
+  	}
+  
+  	public void init() {
+  		clear();
+  		this.status = TransactionStatus.OPEN;
+  	}
 
-	public void init() {
-		clear();
-		this.status = TransactionStatus.OPEN;
-	}
-
+	
 }

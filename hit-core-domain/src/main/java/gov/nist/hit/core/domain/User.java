@@ -21,7 +21,10 @@ public class User implements java.io.Serializable {
   protected String password;
 
   @Column(nullable = true)
-  protected String facilityID;
+  protected String facilityID; 
+  
+  @Column(nullable = true)
+  protected Long responseMessageId;  
 
   public Long getId() {
     return id;
@@ -54,5 +57,19 @@ public class User implements java.io.Serializable {
   public void setFacilityID(String facilityID) {
     this.facilityID = facilityID;
   }
+
+  public Long getResponseMessageId() {
+    return responseMessageId;
+  }
+
+  public void setResponseMessageId(Long responseMessageId) {
+    this.responseMessageId = responseMessageId;
+  }
+
+  
+  
+  
+  
+  
 
 }
