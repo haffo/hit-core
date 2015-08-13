@@ -70,7 +70,8 @@ public class ProfileElement {
 
   @JsonIgnore
   protected ProfileElement parent;
-
+  
+ 
   public String getName() {
     return name;
   }
@@ -304,5 +305,36 @@ public class ProfileElement {
   public void setRelevent(boolean relevent) {
     this.relevent = relevent;
   }
+ 
+  @Override
+  public ProfileElement clone() throws CloneNotSupportedException {
+    ProfileElement element = new ProfileElement();
+    element.setChildren(children);
+    element.setConformanceStatements(conformanceStatements);
+    element.setDataType(dataType);
+    element.setIcon(icon);
+    element.setId(id);
+    element.setLongName(longName);
+    element.setMaxLength(maxLength);
+    element.setMinLength(minLength);
+    element.setMinOccurs(minOccurs);
+    element.setName(name);
+    element.setMaxOccurs(maxOccurs);
+    element.setLenght(lenght);
+    element.setOrder(order);
+    element.setParent(parent);
+     element.setPath(path);
+    element.setPosition(position);
+    element.setPredicates(predicates);
+    element.setReference(reference);
+    element.setRelevent(relevent);
+    element.setTable(table);
+    element.setType(type);
+    element.setUsage(usage);
+    element.setUsages(usages);
+    return element;
+  }
 
+ 
+  
 }
