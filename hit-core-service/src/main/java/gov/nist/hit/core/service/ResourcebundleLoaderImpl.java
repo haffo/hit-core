@@ -334,7 +334,6 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     vocabLibrary.setXml(content);
     vocabLibrary.setJson(obm.writeValueAsString(valueSetLibrarySerializer.toObject(content)));
     vocabularyLibraryRepository.save(vocabLibrary);
-
     return vocabLibrary;
   }
 
@@ -353,9 +352,6 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     Document doc = this.stringToDom(content);
     IntegrationProfile integrationProfile = new IntegrationProfile();
     Element profileElement = (Element) doc.getElementsByTagName("ConformanceProfile").item(0);
-    // integrationProfile.setType(profileElement.getAttribute("Type"));
-    // integrationProfile.setHl7Version(profileElement.getAttribute("HL7Version"));
-    // integrationProfile.setSchemaVersion(profileElement.getAttribute("SchemaVersion"));
     integrationProfile.setSourceId(profileElement.getAttribute("ID"));
     Element metaDataElement = (Element) profileElement.getElementsByTagName("MetaData").item(0);
     integrationProfile.setName(metaDataElement.getAttribute("Name"));
@@ -371,7 +367,6 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
       }
       profileMap.put(id, integrationProfile);
     }
-
     return integrationProfile;
   }
 

@@ -19,8 +19,9 @@ import gov.nist.hit.core.service.exception.ProfileParserException;
 public abstract class ProfileParser {
 
   protected final static String TYPE_GROUP = "GROUP";
-  protected final static String TYPE_DT = "DATATYPE";
+  protected final static String TYPE_DATATYPE = "DATATYPE";
   protected final static String TYPE_SEGMENT = "SEGMENT";
+  protected final static String TYPE_SEGMENT_REF = "SEGMENT_REF";
   protected final static String TYPE_FIELD = "FIELD";
   protected final static String TYPE_COMPONENT = "COMPONENT";
   protected final static String NODE_SEGMENT = "Segment";
