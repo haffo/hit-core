@@ -12,8 +12,9 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.Stage;
+import gov.nist.hit.core.domain.TestArtifact;
+import gov.nist.hit.core.domain.TestStep;
 
 import java.util.List;
 
@@ -24,5 +25,22 @@ import org.springframework.data.repository.query.Param;
 public interface TestStepRepository extends JpaRepository<TestStep, Long> {
   @Query("select ts from TestStep ts where ts.stage = :stage")
   public List<TestStep> findAllByStage(@Param("stage") Stage stage);
+
+  @Query("select ts.jurorDocument from TestStep ts where ts.id = :id")
+  public TestArtifact jurorDocument(@Param("id") Long id);
+
+  @Query("select ts.testPackage from TestStep ts where ts.id = :id")
+  public TestArtifact testPackage(@Param("id") Long id);
+
+
+  @Query("select ts.testStory from TestStep ts where ts.id = :id")
+  public TestArtifact testStory(@Param("id") Long id);
+
+
+  @Query("select ts.messageContent from TestStep ts where ts.id = :id")
+  public TestArtifact messageContent(@Param("id") Long id);
+
+  @Query("select ts.testDataSpecification from TestStep ts where ts.id = :id")
+  public TestArtifact testDataSpecification(@Param("id") Long id);
 
 }

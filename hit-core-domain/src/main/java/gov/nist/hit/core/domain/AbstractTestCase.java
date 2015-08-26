@@ -12,6 +12,10 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
+
+import org.codehaus.jackson.map.annotate.JsonView;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
  
 /**
  * 
@@ -42,22 +46,24 @@ public abstract class AbstractTestCase {
   
   protected int position; 
   
+  @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true)
   protected TestArtifact testPackage; 
   
+  @JsonIgnore
+   @OneToOne(cascade = CascadeType.ALL, optional = true)
+  protected TestArtifact testStory; 
 
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
-  protected TestArtifact TestStory; 
-  
- 
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @JsonIgnore
+   @OneToOne(cascade = CascadeType.ALL, optional = true)
   protected TestArtifact jurorDocument;
   
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @JsonIgnore
+   @OneToOne(cascade = CascadeType.ALL, optional = true)
   protected TestArtifact messageContent;
   
-  
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @JsonIgnore
+   @OneToOne(cascade = CascadeType.ALL, optional = true)
   protected TestArtifact testDataSpecification;
    
  
@@ -117,12 +123,14 @@ public abstract class AbstractTestCase {
     this.testPackage = testPackage;
   }
 
+  
+
   public TestArtifact getTestStory() {
-    return TestStory;
+    return testStory;
   }
 
   public void setTestStory(TestArtifact testStory) {
-    TestStory = testStory;
+    this.testStory = testStory;
   }
 
   public TestArtifact getJurorDocument() {
