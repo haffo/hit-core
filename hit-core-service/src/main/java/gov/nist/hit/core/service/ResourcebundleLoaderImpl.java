@@ -472,6 +472,7 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
         tp.getTestCaseGroups().add(testCaseGroup);
       } else if (filename.endsWith("TestCase.json")) {
         TestCase testCase = testCase(location, stage);
+        testCase.setParentName(tp.getName());
         tp.getTestCases().add(testCase);
       }
     }
@@ -585,7 +586,9 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     for (Resource resource : resources) {
       String fileName = fileName(resource);
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
-      tc.getTestSteps().add(testStep(tcLocation, stage));
+      TestStep testStep = testStep(tcLocation, stage);
+      testStep.setParentName(tc.getName());
+      tc.getTestSteps().add(testStep);
     }
     return tc;
   }
@@ -732,6 +735,7 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
         tcg.getTestCaseGroups().add(testCaseGroup);
       } else if (filename.endsWith("TestCase.json")) {
         TestCase testCase = testCase(tcLocation, stage);
+        testCase.setParentName(tcg.getName());
         tcg.getTestCases().add(testCase);
       }
     }

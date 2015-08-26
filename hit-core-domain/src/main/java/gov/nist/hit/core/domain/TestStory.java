@@ -49,7 +49,11 @@ public class TestStory  implements Serializable {
   private String testObjectives;
 
   @Column(columnDefinition = "TEXT")
-  private String noteToTesters;
+  private String noteToTesters; 
+  
+  @Column(columnDefinition = "TEXT")
+  private String evaluationCriteria;
+  
 
   private String pdfPath;
 

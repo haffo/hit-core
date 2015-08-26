@@ -22,8 +22,9 @@ public class MessageCommand extends TestCaseCommand {
 
   private String name;
 
-  private String facilityId;
-
+  private String facilityId; 
+  
+  private boolean dqa;
 
 
   public String getContent() {
@@ -50,6 +51,17 @@ public class MessageCommand extends TestCaseCommand {
     this.facilityId = facilityId;
   }
 
+  public boolean isDqa() {
+    return dqa;
+  }
 
+  public void setDqa(boolean dqa) {
+    this.dqa = dqa;
+  }
+
+   
+
+
+  
 
 }

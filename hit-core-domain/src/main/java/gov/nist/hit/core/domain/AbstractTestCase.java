@@ -24,6 +24,10 @@ public abstract class AbstractTestCase {
   @Column(columnDefinition = "TEXT")
   protected String name;
   
+  @Column
+  private String parentName;
+
+  
   @Column(columnDefinition = "TEXT")
   protected String description;
   
@@ -143,6 +147,14 @@ public abstract class AbstractTestCase {
 
   public void setTestDataSpecification(TestArtifact testDataSpecification) {
     this.testDataSpecification = testDataSpecification;
+  }
+
+  public String getParentName() {
+    return parentName;
+  }
+
+  public void setParentName(String parentName) {
+    this.parentName = parentName;
   }
 
   

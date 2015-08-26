@@ -22,16 +22,7 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-
-//  @ManyToOne
-//  @JoinColumn(name = "s_actor_id")
-//  private Actor sActor;
-//
-//  @ManyToOne
-//  @JoinColumn(name = "r_actor_id")
-//  private Actor rActor; 
-//  
-//  
+ 
   
   @Enumerated(EnumType.STRING)
   private ConnectionType connectionType; 
@@ -66,22 +57,6 @@ public class TestStep extends AbstractTestCase implements Serializable {
     this.testContext = testContext;
   }
 
-//  public Actor getsActor() {
-//    return sActor;
-//  }
-//
-//  public void setsActor(Actor sActor) {
-//    this.sActor = sActor;
-//  }
-//
-//  public Actor getrActor() {
-//    return rActor;
-//  }
-//
-//  public void setrActor(Actor rActor) {
-//    this.rActor = rActor;
-//  }
-
 
   public ConnectionType getConnectionType() {
     return connectionType;
@@ -91,6 +66,8 @@ public class TestStep extends AbstractTestCase implements Serializable {
     this.connectionType = connectionType;
   }
 
+ 
+  
  
 
 
