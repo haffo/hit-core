@@ -24,6 +24,8 @@ public class MessageCommand extends TestCaseCommand {
 
   private String facilityId; 
   
+  private String contextType; 
+  
   private boolean dqa;
 
 
@@ -57,6 +59,14 @@ public class MessageCommand extends TestCaseCommand {
 
   public void setDqa(boolean dqa) {
     this.dqa = dqa;
+  }
+
+  public String getContextType() {
+    return contextType;
+  }
+
+  public void setContextType(String contextType) {
+    this.contextType = contextType;
   }
 
    

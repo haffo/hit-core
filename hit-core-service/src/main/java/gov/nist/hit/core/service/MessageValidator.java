@@ -15,7 +15,6 @@ import gov.nist.hit.core.service.exception.MessageValidationException;
 
 public interface MessageValidator {
 
-  public String validate(String title, String message, String... options)
-      throws MessageValidationException;
+  public String validate(String... args) throws MessageValidationException;
 
 }
