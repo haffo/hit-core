@@ -24,14 +24,14 @@ public class TestArtifact implements Serializable {
   
   private String name;
   
-//  @JsonIgnore
+  //@JsonIgnore
   @Column(columnDefinition = "TEXT")
   private String html;
   
   @Column(columnDefinition = "TEXT")
   private String pdfPath;
   
-//  @JsonIgnore
+  //@JsonIgnore
   @Column(columnDefinition = "TEXT")
   private String json;
 
