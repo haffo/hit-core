@@ -12,7 +12,6 @@ public class ValueSetDefinition implements java.io.Serializable {
   protected String bindingIdentifier;
   protected String name;
   protected String description;
-  private String displayClassifier;
   private String version;
   protected String oid;
   protected StabilityType stability;
@@ -158,17 +157,6 @@ public class ValueSetDefinition implements java.io.Serializable {
   public void setDescription(String desscription) {
     this.description = desscription;
   }
-
-
-  public String getDisplayClassifier() {
-    return displayClassifier;
-  }
-
-
-  public void setDisplayClassifier(String displayClassifier) {
-    this.displayClassifier = displayClassifier;
-  }
-
 
   public ContentDefinitionType getContentDefinition() {
     return contentDefinition;

@@ -8,13 +8,16 @@
 
 package gov.nist.hit.core.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.datatype.XMLGregorianCalendar;
 
 public class ValueSetLibrary implements java.io.Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected ValueSetDefinitions valueSetDefinitions;
+  protected List<ValueSetDefinitions> valueSetDefinitions;
   protected NoValidation noValidation;
   protected String name;
   protected String organizationName;
@@ -27,6 +30,7 @@ public class ValueSetLibrary implements java.io.Serializable {
 
   public ValueSetLibrary() {
     super();
+    valueSetDefinitions = new ArrayList<ValueSetDefinitions>();
   }
 
   /**
@@ -35,7 +39,7 @@ public class ValueSetLibrary implements java.io.Serializable {
    * @return possible object is {@link ValueSetDefinitions }
    * 
    */
-  public ValueSetDefinitions getValueSetDefinitions() {
+  public List<ValueSetDefinitions> getValueSetDefinitions() {
     return valueSetDefinitions;
   }
 
@@ -45,7 +49,7 @@ public class ValueSetLibrary implements java.io.Serializable {
    * @param value allowed object is {@link ValueSetDefinitions }
    * 
    */
-  public void setValueSetDefinitions(ValueSetDefinitions value) {
+  public void setValueSetDefinitions(List<ValueSetDefinitions> value) {
     this.valueSetDefinitions = value;
   }
 
