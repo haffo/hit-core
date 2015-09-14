@@ -51,48 +51,53 @@ public abstract class ValueSetLibrarySerializer {
       }
     }
 
-    for (ValueSetDefinition t : valueSetLibrary.getValueSetDefinitions().getValueSetDefinitions()) {
-      nu.xom.Element elmTableDefinition = new nu.xom.Element("ValueSetDefinition");
-      elmTableDefinition.addAttribute(new Attribute("BindingIdentifier",
-          (t.getBindingIdentifier() == null) ? "" : t.getBindingIdentifier()));
-      elmTableDefinition.addAttribute(new Attribute("Name", (t.getName() == null) ? "" : t
-          .getName()));
-      elmTableDefinition.addAttribute(new Attribute("Description",
-          (t.getDescription() == null) ? "" : t.getDescription()));
-      elmTableDefinition.addAttribute(new Attribute("DisplayClassifier",
-          (t.getDisplayClassifier() == null) ? "" : "" + t.getDisplayClassifier()));
-      elmTableDefinition.addAttribute(new Attribute("Version", (t.getVersion() == null) ? "" : ""
-          + t.getVersion()));
-      elmTableDefinition.addAttribute(new Attribute("Oid", (t.getOid() == null) ? "" : t.getOid()));
-      elmTableDefinition.addAttribute(new Attribute("Extensibility",
-          (t.getExtensibility() == null) ? "" : t.getExtensibility().value()));
-      elmTableDefinition.addAttribute(new Attribute("Stability", (t.getStability() == null) ? ""
-          : t.getStability().value()));
-      elmTableDefinition.addAttribute(new Attribute("ContentDefinition",
-          (t.getContentDefinition() == null) ? "" : t.getContentDefinition().value()));
+    for (ValueSetDefinitions vDefs : valueSetLibrary.getValueSetDefinitions()) {
+      nu.xom.Element elmValueSetDefinitions = new nu.xom.Element("ValueSetDefinitions");
+      elmValueSetDefinitions.addAttribute(new Attribute("Group", (vDefs.getGrouping() == null) ? ""
+          : vDefs.getGrouping()));
+      elmValueSetDefinitions.addAttribute(new Attribute("Order", vDefs.getPosition() + ""));
+      elmTableLibrary.appendChild(elmValueSetDefinitions);
 
-      elmTableLibrary.appendChild(elmTableDefinition);
+      for (ValueSetDefinition t : vDefs.getValueSetDefinitions()) {
+        nu.xom.Element elmTableDefinition = new nu.xom.Element("ValueSetDefinition");
+        elmValueSetDefinitions.appendChild(elmTableDefinition);
+        elmTableDefinition.addAttribute(new Attribute("BindingIdentifier", (t
+            .getBindingIdentifier() == null) ? "" : t.getBindingIdentifier()));
+        elmTableDefinition.addAttribute(new Attribute("Name", (t.getName() == null) ? "" : t
+            .getName()));
+        elmTableDefinition.addAttribute(new Attribute("Description",
+            (t.getDescription() == null) ? "" : t.getDescription()));
+        elmTableDefinition.addAttribute(new Attribute("Version", (t.getVersion() == null) ? "" : ""
+            + t.getVersion()));
+        elmTableDefinition
+            .addAttribute(new Attribute("Oid", (t.getOid() == null) ? "" : t.getOid()));
+        elmTableDefinition.addAttribute(new Attribute("Extensibility",
+            (t.getExtensibility() == null) ? "" : t.getExtensibility().value()));
+        elmTableDefinition.addAttribute(new Attribute("Stability", (t.getStability() == null) ? ""
+            : t.getStability().value()));
+        elmTableDefinition.addAttribute(new Attribute("ContentDefinition", (t
+            .getContentDefinition() == null) ? "" : t.getContentDefinition().value()));
+        if (t.getValueSetElements() != null) {
+          for (ValueSetElement c : t.getValueSetElements()) {
+            nu.xom.Element elmTableElement = new nu.xom.Element("ValueElement");
+            elmTableElement.addAttribute(new Attribute("Value", c.getValue() == null ? "" : c
+                .getValue()));
+            elmTableElement.addAttribute(new Attribute("DisplayName",
+                (c.getDisplayName() == null) ? "" : c.getDisplayName()));
+            elmTableElement.addAttribute(new Attribute("CodeSystem",
+                (c.getCodeSystem() == null) ? "" : c.getCodeSystem()));
+            elmTableElement.addAttribute(new Attribute("CodeSystemVersion", (c
+                .getCodeSystemVersion() == null) ? "" : c.getCodeSystemVersion()));
 
-      if (t.getValueSetElements() != null) {
-        for (ValueSetElement c : t.getValueSetElements()) {
-          nu.xom.Element elmTableElement = new nu.xom.Element("ValueElement");
-          elmTableElement.addAttribute(new Attribute("Value", c.getValue() == null ? "" : c
-              .getValue()));
-          elmTableElement.addAttribute(new Attribute("DisplayName",
-              (c.getDisplayName() == null) ? "" : c.getDisplayName()));
-          elmTableElement.addAttribute(new Attribute("CodeSystem", (c.getCodeSystem() == null) ? ""
-              : c.getCodeSystem()));
-          elmTableElement.addAttribute(new Attribute("CodeSystemVersion",
-              (c.getCodeSystemVersion() == null) ? "" : c.getCodeSystemVersion()));
-
-          elmTableElement.addAttribute(new Attribute("Comments", (c.getComments() == null) ? "" : c
-              .getComments()));
-          elmTableElement.addAttribute(new Attribute("Usage", (c.getUsage() == null) ? "" : c
-              .getUsage().value()));
-          elmTableDefinition.appendChild(elmTableElement);
+            elmTableElement.addAttribute(new Attribute("Comments", (c.getComments() == null) ? ""
+                : c.getComments()));
+            elmTableElement.addAttribute(new Attribute("Usage", (c.getUsage() == null) ? "" : c
+                .getUsage().value()));
+            elmTableDefinition.appendChild(elmTableElement);
+          }
         }
-      }
 
+      }
     }
 
     nu.xom.Document doc = new nu.xom.Document(elmTableLibrary);
@@ -131,67 +136,73 @@ public abstract class ValueSetLibrarySerializer {
         elmTableLibrary.getElementsByTagName("ValueSetDefinitions");
 
     if (valueSetDefinitionsElements != null && valueSetDefinitionsElements.getLength() > 0) {
-      Element valueSetDefinitionsElement = (Element) valueSetDefinitionsElements.item(0);
-      ValueSetDefinitions valueSetDefinitions = new ValueSetDefinitions();
-      valueSetLibrary.setValueSetDefinitions(valueSetDefinitions);
-      NodeList nodes = valueSetDefinitionsElement.getElementsByTagName("ValueSetDefinition");
-      for (int i = 0; i < nodes.getLength(); i++) {
-        Element elmTable = (Element) nodes.item(i);
-        ValueSetDefinition tableObj = new ValueSetDefinition();
-        tableObj.setBindingIdentifier(elmTable.getAttribute("BindingIdentifier"));
-        tableObj.setName(elmTable.getAttribute("Name"));
-        tableObj.setDisplayClassifier(elmTable.getAttribute("DisplayClassifier"));
+      for (int k = 0; k < valueSetDefinitionsElements.getLength(); k++) {
+        Element valueSetDefinitionsElement = (Element) valueSetDefinitionsElements.item(k);
+        ValueSetDefinitions valueSetDefinitions = new ValueSetDefinitions();
+        valueSetDefinitions.setGrouping(valueSetDefinitionsElement.getAttribute("Group"));
+        valueSetDefinitions.setPosition(Integer.parseInt(valueSetDefinitionsElement
+            .getAttribute("Order")));
+        valueSetLibrary.getValueSetDefinitions().add(valueSetDefinitions);
+        NodeList nodes = valueSetDefinitionsElement.getElementsByTagName("ValueSetDefinition");
+        for (int i = 0; i < nodes.getLength(); i++) {
+          Element elmTable = (Element) nodes.item(i);
+          ValueSetDefinition tableObj = new ValueSetDefinition();
+          tableObj.setBindingIdentifier(elmTable.getAttribute("BindingIdentifier"));
+          tableObj.setName(elmTable.getAttribute("Name"));
 
-        if (StringUtils.isNotEmpty(elmTable.getAttribute("Description"))) {
-          tableObj.setDescription(elmTable.getAttribute("Description"));
-        }
-
-        if (StringUtils.isNotEmpty(elmTable.getAttribute("Oid"))) {
-          tableObj.setOid(elmTable.getAttribute("Oid"));
-        }
-
-        if (StringUtils.isNotEmpty(elmTable.getAttribute("Version"))) {
-          tableObj.setVersion(elmTable.getAttribute("Version"));
-        }
-        if (StringUtils.isNotEmpty(elmTable.getAttribute("Extensibility"))) {
-          tableObj.setExtensibility(ExtensibilityType.fromValue(elmTable
-              .getAttribute("Extensibility")));
-        }
-
-        if (StringUtils.isNotEmpty(elmTable.getAttribute("Stability"))) {
-          tableObj.setStability(StabilityType.fromValue(elmTable.getAttribute("Stability")));
-        }
-
-        if (StringUtils.isNotEmpty(elmTable.getAttribute("ContentDefinition"))) {
-          tableObj.setContentDefinition(ContentDefinitionType.fromValue(elmTable
-              .getAttribute("ContentDefinition")));
-        }
-
-        NodeList tableElements = elmTable.getElementsByTagName("ValueElement");
-
-        for (int j = 0; j < tableElements.getLength(); j++) {
-          Element elmCode = (Element) tableElements.item(j);
-          ValueSetElement codeObj = new ValueSetElement();
-          codeObj.setValue(elmCode.getAttribute("Value"));
-          codeObj.setCodeSystem(elmCode.getAttribute("CodeSystem"));
-          codeObj.setDisplayName(elmCode.getAttribute("DisplayName"));
-
-          if (StringUtils.isNotEmpty(elmCode.getAttribute("CodeSystemVersion"))) {
-            codeObj.setCodeSystemVersion(elmCode.getAttribute("CodeSystemVersion"));
+          if (StringUtils.isNotEmpty(elmTable.getAttribute("Description"))) {
+            tableObj.setDescription(elmTable.getAttribute("Description"));
           }
 
-          if (StringUtils.isNotEmpty(elmCode.getAttribute("Usage"))) {
-            codeObj.setUsage(UsageType.fromValue(elmCode.getAttribute("Usage")));
+          if (StringUtils.isNotEmpty(elmTable.getAttribute("Oid"))) {
+            tableObj.setOid(elmTable.getAttribute("Oid"));
           }
-          codeObj.setComments(elmCode.getAttribute("Comments"));
 
-          tableObj.addValueSetElement(codeObj);
+          if (StringUtils.isNotEmpty(elmTable.getAttribute("Version"))) {
+            tableObj.setVersion(elmTable.getAttribute("Version"));
+          }
+          if (StringUtils.isNotEmpty(elmTable.getAttribute("Extensibility"))) {
+            tableObj.setExtensibility(ExtensibilityType.fromValue(elmTable
+                .getAttribute("Extensibility")));
+          }
+
+          if (StringUtils.isNotEmpty(elmTable.getAttribute("Stability"))) {
+            tableObj.setStability(StabilityType.fromValue(elmTable.getAttribute("Stability")));
+          }
+
+          if (StringUtils.isNotEmpty(elmTable.getAttribute("ContentDefinition"))) {
+            tableObj.setContentDefinition(ContentDefinitionType.fromValue(elmTable
+                .getAttribute("ContentDefinition")));
+          }
+
+          NodeList tableElements = elmTable.getElementsByTagName("ValueElement");
+
+          for (int j = 0; j < tableElements.getLength(); j++) {
+            Element elmCode = (Element) tableElements.item(j);
+            ValueSetElement codeObj = new ValueSetElement();
+            codeObj.setValue(elmCode.getAttribute("Value"));
+            codeObj.setCodeSystem(elmCode.getAttribute("CodeSystem"));
+            codeObj.setDisplayName(elmCode.getAttribute("DisplayName"));
+
+            if (StringUtils.isNotEmpty(elmCode.getAttribute("CodeSystemVersion"))) {
+              codeObj.setCodeSystemVersion(elmCode.getAttribute("CodeSystemVersion"));
+            }
+
+            if (StringUtils.isNotEmpty(elmCode.getAttribute("Usage"))) {
+              codeObj.setUsage(UsageType.fromValue(elmCode.getAttribute("Usage")));
+            }
+            codeObj.setComments(elmCode.getAttribute("Comments"));
+
+            tableObj.addValueSetElement(codeObj);
+          }
+
+          valueSetDefinitions.addValueSet(tableObj);
+
+
         }
-
-        valueSetDefinitions.addValueSet(tableObj);
-
 
       }
+
 
 
     }

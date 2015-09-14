@@ -461,6 +461,7 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
       tp.setPosition(testPlanObj.findValue("position").getIntValue());
     }
     tp.setTestProcedure(testProcedure(testPlanPath));
+    tp.setTestPackage(testPackage(testPlanPath));
     List<Resource> resources = resourceBundleHelper.getDirectories(testPlanPath + "*/");
     for (Resource resource : resources) {
       String fileName = fileName(resource);
@@ -510,24 +511,31 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
     return parent;
   }
 
-  private TestContext testContext(String path, JsonNode parentObj) throws IOException {
+
+  private TestContext ediTestContext(String path, JsonNode domainObj) throws IOException {
     TestContext testContext = new TestContext();
-    JsonNode messageId = parentObj.findValue("messageId");
-    JsonNode constraintId = parentObj.findValue("constraintId");
-    JsonNode valueSetLibraryId = parentObj.findValue("valueSetLibraryId");
-    if (messageId != null && valueSetLibraryId != null) {
-      if (constraintId != null) {
-        testContext.setConstraints(getConstraints(constraintId.getTextValue()));
-      }
+    JsonNode messageId = domainObj.findValue("messageId");
+    JsonNode constraintId = domainObj.findValue("constraintId");
+    JsonNode valueSetLibraryId = domainObj.findValue("valueSetLibraryId");
+
+    if (valueSetLibraryId != null && !"".equals(valueSetLibraryId.getTextValue())) {
       testContext.setVocabularyLibrary((getVocabularyLibrary(valueSetLibraryId.getTextValue())));
-      testContext.setAddditionalConstraints(additionalConstraints(path + CONSTRAINTS_FILE_PATTERN));
+    }
+
+    if (constraintId != null && !"".equals(constraintId.getTextValue())) {
+      testContext.setConstraints(getConstraints(constraintId.getTextValue()));
+    }
+    testContext.setAddditionalConstraints(additionalConstraints(path + CONSTRAINTS_FILE_PATTERN));
+
+    testContext.setMessage(message(FileUtil.getContent(resourceBundleHelper.getResource(path
+        + "Message.txt"))));
+
+    // TODO: Ask Woo to change Message.text to Message.txt
+    if (testContext.getMessage() == null) {
       testContext.setMessage(message(FileUtil.getContent(resourceBundleHelper.getResource(path
-          + "Message.txt"))));
-      // TODO: Ask Woo to change Message.text to Message.txt
-      if (testContext.getMessage() == null) {
-        testContext.setMessage(message(FileUtil.getContent(resourceBundleHelper.getResource(path
-            + "Message.text"))));
-      }
+          + "Message.text"))));
+    }
+    if (messageId != null) {
       try {
         ConformanceProfile conformanceProfile = new ConformanceProfile();
         IntegrationProfile integrationProfile = getIntegrationProfile(messageId.getTextValue());
@@ -543,6 +551,21 @@ public class ResourcebundleLoaderImpl implements ResourcebundleLoader {
       }
     }
     return testContext;
+
+  }
+
+  private TestContext testContext(String path, JsonNode parentObj) throws IOException {
+    if (parentObj.findValue("xml") != null) {
+      // TODO:
+      throw new IllegalArgumentException("TestContext for XML domain is not yet implemented.");
+    } else if (parentObj.findValue("hl7v2") != null || parentObj.findValue("edi") != null) {
+      JsonNode domain =
+          parentObj.findValue("hl7v2") != null ? parentObj.findValue("hl7v2") : parentObj
+              .findValue("edi");
+      return ediTestContext(path, domain);
+    } else { // edi by default
+      return ediTestContext(path, parentObj);
+    }
   }
 
   public String jsonConformanceProfile(String integrationProfileXml, String conformanceProfileId,
