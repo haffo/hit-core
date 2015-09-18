@@ -12,11 +12,14 @@
 
 package gov.nist.hit.core.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Harold Affo(NIST)
  * 
  */
-public class MessageCommand extends TestCaseCommand {
+public class MessageValidationCommand extends TestCaseCommand {
 
   private String content;
 
@@ -24,9 +27,9 @@ public class MessageCommand extends TestCaseCommand {
 
   private String facilityId; 
   
-  private String contextType; 
-  
-  private boolean dqa;
+  private String contextType;  
+    
+  private ArrayList<String> dqaCodes;
 
 
   public String getContent() {
@@ -53,14 +56,6 @@ public class MessageCommand extends TestCaseCommand {
     this.facilityId = facilityId;
   }
 
-  public boolean isDqa() {
-    return dqa;
-  }
-
-  public void setDqa(boolean dqa) {
-    this.dqa = dqa;
-  }
-
   public String getContextType() {
     return contextType;
   }
@@ -69,9 +64,15 @@ public class MessageCommand extends TestCaseCommand {
     this.contextType = contextType;
   }
 
-   
+  public ArrayList<String> getDqaCodes() {
+    return dqaCodes;
+  }
 
+  public void setDqaCodes(ArrayList<String> dqaCodes) {
+    this.dqaCodes = dqaCodes;
+  }
 
   
-
+ 
+ 
 }

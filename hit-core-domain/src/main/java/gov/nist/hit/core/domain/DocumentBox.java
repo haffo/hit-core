@@ -12,7 +12,7 @@ public class DocumentBox {
   
   private String title;
   
-  private List<Document> documents = new ArrayList<Document>();
+  private List<TestCaseDocument> documents = new ArrayList<TestCaseDocument>();
 
   public String getTitle() {
     return title;
@@ -22,11 +22,11 @@ public class DocumentBox {
     this.title = title;
   }
 
-  public List<Document> getDocuments() {
+  public List<TestCaseDocument> getDocuments() {
     return documents;
   }
 
-  public void setDocuments(List<Document> documents) {
+  public void setDocuments(List<TestCaseDocument> documents) {
     this.documents = documents;
   }
   

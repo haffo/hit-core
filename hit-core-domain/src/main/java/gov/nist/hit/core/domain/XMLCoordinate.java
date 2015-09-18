@@ -1,16 +1,16 @@
 package gov.nist.hit.core.domain;
 
-public class XmlCoordinate {
+public class XMLCoordinate {
   int line;
   int index;
 
-  public XmlCoordinate() {
+  public XMLCoordinate() {
     super();
     this.line = 0;
     this.index = 0;
   }
 
-  public XmlCoordinate(int line, int index) {
+  public XMLCoordinate(int line, int index) {
     super();
     this.line = line;
     this.index = index;
@@ -32,8 +32,8 @@ public class XmlCoordinate {
     this.index = index;
   }
 
-  public XmlCoordinate plus(XmlCoordinate two) {
-    XmlCoordinate sum = new XmlCoordinate();
+  public XMLCoordinate plus(XMLCoordinate two) {
+    XMLCoordinate sum = new XMLCoordinate();
     sum.setLine(Math.max(two.getLine(), this.getLine()));
     if (two.getLine() > this.getLine()) {
       sum.setIndex(two.getIndex());

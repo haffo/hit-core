@@ -113,10 +113,8 @@ public abstract class ValueSetLibrarySerializer {
     valueSetLibrary.setDescription(elmTableLibrary.getAttribute("Description"));
     valueSetLibrary.setName(elmTableLibrary.getAttribute("Name"));
     valueSetLibrary.setOrganizationName(elmTableLibrary.getAttribute("OrganizationName"));
-    String t = elmTableLibrary.getAttribute("Status");
     valueSetLibrary.setValueSetIdentifier(elmTableLibrary.getAttribute("ValueSetIdentifier"));
     valueSetLibrary.setValueSetVersion(elmTableLibrary.getAttribute("ValueSetVersion"));
-    System.out.println(valueSetLibrary.getName() + "--" + t);
     if (StringUtils.isNotEmpty(elmTableLibrary.getAttribute("Status"))) {
       valueSetLibrary.setStatus(StatusType.valueOf(elmTableLibrary.getAttribute("Status")));
     }
@@ -139,9 +137,12 @@ public abstract class ValueSetLibrarySerializer {
       for (int k = 0; k < valueSetDefinitionsElements.getLength(); k++) {
         Element valueSetDefinitionsElement = (Element) valueSetDefinitionsElements.item(k);
         ValueSetDefinitions valueSetDefinitions = new ValueSetDefinitions();
-        valueSetDefinitions.setGrouping(valueSetDefinitionsElement.getAttribute("Group"));
-        valueSetDefinitions.setPosition(Integer.parseInt(valueSetDefinitionsElement
-            .getAttribute("Order")));
+        valueSetDefinitions
+            .setGrouping(valueSetDefinitionsElement.getAttribute("Group") != null ? valueSetDefinitionsElement
+                .getAttribute("Group") : "");
+        valueSetDefinitions.setPosition(valueSetDefinitionsElement.getAttribute("Order") != null
+            && !"".equals(valueSetDefinitionsElement.getAttribute("Order")) ? Integer
+            .parseInt(valueSetDefinitionsElement.getAttribute("Order")) : 1);
         valueSetLibrary.getValueSetDefinitions().add(valueSetDefinitions);
         NodeList nodes = valueSetDefinitionsElement.getElementsByTagName("ValueSetDefinition");
         for (int i = 0; i < nodes.getLength(); i++) {

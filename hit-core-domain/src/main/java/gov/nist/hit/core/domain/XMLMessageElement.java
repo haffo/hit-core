@@ -20,69 +20,69 @@ import java.util.List;
  * @author Harold Affo (NIST)
  * 
  */
-public class XmlMessageElement implements Serializable {
+public class XMLMessageElement implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   public static String DEFAULT_TYPE = "default";
 
-  private XmlMessageElementData data;
+  private XMLMessageElementData data;
 
   private String label;
 
-  private List<XmlMessageElement> children;
+  private List<XMLMessageElement> children;
 
-  public XmlMessageElement() {
+  public XMLMessageElement() {
     this.data = null;
     this.children = null;
     this.label = "No defined";
   }
 
-  public XmlMessageElement(XmlMessageElementData data) {
+  public XMLMessageElement(XMLMessageElementData data) {
     this(data, null);
   }
 
-  public XmlMessageElement(XmlMessageElementData data, XmlMessageElement parent) {
+  public XMLMessageElement(XMLMessageElementData data, XMLMessageElement parent) {
     this.data = data;
-    this.children = new ArrayList<XmlMessageElement>();
+    this.children = new ArrayList<XMLMessageElement>();
     if (parent != null) {
       if (parent.getChildren() == null) {
-        parent.setChildren(new ArrayList<XmlMessageElement>());
+        parent.setChildren(new ArrayList<XMLMessageElement>());
       }
       parent.getChildren().add(this);
     }
     label = data.getName();
   }
 
-  public XmlMessageElement(XmlMessageElementData data, String label, XmlMessageElement parent) {
+  public XMLMessageElement(XMLMessageElementData data, String label, XMLMessageElement parent) {
     this.data = data;
-    this.children = new ArrayList<XmlMessageElement>();
+    this.children = new ArrayList<XMLMessageElement>();
     if (parent != null) {
       if (parent.getChildren() == null) {
-        parent.setChildren(new ArrayList<XmlMessageElement>());
+        parent.setChildren(new ArrayList<XMLMessageElement>());
       }
       parent.getChildren().add(this);
     }
     this.label = label;
   }
 
-  public XmlMessageElement(String type, XmlMessageElementData data, XmlMessageElement parent) {
+  public XMLMessageElement(String type, XMLMessageElementData data, XMLMessageElement parent) {
     this(data, parent);
   }
 
-  public XmlMessageElementData getData() {
+  public XMLMessageElementData getData() {
     return this.data;
   }
 
-  public void setData(XmlMessageElementData data) {
+  public void setData(XMLMessageElementData data) {
     this.data = data;
   }
 
-  public List<XmlMessageElement> getChildren() {
+  public List<XMLMessageElement> getChildren() {
     return this.children;
   }
 
-  public void setChildren(List<XmlMessageElement> children) {
+  public void setChildren(List<XMLMessageElement> children) {
     this.children = children;
   }
 
@@ -121,10 +121,10 @@ public class XmlMessageElement implements Serializable {
     return "";
   }
 
-  public XmlMessageElement getChild(int line) {
-    List<XmlMessageElement> children = getChildren();
-    for (XmlMessageElement node : children) {
-      XmlMessageElementData data = node.getData();
+  public XMLMessageElement getChild(int line) {
+    List<XMLMessageElement> children = getChildren();
+    for (XMLMessageElement node : children) {
+      XMLMessageElementData data = node.getData();
       if (data.getStart().getLine() == line) {
         return node;
       }

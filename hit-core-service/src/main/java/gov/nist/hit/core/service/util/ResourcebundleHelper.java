@@ -21,59 +21,64 @@ import java.util.List;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
  * @author Harold Affo (NIST)
  * 
  */
-public class ResourceBundleHelper {
+public class ResourcebundleHelper {
 
-  private Class<?> clazz = null;
 
-  public ResourceBundleHelper(Class<?> clazz) {
-    this.clazz = clazz;
-  }
+  static PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-  public Resource getDescriptorFile(String pattern) throws IOException {
+
+  public ResourcebundleHelper() {}
+
+
+  public static Resource getDescriptorFile(String pattern) throws IOException {
     List<Resource> resources = getResources(pattern);
     return resources != null && resources.size() > 0 ? resources.get(0).exists() ? resources.get(0)
         : null : null;
   }
 
-  public ResourcePatternResolver resourceResolver(Class<?> clazz) {
-    ClassLoader cl = clazz.getClassLoader();
-    PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(cl);
-    return resolver;
+  // public ResourcePatternResolver resourceResolver() {
+  // PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+  // return resolver;
+  // }
+
+  private static String pattern(String path) {
+    return "classpath*:" + path;
   }
 
-
-  public List<Resource> getResources(String pattern) throws IOException {
-    ResourcePatternResolver resolver = resourceResolver(clazz);
-    Resource[] files = resolver.getResources(pattern);
-    List<Resource> resources = Arrays.asList(files);
-    Collections.sort(resources, new Comparator<Resource>() {
-
-      @Override
-      public int compare(Resource o1, Resource o2) {
-        // TODO Auto-generated method stub
-        try {
-          return o1.getURL().toString().compareTo(o2.getURL().toString());
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-        return 0;
-      }
-    });
-    return resources;
-  }
-
-
-
-  public Resource getResource(String location) {
+  public static List<Resource> getResources(String path) {
     try {
-      ResourcePatternResolver resolver = resourceResolver(clazz);
+      Resource[] files = resolver.getResources(pattern(path));
+      List<Resource> resources = Arrays.asList(files);
+      Collections.sort(resources, new Comparator<Resource>() {
+
+        @Override
+        public int compare(Resource o1, Resource o2) {
+          // TODO Auto-generated method stub
+          try {
+            return o1.getURL().toString().compareTo(o2.getURL().toString());
+          } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+          return 0;
+        }
+      });
+      return resources;
+    } catch (IOException e1) {
+      return new ArrayList<Resource>(1);
+    }
+
+  }
+
+
+
+  public static Resource getResource(String location) {
+    try {
       Resource resource = resolver.getResource(location);
       return resource.exists() ? resource : null;
     } catch (RuntimeException e) {
@@ -85,7 +90,7 @@ public class ResourceBundleHelper {
 
 
 
-  public List<Resource> getDirectories(String pattern) throws IOException {
+  public static List<Resource> getDirectories(String pattern) throws IOException {
     if (!pattern.endsWith("/")) {
       pattern = pattern + "/";
     }

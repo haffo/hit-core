@@ -11,42 +11,31 @@
  */
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
-
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
+ * Graph representation of a soap message
  * 
- * @author Harold Affo
- * 
+ * @author Harold Affo (NIST)
  */
-@Entity
-public class ValidationContext implements Serializable {
- 
- 
-  private static final long serialVersionUID = 1L;
+public class XMLMessageModel {
+  protected List<XMLMessageElement> elements;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  protected Long id;
-
-  protected String validationContextContent;
-
-  public String getValidationContextContent() {
-    return validationContextContent;
+  public List<XMLMessageElement> getElements() {
+    return elements;
   }
 
-  public void setValidationContextContent(String validationContextContent) {
-    this.validationContextContent = validationContextContent;
+  public void setElements(List<XMLMessageElement> elements) {
+    this.elements = elements;
   }
 
-  public ValidationContext(String validationContextContent) {
-    super();
-    this.validationContextContent = validationContextContent;
+  /**
+   * @param type
+   * @param content
+   */
+  public XMLMessageModel() {
+    elements = new ArrayList<XMLMessageElement>();
   }
 
 }

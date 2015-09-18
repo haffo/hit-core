@@ -17,12 +17,12 @@ package gov.nist.hit.core.domain;
  * 
  */
 
-public class ReleaseNote extends Document {
+public class ReleaseNote {
 
-  public ReleaseNote() {}
-
-  public ReleaseNote(String title, String description, String path, String version) {
-    super(title, description, path, version);
-  }
+//  public ReleaseNote() {}
+//
+//  public ReleaseNote(String title, String description, String path, String version) {
+//    super(title, description, path, version);
+//  }
 
 }

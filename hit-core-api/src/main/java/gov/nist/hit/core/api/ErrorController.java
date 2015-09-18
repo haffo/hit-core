@@ -9,33 +9,34 @@
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  */
-package gov.nist.hit.core.domain;
 
-import java.util.ArrayList;
-import java.util.List;
+package gov.nist.hit.core.api;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Graph representation of a soap message
- * 
  * @author Harold Affo (NIST)
+ * 
  */
-public class XmlMessageModel {
-  protected List<XmlMessageElement> elements;
+@RestController
+public class ErrorController {
 
-  public List<XmlMessageElement> getElements() {
-    return elements;
-  }
+  @RequestMapping(value = "/error")
+  @ResponseBody
+  public Map<String, Object> handle(HttpServletRequest request) {
 
-  public void setElements(List<XmlMessageElement> elements) {
-    this.elements = elements;
-  }
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put("status", request.getAttribute("javax.servlet.error.status_code"));
+    map.put("reason", request.getAttribute("javax.servlet.error.message"));
 
-  /**
-   * @param type
-   * @param content
-   */
-  public XmlMessageModel() {
-    elements = new ArrayList<XmlMessageElement>();
+    return map;
   }
 
 }

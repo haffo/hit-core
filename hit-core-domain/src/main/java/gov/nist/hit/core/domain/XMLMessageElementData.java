@@ -26,13 +26,13 @@ import org.jdom2.xpath.XPathHelper;
  * 
  */
 
-public class XmlMessageElementData extends MessageElementData implements Serializable {
+public class XMLMessageElementData extends MessageElementData implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private final XmlCoordinate start;
+  private final XMLCoordinate start;
 
-  private final XmlCoordinate end;
+  private final XMLCoordinate end;
 
   private int column = -1;
 
@@ -40,7 +40,7 @@ public class XmlMessageElementData extends MessageElementData implements Seriali
    * 
    * @param element
    */
-  public XmlMessageElementData(Element element) {
+  public XMLMessageElementData(Element element) {
     this(element, element.getName(), "none", 20000, "20000");
     if (element.getChildren().isEmpty()) {
       this.value = element.getValue();
@@ -49,7 +49,7 @@ public class XmlMessageElementData extends MessageElementData implements Seriali
     }
   }
 
-  public XmlMessageElementData(Element element, String name, String usage, Integer minOccurs,
+  public XMLMessageElementData(Element element, String name, String usage, Integer minOccurs,
       String maxOccurs) {
     Located locatedElement = (Located) element;
     start = XmlUtil.getStartCoordinate(element);
@@ -103,7 +103,7 @@ public class XmlMessageElementData extends MessageElementData implements Seriali
     if (getClass() != obj.getClass()) {
       return false;
     }
-    XmlMessageElementData other = (XmlMessageElementData) obj;
+    XMLMessageElementData other = (XMLMessageElementData) obj;
     if (this.maxOccurs == null) {
       if (other.maxOccurs != null) {
         return false;
@@ -156,11 +156,11 @@ public class XmlMessageElementData extends MessageElementData implements Seriali
     this.column = column;
   }
 
-  public XmlCoordinate getStart() {
+  public XMLCoordinate getStart() {
     return start;
   }
 
-  public XmlCoordinate getEnd() {
+  public XMLCoordinate getEnd() {
     return end;
   }
 

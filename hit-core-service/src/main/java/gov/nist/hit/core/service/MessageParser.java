@@ -13,10 +13,14 @@
 package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.MessageModel;
+import gov.nist.hit.core.domain.MessageParserCommand;
+import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.service.exception.MessageParserException;
 
 public interface MessageParser {
 
-  public MessageModel parse(String message, String... options) throws MessageParserException;
+  public MessageModel parse(TestContext context, MessageParserCommand command)
+      throws MessageParserException;
+
 
 }

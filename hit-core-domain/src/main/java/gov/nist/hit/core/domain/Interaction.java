@@ -26,7 +26,7 @@ public class Interaction implements java.io.Serializable {
 
   private Message message;
 
-  private ValidationContext validationContext;
+//  private ValidationContext validationContext;
 
   public Interaction() {
     super();
@@ -73,12 +73,12 @@ public class Interaction implements java.io.Serializable {
     this.responderActor = responderActor;
   }
 
-  public ValidationContext getValidationContext() {
-    return validationContext;
-  }
-
-  public void setValidationContext(ValidationContext validationContext) {
-    this.validationContext = validationContext;
-  }
+//  public ValidationContext getValidationContext() {
+//    return validationContext;
+//  }
+//
+//  public void setValidationContext(ValidationContext validationContext) {
+//    this.validationContext = validationContext;
+//  }
 
 }
