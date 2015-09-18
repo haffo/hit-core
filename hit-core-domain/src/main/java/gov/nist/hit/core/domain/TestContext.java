@@ -29,8 +29,7 @@ public class TestContext implements Serializable {
   @GeneratedValue(strategy = GenerationType.TABLE)
   protected Long id;
 
-  @Enumerated(EnumType.STRING)
-  protected TestDomain domain;
+   protected String format;
   
   public TestContext() {}
 
@@ -46,14 +45,15 @@ public class TestContext implements Serializable {
     this.id = id;
   }
 
-  public TestDomain getDomain() {
-    return domain;
+  public String getFormat() {
+    return format;
   }
 
-  public void setDomain(TestDomain domain) {
-    this.domain = domain;
+  public void setFormat(String format) {
+    this.format = format;
   }
-
+ 
+  
   
   
   

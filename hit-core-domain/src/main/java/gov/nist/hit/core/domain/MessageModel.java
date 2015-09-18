@@ -2,9 +2,11 @@ package gov.nist.hit.core.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MessageModel {
-
+  
+  private Map<String, String> delimeters;
   protected List<MessageElement> elements;
 
   public List<MessageElement> getElements() {
@@ -26,5 +28,15 @@ public class MessageModel {
   public MessageModel(MessageElement root) {
     elements = root.getChildren();
   }
+
+  public Map<String, String> getDelimeters() {
+    return delimeters;
+  }
+
+  public void setDelimeters(Map<String, String> delimeters) {
+    this.delimeters = delimeters;
+  }
+  
+  
 
 }

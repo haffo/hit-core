@@ -40,9 +40,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/report")
 @RestController
-public class ReportController extends ExceptionHandlingController {
+public class ValidationReportController extends ExceptionHandlingController {
 
-  static final Logger logger = LoggerFactory.getLogger(ReportController.class);
+  static final Logger logger = LoggerFactory.getLogger(ValidationReportController.class);
 
   @Autowired
   private ValidationReportGenerator reportService;
