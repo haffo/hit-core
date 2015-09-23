@@ -56,12 +56,6 @@ public class TestCaseController {
   private TestStepRepository testStepRepository;
 
   @Autowired
-  private MessageValidator messageValidator;
-
-  @Autowired
-  private MessageParser messageParser;
-
-  @Autowired
   protected TestCaseRepository testCaseRepository;
 
   @RequestMapping(value = "/testcase/{testCaseId}")
@@ -83,54 +77,6 @@ public class TestCaseController {
     }
     return testStep;
   }
-
-
-
-  @RequestMapping(value = "/testcase/{testCaseId}/downloadTestPackage", method = RequestMethod.POST)
-  public void testPackage(@PathVariable Long testCaseId, HttpServletRequest request,
-      HttpServletResponse response) throws MessageException {
-    try {
-      TestCase tc = testCaseRepository.findOne(testCaseId);
-      if (tc == null) {
-        throw new IllegalArgumentException("The test case cannot be retrieved");
-      }
-      if (tc.getTestPackage() == null || tc.getTestPackage().getPdfPath() == null) {
-        throw new IllegalArgumentException("No test package found");
-      }
-      InputStream content =
-          TestCaseController.class.getResourceAsStream(tc.getTestPackage().getPdfPath());
-      response
-          .setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-      response.setHeader("Content-disposition", "attachment;filename=" + tc.getName() + ".docx");
-      FileCopyUtils.copy(content, response.getOutputStream());
-
-    } catch (IOException e) {
-      logger.debug("Failed to download the test package ");
-      throw new TestCaseException("Cannot download the test package " + e.getMessage());
-    }
-  }
-
-  @RequestMapping(value = "/{testCaseId}/downloadTestStory", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public String testStory(@RequestParam("path") String path, @RequestParam("title") String title,
-      HttpServletRequest request, HttpServletResponse response) throws MessageException {
-    try {
-      if (path == null) {
-        throw new IllegalArgumentException("No test story path found");
-      }
-      InputStream content = TestCaseController.class.getResourceAsStream(path);
-      response.setContentType("application/pdf");
-      response.setHeader("Content-disposition", "attachment;filename=" + title + "-TestStory.pdf");
-      FileCopyUtils.copy(content, response.getOutputStream());
-
-    } catch (IOException e) {
-      logger.debug("Failed to download the test stoty of " + title);
-      throw new TestCaseException("Cannot download the test story " + e.getMessage());
-    }
-    return null;
-  }
-
-
 
   @RequestMapping(value = "/teststep/{testStepId}/testcontext")
   public TestContext testContext(@PathVariable final Long testStepId) {

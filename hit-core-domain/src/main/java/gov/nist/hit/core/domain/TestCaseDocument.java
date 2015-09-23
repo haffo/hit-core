@@ -25,9 +25,9 @@ public class TestCaseDocument {
   protected String jdPath;
   protected String tsPath;
   protected String csPath;
-  protected boolean exMsgPresent;
-  protected boolean xmlConfProfilePresent;
-  protected boolean xmlValueSetLibraryPresent;
+  protected String format;
+
+
 
   protected List<TestCaseDocument> children = new ArrayList<TestCaseDocument>();
 
@@ -98,31 +98,6 @@ public class TestCaseDocument {
   public void setChildren(List<TestCaseDocument> children) {
     this.children = children;
   }
-
-  public boolean isExMsgPresent() {
-    return exMsgPresent;
-  }
-
-  public void setExMsgPresent(boolean exMsgPresent) {
-    this.exMsgPresent = exMsgPresent;
-  }
-
-  public boolean isXmlConfProfilePresent() {
-    return xmlConfProfilePresent;
-  }
-
-  public void setXmlConfProfilePresent(boolean xmlConfProfilePresent) {
-    this.xmlConfProfilePresent = xmlConfProfilePresent;
-  }
-
-  public boolean isXmlValueSetLibraryPresent() {
-    return xmlValueSetLibraryPresent;
-  }
-
-  public void setXmlValueSetLibraryPresent(boolean xmlValueSetLibraryPresent) {
-    this.xmlValueSetLibraryPresent = xmlValueSetLibraryPresent;
-  }
-
  
   public Long getId() {
     return id;
@@ -138,6 +113,14 @@ public class TestCaseDocument {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public String getFormat() {
+    return format;
+  }
+
+  public void setFormat(String format) {
+    this.format = format;
   }
 
   

@@ -51,7 +51,7 @@ public class AppInfoController {
     String scheme = request.getScheme();
     String host = request.getHeader("Host");
  //    return scheme + "://" + host + "/hit-tool";
-    return scheme + "://" + host + "/" + request.getContextPath();
-
+    String url =  scheme + "://" + host + request.getContextPath();
+    return url;
   }
 }

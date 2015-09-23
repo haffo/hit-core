@@ -15,6 +15,7 @@ package gov.nist.hit.core.service;
 import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.ConnectionType;
 import gov.nist.hit.core.domain.Constraints;
+import gov.nist.hit.core.domain.DocumentType;
 import gov.nist.hit.core.domain.IntegrationProfile;
 import gov.nist.hit.core.domain.Message;
 import gov.nist.hit.core.domain.ProfileModel;
@@ -31,20 +32,24 @@ import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.ConstraintsRepository;
+import gov.nist.hit.core.repo.DocumentRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.MessageRepository;
 import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
 import gov.nist.hit.core.repo.TestObjectRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
-import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
 import gov.nist.hit.core.service.util.ResourcebundleHelper;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -91,6 +96,13 @@ public abstract class ResourcebundleLoader {
   final static public String MESSAGE_PATTERN = "Message.txt";
   final static public String ABOUT_PATTERN = "About/";
   final static String ISOLATED_PATTERN = "Isolated/";
+  public static final String RELEASENOTE_PATTERN = "Documentation/ReleaseNotes";
+  public static final String RELEASENOTE_FILE_PATTERN = "ReleaseNotes.json";
+  public static final String KNOWNISSUE_PATTERN = "Documentation/KnownIssues";
+  public static final String KNOWNISSUE_FILE_PATTERN = "KnownIssues.json";
+  public static final String USERDOCS_PATTERN = "Documentation/UserDocs";
+  public static final String USERDOCS_FILE_PATTERN = "UserDocs.json";
+
 
   Map<String, IntegrationProfile> cachedProfiles = new HashMap<String, IntegrationProfile>();
   Map<String, VocabularyLibrary> cachedVocabLibraries = new HashMap<String, VocabularyLibrary>();
@@ -100,17 +112,14 @@ public abstract class ResourcebundleLoader {
   IntegrationProfileRepository integrationProfileRepository;
 
   @Autowired
-  VocabularyLibraryRepository vocabularyLibraryRepository;
-
-  @Autowired
   MessageRepository messageRepository;
 
   @Autowired
   ConstraintsRepository constraintsRepository;
 
-  @Autowired
-  ValueSetLibrarySerializer valueSetLibrarySerializer;
 
+  @Autowired
+  DocumentRepository documentRepository;
 
   @PostConstruct
   public void load() throws JsonProcessingException, IOException, ProfileParserException {
@@ -122,12 +131,153 @@ public abstract class ResourcebundleLoader {
     this.loadCbTestCases();
     this.loadIsolatedTestCases();
     this.loadTestCasesDocumentation();
+    this.loadUserDocs();
+    this.loadKownIssues();
+    this.loadReleaseNotes();
     cachedProfiles.clear();
     cachedVocabLibraries.clear();
     cachedConstraints.clear();
     logger.info("loading resource bundle...DONE");
   }
 
+  protected void loadUserDocs() throws IOException {
+    logger.info("loading user documents...");
+    Resource resource = getResource(USERDOCS_PATTERN + "/" + USERDOCS_FILE_PATTERN);
+    if (resource != null) {
+      String descriptorContent = FileUtil.getContent(resource);
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode userDocsObj = mapper.readTree(descriptorContent);
+      List<gov.nist.hit.core.domain.Document> userDocs =
+          new ArrayList<gov.nist.hit.core.domain.Document>();
+      if (userDocsObj.isArray()) {
+        Iterator<JsonNode> it = userDocsObj.getElements();
+        if (it != null) {
+          while (it.hasNext()) {
+            JsonNode node = it.next();
+            gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+            document.setPosition(node.findValue("order") != null ? node.findValue("order")
+                .getIntValue() : userDocs.size() + 1);
+            document.setTitle(node.findValue("title") != null ? node.findValue("title")
+                .getTextValue() : null);
+            if (node.findValue("name") != null) {
+              String path = node.findValue("name").getTextValue();
+              if (path.endsWith("*")) {
+                Resource rs =
+                    getLatestResource(USERDOCS_PATTERN + "/"
+                        + node.findValue("name").getTextValue());
+                path = rs.getFilename();
+              }
+              document.setName(path);
+              document.setPath(USERDOCS_PATTERN + "/" + path);
+            } else if (node.findValue("link") != null) {
+              document.setPath(node.findValue("link").getTextValue());
+            }
+            document.setDate(node.findValue("date") != null ? node.findValue("date").getTextValue()
+                : null);
+            document.setType(DocumentType.USERDOC);
+            document.setComments(node.findValue("comments") != null ? node.findValue("comments")
+                .getTextValue() : null);
+            userDocs.add(document);
+          }
+          if (!userDocs.isEmpty()) {
+            documentRepository.save(userDocs);
+          }
+        }
+      }
+    }
+
+    logger.info("loading user documents...DONE");
+  }
+
+  protected void loadKownIssues() throws IOException {
+    logger.info("loading known issues...");
+    Resource resource = getResource(domainPath(KNOWNISSUE_FILE_PATTERN) + "*/");
+    if (resource != null) {
+      String descriptorContent = FileUtil.getContent(resource);
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode knownIssueObj = mapper.readTree(descriptorContent);
+      List<gov.nist.hit.core.domain.Document> knownIssues =
+          new ArrayList<gov.nist.hit.core.domain.Document>();
+      if (knownIssueObj.isArray()) {
+        Iterator<JsonNode> it = knownIssueObj.getElements();
+        if (it != null) {
+          while (it.hasNext()) {
+            JsonNode node = it.next();
+            gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+            document.setVersion(node.findValue("version") != null ? node.findValue("version")
+                .getTextValue() : null);
+            document.setTitle(node.findValue("title") != null ? node.findValue("title")
+                .getTextValue() : null);
+            document.setName(node.findValue("name").getTextValue());
+            document.setPath(KNOWNISSUE_PATTERN + "/" + node.findValue("name").getTextValue());
+            document.setDate(node.findValue("date") != null ? node.findValue("date").getTextValue()
+                : null);
+            document.setType(DocumentType.KNOWNISSUE);
+            document.setComments(node.findValue("comments") != null ? node.findValue("comments")
+                .getTextValue() : null);
+            knownIssues.add(document);
+          }
+          if (!knownIssues.isEmpty()) {
+            documentRepository.save(knownIssues);
+          }
+        }
+      }
+    }
+    logger.info("loading known issues...DONE");
+  }
+
+  protected void loadReleaseNotes() throws IOException {
+    logger.info("loading release notes...");
+    Resource resource = getResource(domainPath(RELEASENOTE_FILE_PATTERN) + "*/");
+    if (resource != null) {
+      String descriptorContent = FileUtil.getContent(resource);
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode releaseNoteObj = mapper.readTree(descriptorContent);
+      List<gov.nist.hit.core.domain.Document> releaseNotes =
+          new ArrayList<gov.nist.hit.core.domain.Document>();
+      if (releaseNoteObj.isArray()) {
+        Iterator<JsonNode> it = releaseNoteObj.getElements();
+        if (it != null) {
+          while (it.hasNext()) {
+            JsonNode node = it.next();
+            gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+            document.setVersion(node.findValue("version") != null ? node.findValue("version")
+                .getTextValue() : null);
+            document.setTitle(node.findValue("title") != null ? node.findValue("title")
+                .getTextValue() : null);
+            document.setPath(node.findValue("name") != null ? RELEASENOTE_PATTERN + "/"
+                + node.findValue("name").getTextValue() : null);
+            document.setDate(node.findValue("date") != null ? node.findValue("date").getTextValue()
+                : null);
+            document.setType(DocumentType.RELEASENOTE);
+            document.setComments(node.findValue("comments") != null ? node.findValue("comments")
+                .getTextValue() : null);
+            releaseNotes.add(document);
+          }
+          if (!releaseNotes.isEmpty()) {
+            documentRepository.save(releaseNotes);
+          }
+        }
+      }
+    }
+    logger.info("loading release notes...DONE");
+  }
+
+
+  protected Resource getLatestResource(String pathWithWilcard) throws IOException {
+    List<Resource> resources = getResources(pathWithWilcard);
+    if (resources != null && !resources.isEmpty()) {
+      Collections.sort(resources, new Comparator<Resource>() {
+        @Override
+        public int compare(Resource o1, Resource o2) {
+          return o2.getFilename().compareTo(o1.getFilename());
+        }
+      });
+      return resources.get(0);
+    }
+    throw new IllegalArgumentException("Could not determine the most recent file matching "
+        + pathWithWilcard);
+  }
 
   protected void loadConstraints() throws IOException {
     logger.info("loading constraints...");
@@ -167,19 +317,9 @@ public abstract class ResourcebundleLoader {
     logger.info("loading value set libraries...DONE");
   }
 
-  protected VocabularyLibrary vocabLibrary(String content) throws JsonGenerationException,
-      JsonMappingException, IOException {
-    Document doc = this.stringToDom(content);
-    VocabularyLibrary vocabLibrary = new VocabularyLibrary();
-    Element valueSetLibraryeElement = (Element) doc.getElementsByTagName("ValueSetLibrary").item(0);
-    vocabLibrary.setSourceId(valueSetLibraryeElement.getAttribute("ValueSetLibraryIdentifier"));
-    vocabLibrary.setName(valueSetLibraryeElement.getAttribute("Name"));
-    vocabLibrary.setDescription(valueSetLibraryeElement.getAttribute("Description"));
-    vocabLibrary.setXml(content);
-    vocabLibrary.setJson(obm.writeValueAsString(valueSetLibrarySerializer.toObject(content)));
-    vocabularyLibraryRepository.save(vocabLibrary);
-    return vocabLibrary;
-  }
+  protected abstract VocabularyLibrary vocabLibrary(String content) throws JsonGenerationException,
+      JsonMappingException, IOException;
+
 
 
   protected Constraints additionalConstraints(String location) throws IOException {
@@ -318,13 +458,13 @@ public abstract class ResourcebundleLoader {
   /**
    * 
    */
-  public abstract TestContext testContext(String location, JsonNode parentObj) throws IOException;
+  public abstract TestContext testContext(String location, JsonNode parentOb, Stage stage)
+      throws IOException;
 
   /**
    * 
    */
-  public abstract TestCaseDocument setTestContextDocument(TestContext c, TestCaseDocument doc)
-      throws IOException;
+  public abstract TestCaseDocument generateTestCaseDocument(TestContext c) throws IOException;
 
 
   public abstract ProfileModel parseProfile(String integrationProfileXml,
@@ -433,7 +573,7 @@ public abstract class ResourcebundleLoader {
     if (connType == null
         || (!connType.equals(ConnectionType.SUT_MANUAL) && !connType
             .equals(ConnectionType.TA_MANUAL))) {
-      testStep.setTestContext(testContext(location, testStepObj));
+      testStep.setTestContext(testContext(location, testStepObj, stage));
     }
     testStep.setTestStory(testStory(location));
     testStep.setTestPackage(testPackage(location));
@@ -588,7 +728,7 @@ public abstract class ResourcebundleLoader {
     JsonNode constraintId = testPlanObj.findValue("constraintId");
     JsonNode valueSetLibraryId = testPlanObj.findValue("valueSetLibraryId");
     if (messageId != null && constraintId != null && valueSetLibraryId != null) {
-      parent.setTestContext(testContext(testObjectPath, testPlanObj));
+      parent.setTestContext(testContext(testObjectPath, testPlanObj, Stage.CF));
     }
     List<Resource> resources = getDirectories(testObjectPath + "*/");
     for (Resource resource : resources) {
@@ -659,7 +799,7 @@ public abstract class ResourcebundleLoader {
 
   protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestPlan tp)
       throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = generateAbsTestCaseDocument(tp);
+    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
     doc.setId(tp.getId());
     if (tp.getTestCaseGroups() != null && !tp.getTestCaseGroups().isEmpty()) {
       for (TestCaseGroup tcg : tp.getTestCaseGroups()) {
@@ -676,7 +816,7 @@ public abstract class ResourcebundleLoader {
 
   protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestCaseGroup tcg)
       throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = generateAbsTestCaseDocument(tcg);
+    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tcg);
     doc.setId(tcg.getId());
     if (tcg.getTestCaseGroups() != null && !tcg.getTestCaseGroups().isEmpty()) {
       for (TestCaseGroup child : tcg.getTestCaseGroups()) {
@@ -696,7 +836,7 @@ public abstract class ResourcebundleLoader {
 
   protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestCase tc)
       throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = generateAbsTestCaseDocument(tc);
+    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tc);
     doc.setId(tc.getId());
     if (tc.getTestSteps() != null && !tc.getTestSteps().isEmpty()) {
       for (TestStep ts : tc.getTestSteps()) {
@@ -708,17 +848,17 @@ public abstract class ResourcebundleLoader {
 
   protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestStep ts)
       throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = generateAbsTestCaseDocument(ts);
+    gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(ts.getTestContext());
+    doc = initTestCaseDocument(ts, doc);
     doc.setId(ts.getId());
-    setTestContextDocument(ts.getTestContext(), doc);
     return doc;
   }
 
   protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestObject to)
       throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = generateAbsTestCaseDocument(to);
+    gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(to.getTestContext());
+    doc = initTestCaseDocument(to, doc);
     doc.setId(to.getId());
-    setTestContextDocument(to.getTestContext(), doc);
     if (to.getChildren() != null && !to.getChildren().isEmpty()) {
       for (TestObject child : to.getChildren()) {
         doc.getChildren().add(generateTestCaseDocument(child));
@@ -728,9 +868,13 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  protected gov.nist.hit.core.domain.TestCaseDocument generateAbsTestCaseDocument(
-      AbstractTestCase ts) throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = new gov.nist.hit.core.domain.TestCaseDocument();
+  protected gov.nist.hit.core.domain.TestCaseDocument initTestCaseDocument(AbstractTestCase ts)
+      throws IOException {
+    return initTestCaseDocument(ts, new TestCaseDocument());
+  }
+
+  protected gov.nist.hit.core.domain.TestCaseDocument initTestCaseDocument(AbstractTestCase ts,
+      TestCaseDocument doc) throws IOException {
     doc.setTitle(ts.getName());
     doc.setType(ts.getType().toString());
     doc.setMcPath(ts.getMessageContent() != null ? ts.getMessageContent().getPdfPath() : null);
@@ -837,14 +981,6 @@ public abstract class ResourcebundleLoader {
     this.integrationProfileRepository = integrationProfileRepository;
   }
 
-  public VocabularyLibraryRepository getVocabularyLibraryRepository() {
-    return vocabularyLibraryRepository;
-  }
-
-  public void setVocabularyLibraryRepository(VocabularyLibraryRepository vocabularyLibraryRepository) {
-    this.vocabularyLibraryRepository = vocabularyLibraryRepository;
-  }
-
   public MessageRepository getMessageRepository() {
     return messageRepository;
   }
@@ -860,16 +996,6 @@ public abstract class ResourcebundleLoader {
   public void setConstraintsRepository(ConstraintsRepository constraintsRepository) {
     this.constraintsRepository = constraintsRepository;
   }
-
-  public ValueSetLibrarySerializer getValueSetLibrarySerializer() {
-    return valueSetLibrarySerializer;
-  }
-
-  public void setValueSetLibrarySerializer(ValueSetLibrarySerializer valueSetLibrarySerializer) {
-    this.valueSetLibrarySerializer = valueSetLibrarySerializer;
-  }
-
-
 
   public Map<String, IntegrationProfile> getCachedProfiles() {
     return cachedProfiles;

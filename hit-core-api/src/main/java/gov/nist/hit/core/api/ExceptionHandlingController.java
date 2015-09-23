@@ -12,6 +12,8 @@
 
 package gov.nist.hit.core.api;
 
+import gov.nist.hit.core.service.exception.DocumentationException;
+import gov.nist.hit.core.service.exception.DownloadDocumentException;
 import gov.nist.hit.core.service.exception.MessageParserException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ProfileParserException;
@@ -96,6 +98,14 @@ public class ExceptionHandlingController {
   public String xmlFormatterException(XmlFormatterException ex) {
     logger.error(ex.getMessage(), ex);
     return "Malformed xml content.";
-  }
+  } 
+ 
+  
+  @ExceptionHandler(DownloadDocumentException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public String documentationException(DocumentationException ex) {
+    logger.error(ex.getMessage(), ex);
+    return "Sorry, Cannot download the document";
+  } 
 
 }

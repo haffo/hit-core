@@ -21,16 +21,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class TestContext implements Serializable { 
- 
+public class TestContext implements Serializable {
+
   private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.TABLE)
   protected Long id;
 
-   protected String format;
-  
+  protected String format;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(unique = true, nullable = true, insertable = true, updatable = true)
+  protected Message message;
+
+  @JsonIgnore
+  @Enumerated(EnumType.STRING)
+  protected Stage stage;
+
+
   public TestContext() {}
 
   public long getId() {
@@ -52,10 +61,23 @@ public class TestContext implements Serializable {
   public void setFormat(String format) {
     this.format = format;
   }
- 
-  
-  
-  
-  
+
+  public Message getMessage() {
+    return message;
+  }
+
+  public void setMessage(Message message) {
+    this.message = message;
+  }
+
+  public Stage getStage() {
+    return stage;
+  }
+
+  public void setStage(Stage stage) {
+    this.stage = stage;
+  }
+
+
 
 }

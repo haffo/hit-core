@@ -39,7 +39,9 @@ public class TestCaseDocumentation implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
 
-  private String title;
+  private String title; 
+  
+
 
   @Enumerated(EnumType.STRING)
   private Stage stage;
@@ -91,6 +93,7 @@ public class TestCaseDocumentation implements Serializable {
     this.stage = stage;
   }
 
-
+ 
+  
 
 }

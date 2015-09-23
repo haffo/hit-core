@@ -9,20 +9,26 @@
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  */
-package gov.nist.hit.core.domain;
 
-/**
- * 
- * @author Harold Affo
- * 
- */
+package gov.nist.hit.core.repo;
 
-public class ReleaseNote {
+import gov.nist.hit.core.domain.Document;
 
-//  public ReleaseNote() {}
-//
-//  public ReleaseNote(String title, String description, String path, String version) {
-//    super(title, description, path, version);
-//  }
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+public interface DocumentRepository extends JpaRepository<Document, Long> {
+
+  @Query("select doc from Document doc where doc.type = 'RELEASENOTE' order by doc.version desc")
+  public List<Document> findAllReleaseNotes();
+
+  @Query("select doc from Document doc where doc.type = 'KNWONISSUE' order by doc.version desc")
+  public List<Document> findAllKnownIssues();
+
+  @Query("select doc from Document doc where doc.type = 'USERDOC' order by doc.position asc")
+  public List<Document> findAllUserDocs();
+
 
 }
