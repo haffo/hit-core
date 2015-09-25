@@ -13,6 +13,7 @@
 package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.AbstractTestCase;
+import gov.nist.hit.core.domain.AppInfo;
 import gov.nist.hit.core.domain.ConnectionType;
 import gov.nist.hit.core.domain.Constraints;
 import gov.nist.hit.core.domain.DocumentType;
@@ -31,6 +32,7 @@ import gov.nist.hit.core.domain.TestObject;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.VocabularyLibrary;
+import gov.nist.hit.core.repo.AppInfoRepository;
 import gov.nist.hit.core.repo.ConstraintsRepository;
 import gov.nist.hit.core.repo.DocumentRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
@@ -48,6 +50,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -117,13 +120,37 @@ public abstract class ResourcebundleLoader {
   @Autowired
   ConstraintsRepository constraintsRepository;
 
+  @Autowired
+  AppInfoRepository appInfoRepository;
 
   @Autowired
   DocumentRepository documentRepository;
 
+  @Autowired
+  protected TestPlanRepository testPlanRepository;
+
+  @Autowired
+  protected TestObjectRepository testObjectRepository;
+
+  @Autowired
+  protected TestStepRepository testStepRepository;
+
+  @Autowired
+  protected TestCaseDocumentationRepository testCaseDocumentationRepository;
+
+
+  protected com.fasterxml.jackson.databind.ObjectMapper obm;
+
+  public ResourcebundleLoader() {
+    obm = new com.fasterxml.jackson.databind.ObjectMapper();
+    obm.setSerializationInclusion(Include.NON_NULL);
+  }
+
+
   @PostConstruct
   public void load() throws JsonProcessingException, IOException, ProfileParserException {
     logger.info("loading resource bundle...");
+    this.loadAppInfo();
     this.loadConstraints();
     this.loadVocabularyLibraries();
     this.loadIntegrationProfiles();
@@ -140,7 +167,43 @@ public abstract class ResourcebundleLoader {
     logger.info("loading resource bundle...DONE");
   }
 
-  protected void loadUserDocs() throws IOException {
+
+  public abstract TestContext testContext(String location, JsonNode parentOb, Stage stage)
+      throws IOException;
+
+  public abstract TestCaseDocument generateTestCaseDocument(TestContext c) throws IOException;
+
+  public abstract ProfileModel parseProfile(String integrationProfileXml,
+      String conformanceProfileId, String constraintsXml, String additionalConstraintsXml)
+      throws ProfileParserException;
+
+
+
+  private void loadAppInfo() throws JsonProcessingException, IOException {
+    logger.info("loading app info...");
+    Resource resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN + "MetaData.json");
+    if (resource == null)
+      throw new RuntimeException("No MetaData.json found in the resource bundle");
+    AppInfo appInfo = new AppInfo();
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode appInfoJson = mapper.readTree(FileUtil.getContent(resource));
+    appInfo.setAdminEmail(appInfoJson.get("adminEmail").getTextValue());
+    appInfo.setDomain(appInfoJson.get("domain").getTextValue());
+    appInfo.setHeader(appInfoJson.get("header").getTextValue());
+    appInfo.setHomeContent(appInfoJson.get("homeContent").getTextValue());
+    appInfo.setHomeTitle(appInfoJson.get("homeTitle").getTextValue());
+    appInfo.setName(appInfoJson.get("name").getTextValue());
+    appInfo.setVersion(appInfoJson.get("version").getTextValue());
+
+    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+    Date date = new Date();
+    appInfo.setDate(dateFormat.format(date));
+    appInfoRepository.save(appInfo);
+    logger.info("loading app info...DONE");
+  }
+
+  private void loadUserDocs() throws IOException {
     logger.info("loading user documents...");
     Resource resource = getResource(USERDOCS_PATTERN + "/" + USERDOCS_FILE_PATTERN);
     if (resource != null) {
@@ -189,7 +252,7 @@ public abstract class ResourcebundleLoader {
     logger.info("loading user documents...DONE");
   }
 
-  protected void loadKownIssues() throws IOException {
+  private void loadKownIssues() throws IOException {
     logger.info("loading known issues...");
     Resource resource = getResource(domainPath(KNOWNISSUE_FILE_PATTERN) + "*/");
     if (resource != null) {
@@ -226,7 +289,7 @@ public abstract class ResourcebundleLoader {
     logger.info("loading known issues...DONE");
   }
 
-  protected void loadReleaseNotes() throws IOException {
+  private void loadReleaseNotes() throws IOException {
     logger.info("loading release notes...");
     Resource resource = getResource(domainPath(RELEASENOTE_FILE_PATTERN) + "*/");
     if (resource != null) {
@@ -264,7 +327,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  protected Resource getLatestResource(String pathWithWilcard) throws IOException {
+  private Resource getLatestResource(String pathWithWilcard) throws IOException {
     List<Resource> resources = getResources(pathWithWilcard);
     if (resources != null && !resources.isEmpty()) {
       Collections.sort(resources, new Comparator<Resource>() {
@@ -279,7 +342,7 @@ public abstract class ResourcebundleLoader {
         + pathWithWilcard);
   }
 
-  protected void loadConstraints() throws IOException {
+  private void loadConstraints() throws IOException {
     logger.info("loading constraints...");
     List<Resource> resources = getResources(domainPath(CONSTRAINT_PATTERN) + "*");
     if (resources != null && !resources.isEmpty()) {
@@ -292,7 +355,7 @@ public abstract class ResourcebundleLoader {
     logger.info("loading constraints...DONE");
   }
 
-  protected void loadIntegrationProfiles() throws IOException {
+  private void loadIntegrationProfiles() throws IOException {
     logger.info("loading integration profiles...");
     List<Resource> resources = getResources(domainPath(PROFILE_PATTERN) + "*");
     if (resources != null && !resources.isEmpty()) {
@@ -304,7 +367,7 @@ public abstract class ResourcebundleLoader {
     logger.info("loading integration profiles...DONE");
   }
 
-  protected void loadVocabularyLibraries() throws IOException {
+  private void loadVocabularyLibraries() throws IOException {
     logger.info("loading value set libraries...");
     List<Resource> resources = getResources(domainPath(VALUESET_PATTERN) + "*");
     if (resources != null && !resources.isEmpty()) {
@@ -332,7 +395,7 @@ public abstract class ResourcebundleLoader {
     return constraints;
   }
 
-  protected IntegrationProfile integrationProfile(String content) {
+  private IntegrationProfile integrationProfile(String content) {
     Document doc = this.stringToDom(content);
     IntegrationProfile integrationProfile = new IntegrationProfile();
     Element profileElement = (Element) doc.getElementsByTagName("ConformanceProfile").item(0);
@@ -363,7 +426,7 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  protected Constraints constraint(String content) {
+  private Constraints constraint(String content) {
     Document doc = this.stringToDom(content);
     Constraints constraints = new Constraints();
     Element constraintsElement = (Element) doc.getElementsByTagName("ConformanceContext").item(0);
@@ -396,9 +459,10 @@ public abstract class ResourcebundleLoader {
 
 
 
-  public String jsonConformanceProfile(String integrationProfileXml, String conformanceProfileId,
-      String constraintsXml, String additionalConstraintsXml) throws ProfileParserException,
-      JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {
+  protected String jsonConformanceProfile(String integrationProfileXml,
+      String conformanceProfileId, String constraintsXml, String additionalConstraintsXml)
+      throws ProfileParserException, JsonProcessingException,
+      com.fasterxml.jackson.core.JsonProcessingException {
     ProfileModel profileModel =
         parseProfile(integrationProfileXml, conformanceProfileId, constraintsXml,
             additionalConstraintsXml);
@@ -435,49 +499,12 @@ public abstract class ResourcebundleLoader {
 
 
 
-  @Autowired
-  protected TestPlanRepository testPlanRepository;
-
-  @Autowired
-  protected TestObjectRepository testObjectRepository;
-
-  @Autowired
-  protected TestStepRepository testStepRepository;
-
-  @Autowired
-  protected TestCaseDocumentationRepository testCaseDocumentationRepository;
-
-
-  protected com.fasterxml.jackson.databind.ObjectMapper obm;
-
-  public ResourcebundleLoader() {
-    obm = new com.fasterxml.jackson.databind.ObjectMapper();
-    obm.setSerializationInclusion(Include.NON_NULL);
-  }
-
-  /**
-   * 
-   */
-  public abstract TestContext testContext(String location, JsonNode parentOb, Stage stage)
-      throws IOException;
-
-  /**
-   * 
-   */
-  public abstract TestCaseDocument generateTestCaseDocument(TestContext c) throws IOException;
-
-
-  public abstract ProfileModel parseProfile(String integrationProfileXml,
-      String conformanceProfileId, String constraintsXml, String additionalConstraintsXml)
-      throws ProfileParserException;
-
-
   public String domainPath(String path) {
     return path;
   }
 
 
-  protected void loadIsolatedTestCases() throws IOException {
+  private void loadIsolatedTestCases() throws IOException {
     List<Resource> resources = getDirectories(domainPath(ISOLATED_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
@@ -490,7 +517,7 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  protected void loadCbTestCases() throws IOException {
+  private void loadCbTestCases() throws IOException {
     List<Resource> resources = getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
@@ -504,7 +531,7 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  protected void loadCfTestCases() throws IOException, ProfileParserException {
+  private void loadCfTestCases() throws IOException, ProfileParserException {
     List<Resource> resources = getDirectories(domainPath(CONTEXTFREE_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
@@ -520,7 +547,7 @@ public abstract class ResourcebundleLoader {
 
 
 
-  public TestCase testCase(String location, Stage stage) throws IOException {
+  private TestCase testCase(String location, Stage stage) throws IOException {
     logger.info("Processing test case at:" + location);
     TestCase tc = new TestCase();
     Resource res = ResourcebundleHelper.getResource(location + "TestCase.json");
@@ -553,7 +580,7 @@ public abstract class ResourcebundleLoader {
     return tc;
   }
 
-  public TestStep testStep(String location, Stage stage) throws IOException {
+  private TestStep testStep(String location, Stage stage) throws IOException {
     logger.info("Processing test step at:" + location);
     TestStep testStep = new TestStep();
     Resource res = ResourcebundleHelper.getResource(location + "TestStep.json");
@@ -587,19 +614,19 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  public TestArtifact testStory(String location) throws IOException {
+  private TestArtifact testStory(String location) throws IOException {
     return artifact(location, "TestStory");
   }
 
-  public TestArtifact testProcedure(String location) throws IOException {
+  private TestArtifact testProcedure(String location) throws IOException {
     return artifact(location, "TestProcedure");
   }
 
-  public TestArtifact jurorDocument(String location) throws IOException {
+  private TestArtifact jurorDocument(String location) throws IOException {
     return artifact(location, "JurorDocument");
   }
 
-  public TestArtifact artifact(String location, String type) throws IOException {
+  private TestArtifact artifact(String location, String type) throws IOException {
     TestArtifact doc = null;
     String path = location + type + ".pdf";
     Resource resource = ResourcebundleHelper.getResource(path);
@@ -627,22 +654,20 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  public TestArtifact messageContent(String location) throws IOException {
+  private TestArtifact messageContent(String location) throws IOException {
     return artifact(location, "MessageContent");
   }
 
-  public TestArtifact testDataSpecification(String location) throws IOException {
+  private TestArtifact testDataSpecification(String location) throws IOException {
     return artifact(location, "TestDataSpecification");
   }
 
-
-
-  public TestArtifact testPackage(String location) throws IOException {
+  private TestArtifact testPackage(String location) throws IOException {
     return artifact(location, "TestPackage");
   }
 
 
-  protected TestCaseGroup testCaseGroup(String location, Stage stage) throws IOException {
+  private TestCaseGroup testCaseGroup(String location, Stage stage) throws IOException {
     logger.info("Processing test case group at:" + location);
     TestCaseGroup tcg = new TestCaseGroup();
     Resource descriptorRsrce = ResourcebundleHelper.getResource(location + "TestCaseGroup.json");
@@ -675,7 +700,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  protected TestPlan testPlan(String testPlanPath, Stage stage) throws IOException {
+  private TestPlan testPlan(String testPlanPath, Stage stage) throws IOException {
     logger.info("Processing test plan  at:" + testPlanPath);
     TestPlan tp = new TestPlan();
     Resource res = ResourcebundleHelper.getResource(testPlanPath + "TestPlan.json");
@@ -710,7 +735,7 @@ public abstract class ResourcebundleLoader {
     return tp;
   }
 
-  protected TestObject testObject(String testObjectPath) throws IOException {
+  private TestObject testObject(String testObjectPath) throws IOException {
     logger.info("Processing test object at:" + testObjectPath);
     TestObject parent = new TestObject();
     Resource res = ResourcebundleHelper.getResource(testObjectPath + "TestObject.json");
@@ -741,7 +766,7 @@ public abstract class ResourcebundleLoader {
     return parent;
   }
 
-  protected void loadTestCasesDocumentation() throws IOException {
+  private void loadTestCasesDocumentation() throws IOException {
     TestCaseDocumentation doc =
         generateTestObjectDocumentation("Context-free", Stage.CF,
             testObjectRepository.findAllAsRoot());
@@ -767,7 +792,7 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  protected TestCaseDocumentation generateTestCaseDocumentation(String title, Stage stage,
+  private TestCaseDocumentation generateTestCaseDocumentation(String title, Stage stage,
       List<TestPlan> tps) throws IOException {
     if (tps != null && !tps.isEmpty()) {
       TestCaseDocumentation documentation = new TestCaseDocumentation();
@@ -781,7 +806,7 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  protected TestCaseDocumentation generateTestObjectDocumentation(String title, Stage stage,
+  private TestCaseDocumentation generateTestObjectDocumentation(String title, Stage stage,
       List<TestObject> tos) throws IOException {
     if (tos != null && !tos.isEmpty()) {
       TestCaseDocumentation documentation = new TestCaseDocumentation();
@@ -797,7 +822,7 @@ public abstract class ResourcebundleLoader {
 
 
 
-  protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestPlan tp)
+  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestPlan tp)
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
     doc.setId(tp.getId());
@@ -814,7 +839,7 @@ public abstract class ResourcebundleLoader {
     return doc;
   }
 
-  protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestCaseGroup tcg)
+  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestCaseGroup tcg)
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tcg);
     doc.setId(tcg.getId());
@@ -834,7 +859,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestCase tc)
+  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestCase tc)
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tc);
     doc.setId(tc.getId());
@@ -846,7 +871,7 @@ public abstract class ResourcebundleLoader {
     return doc;
   }
 
-  protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestStep ts)
+  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestStep ts)
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(ts.getTestContext());
     doc = initTestCaseDocument(ts, doc);
@@ -854,7 +879,7 @@ public abstract class ResourcebundleLoader {
     return doc;
   }
 
-  protected gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestObject to)
+  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestObject to)
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(to.getTestContext());
     doc = initTestCaseDocument(to, doc);
@@ -868,12 +893,12 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  protected gov.nist.hit.core.domain.TestCaseDocument initTestCaseDocument(AbstractTestCase ts)
+  private gov.nist.hit.core.domain.TestCaseDocument initTestCaseDocument(AbstractTestCase ts)
       throws IOException {
     return initTestCaseDocument(ts, new TestCaseDocument());
   }
 
-  protected gov.nist.hit.core.domain.TestCaseDocument initTestCaseDocument(AbstractTestCase ts,
+  private gov.nist.hit.core.domain.TestCaseDocument initTestCaseDocument(AbstractTestCase ts,
       TestCaseDocument doc) throws IOException {
     doc.setTitle(ts.getName());
     doc.setType(ts.getType().toString());
