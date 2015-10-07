@@ -27,6 +27,7 @@ import gov.nist.hit.core.repo.TestContextRepository;
 import gov.nist.hit.core.repo.TestObjectRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.TestCaseException;
@@ -80,9 +81,11 @@ public class DocumentationController {
   @Autowired
   private DocumentRepository documentRepository;
 
-
   @Autowired
-  private TestContextRepository testContextRepository;
+  private TestContextRepository testContextRepository; 
+  
+  @Autowired
+  private ZipGenerator zipGenerator;
 
 
   @RequestMapping(value = "/testcases", method = RequestMethod.GET)
@@ -149,6 +152,9 @@ public class DocumentationController {
     } catch (IOException e) {
       logger.debug("Failed to download the test packages ");
       throw new DownloadDocumentException("Cannot download the test packages");
+    } catch (Exception e) {
+      logger.debug("Failed to download the test packages ");
+      throw new DownloadDocumentException("Cannot download the test packages");
     }
   }
 
@@ -161,10 +167,12 @@ public class DocumentationController {
       response.setHeader("Content-disposition", "attachment;filename=" + stage
           + "ExampleMessages.zip");
       FileCopyUtils.copy(stream, response.getOutputStream());
-
     } catch (IOException e) {
-      logger.debug("Failed to download the test packages ");
-      throw new DownloadDocumentException("Cannot download the test packages");
+      logger.debug("Failed to download the example messages ");
+      throw new DownloadDocumentException("Cannot download the example messages");
+    } catch (Exception e) {
+      logger.debug("Failed to download the example messages ");
+      throw new DownloadDocumentException("Cannot download the example messages");
     }
   }
 
@@ -191,104 +199,48 @@ public class DocumentationController {
   }
 
 
-
-  public InputStream zipTestPackages(Stage stage) throws IOException {
-    List<Resource> resources = null;
+  public InputStream zipTestPackages(Stage stage) throws Exception {
+    String pattern = null;
+    String name = null;
     if (stage == Stage.CB) {
-      resources = ResourcebundleHelper.getResources("/*Contextbased/**/TestPackage.pdf");
-    } else if (stage == Stage.CB) {
-      resources = ResourcebundleHelper.getResources("/*Contextfree/**/TestPackage.pdf");
-    } else if (stage == Stage.CB) {
-      resources = ResourcebundleHelper.getResources("/*Isolated/**/TestPackage.pdf");
+      pattern = "/*Contextbased/**/TestPackage.pdf";
+      name = "ContextbasedTestPackages";
+    } else if (stage == Stage.CF) {
+      pattern = "/*Contextfree/**/TestPackage.pdf";
+      name = "ContextfreeTestPackages";
+    } else if (stage == Stage.ISOLATED) {
+      pattern = "/*Isolated/**/TestPackage.pdf";
+      name = "IsolatedTestPackages";
     }
+    return generateZip(pattern, name);
+  }
 
-    for (Resource resource : resources) {
-      System.out.println(resource.getFilename());
+
+  public InputStream zipExampleMessages(Stage stage) throws Exception {
+    String pattern = null;
+    String name = null;
+    if (stage == Stage.CB) {
+      pattern = "/*Contextbased/**/Message.t*";
+      name = "ContextbasedExampleMessages";
+    } else if (stage == Stage.CF) {
+      pattern = "/*Contextfree/**/Message.t*";
+      name = "ContextfreeExampleMessages";
+    } else if (stage == Stage.ISOLATED) {
+      pattern = "/*Isolated/**/Message.t*";
+      name = "IsolatedExampleMessages";
     }
-
+    return generateZip(pattern, name);
+  } 
+  
+  
+  private InputStream generateZip(String pattern, String name) throws Exception{
+    if(pattern != null && name != null){ 
+      String filename =  zipGenerator.generate(pattern, name);
+      FileInputStream io = new FileInputStream(new File(filename));
+      return io;
+    }
     return null;
   }
-
-
-  public InputStream zipExampleMessages(Stage stage) throws IOException {
-    List<Message> messages = testContextRepository.findAllExampleMessages(stage);
-    ByteArrayOutputStream outputStream = null;
-    byte[] bytes;
-    outputStream = new ByteArrayOutputStream();
-    ZipOutputStream out = new ZipOutputStream(outputStream);
-    for (Message message : messages) {
-      this.zipMessage(out, message);
-    }
-    out.close();
-    bytes = outputStream.toByteArray();
-    return new ByteArrayInputStream(bytes);
-  }
-
-
-  private void zipMessage(ZipOutputStream out, Message message) throws IOException {
-    byte[] buf = new byte[1024];
-    out.putNextEntry(new ZipEntry(message.getName() + "Message.txt"));
-    int lenTP;
-    InputStream io = IOUtils.toInputStream(message.getContent());
-    while ((lenTP = io.read(buf)) > 0) {
-      out.write(buf, 0, lenTP);
-    }
-    out.closeEntry();
-    io.close();
-  }
-
-  // public InputStream zipTestPackages(List<TestArtifact> testPackages) throws IOException {
-  // ByteArrayOutputStream outputStream = null;
-  // byte[] bytes;
-  // outputStream = new ByteArrayOutputStream();
-  // ZipOutputStream out = new ZipOutputStream(outputStream);
-  // for (TestArtifact testPackage : testPackages) {
-  // this.zipTestPackage(out, testPackage.getPdfPath());
-  // }
-  // out.close();
-  // bytes = outputStream.toByteArray();
-  // return new ByteArrayInputStream(bytes);
-  // }
-  //
-  //
-  // private void zipTestPackage(String path, String title) throws IOException {
-  // byte[] buf = new byte[1024];
-  // out.putNextEntry(new ZipEntry(path.substring(path.lastIndexOf("/") + 1).replaceAll(" ", "-")));
-  // int lenTP;
-  // InputStream io = getContent(path);
-  // while ((lenTP = io.read(buf)) > 0) {
-  // out.write(buf, 0, lenTP);
-  // }
-  // out.closeEntry();
-  // io.close();
-  // }
-
-  // private void zipTestPackage(TestPlan testPlan) throws IOException {
-  //
-  // File tpFolder = new File(testPlan.getName());
-  // tpFolder.mkdir();
-  //
-  // if (testPlan.getTestPackage() != null) {
-  //
-  // }
-  //
-  //
-  // if (testPlan.getTestCaseGroups() != null && !testPlan.getTestCaseGroups().isEmpty()) {
-  // for (TestCaseGroup tcg : tp.getTestCaseGroups()) {
-  // doc.getChildren().add(generateTestCaseDocument(tcg));
-  // }
-  // }
-  // if (testPlan.getTestCases() != null && !testPlan.getTestCases().isEmpty()) {
-  // for (TestCase tc : testPlan.getTestCases()) {
-  // doc.getChildren().add(generateTestCaseDocument(tc));
-  // }
-  // }
-  //
-  //
-  //
-  // }
-
-
 
   private InputStream getContent(String path) {
     InputStream content = null;

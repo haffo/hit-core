@@ -51,9 +51,11 @@ public class AppInfo  implements Serializable {
    private String homeTitle;
   
   @Column(columnDefinition = "TEXT")
-  private String homeContent;
+  private String homeContent; 
   
-
+  @Column(columnDefinition = "TEXT")
+  private String profileInfo;
+  
   public String getUrl() {
     return url;
   }
@@ -125,13 +127,36 @@ public class AppInfo  implements Serializable {
   public void setHomeContent(String homeContent) {
     this.homeContent = homeContent;
   }
+  
+  public String getProfileInfo() {
+    return profileInfo;
+  }
+
+  public void setProfileInfo(String profileInfo) {
+    this.profileInfo = profileInfo;
+  }
+
+  
+  
+  
+  
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   @Override
   public String toString() {
-    return "AppInfo [\n id=" + id + "\n, url=" + url + "\n, version=" + version + "\n, date=" + date
-        + "\n, name=" + name + "\n, domain=" + domain + "\n, header=" + header + "\n, adminEmail="
-        + adminEmail + "\n, homeTitle=" + homeTitle + "\n, homeContent=" + homeContent + "\n]";
+    return "AppInfo [id=" + id + ", url=" + url + ", version=" + version + ", date=" + date
+        + ", name=" + name + ", domain=" + domain + ", header=" + header + ", adminEmail="
+        + adminEmail + ", homeTitle=" + homeTitle + ", homeContent=" + homeContent
+        + ", profileInfo=" + profileInfo + "]";
   }
+
+  
   
   
   

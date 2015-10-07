@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MessageModel {
-  
+
   private Map<String, String> delimeters;
   protected List<MessageElement> elements;
 
@@ -29,6 +29,12 @@ public class MessageModel {
     elements = root.getChildren();
   }
 
+  public MessageModel(List<MessageElement> elements, Map<String, String> delimeters) {
+    this.elements = elements;
+    this.delimeters = delimeters;
+  }
+
+
   public Map<String, String> getDelimeters() {
     return delimeters;
   }
@@ -36,7 +42,7 @@ public class MessageModel {
   public void setDelimeters(Map<String, String> delimeters) {
     this.delimeters = delimeters;
   }
-  
-  
+
+
 
 }

@@ -105,6 +105,7 @@ public abstract class ResourcebundleLoader {
   public static final String KNOWNISSUE_FILE_PATTERN = "KnownIssues.json";
   public static final String USERDOCS_PATTERN = "Documentation/UserDocs";
   public static final String USERDOCS_FILE_PATTERN = "UserDocs.json";
+  public static final String PROFILE_INFO_PATTERN = "ProfileInfo.html";
 
 
   Map<String, IntegrationProfile> cachedProfiles = new HashMap<String, IntegrationProfile>();
@@ -195,11 +196,17 @@ public abstract class ResourcebundleLoader {
     appInfo.setHomeTitle(appInfoJson.get("homeTitle").getTextValue());
     appInfo.setName(appInfoJson.get("name").getTextValue());
     appInfo.setVersion(appInfoJson.get("version").getTextValue());
-
     java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     Date date = new Date();
     appInfo.setDate(dateFormat.format(date));
+    resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.PROFILE_PATTERN
+            + PROFILE_INFO_PATTERN);
+    if (resource != null) {
+      appInfo.setProfileInfo(FileUtil.getContent(resource));
+    }
     appInfoRepository.save(appInfo);
+
     logger.info("loading app info...DONE");
   }
 
@@ -357,7 +364,7 @@ public abstract class ResourcebundleLoader {
 
   private void loadIntegrationProfiles() throws IOException {
     logger.info("loading integration profiles...");
-    List<Resource> resources = getResources(domainPath(PROFILE_PATTERN) + "*");
+    List<Resource> resources = getResources(domainPath(PROFILE_PATTERN) + "*.xml");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         IntegrationProfile integrationProfile = integrationProfile(FileUtil.getContent(resource));

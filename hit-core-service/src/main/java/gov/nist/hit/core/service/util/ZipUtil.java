@@ -1,4 +1,4 @@
-package gov.nist.hit.core.api.util;
+package gov.nist.hit.core.service.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -112,5 +112,11 @@ public class ZipUtil {
         }
       }
     }
+  } 
+  
+  
+  public static void main(String[] agrs){
+    
   }
+  
 }
