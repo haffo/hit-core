@@ -14,12 +14,14 @@ package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.TestObject;
 import gov.nist.hit.core.repo.TestObjectRepository;
+import gov.nist.hit.core.service.TestObjectService;
 
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,26 +36,13 @@ public class CFTestingController {
   static final Logger logger = LoggerFactory.getLogger(CFTestingController.class);
 
   @Autowired
-  private TestObjectRepository testObjectRepository;
-
-
-
-  public TestObjectRepository getTestObjectRepository() {
-    return testObjectRepository;
-  }
-
-
-
-  public void setTestObjectRepository(TestObjectRepository testObjectRepository) {
-    this.testObjectRepository = testObjectRepository;
-  }
-
+  private TestObjectService testObjectService;
 
 
   @RequestMapping(value = "/testcases")
   public List<TestObject> testCases() {
     logger.info("Fetching all testCases...");
-    return testObjectRepository.findAllAsRoot();
+    return testObjectService.findAllAsRoot();
   }
 
 

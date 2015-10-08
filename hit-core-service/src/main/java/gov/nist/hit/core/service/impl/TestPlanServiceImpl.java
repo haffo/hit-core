@@ -1,0 +1,33 @@
+package gov.nist.hit.core.service.impl;
+
+import gov.nist.hit.core.domain.Stage;
+import gov.nist.hit.core.domain.TestArtifact;
+import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.repo.TestPlanRepository;
+import gov.nist.hit.core.service.TestPlanService;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+@Service
+public class TestPlanServiceImpl implements TestPlanService {
+
+  @Autowired
+  private TestPlanRepository testPlanRepository;
+
+  @Override
+  @Cacheable(value = "testCaseCache", key = "#stage.name() + 'TestPlans'")
+  public List<TestPlan> findAllByStage(Stage stage) {
+    return testPlanRepository.findAllByStage(stage);
+  }
+
+  @Override
+  public List<TestArtifact> findAllTestPackages(Stage stage) {
+    return testPlanRepository.findAllTestPackages(stage);
+  }
+
+
+}

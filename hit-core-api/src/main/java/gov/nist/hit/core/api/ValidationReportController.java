@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/report")
 @RestController
-public class ValidationReportController extends ExceptionHandlingController {
+public class ValidationReportController  {
 
   static final Logger logger = LoggerFactory.getLogger(ValidationReportController.class);
 
@@ -72,15 +72,18 @@ public class ValidationReportController extends ExceptionHandlingController {
 
   @RequestMapping(value = "/downloadAs/{format}", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public String download(@PathVariable String format, @RequestParam("xmlReport") String xmlReport,
+  public void download(@PathVariable String format, @RequestParam("json") String json,
       HttpServletRequest request, HttpServletResponse response) {
     try {
       logger.info("Downloading validation report in " + format);
-      if (xmlReport == null) {
+      if (json == null) {
         throw new ValidationReportException("No report generated");
       }
+      String xmlReport = reportService.toXML(json);
+      if(xmlReport == null){
+        throw new ValidationReportException("Cannot parse the report");
+      }
       InputStream content = null;
-
       if ("HTML".equalsIgnoreCase(format)) {
         content = IOUtils.toInputStream(createHtml(xmlReport), "UTF-8");
         response.setContentType("text/html");
@@ -108,8 +111,10 @@ public class ValidationReportController extends ExceptionHandlingController {
     } catch (ValidationReportException | IOException e) {
       logger.debug("Failed to download the validation report ");
       throw new ValidationReportException("Failed to download the validation report");
+    } catch (Exception e) {
+      logger.debug("Failed to download the validation report ");
+      throw new ValidationReportException("Failed to download the validation report");
     }
-    return null;
-  }
+   }
 
 }

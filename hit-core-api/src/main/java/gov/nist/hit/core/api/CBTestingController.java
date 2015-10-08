@@ -19,12 +19,16 @@ import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.repo.TestCaseRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.service.TestCaseService;
+import gov.nist.hit.core.service.TestPlanService;
+import gov.nist.hit.core.service.TestStepService;
 
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,33 +44,34 @@ public class CBTestingController {
   static final Logger logger = LoggerFactory.getLogger(CBTestingController.class);
 
   @Autowired
-  private TestPlanRepository testPlanRepository;
-
+  private TestPlanService testPlanService;
+  
   @Autowired
-  private TestCaseRepository testCaseRepository;
-
+  private TestCaseService testCaseService;
+  
   @Autowired
-  private TestStepRepository testStepRepository;
+  private TestStepService testStepService;
+  
 
 
   @RequestMapping(value = "/testcases", method = RequestMethod.GET)
   public List<TestPlan> testCases() {
     logger.info("Fetching all testCases...");
-    List<TestPlan> testPlans = testPlanRepository.findAllByStage(Stage.CB);
+    List<TestPlan> testPlans = testPlanService.findAllByStage(Stage.CB);
     return testPlans;
   }
 
   @RequestMapping(value = "/testcases/{testCaseId}", method = RequestMethod.GET)
   public TestCase testCase(@PathVariable final Long testCaseId) {
     logger.info("Fetching  test case...");
-    TestCase testCase = testCaseRepository.findOne(testCaseId);
+    TestCase testCase = testCaseService.findOne(testCaseId);
     return testCase;
   }
 
   @RequestMapping(value = "/teststeps/{testStepId}", method = RequestMethod.GET)
   public TestStep testStep(@PathVariable final Long testStepId) {
     logger.info("Fetching  test step...");
-    TestStep testStep = testStepRepository.findOne(testStepId);
+    TestStep testStep = testStepService.findOne(testStepId);
     return testStep;
   }
 

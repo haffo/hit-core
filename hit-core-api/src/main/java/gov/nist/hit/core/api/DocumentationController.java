@@ -27,6 +27,8 @@ import gov.nist.hit.core.repo.TestContextRepository;
 import gov.nist.hit.core.repo.TestObjectRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.service.TestCaseDocumentationService;
+import gov.nist.hit.core.service.TestPlanService;
 import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
 import gov.nist.hit.core.service.exception.MessageException;
@@ -73,16 +75,10 @@ public class DocumentationController {
   static final Logger logger = LoggerFactory.getLogger(DocumentationController.class);
 
   @Autowired
-  private TestPlanRepository testPlanRepository;
-
-  @Autowired
-  private TestCaseDocumentationRepository testCaseDocumentationRepository;
+  private TestCaseDocumentationService testCaseDocumentationService;
 
   @Autowired
   private DocumentRepository documentRepository;
-
-  @Autowired
-  private TestContextRepository testContextRepository; 
   
   @Autowired
   private ZipGenerator zipGenerator;
@@ -91,7 +87,7 @@ public class DocumentationController {
   @RequestMapping(value = "/testcases", method = RequestMethod.GET)
   public TestCaseDocumentation testCases(@RequestParam("stage") Stage stage) {
     logger.info("Fetching " + stage + " test case documentation");
-    TestCaseDocumentation doc = testCaseDocumentationRepository.findOneByStage(stage);
+    TestCaseDocumentation doc = testCaseDocumentationService.findOneByStage(stage);
     return doc;
   }
 

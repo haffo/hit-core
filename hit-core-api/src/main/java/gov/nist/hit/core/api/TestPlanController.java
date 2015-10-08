@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/testplans")
-public class TestPlanController extends ExceptionHandlingController {
+public class TestPlanController {
 
   static final Logger logger = LoggerFactory.getLogger(TestPlanController.class);
 

@@ -2,12 +2,11 @@ package gov.nist.hit.core.domain;
 
 public class MessageValidationResult {
  
-  
   public MessageValidationResult(String json, String html) {
     super();
     this.json = json;
     this.html = html;
-  }
+   }
 
   private String json; 
   
@@ -28,8 +27,6 @@ public class MessageValidationResult {
   public void setHtml(String html) {
     this.html = html;
   }
-  
-  
   
   
   

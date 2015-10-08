@@ -82,7 +82,7 @@ public abstract class ValidationReportGenerator {
       transformer.transform(source, result);
       String htmlReport = HtmlUtil.repairStyle(new String(resultStream.toByteArray()));
       logger.info("HTML validation report generated");
-      return addStyleSheet(htmlReport);
+      return htmlReport;
     } catch (Exception e) {
       throw new ValidationReportException(e);
     } catch (TransformerFactoryConfigurationError e) {
@@ -99,19 +99,16 @@ public abstract class ValidationReportGenerator {
    */
   public String toXHTML(String xml) throws ValidationReportException {
     try {
-      StringBuffer bf = new StringBuffer();
-      bf.append("<?xml version='1.0' encoding='UTF-8'?>");
-      bf.append(xml);
       Transformer transformer =
           TransformerFactory.newInstance().newTransformer(
               new StreamSource(new StringReader(getPdfConversionXslt())));
-      StreamSource source = new StreamSource(new StringReader(bf.toString()));
+      StreamSource source = new StreamSource(new StringReader(xml));
       ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
       StreamResult result = new StreamResult(resultStream);
       transformer.transform(source, result);
       String html = HtmlUtil.repairStyle(new String(resultStream.toByteArray()));
       logger.info("XHTML validation report generated");
-      return addStyleSheet(html);
+      return html;
     } catch (Exception e) {
       throw new ValidationReportException(e);
     } catch (TransformerFactoryConfigurationError e) {
@@ -119,11 +116,8 @@ public abstract class ValidationReportGenerator {
     }
   }
 
-  /**
-   * @param htmlReport
-   * @return
-   */
-  public abstract String addStyleSheet(String htmlReport);
+  public abstract String toXML(String json) throws Exception;
+
 
   /**
    * return the xstl path for the conversion of xml to pdf
