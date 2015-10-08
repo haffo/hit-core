@@ -56,6 +56,11 @@ public class ConformanceProfile implements Serializable {
   @Column(columnDefinition = "LONGTEXT")
   protected String json;
 
+  
+  @JsonIgnore
+  @Column(columnDefinition = "LONGTEXT")
+  protected String xml;
+  
  
   public IntegrationProfile getIntegrationProfile() {
     return integrationProfile;
@@ -82,10 +87,7 @@ public class ConformanceProfile implements Serializable {
     this.id = id;
   } 
   
-  
-  
-
-  
+    
   public String getJson() {
     return json;
   }
@@ -100,6 +102,14 @@ public class ConformanceProfile implements Serializable {
 
   public void setSourceId(String sourceId) {
     this.sourceId = sourceId;
+  }
+
+  public String getXml() {
+    return xml;
+  }
+
+  public void setXml(String xml) {
+    this.xml = xml;
   }
  
  

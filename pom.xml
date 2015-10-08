@@ -12,6 +12,7 @@
 		<module>hit-core-domain</module>
 		<module>hit-core-transport</module>
 		<module>hit-core-repo</module>
+		<module>hit-core-api</module>
 	</modules>
 
 	<properties>

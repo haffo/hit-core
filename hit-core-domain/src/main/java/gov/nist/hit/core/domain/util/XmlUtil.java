@@ -1,6 +1,6 @@
 package gov.nist.hit.core.domain.util;
 
-import gov.nist.hit.core.domain.XmlCoordinate;
+import gov.nist.hit.core.domain.XMLCoordinate;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -85,13 +85,13 @@ public class XmlUtil {
     return new XMLOutputter().outputString(document.getRootElement());
   }
 
-  public static XmlCoordinate getStartCoordinate(Element element) {
+  public static XMLCoordinate getStartCoordinate(Element element) {
     Located locatedElement = (Located) element;
-    return new XmlCoordinate(locatedElement.getLine(), 0);
+    return new XMLCoordinate(locatedElement.getLine(), 0);
   }
 
-  public static XmlCoordinate getEndCoordinate(Element element) {
-    return new XmlCoordinate(getEndLine(element), 1000);
+  public static XMLCoordinate getEndCoordinate(Element element) {
+    return new XMLCoordinate(getEndLine(element), 1000);
   }
 
   private static int getNumberOfLine(Element element) {

@@ -32,7 +32,7 @@ public class TestObject extends AbstractTestCase implements Serializable{
   
   public TestObject() {
     super();
-    category = TestCategory.DataInstance;
+    this.type = TestType.TestObject;
   }
 
   @OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER,

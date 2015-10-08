@@ -11,10 +11,21 @@
  */
 package gov.nist.hit.core.service;
 
+import gov.nist.hit.core.domain.MessageValidationResult;
+import gov.nist.hit.core.domain.TestContext;
+import gov.nist.hit.core.domain.MessageValidationCommand;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 
 public interface MessageValidator {
 
-  public String validate(String... args) throws MessageValidationException;
+  /**
+   * 
+   * @param testContext
+   * @param command
+   * @return
+   * @throws MessageValidationException
+   */
+  public MessageValidationResult validate(TestContext testContext, MessageValidationCommand command)
+      throws MessageValidationException;
 
 }

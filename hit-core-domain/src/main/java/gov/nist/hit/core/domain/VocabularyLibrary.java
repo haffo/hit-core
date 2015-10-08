@@ -23,14 +23,18 @@ public class VocabularyLibrary implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
   
+  @JsonIgnore
   @NotNull
   @Column(nullable = false)
   protected String sourceId;
   
+  @JsonIgnore
   protected String name; 
   
+  @JsonIgnore
   protected String description;
   
+  @JsonIgnore
   protected String key;
   
   @JsonIgnore
@@ -63,12 +67,8 @@ public class VocabularyLibrary implements Serializable {
 
   public VocabularyLibrary(String valueSetXml) {
     super();
-    this.xml = xml;
+    this.xml = valueSetXml;
   }
-
-  
-  
-  
   
   public Long getId() {
     return id;

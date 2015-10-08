@@ -42,8 +42,9 @@ public abstract class AbstractTestCase {
   protected TestCategory category;
   
   @Enumerated(EnumType.STRING)
-  protected Stage stage;
+  protected Stage stage; 
   
+   
   protected int position; 
   
   @JsonIgnore

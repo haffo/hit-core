@@ -1,58 +1,96 @@
-/**
- * This software was developed at the National Institute of Standards and Technology by employees of
- * the Federal Government in the course of their official duties. Pursuant to title 17 Section 105
- * of the United States Code this software is not subject to copyright protection and is in the
- * public domain. This is an experimental system. NIST assumes no responsibility whatsoever for its
- * use by other parties, and makes no guarantees, expressed or implied, about its quality,
- * reliability, or any other characteristic. We would appreciate acknowledgement if the software is
- * used. This software can be redistributed and/or modified freely provided that any derivative
- * works bear some notice that they are derived from it, and any modified versions bear some notice
- * that they have been modified.
+/*
+ * Meaningful Use Core Artifact.java October 14, 2011
+ * 
+ * This code was produced by the National Institute of Standards and Technology (NIST). See the
+ * 'nist.disclaimer' file given in the distribution for information on the use and redistribution of
+ * this software.
  */
-
 package gov.nist.hit.core.domain;
 
-public  class Document {
-  protected String title;
+import java.io.Serializable;
+import java.util.List;
 
-  protected String description;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 
-  protected String path;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-  protected String version;
+/**
+ * @author Harold Affo (NIST)
+ */
+@Entity
+public class Document implements Serializable {
 
-  protected String content;
+  @Id
+  @GeneratedValue(strategy = GenerationType.TABLE)
+  protected Long id;
 
-  public Document() {}
+  private static final long serialVersionUID = 1L;
 
-  public Document(String title, String description, String path, String version) {
+  private String title;
+  
+  private String name;
+  
+  private String path; 
+    
+  private String version;
+
+  private String comments;
+
+  private String date;
+
+  private int position;
+  
+  @JsonIgnore
+  @Enumerated(EnumType.STRING)
+  private DocumentType type;
+
+  public Document() {
     super();
-    this.title = title;
-    this.description = description;
-    this.path = path;
-    this.version = version;
   }
 
-  public Document(String title, String description, String path, String version, String content) {
-    this(title, description, path, version);
-    this.content = content;
-  }
+//  public Document(DocumentType type, String title, String description, String path, String version, String format,
+//      String date) {
+//    this(type,title, description, path, version, format, date);
+//   }
 
-  public String getTitle() {
-    return title;
-  }
+//  public Document(DocumentType type,String title, String description, String path, String version) {
+//    this(type, title, description, path, version);
+//    }
 
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
+//  public Document(DocumentType type, String title, String description, String path, String version, String format,
+//      String date) {
+//    super();
+//    this.title = title;
+//    this.description = description;
+//    this.path = path;
+//    this.version = version;
+//    this.format = format;
+//    this.date = date;
+//    this.type = type;
+//  }
+//
+//  public Document(DocumentType type, String title, String description, String path, String version) {
+//    super();
+//    this.title = title;
+//    this.description = description;
+//    this.path = path;
+//    this.version = version;
+//  }
+//
+//  public Document(DocumentType type, String title, String description) {
+//    this(type,title, description, null, null);
+//  }
+//
+//  public Document(DocumentType type, String title, String description, String path) {
+//    this(type,title, description, path, null);
+//  }
 
   public String getPath() {
     return path;
@@ -70,12 +108,61 @@ public  class Document {
     this.version = version;
   }
 
-  public String getContent() {
-    return content;
+  public String getComments() {
+    return comments;
   }
 
-  public void setContent(String content) {
-    this.content = content;
+  public void setComments(String comments) {
+    this.comments = comments;
   }
 
+  public String getDate() {
+    return date;
+  }
+
+  public void setDate(String date) {
+    this.date = date;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public DocumentType getType() {
+    return type;
+  }
+
+  public void setType(DocumentType type) {
+    this.type = type;
+  }
+
+  public int getPosition() {
+    return position;
+  }
+
+  public void setPosition(int position) {
+    this.position = position;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+ 
 }

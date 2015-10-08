@@ -19,6 +19,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ConformanceProfileRepository extends JpaRepository<ConformanceProfile, Long> {
+
   @Query("select conformance.json from ConformanceProfile conformance where conformance.id = :conformanceId")
   public String getJson(@Param("conformanceId") Long conformanceId);
 

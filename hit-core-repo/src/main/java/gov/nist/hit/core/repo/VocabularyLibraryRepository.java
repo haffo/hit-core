@@ -28,5 +28,4 @@ public interface VocabularyLibraryRepository extends JpaRepository<VocabularyLib
   public String getJson(@Param("valueSetLibraryId") Long valueSetLibraryId);
 
 
-
 }
