@@ -15,6 +15,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 
 public class ZipGeneratorImpl implements ZipGenerator {
@@ -24,6 +25,7 @@ public class ZipGeneratorImpl implements ZipGenerator {
   }
 
   @Override
+  @Cacheable(value = "zipCache", key = "#type")
   public String generate(String pattern, String type) throws Exception {
     List<Resource> resources = ResourcebundleHelper.getResources(pattern);
     if (resources != null) {

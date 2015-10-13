@@ -74,7 +74,7 @@ public class ExceptionHandlingController {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String reportException(ValidationReportException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, exporting the report Failed.\n";
+    return ex.getMessage();
   }
 
 
@@ -106,6 +106,6 @@ public class ExceptionHandlingController {
   public String documentationException(DocumentationException ex) {
     logger.error(ex.getMessage(), ex);
     return "Sorry, Cannot download the document";
-  } 
+  }
 
 }
