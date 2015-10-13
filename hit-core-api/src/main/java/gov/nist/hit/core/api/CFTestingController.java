@@ -38,7 +38,7 @@ public class CFTestingController {
   @Autowired
   private TestObjectService testObjectService;
 
-
+  @Cacheable(value = "testCaseCache", key = "'cf-testcases'")
   @RequestMapping(value = "/testcases")
   public List<TestObject> testCases() {
     logger.info("Fetching all testCases...");

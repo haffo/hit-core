@@ -28,8 +28,8 @@ public class ValidationReportGeneratorImpl extends ValidationReportGenerator {
 
   private final static Logger logger = Logger.getLogger(ValidationReportGeneratorImpl.class);
 
-  private static final String HTML_XSL = "/report_html.xsl";
-  private static final String PDF_XSL = "/report_pdf.xsl";
+  private static final String HTML_XSL = "/xslt/report-html.xsl";
+  private static final String PDF_XSL = "/xslt/report-pdf.xsl";
 
   public ValidationReportGeneratorImpl() {
 

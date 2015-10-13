@@ -7,7 +7,6 @@ import gov.nist.hit.core.service.TestObjectService;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +21,7 @@ public class TestObjectServiceImpl implements TestObjectService {
   }
 
   @Override
-  @Cacheable(value = "testCaseCache", key = "'TestObjects'")
+  // @Cacheable(value = "testCaseCache", key = "'TestObjects'")
   public List<TestObject> findAllAsRoot() {
     return testObjectRepository.findAllAsRoot();
   }

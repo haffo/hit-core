@@ -54,6 +54,7 @@ public class CBTestingController {
   
 
 
+  @Cacheable(value = "testCaseCache", key = "'cb-testcases'")
   @RequestMapping(value = "/testcases", method = RequestMethod.GET)
   public List<TestPlan> testCases() {
     logger.info("Fetching all testCases...");

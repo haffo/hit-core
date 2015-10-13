@@ -56,6 +56,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,6 +85,7 @@ public class DocumentationController {
   private ZipGenerator zipGenerator;
 
 
+  @Cacheable(value = "documentationCache", key = "#stage.name() + 'testcases-documentation'")
   @RequestMapping(value = "/testcases", method = RequestMethod.GET)
   public TestCaseDocumentation testCases(@RequestParam("stage") Stage stage) {
     logger.info("Fetching " + stage + " test case documentation");
@@ -91,18 +93,21 @@ public class DocumentationController {
     return doc;
   }
 
+  @Cacheable(value = "documentationCache", key = "'releasenotes'")
   @RequestMapping(value = "/releasenotes", method = RequestMethod.GET)
   public List<Document> releaseNotes() {
     logger.info("Fetching  all release notes");
     return documentRepository.findAllReleaseNotes();
   }
 
+  @Cacheable(value = "documentationCache", key = "'userdocs'")
   @RequestMapping(value = "/userdocs", method = RequestMethod.GET)
   public List<Document> userDocs() {
     logger.info("Fetching  all release notes");
     return documentRepository.findAllUserDocs();
   }
 
+  @Cacheable(value = "documentationCache", key = "'knownissues'")
   @RequestMapping(value = "/knownissues", method = RequestMethod.GET)
   public List<Document> knownIssues() {
     logger.info("Fetching  all known issues");
