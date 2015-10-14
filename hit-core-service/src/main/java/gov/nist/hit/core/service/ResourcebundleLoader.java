@@ -176,7 +176,10 @@ public abstract class ResourcebundleLoader {
 
   public abstract ProfileModel parseProfile(String integrationProfileXml,
       String conformanceProfileId, String constraintsXml, String additionalConstraintsXml)
-      throws ProfileParserException;
+      throws ProfileParserException, UnsupportedOperationException;
+
+  protected abstract VocabularyLibrary vocabLibrary(String content) throws JsonGenerationException,
+      JsonMappingException, IOException, UnsupportedOperationException;
 
 
 
@@ -380,16 +383,15 @@ public abstract class ResourcebundleLoader {
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String content = FileUtil.getContent(resource);
-        VocabularyLibrary vocabLibrary = vocabLibrary(content);
-        cachedVocabLibraries.put(vocabLibrary.getSourceId(), vocabLibrary);
+        try {
+          VocabularyLibrary vocabLibrary = vocabLibrary(content);
+          cachedVocabLibraries.put(vocabLibrary.getSourceId(), vocabLibrary);
+        } catch (UnsupportedOperationException e) {
+        }
       }
     }
     logger.info("loading value set libraries...DONE");
   }
-
-  protected abstract VocabularyLibrary vocabLibrary(String content) throws JsonGenerationException,
-      JsonMappingException, IOException;
-
 
 
   protected Constraints additionalConstraints(String location) throws IOException {
@@ -464,17 +466,20 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-
-
   protected String jsonConformanceProfile(String integrationProfileXml,
       String conformanceProfileId, String constraintsXml, String additionalConstraintsXml)
       throws ProfileParserException, JsonProcessingException,
       com.fasterxml.jackson.core.JsonProcessingException {
-    ProfileModel profileModel =
-        parseProfile(integrationProfileXml, conformanceProfileId, constraintsXml,
-            additionalConstraintsXml);
-    String json = obm.writeValueAsString(profileModel);
-    return json;
+    try {
+      ProfileModel profileModel =
+          parseProfile(integrationProfileXml, conformanceProfileId, constraintsXml,
+              additionalConstraintsXml);
+      String json = obm.writeValueAsString(profileModel);
+      return json;
+    } catch (UnsupportedOperationException e) {
+
+    }
+    return null;
   }
 
 

@@ -39,14 +39,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Harold Affo (NIST)
  * 
  */
-@RequestMapping("/report")
-@Controller
-public class ValidationReportController  {
+ public abstract class ValidationReportController  {
 
   static final Logger logger = LoggerFactory.getLogger(ValidationReportController.class);
-
-  @Autowired
-  private ValidationReportGenerator reportService;
+ 
+  
+  public abstract ValidationReportGenerator getValidationReportGenerator();
 
   @RequestMapping(value = "/generateAs/{format}", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
@@ -67,7 +65,7 @@ public class ValidationReportController  {
   }
 
   private String createHtml(String xmlReport) {
-    String htmlReport = reportService.toHTML(xmlReport);
+    String htmlReport = getValidationReportGenerator().toHTML(xmlReport);
     return htmlReport;
   }
 
@@ -80,7 +78,7 @@ public class ValidationReportController  {
       if (json == null) {
         throw new ValidationReportException("No report generated");
       }
-      String xmlReport = reportService.toXML(json);
+      String xmlReport = getValidationReportGenerator().toXML(json);
       if(xmlReport == null){
         throw new ValidationReportException("Cannot parse the report");
       }
@@ -101,7 +99,7 @@ public class ValidationReportController  {
         response
             .setHeader("Content-disposition", "attachment;filename=MessageValidationReport.xml");
       } else if ("PDF".equalsIgnoreCase(format)) {
-        content = reportService.toPDF(xmlReport);
+        content = getValidationReportGenerator().toPDF(xmlReport);
         response.setContentType("application/pdf");
         response
             .setHeader("Content-disposition", "attachment;filename=MessageValidationReport.pdf");
@@ -116,6 +114,9 @@ public class ValidationReportController  {
       logger.debug("Failed to download the validation report ");
       throw new ValidationReportException("Failed to download the validation report");
     }
-   }
+   } 
+  
+  
+  
 
 }
