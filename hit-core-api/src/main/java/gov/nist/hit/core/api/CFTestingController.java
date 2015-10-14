@@ -45,6 +45,14 @@ public class CFTestingController {
     return testObjectService.findAllAsRoot();
   }
 
+  public TestObjectService getTestObjectService() {
+    return testObjectService;
+  }
+
+  public void setTestObjectService(TestObjectService testObjectService) {
+    this.testObjectService = testObjectService;
+  }
+
 
 
 }

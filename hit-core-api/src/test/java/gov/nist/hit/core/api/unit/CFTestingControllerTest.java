@@ -15,6 +15,7 @@ import gov.nist.hit.core.api.CFTestingController;
 import gov.nist.hit.core.repo.TestObjectRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.TestContextRepository;
+import gov.nist.hit.core.service.TestObjectService;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +37,7 @@ public class CFTestingControllerTest {
 
 
   @Mock
-  TestObjectRepository testObjectRepository;
+  TestObjectService testObjectService;
 
   @Mock
   IntegrationProfileRepository integrationProfileRepository;
@@ -56,7 +57,7 @@ public class CFTestingControllerTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    controller.setTestObjectRepository(testObjectRepository);
+    controller.setTestObjectService(testObjectService);
     mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
   }
 
