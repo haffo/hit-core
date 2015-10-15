@@ -25,12 +25,12 @@ public class TestStep extends AbstractTestCase implements Serializable {
  
   
   @Enumerated(EnumType.STRING)
-  private ConnectionType connectionType; 
+  private TestStepTestingType testingType; 
   
   public TestStep() {
     super();
-    this.type = TestType.TestStep;
-   }
+    this.type = ObjectType.TestStep;
+  }
 
   @OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER,
       orphanRemoval = true)
@@ -57,15 +57,16 @@ public class TestStep extends AbstractTestCase implements Serializable {
     this.testContext = testContext;
   }
 
-
-  public ConnectionType getConnectionType() {
-    return connectionType;
+  public TestStepTestingType getTestingType() {
+    return testingType;
   }
 
-  public void setConnectionType(ConnectionType connectionType) {
-    this.connectionType = connectionType;
+  public void setTestingType(TestStepTestingType testingType) {
+    this.testingType = testingType;
   }
 
+  
+  
  
   
  

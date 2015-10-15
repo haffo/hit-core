@@ -12,62 +12,66 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.codehaus.jackson.map.annotate.JsonView;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
- 
+
 /**
  * 
  * @author haffo
- *
+ * 
  */
 @MappedSuperclass
 public abstract class AbstractTestCase {
 
   @Column(columnDefinition = "TEXT")
   protected String name;
-  
+
   @Column
   private String parentName;
 
-  
+
   @Column(columnDefinition = "TEXT")
   protected String description;
-  
+
+
+  @NotNull
   @Enumerated(EnumType.STRING)
-  protected TestType type;
-  
+  protected ObjectType type;
+
+
   @Enumerated(EnumType.STRING)
-  protected TestCategory category;
-  
-  @Enumerated(EnumType.STRING)
-  protected Stage stage; 
-  
-   
-  protected int position; 
-  
-  @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
-  protected TestArtifact testPackage; 
-  
-  @JsonIgnore
-   @OneToOne(cascade = CascadeType.ALL, optional = true)
-  protected TestArtifact testStory; 
+  protected TestingStage stage;
+
+  @Min(1)
+  protected int position;
 
   @JsonIgnore
-   @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  protected TestArtifact testPackage;
+
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  protected TestArtifact testStory;
+
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.ALL, optional = true)
   protected TestArtifact jurorDocument;
-  
+
   @JsonIgnore
-   @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @OneToOne(cascade = CascadeType.ALL, optional = true)
   protected TestArtifact messageContent;
-  
+
   @JsonIgnore
-   @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @OneToOne(cascade = CascadeType.ALL, optional = true)
   protected TestArtifact testDataSpecification;
-   
- 
+
+
   public String getName() {
     return name;
   }
@@ -84,21 +88,14 @@ public abstract class AbstractTestCase {
     this.description = description;
   }
 
-  public TestType getType() {
+  public ObjectType getType() {
     return type;
   }
 
-  public void setType(TestType type) {
+  public void setType(ObjectType type) {
     this.type = type;
   }
 
-  public TestCategory getCategory() {
-    return category;
-  }
-
-  public void setCategory(TestCategory category) {
-    this.category = category;
-  }
 
   public int getPosition() {
     return position;
@@ -108,11 +105,11 @@ public abstract class AbstractTestCase {
     this.position = position;
   }
 
-  public Stage getStage() {
+  public TestingStage getStage() {
     return stage;
   }
 
-  public void setStage(Stage stage) {
+  public void setStage(TestingStage stage) {
     this.stage = stage;
   }
 
@@ -124,7 +121,7 @@ public abstract class AbstractTestCase {
     this.testPackage = testPackage;
   }
 
-  
+
 
   public TestArtifact getTestStory() {
     return testStory;
@@ -166,8 +163,6 @@ public abstract class AbstractTestCase {
     this.parentName = parentName;
   }
 
-  
-  
-  
- 
+
+
 }

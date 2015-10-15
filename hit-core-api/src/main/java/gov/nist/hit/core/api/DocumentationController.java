@@ -14,7 +14,7 @@ package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.Message;
-import gov.nist.hit.core.domain.Stage;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseDocumentation;
@@ -87,7 +87,7 @@ public class DocumentationController {
 
   @Cacheable(value = "documentationCache", key = "#stage.name() + 'testcases-documentation'")
   @RequestMapping(value = "/testcases", method = RequestMethod.GET)
-  public TestCaseDocumentation testCases(@RequestParam("stage") Stage stage) {
+  public TestCaseDocumentation testCases(@RequestParam("stage") TestingStage stage) {
     logger.info("Fetching " + stage + " test case documentation");
     TestCaseDocumentation doc = testCaseDocumentationService.findOneByStage(stage);
     return doc;
@@ -141,7 +141,7 @@ public class DocumentationController {
 
 
   @RequestMapping(value = "/testPackages", method = RequestMethod.POST)
-  public void testPackages(@RequestParam("stage") Stage stage, HttpServletRequest request,
+  public void testPackages(@RequestParam("stage") TestingStage stage, HttpServletRequest request,
       HttpServletResponse response) throws DownloadDocumentException {
     try {
       InputStream stream = zipTestPackages(stage);
@@ -160,7 +160,7 @@ public class DocumentationController {
   }
 
   @RequestMapping(value = "/exampleMessages", method = RequestMethod.POST)
-  public void exampleMessages(@RequestParam("stage") Stage stage, HttpServletRequest request,
+  public void exampleMessages(@RequestParam("stage") TestingStage stage, HttpServletRequest request,
       HttpServletResponse response) throws DownloadDocumentException {
     try {
       InputStream stream = zipExampleMessages(stage);
@@ -200,16 +200,16 @@ public class DocumentationController {
   }
 
 
-  public InputStream zipTestPackages(Stage stage) throws Exception {
+  public InputStream zipTestPackages(TestingStage stage) throws Exception {
     String pattern = null;
     String name = null;
-    if (stage == Stage.CB) {
+    if (stage == TestingStage.CB) {
       pattern = "/*Contextbased/**/TestPackage.pdf";
       name = "ContextbasedTestPackages";
-    } else if (stage == Stage.CF) {
+    } else if (stage == TestingStage.CF) {
       pattern = "/*Contextfree/**/TestPackage.pdf";
       name = "ContextfreeTestPackages";
-    } else if (stage == Stage.ISOLATED) {
+    } else if (stage == TestingStage.ISOLATED) {
       pattern = "/*Isolated/**/TestPackage.pdf";
       name = "IsolatedTestPackages";
     }
@@ -217,16 +217,16 @@ public class DocumentationController {
   }
 
 
-  public InputStream zipExampleMessages(Stage stage) throws Exception {
+  public InputStream zipExampleMessages(TestingStage stage) throws Exception {
     String pattern = null;
     String name = null;
-    if (stage == Stage.CB) {
+    if (stage == TestingStage.CB) {
       pattern = "/*Contextbased/**/Message.t*";
       name = "ContextbasedExampleMessages";
-    } else if (stage == Stage.CF) {
+    } else if (stage == TestingStage.CF) {
       pattern = "/*Contextfree/**/Message.t*";
       name = "ContextfreeExampleMessages";
-    } else if (stage == Stage.ISOLATED) {
+    } else if (stage == TestingStage.ISOLATED) {
       pattern = "/*Isolated/**/Message.t*";
       name = "IsolatedExampleMessages";
     }

@@ -39,7 +39,7 @@ public class TestCaseGroup extends AbstractTestCase implements Serializable {
   
   public TestCaseGroup() {
     super();
-    this.type = TestType.TestCaseGroup;
+    this.type = ObjectType.TestCaseGroup;
    }
     
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})

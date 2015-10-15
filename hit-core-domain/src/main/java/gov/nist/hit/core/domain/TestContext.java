@@ -37,7 +37,7 @@ public class TestContext implements Serializable {
 
   @JsonIgnore
   @Enumerated(EnumType.STRING)
-  protected Stage stage;
+  protected TestingStage stage;
 
 
   public TestContext() {}
@@ -70,11 +70,11 @@ public class TestContext implements Serializable {
     this.message = message;
   }
 
-  public Stage getStage() {
+  public TestingStage getStage() {
     return stage;
   }
 
-  public void setStage(Stage stage) {
+  public void setStage(TestingStage stage) {
     this.stage = stage;
   }
 

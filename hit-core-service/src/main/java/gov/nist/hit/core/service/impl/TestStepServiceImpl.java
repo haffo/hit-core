@@ -1,6 +1,6 @@
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.hit.core.domain.Stage;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.repo.TestStepRepository;
@@ -50,7 +50,7 @@ public class TestStepServiceImpl implements TestStepService {
 
   @Override
   @Cacheable(value = "testCaseCache", key = "#stage.name() + 'TestSteps'")
-  public List<TestStep> findAllByStage(Stage stage) {
+  public List<TestStep> findAllByStage(TestingStage stage) {
     return testStepRepository.findAllByStage(stage);
   }
 

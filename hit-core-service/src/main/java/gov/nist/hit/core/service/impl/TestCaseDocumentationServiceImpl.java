@@ -1,6 +1,6 @@
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.hit.core.domain.Stage;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestCaseDocumentation;
 import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
 import gov.nist.hit.core.service.TestCaseDocumentationService;
@@ -16,7 +16,7 @@ public class TestCaseDocumentationServiceImpl implements TestCaseDocumentationSe
   private TestCaseDocumentationRepository testCaseDocumentationRepository;
 
   @Override
-  public TestCaseDocumentation findOneByStage(Stage stage) {
+  public TestCaseDocumentation findOneByStage(TestingStage stage) {
     return testCaseDocumentationRepository.findOneByStage(stage);
   }
 

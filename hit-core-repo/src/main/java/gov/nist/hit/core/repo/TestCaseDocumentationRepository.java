@@ -12,7 +12,7 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.Stage;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestCaseDocumentation;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,6 +22,6 @@ import org.springframework.data.repository.query.Param;
 public interface TestCaseDocumentationRepository extends JpaRepository<TestCaseDocumentation, Long> {
 
   @Query("select docu from TestCaseDocumentation docu where docu.stage = :stage")
-  public TestCaseDocumentation findOneByStage(@Param("stage") Stage stage);
+  public TestCaseDocumentation findOneByStage(@Param("stage") TestingStage stage);
 
 }
