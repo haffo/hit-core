@@ -762,12 +762,7 @@ public abstract class ResourcebundleLoader {
       parent.setPosition(testPlanObj.findValue("position").getIntValue());
     }
     parent.setDescription(testPlanObj.findValue("description").getTextValue());
-    JsonNode messageId = testPlanObj.findValue("messageId");
-    JsonNode constraintId = testPlanObj.findValue("constraintId");
-    JsonNode valueSetLibraryId = testPlanObj.findValue("valueSetLibraryId");
-    if (messageId != null && constraintId != null && valueSetLibraryId != null) {
-      parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
-    }
+    parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
     List<Resource> resources = getDirectories(testObjectPath + "*/");
     for (Resource resource : resources) {
       String fileName = fileName(resource);
