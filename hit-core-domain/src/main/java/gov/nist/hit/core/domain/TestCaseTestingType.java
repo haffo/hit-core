@@ -8,7 +8,6 @@
 
 package gov.nist.hit.core.domain;
 
-public enum TestCategory {
-  Isolated, DataInstance
-
+public enum TestCaseTestingType {
+  ISOLATED, DATAINSTANCE, MANUAL
 }

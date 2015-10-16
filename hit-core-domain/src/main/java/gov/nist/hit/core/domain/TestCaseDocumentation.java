@@ -44,7 +44,7 @@ public class TestCaseDocumentation implements Serializable {
 
 
   @Enumerated(EnumType.STRING)
-  private Stage stage;
+  private TestingStage stage;
 
   @Transient
   private List<TestCaseDocument> children = new ArrayList<TestCaseDocument>();
@@ -85,11 +85,11 @@ public class TestCaseDocumentation implements Serializable {
     this.id = id;
   }
 
-  public Stage getStage() {
+  public TestingStage getStage() {
     return stage;
   }
 
-  public void setStage(Stage stage) {
+  public void setStage(TestingStage stage) {
     this.stage = stage;
   }
 

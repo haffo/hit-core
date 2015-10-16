@@ -12,7 +12,7 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.Stage;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
@@ -58,7 +58,7 @@ public class CBTestingController {
   @RequestMapping(value = "/testcases", method = RequestMethod.GET)
   public List<TestPlan> testCases() {
     logger.info("Fetching all testCases...");
-    List<TestPlan> testPlans = testPlanService.findAllByStage(Stage.CB);
+    List<TestPlan> testPlans = testPlanService.findAllByStage(TestingStage.CB);
     return testPlans;
   }
 

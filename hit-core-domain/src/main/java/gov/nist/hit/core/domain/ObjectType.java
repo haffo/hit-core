@@ -1,5 +1,5 @@
 package gov.nist.hit.core.domain;
 
-public enum TestType {
+public enum ObjectType {
   TestStep, TestCase, TestPlan, TestCaseGroup,TestObject
 }

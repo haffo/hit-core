@@ -1,11 +1,11 @@
 package gov.nist.hit.core.service;
 
-import gov.nist.hit.core.domain.Stage;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestCaseDocumentation;
 
 public interface TestCaseDocumentationService {
 
-  public TestCaseDocumentation findOneByStage(Stage stage);
+  public TestCaseDocumentation findOneByStage(TestingStage stage);
 
 
 }

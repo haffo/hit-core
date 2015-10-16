@@ -6,6 +6,8 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -32,8 +35,13 @@ public class TestObject extends AbstractTestCase implements Serializable{
   
   public TestObject() {
     super();
-    this.type = TestType.TestObject;
-  }
+    this.type = ObjectType.TestObject;
+    this.testingType = TestStepTestingType.DATAINSTANCE;
+  } 
+  
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  protected TestStepTestingType testingType;
 
   @OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER,
       orphanRemoval = true)
@@ -82,6 +90,17 @@ public class TestObject extends AbstractTestCase implements Serializable{
   public void setRoot(boolean root) {
     this.root = root;
   }
+
+  public TestStepTestingType getTestingType() {
+    return testingType;
+  }
+
+  public void setTestingType(TestStepTestingType testingType) {
+    this.testingType = testingType;
+  }
+
+  
   
  
+  
 }

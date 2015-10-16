@@ -6,6 +6,8 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class TestCase extends AbstractTestCase implements Serializable {
@@ -23,12 +26,16 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-
+  private Long id; 
+  
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  private TestCaseTestingType testingType;
   
   public TestCase() {
     super();
-    this.type = TestType.TestCase;
+    this.type = ObjectType.TestCase;
+    this.testingType = TestCaseTestingType.DATAINSTANCE;
    }
 
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
@@ -52,10 +59,17 @@ public class TestCase extends AbstractTestCase implements Serializable {
     this.testSteps = testSteps;
   }
 
-   
-  public static long getSerialversionuid() {
-    return serialVersionUID;
+  public TestCaseTestingType getTestingType() {
+    return testingType;
   }
+
+  public void setTestingType(TestCaseTestingType testingType) {
+    this.testingType = testingType;
+  }
+
+  
+
+ 
  
 
   

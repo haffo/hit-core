@@ -1,6 +1,6 @@
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.hit.core.domain.Stage;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.repo.TestPlanRepository;
@@ -18,12 +18,12 @@ public class TestPlanServiceImpl implements TestPlanService {
   private TestPlanRepository testPlanRepository;
 
   @Override
-  public List<TestPlan> findAllByStage(Stage stage) {
+  public List<TestPlan> findAllByStage(TestingStage stage) {
     return testPlanRepository.findAllByStage(stage);
   }
 
   @Override
-  public List<TestArtifact> findAllTestPackages(Stage stage) {
+  public List<TestArtifact> findAllTestPackages(TestingStage stage) {
     return testPlanRepository.findAllTestPackages(stage);
   }
 

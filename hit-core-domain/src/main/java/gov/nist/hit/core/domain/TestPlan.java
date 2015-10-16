@@ -31,7 +31,7 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   protected TestArtifact testProcedure; 
 
   public TestPlan() {
-    this.type = TestType.TestPlan;
+    this.type = ObjectType.TestPlan;
   }
   
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})

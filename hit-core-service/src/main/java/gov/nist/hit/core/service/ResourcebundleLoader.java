@@ -14,23 +14,23 @@ package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.AppInfo;
-import gov.nist.hit.core.domain.ConnectionType;
 import gov.nist.hit.core.domain.Constraints;
 import gov.nist.hit.core.domain.DocumentType;
 import gov.nist.hit.core.domain.IntegrationProfile;
 import gov.nist.hit.core.domain.Message;
 import gov.nist.hit.core.domain.ProfileModel;
-import gov.nist.hit.core.domain.Stage;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseDocument;
 import gov.nist.hit.core.domain.TestCaseDocumentation;
 import gov.nist.hit.core.domain.TestCaseGroup;
-import gov.nist.hit.core.domain.TestCategory;
+import gov.nist.hit.core.domain.TestCaseTestingType;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestObject;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
+import gov.nist.hit.core.domain.TestStepTestingType;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.AppInfoRepository;
 import gov.nist.hit.core.repo.ConstraintsRepository;
@@ -169,7 +169,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  public abstract TestContext testContext(String location, JsonNode parentOb, Stage stage)
+  public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage)
       throws IOException;
 
   public abstract TestCaseDocument generateTestCaseDocument(TestContext c) throws IOException;
@@ -523,7 +523,7 @@ public abstract class ResourcebundleLoader {
         String fileName = fileName(resource);
         String location =
             fileName.substring(fileName.indexOf(domainPath(ISOLATED_PATTERN)), fileName.length());
-        TestPlan testPlan = testPlan(location, Stage.ISOLATED);
+        TestPlan testPlan = testPlan(location, TestingStage.ISOLATED);
         testPlanRepository.save(testPlan);
       }
     }
@@ -537,7 +537,7 @@ public abstract class ResourcebundleLoader {
         String location =
             fileName.substring(fileName.indexOf(domainPath(CONTEXTBASED_PATTERN)),
                 fileName.length());
-        TestPlan testPlan = testPlan(location, Stage.CB);
+        TestPlan testPlan = testPlan(location, TestingStage.CB);
         testPlanRepository.save(testPlan);
       }
     }
@@ -557,9 +557,7 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-
-
-  private TestCase testCase(String location, Stage stage) throws IOException {
+  private TestCase testCase(String location, TestingStage stage) throws IOException {
     logger.info("Processing test case at:" + location);
     TestCase tc = new TestCase();
     Resource res = ResourcebundleHelper.getResource(location + "TestCase.json");
@@ -579,7 +577,8 @@ public abstract class ResourcebundleLoader {
       tc.setPosition(testCaseObj.findValue("position").getIntValue());
     }
     if (testCaseObj.findValue("type") != null) {
-      tc.setCategory(TestCategory.valueOf(testCaseObj.findValue("type").getTextValue()));
+      tc.setTestingType(TestCaseTestingType.valueOf(testCaseObj.findValue("type").getTextValue()
+          .toUpperCase()));
     }
     List<Resource> resources = getDirectories(location + "*");
     for (Resource resource : resources) {
@@ -592,7 +591,7 @@ public abstract class ResourcebundleLoader {
     return tc;
   }
 
-  private TestStep testStep(String location, Stage stage) throws IOException {
+  private TestStep testStep(String location, TestingStage stage) throws IOException {
     logger.info("Processing test step at:" + location);
     TestStep testStep = new TestStep();
     Resource res = ResourcebundleHelper.getResource(location + "TestStep.json");
@@ -603,15 +602,14 @@ public abstract class ResourcebundleLoader {
     JsonNode testStepObj = mapper.readTree(descriptorContent);
     testStep.setName(testStepObj.findValue("name").getTextValue());
     testStep.setDescription(testStepObj.findValue("description").getTextValue());
-    ConnectionType connType = null;
-    if (testStepObj.findValue("type") != null) {
-      String type = testStepObj.findValue("type").getTextValue();
-      connType = type != null ? ConnectionType.valueOf(type) : null;
-      testStep.setConnectionType(connType);
-    }
-    if (connType == null
-        || (!connType.equals(ConnectionType.SUT_MANUAL) && !connType
-            .equals(ConnectionType.TA_MANUAL))) {
+    JsonNode ttypeObj = testStepObj.findValue("type");
+    String tttypeValue = ttypeObj != null ? ttypeObj.getTextValue() : null;
+    TestStepTestingType testingType =
+        tttypeValue != null ? TestStepTestingType.valueOf(tttypeValue)
+            : TestStepTestingType.DATAINSTANCE;
+    testStep.setTestingType(testingType);
+    if (!testingType.equals(TestStepTestingType.SUT_MANUAL)
+        && !testingType.equals(TestStepTestingType.TA_MANUAL)) {
       testStep.setTestContext(testContext(location, testStepObj, stage));
     }
     testStep.setTestStory(testStory(location));
@@ -624,7 +622,6 @@ public abstract class ResourcebundleLoader {
     }
     return testStep;
   }
-
 
   private TestArtifact testStory(String location) throws IOException {
     return artifact(location, "TestStory");
@@ -679,7 +676,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private TestCaseGroup testCaseGroup(String location, Stage stage) throws IOException {
+  private TestCaseGroup testCaseGroup(String location, TestingStage stage) throws IOException {
     logger.info("Processing test case group at:" + location);
     TestCaseGroup tcg = new TestCaseGroup();
     Resource descriptorRsrce = ResourcebundleHelper.getResource(location + "TestCaseGroup.json");
@@ -692,6 +689,8 @@ public abstract class ResourcebundleLoader {
     tcg.setDescription(testPlanObj.findValue("description").getTextValue());
     if (testPlanObj.findValue("position") != null) {
       tcg.setPosition(testPlanObj.findValue("position").getIntValue());
+    } else {
+      tcg.setPosition(1);
     }
     List<Resource> resources = getDirectories(location + "*/");
     for (Resource resource : resources) {
@@ -712,7 +711,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private TestPlan testPlan(String testPlanPath, Stage stage) throws IOException {
+  private TestPlan testPlan(String testPlanPath, TestingStage stage) throws IOException {
     logger.info("Processing test plan  at:" + testPlanPath);
     TestPlan tp = new TestPlan();
     Resource res = ResourcebundleHelper.getResource(testPlanPath + "TestPlan.json");
@@ -726,6 +725,8 @@ public abstract class ResourcebundleLoader {
     tp.setStage(stage);
     if (testPlanObj.findValue("position") != null) {
       tp.setPosition(testPlanObj.findValue("position").getIntValue());
+    } else {
+      tp.setPosition(1);
     }
     tp.setTestProcedure(testProcedure(testPlanPath));
     tp.setTestPackage(testPackage(testPlanPath));
@@ -761,12 +762,7 @@ public abstract class ResourcebundleLoader {
       parent.setPosition(testPlanObj.findValue("position").getIntValue());
     }
     parent.setDescription(testPlanObj.findValue("description").getTextValue());
-    JsonNode messageId = testPlanObj.findValue("messageId");
-    JsonNode constraintId = testPlanObj.findValue("constraintId");
-    JsonNode valueSetLibraryId = testPlanObj.findValue("valueSetLibraryId");
-    if (messageId != null && constraintId != null && valueSetLibraryId != null) {
-      parent.setTestContext(testContext(testObjectPath, testPlanObj, Stage.CF));
-    }
+    parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
     List<Resource> resources = getDirectories(testObjectPath + "*/");
     for (Resource resource : resources) {
       String fileName = fileName(resource);
@@ -780,7 +776,7 @@ public abstract class ResourcebundleLoader {
 
   private void loadTestCasesDocumentation() throws IOException {
     TestCaseDocumentation doc =
-        generateTestObjectDocumentation("Context-free", Stage.CF,
+        generateTestObjectDocumentation("Context-free", TestingStage.CF,
             testObjectRepository.findAllAsRoot());
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
@@ -788,23 +784,23 @@ public abstract class ResourcebundleLoader {
     }
 
     doc =
-        generateTestCaseDocumentation("Context-based", Stage.CB,
-            testPlanRepository.findAllByStage(Stage.CB));
+        generateTestCaseDocumentation("Context-based", TestingStage.CB,
+            testPlanRepository.findAllByStage(TestingStage.CB));
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
       testCaseDocumentationRepository.save(doc);
     }
 
     doc =
-        generateTestCaseDocumentation("Isolated", Stage.ISOLATED,
-            testPlanRepository.findAllByStage(Stage.ISOLATED));
+        generateTestCaseDocumentation("Isolated", TestingStage.ISOLATED,
+            testPlanRepository.findAllByStage(TestingStage.ISOLATED));
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
       testCaseDocumentationRepository.save(doc);
     }
   }
 
-  private TestCaseDocumentation generateTestCaseDocumentation(String title, Stage stage,
+  private TestCaseDocumentation generateTestCaseDocumentation(String title, TestingStage stage,
       List<TestPlan> tps) throws IOException {
     if (tps != null && !tps.isEmpty()) {
       TestCaseDocumentation documentation = new TestCaseDocumentation();
@@ -818,7 +814,7 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  private TestCaseDocumentation generateTestObjectDocumentation(String title, Stage stage,
+  private TestCaseDocumentation generateTestObjectDocumentation(String title, TestingStage stage,
       List<TestObject> tos) throws IOException {
     if (tos != null && !tos.isEmpty()) {
       TestCaseDocumentation documentation = new TestCaseDocumentation();
