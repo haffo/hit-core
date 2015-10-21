@@ -98,7 +98,7 @@ public abstract class ResourcebundleLoader {
   final static public String TEST_STORY_FILE_PATTERN = "TestStory.json";
   final static public String MESSAGE_PATTERN = "Message.txt";
   final static public String ABOUT_PATTERN = "About/";
-  final static String ISOLATED_PATTERN = "Isolated/";
+  final static public String ISOLATED_PATTERN = "Isolated/";
   public static final String RELEASENOTE_PATTERN = "Documentation/ReleaseNotes";
   public static final String RELEASENOTE_FILE_PATTERN = "ReleaseNotes.json";
   public static final String KNOWNISSUE_PATTERN = "Documentation/KnownIssues";
@@ -106,6 +106,7 @@ public abstract class ResourcebundleLoader {
   public static final String USERDOCS_PATTERN = "Documentation/UserDocs";
   public static final String USERDOCS_FILE_PATTERN = "UserDocs.json";
   public static final String PROFILE_INFO_PATTERN = "ProfileInfo.html";
+  public static final String VALUE_SET_COPYRIGHT_PATTERN = "Copyright.html";
 
 
   Map<String, IntegrationProfile> cachedProfiles = new HashMap<String, IntegrationProfile>();
@@ -208,6 +209,14 @@ public abstract class ResourcebundleLoader {
     if (resource != null) {
       appInfo.setProfileInfo(FileUtil.getContent(resource));
     }
+
+    resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.VALUESET_PATTERN
+            + ResourcebundleLoader.VALUE_SET_COPYRIGHT_PATTERN);
+    if (resource != null) {
+      appInfo.setValueSetCopyright(FileUtil.getContent(resource));
+    }
+
     appInfoRepository.save(appInfo);
 
     logger.info("loading app info...DONE");
@@ -379,7 +388,7 @@ public abstract class ResourcebundleLoader {
 
   private void loadVocabularyLibraries() throws IOException {
     logger.info("loading value set libraries...");
-    List<Resource> resources = getResources(domainPath(VALUESET_PATTERN) + "*");
+    List<Resource> resources = getResources(domainPath(VALUESET_PATTERN) + "*.xml");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String content = FileUtil.getContent(resource);

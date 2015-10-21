@@ -54,7 +54,11 @@ public class AppInfo  implements Serializable {
   private String homeContent; 
   
   @Column(columnDefinition = "TEXT")
-  private String profileInfo;
+  private String profileInfo; 
+  
+  @Column(columnDefinition = "TEXT")
+  private String valueSetCopyright;
+  
   
   public String getUrl() {
     return url;
@@ -140,6 +144,14 @@ public class AppInfo  implements Serializable {
   
   
   
+  public String getValueSetCopyright() {
+    return valueSetCopyright;
+  }
+
+  public void setValueSetCopyright(String valueSetCopyright) {
+    this.valueSetCopyright = valueSetCopyright;
+  }
+
   public Long getId() {
     return id;
   }
