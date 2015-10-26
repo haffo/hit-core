@@ -32,9 +32,22 @@ public abstract class AbstractTestCase {
   @Column(columnDefinition = "TEXT")
   protected String name;
 
+
   @Column
   private String parentName;
 
+  @Column
+  private String testCaseName;
+
+  @Column
+  private String testPlanName;
+
+  @Column
+  private String testCaseGroupName;
+
+  @Column
+  private String testStepName;
+  
 
   @Column(columnDefinition = "TEXT")
   protected String description;
@@ -161,6 +174,38 @@ public abstract class AbstractTestCase {
 
   public void setParentName(String parentName) {
     this.parentName = parentName;
+  }
+
+  public String getTestCaseName() {
+    return testCaseName;
+  }
+
+  public void setTestCaseName(String testCaseName) {
+    this.testCaseName = testCaseName;
+  }
+
+  public String getTestPlanName() {
+    return testPlanName;
+  }
+
+  public void setTestPlanName(String testPlanName) {
+    this.testPlanName = testPlanName;
+  }
+
+  public String getTestCaseGroupName() {
+    return testCaseGroupName;
+  }
+
+  public void setTestCaseGroupName(String testCaseGroupName) {
+    this.testCaseGroupName = testCaseGroupName;
+  }
+
+  public String getTestStepName() {
+    return testStepName;
+  }
+
+  public void setTestStepName(String testStepName) {
+    this.testStepName = testStepName;
   }
 
 

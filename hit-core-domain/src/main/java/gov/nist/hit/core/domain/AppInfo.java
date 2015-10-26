@@ -47,8 +47,8 @@ public class AppInfo  implements Serializable {
   private String header;
   
   private String adminEmail;
-  
-   private String homeTitle;
+    
+   private String homeTitle; 
   
   @Column(columnDefinition = "TEXT")
   private String homeContent; 
@@ -58,6 +58,21 @@ public class AppInfo  implements Serializable {
   
   @Column(columnDefinition = "TEXT")
   private String valueSetCopyright;
+  
+  
+  @Column(columnDefinition = "TEXT")
+  private String disclaimer;
+  
+  
+  @Column(columnDefinition = "TEXT")
+  private String confidentiality;
+  
+  
+  @Column(columnDefinition = "TEXT")
+  private String validationResultInfo;
+  
+  @Column(columnDefinition = "TEXT")
+  private String acknowledgment;
   
   
   public String getUrl() {
@@ -115,14 +130,7 @@ public class AppInfo  implements Serializable {
   public void setAdminEmail(String adminEmail) {
     this.adminEmail = adminEmail;
   }
-
-  public String getHomeTitle() {
-    return homeTitle;
-  }
-
-  public void setHomeTitle(String homeTitle) {
-    this.homeTitle = homeTitle;
-  }
+ 
 
   public String getHomeContent() {
     return homeContent;
@@ -141,9 +149,6 @@ public class AppInfo  implements Serializable {
   }
 
   
-  
-  
-  
   public String getValueSetCopyright() {
     return valueSetCopyright;
   }
@@ -159,12 +164,57 @@ public class AppInfo  implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
+  
+  
+  
+
+  public String getDisclaimer() {
+    return disclaimer;
+  }
+
+  public void setDisclaimer(String disclaimer) {
+    this.disclaimer = disclaimer;
+  }
+
+  public String getConfidentiality() {
+    return confidentiality;
+  }
+
+  public void setConfidentiality(String confidentiality) {
+    this.confidentiality = confidentiality;
+  }
+  
+
+  public String getValidationResultInfo() {
+    return validationResultInfo;
+  }
+
+  public void setValidationResultInfo(String validationResultInfo) {
+    this.validationResultInfo = validationResultInfo;
+  }
+  
+  public String getAcknowledgment() {
+    return acknowledgment;
+  }
+
+  public void setAcknowledgment(String acknowledgment) {
+    this.acknowledgment = acknowledgment;
+  }
+ 
+ 
+  public String getHomeTitle() {
+    return homeTitle;
+  }
+
+  public void setHomeTitle(String homeTitle) {
+    this.homeTitle = homeTitle;
+  }
 
   @Override
   public String toString() {
     return "AppInfo [id=" + id + ", url=" + url + ", version=" + version + ", date=" + date
         + ", name=" + name + ", domain=" + domain + ", header=" + header + ", adminEmail="
-        + adminEmail + ", homeTitle=" + homeTitle + ", homeContent=" + homeContent
+        + adminEmail + ", homeContent=" + homeContent
         + ", profileInfo=" + profileInfo + "]";
   }
 

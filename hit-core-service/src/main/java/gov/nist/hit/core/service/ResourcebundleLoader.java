@@ -99,14 +99,19 @@ public abstract class ResourcebundleLoader {
   final static public String MESSAGE_PATTERN = "Message.txt";
   final static public String ABOUT_PATTERN = "About/";
   final static public String ISOLATED_PATTERN = "Isolated/";
-  public static final String RELEASENOTE_PATTERN = "Documentation/ReleaseNotes";
+  public static final String RELEASENOTE_PATTERN = "Documentation/ReleaseNotes/";
   public static final String RELEASENOTE_FILE_PATTERN = "ReleaseNotes.json";
-  public static final String KNOWNISSUE_PATTERN = "Documentation/KnownIssues";
+  public static final String KNOWNISSUE_PATTERN = "Documentation/KnownIssues/";
   public static final String KNOWNISSUE_FILE_PATTERN = "KnownIssues.json";
-  public static final String USERDOCS_PATTERN = "Documentation/UserDocs";
+  public static final String USERDOCS_PATTERN = "Documentation/UserDocs/";
   public static final String USERDOCS_FILE_PATTERN = "UserDocs.json";
   public static final String PROFILE_INFO_PATTERN = "ProfileInfo.html";
   public static final String VALUE_SET_COPYRIGHT_PATTERN = "Copyright.html";
+  public static final String CONFIDENTIALITY_PATTERN = "Confidentiality.html";
+  public static final String DISCLAIMER_PATTERN = "Disclaimer.html";
+  public static final String VALIDATIONRESULT_INFO_PATTERN = "ValidationResultInfo.html";
+  public static final String ACKNOWLEDGMENT_PATTERN = "Acknowledgment.html";
+  public static final String HOME_PATTERN = "Home.html";
 
 
   Map<String, IntegrationProfile> cachedProfiles = new HashMap<String, IntegrationProfile>();
@@ -196,8 +201,10 @@ public abstract class ResourcebundleLoader {
     appInfo.setAdminEmail(appInfoJson.get("adminEmail").getTextValue());
     appInfo.setDomain(appInfoJson.get("domain").getTextValue());
     appInfo.setHeader(appInfoJson.get("header").getTextValue());
-    appInfo.setHomeContent(appInfoJson.get("homeContent").getTextValue());
-    appInfo.setHomeTitle(appInfoJson.get("homeTitle").getTextValue());
+    appInfo.setHomeContent(appInfoJson.get("homeTitle") != null ? appInfoJson.get("homeTitle")
+        .getTextValue() : null);
+    appInfo.setHomeContent(appInfoJson.get("homeContent") != null ? appInfoJson.get("homeContent")
+        .getTextValue() : null); // backward compatibility
     appInfo.setName(appInfoJson.get("name").getTextValue());
     appInfo.setVersion(appInfoJson.get("version").getTextValue());
     java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -217,6 +224,44 @@ public abstract class ResourcebundleLoader {
       appInfo.setValueSetCopyright(FileUtil.getContent(resource));
     }
 
+
+    resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
+            + ResourcebundleLoader.CONFIDENTIALITY_PATTERN);
+    if (resource != null) {
+      appInfo.setConfidentiality(FileUtil.getContent(resource));
+    }
+
+    resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
+            + ResourcebundleLoader.DISCLAIMER_PATTERN);
+    if (resource != null) {
+      appInfo.setDisclaimer(FileUtil.getContent(resource));
+    }
+
+    resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
+            + ResourcebundleLoader.VALIDATIONRESULT_INFO_PATTERN);
+    if (resource != null) {
+      appInfo.setValidationResultInfo(FileUtil.getContent(resource));
+    }
+
+    resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
+            + ResourcebundleLoader.ACKNOWLEDGMENT_PATTERN);
+    if (resource != null) {
+      appInfo.setAcknowledgment(FileUtil.getContent(resource));
+    }
+
+    resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
+            + ResourcebundleLoader.HOME_PATTERN);
+    if (resource != null) {
+      appInfo.setHomeContent(FileUtil.getContent(resource));
+    }
+
+
+
     appInfoRepository.save(appInfo);
 
     logger.info("loading app info...DONE");
@@ -224,7 +269,7 @@ public abstract class ResourcebundleLoader {
 
   private void loadUserDocs() throws IOException {
     logger.info("loading user documents...");
-    Resource resource = getResource(USERDOCS_PATTERN + "/" + USERDOCS_FILE_PATTERN);
+    Resource resource = getResource(USERDOCS_PATTERN + USERDOCS_FILE_PATTERN);
     if (resource != null) {
       String descriptorContent = FileUtil.getContent(resource);
       ObjectMapper mapper = new ObjectMapper();
@@ -245,12 +290,11 @@ public abstract class ResourcebundleLoader {
               String path = node.findValue("name").getTextValue();
               if (path.endsWith("*")) {
                 Resource rs =
-                    getLatestResource(USERDOCS_PATTERN + "/"
-                        + node.findValue("name").getTextValue());
+                    getLatestResource(USERDOCS_PATTERN + node.findValue("name").getTextValue());
                 path = rs.getFilename();
               }
               document.setName(path);
-              document.setPath(USERDOCS_PATTERN + "/" + path);
+              document.setPath(USERDOCS_PATTERN + path);
             } else if (node.findValue("link") != null) {
               document.setPath(node.findValue("link").getTextValue());
             }
@@ -273,7 +317,7 @@ public abstract class ResourcebundleLoader {
 
   private void loadKownIssues() throws IOException {
     logger.info("loading known issues...");
-    Resource resource = getResource(domainPath(KNOWNISSUE_FILE_PATTERN) + "*/");
+    Resource resource = getResource(KNOWNISSUE_PATTERN + KNOWNISSUE_FILE_PATTERN);
     if (resource != null) {
       String descriptorContent = FileUtil.getContent(resource);
       ObjectMapper mapper = new ObjectMapper();
@@ -290,8 +334,10 @@ public abstract class ResourcebundleLoader {
                 .getTextValue() : null);
             document.setTitle(node.findValue("title") != null ? node.findValue("title")
                 .getTextValue() : null);
-            document.setName(node.findValue("name").getTextValue());
-            document.setPath(KNOWNISSUE_PATTERN + "/" + node.findValue("name").getTextValue());
+            document.setName(node.findValue("name") != null ? node.findValue("name").getTextValue()
+                : null);
+            document.setPath(node.findValue("name") != null ? KNOWNISSUE_PATTERN
+                + node.findValue("name").getTextValue() : null);
             document.setDate(node.findValue("date") != null ? node.findValue("date").getTextValue()
                 : null);
             document.setType(DocumentType.KNOWNISSUE);
@@ -310,7 +356,7 @@ public abstract class ResourcebundleLoader {
 
   private void loadReleaseNotes() throws IOException {
     logger.info("loading release notes...");
-    Resource resource = getResource(domainPath(RELEASENOTE_FILE_PATTERN) + "*/");
+    Resource resource = getResource(RELEASENOTE_PATTERN + RELEASENOTE_FILE_PATTERN);
     if (resource != null) {
       String descriptorContent = FileUtil.getContent(resource);
       ObjectMapper mapper = new ObjectMapper();
@@ -327,7 +373,9 @@ public abstract class ResourcebundleLoader {
                 .getTextValue() : null);
             document.setTitle(node.findValue("title") != null ? node.findValue("title")
                 .getTextValue() : null);
-            document.setPath(node.findValue("name") != null ? RELEASENOTE_PATTERN + "/"
+            document.setName(node.findValue("name") != null ? node.findValue("name").getTextValue()
+                : null);
+            document.setPath(node.findValue("name") != null ? RELEASENOTE_PATTERN
                 + node.findValue("name").getTextValue() : null);
             document.setDate(node.findValue("date") != null ? node.findValue("date").getTextValue()
                 : null);
@@ -533,7 +581,8 @@ public abstract class ResourcebundleLoader {
         String location =
             fileName.substring(fileName.indexOf(domainPath(ISOLATED_PATTERN)), fileName.length());
         TestPlan testPlan = testPlan(location, TestingStage.ISOLATED);
-        testPlanRepository.save(testPlan);
+        if (testPlan != null)
+          testPlanRepository.save(testPlan);
       }
     }
   }
@@ -547,7 +596,8 @@ public abstract class ResourcebundleLoader {
             fileName.substring(fileName.indexOf(domainPath(CONTEXTBASED_PATTERN)),
                 fileName.length());
         TestPlan testPlan = testPlan(location, TestingStage.CB);
-        testPlanRepository.save(testPlan);
+        if (testPlan != null)
+          testPlanRepository.save(testPlan);
       }
     }
   }
@@ -560,8 +610,10 @@ public abstract class ResourcebundleLoader {
         TestObject testObject =
             testObject(fileName.substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)),
                 fileName.length()));
-        testObject.setRoot(true);
-        testObjectRepository.save(testObject);
+        if (testObject != null) {
+          testObject.setRoot(true);
+          testObjectRepository.save(testObject);
+        }
       }
     }
   }
@@ -595,8 +647,10 @@ public abstract class ResourcebundleLoader {
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
       TestStep testStep = testStep(tcLocation, stage);
       testStep.setParentName(tc.getName());
+
       tc.getTestSteps().add(testStep);
     }
+
     return tc;
   }
 
@@ -687,74 +741,80 @@ public abstract class ResourcebundleLoader {
 
   private TestCaseGroup testCaseGroup(String location, TestingStage stage) throws IOException {
     logger.info("Processing test case group at:" + location);
-    TestCaseGroup tcg = new TestCaseGroup();
     Resource descriptorRsrce = ResourcebundleHelper.getResource(location + "TestCaseGroup.json");
     if (descriptorRsrce == null)
       throw new IllegalArgumentException("No TestCaseGroup.json found at " + location);
     String descriptorContent = FileUtil.getContent(descriptorRsrce);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
-    tcg.setName(testPlanObj.findValue("name").getTextValue());
-    tcg.setDescription(testPlanObj.findValue("description").getTextValue());
-    if (testPlanObj.findValue("position") != null) {
-      tcg.setPosition(testPlanObj.findValue("position").getIntValue());
-    } else {
-      tcg.setPosition(1);
-    }
-    List<Resource> resources = getDirectories(location + "*/");
-    for (Resource resource : resources) {
-      String fileName = fileName(resource);
-      String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
-      Resource descriptorResource = getDescriptorResource(tcLocation);
-      String filename = descriptorResource.getFilename();
-      if (filename.endsWith("TestCaseGroup.json")) {
-        TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage);
-        tcg.getTestCaseGroups().add(testCaseGroup);
-      } else if (filename.endsWith("TestCase.json")) {
-        TestCase testCase = testCase(tcLocation, stage);
-        testCase.setParentName(tcg.getName());
-        tcg.getTestCases().add(testCase);
+    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").getBooleanValue()) {
+      TestCaseGroup tcg = new TestCaseGroup();
+      tcg.setName(testPlanObj.findValue("name").getTextValue());
+      tcg.setDescription(testPlanObj.findValue("description").getTextValue());
+      if (testPlanObj.findValue("position") != null) {
+        tcg.setPosition(testPlanObj.findValue("position").getIntValue());
+      } else {
+        tcg.setPosition(1);
       }
+      List<Resource> resources = getDirectories(location + "*/");
+      for (Resource resource : resources) {
+        String fileName = fileName(resource);
+        String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
+        Resource descriptorResource = getDescriptorResource(tcLocation);
+        String filename = descriptorResource.getFilename();
+        if (filename.endsWith("TestCaseGroup.json")) {
+          TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage);
+          tcg.getTestCaseGroups().add(testCaseGroup);
+        } else if (filename.endsWith("TestCase.json")) {
+          TestCase testCase = testCase(tcLocation, stage);
+          testCase.setParentName(tcg.getName());
+          tcg.getTestCases().add(testCase);
+        }
+      }
+      return tcg;
     }
-    return tcg;
+    return null;
   }
 
 
   private TestPlan testPlan(String testPlanPath, TestingStage stage) throws IOException {
     logger.info("Processing test plan  at:" + testPlanPath);
-    TestPlan tp = new TestPlan();
     Resource res = ResourcebundleHelper.getResource(testPlanPath + "TestPlan.json");
     if (res == null)
       throw new IllegalArgumentException("No TestPlan.json found at " + testPlanPath);
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
-    tp.setName(testPlanObj.findValue("name").getTextValue());
-    tp.setDescription(testPlanObj.findValue("description").getTextValue());
-    tp.setStage(stage);
-    if (testPlanObj.findValue("position") != null) {
-      tp.setPosition(testPlanObj.findValue("position").getIntValue());
-    } else {
-      tp.setPosition(1);
-    }
-    tp.setTestProcedure(testProcedure(testPlanPath));
-    tp.setTestPackage(testPackage(testPlanPath));
-    List<Resource> resources = getDirectories(testPlanPath + "*/");
-    for (Resource resource : resources) {
-      String fileName = fileName(resource);
-      String location = fileName.substring(fileName.indexOf(testPlanPath), fileName.length());
-      Resource descriptorResource = getDescriptorResource(location);
-      String filename = descriptorResource.getFilename();
-      if (filename.endsWith("TestCaseGroup.json")) {
-        TestCaseGroup testCaseGroup = testCaseGroup(location, stage);
-        tp.getTestCaseGroups().add(testCaseGroup);
-      } else if (filename.endsWith("TestCase.json")) {
-        TestCase testCase = testCase(location, stage);
-        testCase.setParentName(tp.getName());
-        tp.getTestCases().add(testCase);
+    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").getBooleanValue()) {
+      TestPlan tp = new TestPlan();
+      tp.setName(testPlanObj.findValue("name").getTextValue());
+      tp.setDescription(testPlanObj.findValue("description").getTextValue());
+      tp.setStage(stage);
+      if (testPlanObj.findValue("position") != null) {
+        tp.setPosition(testPlanObj.findValue("position").getIntValue());
+      } else {
+        tp.setPosition(1);
       }
+      tp.setTestProcedure(testProcedure(testPlanPath));
+      tp.setTestPackage(testPackage(testPlanPath));
+      List<Resource> resources = getDirectories(testPlanPath + "*/");
+      for (Resource resource : resources) {
+        String fileName = fileName(resource);
+        String location = fileName.substring(fileName.indexOf(testPlanPath), fileName.length());
+        Resource descriptorResource = getDescriptorResource(location);
+        String filename = descriptorResource.getFilename();
+        if (filename.endsWith("TestCaseGroup.json")) {
+          TestCaseGroup testCaseGroup = testCaseGroup(location, stage);
+          tp.getTestCaseGroups().add(testCaseGroup);
+        } else if (filename.endsWith("TestCase.json")) {
+          TestCase testCase = testCase(location, stage);
+          testCase.setParentName(tp.getName());
+          tp.getTestCases().add(testCase);
+        }
+      }
+      return tp;
     }
-    return tp;
+    return null;
   }
 
   private TestObject testObject(String testObjectPath) throws IOException {

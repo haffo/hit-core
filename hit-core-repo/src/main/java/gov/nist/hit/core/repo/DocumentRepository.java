@@ -24,7 +24,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
   @Query("select doc from Document doc where doc.type = 'RELEASENOTE' order by doc.version desc")
   public List<Document> findAllReleaseNotes();
 
-  @Query("select doc from Document doc where doc.type = 'KNWONISSUE' order by doc.version desc")
+  @Query("select doc from Document doc where doc.type = 'KNOWNISSUE' order by doc.version desc")
   public List<Document> findAllKnownIssues();
 
   @Query("select doc from Document doc where doc.type = 'USERDOC' order by doc.position asc")
