@@ -200,7 +200,7 @@ public abstract class ResourcebundleLoader {
     appInfo.setAdminEmail(appInfoJson.get("adminEmail").getTextValue());
     appInfo.setDomain(appInfoJson.get("domain").getTextValue());
     appInfo.setHeader(appInfoJson.get("header").getTextValue());
-    appInfo.setHomeContent(appInfoJson.get("homeTitle") != null ? appInfoJson.get("homeTitle")
+    appInfo.setHomeTitle(appInfoJson.get("homeTitle") != null ? appInfoJson.get("homeTitle")
         .getTextValue() : null);
     appInfo.setHomeContent(appInfoJson.get("homeContent") != null ? appInfoJson.get("homeContent")
         .getTextValue() : null); // backward compatibility
