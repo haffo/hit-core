@@ -15,6 +15,7 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.AppInfo;
 import gov.nist.hit.core.repo.AppInfoRepository;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +42,7 @@ public class AppInfoController {
     List<AppInfo> infos = appInfoRepository.findAll();
     if (infos != null && !infos.isEmpty()) {
       AppInfo appInfo = infos.get(0);
+      appInfo.setDate(request.getServletContext().getInitParameter("DEPLOYMENT_TIME"));      
       appInfo.setUrl(getUrl(request));
       return appInfo;
     }

@@ -50,7 +50,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -207,9 +206,6 @@ public abstract class ResourcebundleLoader {
         .getTextValue() : null); // backward compatibility
     appInfo.setName(appInfoJson.get("name").getTextValue());
     appInfo.setVersion(appInfoJson.get("version").getTextValue());
-    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-    Date date = new Date();
-    appInfo.setDate(dateFormat.format(date));
     resource =
         ResourcebundleHelper.getResource(ResourcebundleLoader.PROFILE_PATTERN
             + PROFILE_INFO_PATTERN);

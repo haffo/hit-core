@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-@WebFilter(urlPatterns = "*", asyncSupported = true, dispatcherTypes = DispatcherType.ASYNC)
-public class HTTPSecurityFilter implements Filter {
+@WebFilter(urlPatterns = "/api/*")
+public class AppVersionFilter implements Filter {
 
   /*
    * flaw: Browser Mime Sniffing - fix: X-Content-Type-Options flaw: Cached SSL Content - fix:
@@ -43,21 +43,11 @@ public class HTTPSecurityFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
-    String cache = "no-cache, no-store, must-revalidate";
-
-    if (response instanceof HttpServletResponse) {
+      if (response instanceof HttpServletResponse) {
       HttpServletResponse httpResponse = (HttpServletResponse) response;
-      httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
-      httpResponse.setHeader("Cache-Control", cache);
-      httpResponse.setHeader("X-Content-Type-Options", "nosniff");
-      httpResponse.setHeader("Strict-Transport-Security", "max-age=31536000");
-      httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
-      httpResponse.setHeader("Access-Control-Allow-Headers", "dTime");
-
-    }
-
+      httpResponse.addHeader("dTime", request.getServletContext().getInitParameter("DEPLOYMENT_TIME"));
+     }
     chain.doFilter(request, response);
-
   }
 
 }
