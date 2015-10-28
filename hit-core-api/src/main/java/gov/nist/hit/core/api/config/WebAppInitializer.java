@@ -38,7 +38,7 @@ public class WebAppInitializer implements WebApplicationInitializer
     servlet.setLoadOnStartup(1);
     servlet.addMapping("/api/*");
     servlet.setAsyncSupported(true);    
-    servletContext.setInitParameter("DEPLOYMENT_TIME", new Date().getTime()+"");
+    servletContext.setInitParameter("dTime", new Date().getTime()+"");
   }
 
 }

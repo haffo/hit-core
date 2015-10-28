@@ -815,28 +815,33 @@ public abstract class ResourcebundleLoader {
 
   private TestObject testObject(String testObjectPath) throws IOException {
     logger.info("Processing test object at:" + testObjectPath);
-    TestObject parent = new TestObject();
     Resource res = ResourcebundleHelper.getResource(testObjectPath + "TestObject.json");
     if (res == null)
       throw new IllegalArgumentException("No TestObject.json found at " + testObjectPath);
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
-    parent.setName(testPlanObj.findValue("name").getTextValue());
-    if (testPlanObj.findValue("position") != null) {
-      parent.setPosition(testPlanObj.findValue("position").getIntValue());
-    }
-    parent.setDescription(testPlanObj.findValue("description").getTextValue());
-    parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
-    List<Resource> resources = getDirectories(testObjectPath + "*/");
-    for (Resource resource : resources) {
-      String fileName = fileName(resource);
-      String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
-      TestObject testObject = testObject(location);
-      parent.getChildren().add(testObject);
-    }
+    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").getBooleanValue()) {
+      TestObject parent = new TestObject();
+      parent.setName(testPlanObj.findValue("name").getTextValue());
+      if (testPlanObj.findValue("position") != null) {
+        parent.setPosition(testPlanObj.findValue("position").getIntValue());
+      }
+      parent.setDescription(testPlanObj.findValue("description").getTextValue());
+      parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
+      List<Resource> resources = getDirectories(testObjectPath + "*/");
+      for (Resource resource : resources) {
+        String fileName = fileName(resource);
+        String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
+        TestObject testObject = testObject(location);
+        if (testObject != null) {
+          parent.getChildren().add(testObject);
+        }
+      }
 
-    return parent;
+      return parent;
+    }
+    return null;
   }
 
   private void loadTestCasesDocumentation() throws IOException {

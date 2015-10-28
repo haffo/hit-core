@@ -16,7 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 @WebFilter(urlPatterns = "/api/*")
-public class AppVersionFilter implements Filter {
+public class VersionFilter implements Filter {
 
   /*
    * flaw: Browser Mime Sniffing - fix: X-Content-Type-Options flaw: Cached SSL Content - fix:
@@ -45,8 +45,9 @@ public class AppVersionFilter implements Filter {
       throws IOException, ServletException {
       if (response instanceof HttpServletResponse) {
       HttpServletResponse httpResponse = (HttpServletResponse) response;
-      httpResponse.addHeader("dTime", request.getServletContext().getInitParameter("DEPLOYMENT_TIME"));
-     }
+      httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
+      httpResponse.addHeader("dTime", request.getServletContext().getInitParameter("dTime"));
+      }
     chain.doFilter(request, response);
   }
 
