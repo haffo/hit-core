@@ -14,6 +14,7 @@ package gov.nist.hit.core.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Harold Affo(NIST)
@@ -23,14 +24,15 @@ public class MessageValidationCommand extends TestCaseCommand {
 
   private String content;
 
-  private String name;
+  private Map<String, String> nav;;
 
   private String facilityId; 
   
-  private String contextType;  
+  private String contextType; 
+  
+  private String name;
     
-  private ArrayList<String> dqaCodes;
-
+  private ArrayList<String> dqaCodes; 
 
   public String getContent() {
     return content;
@@ -40,14 +42,7 @@ public class MessageValidationCommand extends TestCaseCommand {
     this.content = content;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
+ 
   public String getFacilityId() {
     return facilityId;
   }
@@ -70,6 +65,23 @@ public class MessageValidationCommand extends TestCaseCommand {
 
   public void setDqaCodes(ArrayList<String> dqaCodes) {
     this.dqaCodes = dqaCodes;
+  }
+
+  
+  public Map<String, String> getNav() {
+    return nav;
+  }
+
+  public void setNav(Map<String, String> nav) {
+    this.nav = nav;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   

@@ -11,6 +11,8 @@
  */
 package gov.nist.hit.core.api.config;
 
+import java.util.Date;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration.Dynamic;
@@ -35,8 +37,8 @@ public class WebAppInitializer implements WebApplicationInitializer
     Dynamic servlet = servletContext.addServlet("hit-api", new DispatcherServlet(root));
     servlet.setLoadOnStartup(1);
     servlet.addMapping("/api/*");
-    servlet.setAsyncSupported(true);
-
+    servlet.setAsyncSupported(true);    
+    servletContext.setInitParameter("dTime", new Date().getTime()+"");
   }
 
 }

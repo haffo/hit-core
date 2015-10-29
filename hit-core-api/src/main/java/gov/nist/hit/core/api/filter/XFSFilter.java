@@ -5,12 +5,14 @@ package gov.nist.hit.core.api.filter;
 
 import java.io.IOException;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,8 +20,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author haffo
  * 
  */
-// @WebFilter(urlPatterns = "*", asyncSupported = true, dispatcherTypes =
-// DispatcherType.ASYNC)
+
+@WebFilter(urlPatterns = "*", asyncSupported = true, dispatcherTypes = DispatcherType.ASYNC)
 public class XFSFilter implements Filter {
 
   /*
@@ -44,6 +46,7 @@ public class XFSFilter implements Filter {
     HttpServletRequest req = (HttpServletRequest) request;
     HttpServletResponse resp = (HttpServletResponse) response;
     resp.addHeader("X-FRAME-OPTIONS", "SAMEORIGIN");
+
     chain.doFilter(req, resp);
   }
 
