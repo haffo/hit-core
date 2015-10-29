@@ -107,11 +107,6 @@ public abstract class ResourcebundleLoader {
   public static final String USERDOCS_FILE_PATTERN = "UserDocs.json";
   public static final String PROFILE_INFO_PATTERN = "ProfileInfo.html";
 
-
-  Map<String, IntegrationProfile> cachedProfiles = new HashMap<String, IntegrationProfile>();
-  Map<String, VocabularyLibrary> cachedVocabLibraries = new HashMap<String, VocabularyLibrary>();
-  Map<String, Constraints> cachedConstraints = new HashMap<String, Constraints>();
-
   @Autowired
   IntegrationProfileRepository integrationProfileRepository;
 
@@ -139,6 +134,8 @@ public abstract class ResourcebundleLoader {
   @Autowired
   protected TestCaseDocumentationRepository testCaseDocumentationRepository;
 
+  @Autowired
+  protected CachedRepository cachedRepository;
 
   protected com.fasterxml.jackson.databind.ObjectMapper obm;
 
@@ -148,7 +145,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  @PostConstruct
+
   public void load() throws JsonProcessingException, IOException, ProfileParserException {
     logger.info("loading resource bundle...");
     this.loadAppInfo();
@@ -162,9 +159,9 @@ public abstract class ResourcebundleLoader {
     this.loadUserDocs();
     this.loadKownIssues();
     this.loadReleaseNotes();
-    cachedProfiles.clear();
-    cachedVocabLibraries.clear();
-    cachedConstraints.clear();
+    cachedRepository.getCachedProfiles().clear();
+    cachedRepository.getCachedVocabLibraries().clear();
+    cachedRepository.getCachedConstraints().clear();
     logger.info("loading resource bundle...DONE");
   }
 
@@ -178,7 +175,7 @@ public abstract class ResourcebundleLoader {
       String conformanceProfileId, String constraintsXml, String additionalConstraintsXml)
       throws ProfileParserException, UnsupportedOperationException;
 
-  protected abstract VocabularyLibrary vocabLibrary(String content) throws JsonGenerationException,
+  public abstract VocabularyLibrary vocabLibrary(String content) throws JsonGenerationException,
       JsonMappingException, IOException, UnsupportedOperationException;
 
 
@@ -359,7 +356,7 @@ public abstract class ResourcebundleLoader {
       for (Resource resource : resources) {
         String content = FileUtil.getContent(resource);
         Constraints constraints = constraint(content);
-        cachedConstraints.put(constraints.getSourceId(), constraints);
+        cachedRepository.getCachedConstraints().put(constraints.getSourceId(), constraints);
       }
     }
     logger.info("loading constraints...DONE");
@@ -385,7 +382,7 @@ public abstract class ResourcebundleLoader {
         String content = FileUtil.getContent(resource);
         try {
           VocabularyLibrary vocabLibrary = vocabLibrary(content);
-          cachedVocabLibraries.put(vocabLibrary.getSourceId(), vocabLibrary);
+          cachedRepository.getCachedVocabLibraries().put(vocabLibrary.getSourceId(), vocabLibrary);
         } catch (UnsupportedOperationException e) {
         }
       }
@@ -418,10 +415,10 @@ public abstract class ResourcebundleLoader {
     for (int j = 0; j < messages.getLength(); j++) {
       Element elmCode = (Element) messages.item(j);
       String id = elmCode.getAttribute("ID");
-      if (cachedProfiles.containsKey(id)) {
+      if (cachedRepository.getCachedProfiles().containsKey(id)) {
         throw new RuntimeException("Found duplicate conformance profile id " + id);
       }
-      cachedProfiles.put(id, integrationProfile);
+      cachedRepository.getCachedProfiles().put(id, integrationProfile);
     }
     return integrationProfile;
   }
@@ -484,7 +481,7 @@ public abstract class ResourcebundleLoader {
 
 
   protected IntegrationProfile getIntegrationProfile(String id) throws IOException {
-    IntegrationProfile p = cachedProfiles.get(id);
+    IntegrationProfile p = cachedRepository.getCachedProfiles().get(id);
     if (p == null) {
       throw new IllegalArgumentException(
           "Cannot find IntegrationProfile associated to ConformanceProfile with id = " + id);
@@ -494,7 +491,7 @@ public abstract class ResourcebundleLoader {
   }
 
   protected Constraints getConstraints(String id) throws IOException {
-    Constraints c = cachedConstraints.get(id);
+    Constraints c = cachedRepository.getCachedConstraints().get(id);
     if (c == null) {
       throw new IllegalArgumentException("Constraints with id = " + id + " not found");
     }
@@ -502,7 +499,7 @@ public abstract class ResourcebundleLoader {
   }
 
   protected VocabularyLibrary getVocabularyLibrary(String id) throws IOException {
-    VocabularyLibrary v = cachedVocabLibraries.get(id);
+    VocabularyLibrary v = cachedRepository.getCachedVocabLibraries().get(id);
     if (v == null) {
       throw new IllegalArgumentException("VocabularyLibrary with id = " + id + " not found");
     }
@@ -1030,34 +1027,34 @@ public abstract class ResourcebundleLoader {
     this.constraintsRepository = constraintsRepository;
   }
 
-  public Map<String, IntegrationProfile> getCachedProfiles() {
-    return cachedProfiles;
-  }
-
-
-  public void setCachedProfiles(Map<String, IntegrationProfile> cachedProfiles) {
-    this.cachedProfiles = cachedProfiles;
-  }
-
-
-  public Map<String, VocabularyLibrary> getCachedVocabLibraries() {
-    return cachedVocabLibraries;
-  }
-
-
-  public void setCachedVocabLibraries(Map<String, VocabularyLibrary> cachedVocabLibraries) {
-    this.cachedVocabLibraries = cachedVocabLibraries;
-  }
-
-
-  public Map<String, Constraints> getCachedConstraints() {
-    return cachedConstraints;
-  }
-
-
-  public void setCachedConstraints(Map<String, Constraints> cachedConstraints) {
-    this.cachedConstraints = cachedConstraints;
-  }
+//  public Map<String, IntegrationProfile> getCachedProfiles() {
+//    return cachedProfiles;
+//  }
+//
+//
+//  public void setCachedProfiles(Map<String, IntegrationProfile> cachedProfiles) {
+//    this.cachedProfiles = cachedProfiles;
+//  }
+//
+//
+//  public Map<String, VocabularyLibrary> getCachedVocabLibraries() {
+//    return cachedVocabLibraries;
+//  }
+//
+//
+//  public void setCachedVocabLibraries(Map<String, VocabularyLibrary> cachedVocabLibraries) {
+//    this.cachedVocabLibraries = cachedVocabLibraries;
+//  }
+//
+//
+//  public Map<String, Constraints> getCachedConstraints() {
+//    return cachedConstraints;
+//  }
+//
+//
+//  public void setCachedConstraints(Map<String, Constraints> cachedConstraints) {
+//    this.cachedConstraints = cachedConstraints;
+//  }
 
 
 
