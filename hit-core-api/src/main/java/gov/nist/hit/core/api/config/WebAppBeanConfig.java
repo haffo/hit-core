@@ -12,6 +12,7 @@
 
 package gov.nist.hit.core.api.config;
 
+import gov.nist.hit.core.service.CachedRepository;
 import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.impl.ZipGeneratorImpl;
 
@@ -31,5 +32,11 @@ public class WebAppBeanConfig {
   @Bean
   public ZipGenerator zipGenerator() {
     return new ZipGeneratorImpl();
+  } 
+  
+  @Bean
+  public CachedRepository cachedRepository() {
+    return new CachedRepository();
   }
+    
 }
