@@ -47,7 +47,7 @@ public abstract class AbstractTestCase {
 
   @Column
   private String testStepName;
-  
+
 
   @Column(columnDefinition = "TEXT")
   protected String description;

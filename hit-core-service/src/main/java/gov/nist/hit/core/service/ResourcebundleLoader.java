@@ -50,12 +50,9 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -1097,34 +1094,34 @@ public abstract class ResourcebundleLoader {
     this.constraintsRepository = constraintsRepository;
   }
 
-//  public Map<String, IntegrationProfile> getCachedProfiles() {
-//    return cachedProfiles;
-//  }
-//
-//
-//  public void setCachedProfiles(Map<String, IntegrationProfile> cachedProfiles) {
-//    this.cachedProfiles = cachedProfiles;
-//  }
-//
-//
-//  public Map<String, VocabularyLibrary> getCachedVocabLibraries() {
-//    return cachedVocabLibraries;
-//  }
-//
-//
-//  public void setCachedVocabLibraries(Map<String, VocabularyLibrary> cachedVocabLibraries) {
-//    this.cachedVocabLibraries = cachedVocabLibraries;
-//  }
-//
-//
-//  public Map<String, Constraints> getCachedConstraints() {
-//    return cachedConstraints;
-//  }
-//
-//
-//  public void setCachedConstraints(Map<String, Constraints> cachedConstraints) {
-//    this.cachedConstraints = cachedConstraints;
-//  }
+  // public Map<String, IntegrationProfile> getCachedProfiles() {
+  // return cachedProfiles;
+  // }
+  //
+  //
+  // public void setCachedProfiles(Map<String, IntegrationProfile> cachedProfiles) {
+  // this.cachedProfiles = cachedProfiles;
+  // }
+  //
+  //
+  // public Map<String, VocabularyLibrary> getCachedVocabLibraries() {
+  // return cachedVocabLibraries;
+  // }
+  //
+  //
+  // public void setCachedVocabLibraries(Map<String, VocabularyLibrary> cachedVocabLibraries) {
+  // this.cachedVocabLibraries = cachedVocabLibraries;
+  // }
+  //
+  //
+  // public Map<String, Constraints> getCachedConstraints() {
+  // return cachedConstraints;
+  // }
+  //
+  //
+  // public void setCachedConstraints(Map<String, Constraints> cachedConstraints) {
+  // this.cachedConstraints = cachedConstraints;
+  // }
 
 
 

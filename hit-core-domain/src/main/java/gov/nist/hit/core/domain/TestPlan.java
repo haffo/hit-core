@@ -2,6 +2,7 @@ package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -16,6 +17,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+
+import javax.persistence.OrderBy;
 
 @Entity
 public class TestPlan extends AbstractTestCase  implements Serializable {
@@ -37,12 +40,14 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JoinTable(name = "tp_tc", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcase_id")})
-  private Set<TestCase> testCases = new HashSet<TestCase>();
+  @OrderBy( "position asc")
+  private Set<TestCase> testCases = new LinkedHashSet<TestCase>();
 
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tp_tcg", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcasegroup_id")})
-  private Set<TestCaseGroup> testCaseGroups = new HashSet<TestCaseGroup>();
+  @OrderBy( "position asc")
+  private Set<TestCaseGroup> testCaseGroups = new LinkedHashSet<TestCaseGroup>();
 
   public Long getId() {
     return id;
