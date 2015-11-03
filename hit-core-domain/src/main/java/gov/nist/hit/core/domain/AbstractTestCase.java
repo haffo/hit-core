@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  */
 @MappedSuperclass
-public abstract class AbstractTestCase {
+public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
 
   @Column(columnDefinition = "TEXT")
   protected String name;
@@ -208,6 +208,13 @@ public abstract class AbstractTestCase {
     this.testStepName = testStepName;
   }
 
+  @Override
+  public int compareTo(AbstractTestCase o) {
+    // TODO Auto-generated method stub
+    return this.getPosition() - o.getPosition();
+  }
+
+  
 
 
 }

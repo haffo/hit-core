@@ -1,8 +1,11 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -44,8 +47,7 @@ public class TestCase extends AbstractTestCase implements Serializable {
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tc_ts", joinColumns = {@JoinColumn(name = "testcase_id")},
       inverseJoinColumns = {@JoinColumn(name = "teststep_id")})
-  @OrderBy("position asc")
-  private Set<TestStep> testSteps = new LinkedHashSet<TestStep>();
+  private List<TestStep> testSteps = new ArrayList<TestStep>();
 
   public Long getId() {
     return id;
@@ -55,11 +57,11 @@ public class TestCase extends AbstractTestCase implements Serializable {
     this.id = id;
   }
 
-  public Set<TestStep> getTestSteps() {
-    return testSteps;
+  public List<TestStep> getTestSteps() {
+      return testSteps;
   }
 
-  public void setTestSteps(Set<TestStep> testSteps) {
+  public void setTestSteps(List<TestStep> testSteps) {
     this.testSteps = testSteps;
   }
 

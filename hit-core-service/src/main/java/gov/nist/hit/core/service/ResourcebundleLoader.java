@@ -884,6 +884,7 @@ public abstract class ResourcebundleLoader {
       TestCaseDocumentation documentation = new TestCaseDocumentation();
       documentation.setTitle(title);
       documentation.setStage(stage);
+      Collections.sort(tos);
       for (TestObject to : tos) {
         documentation.getChildren().add(generateTestCaseDocument(to));
       }
@@ -899,11 +900,13 @@ public abstract class ResourcebundleLoader {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
     doc.setId(tp.getId());
     if (tp.getTestCaseGroups() != null && !tp.getTestCaseGroups().isEmpty()) {
+      Collections.sort(tp.getTestCaseGroups());
       for (TestCaseGroup tcg : tp.getTestCaseGroups()) {
         doc.getChildren().add(generateTestCaseDocument(tcg));
       }
     }
     if (tp.getTestCases() != null && !tp.getTestCases().isEmpty()) {
+      Collections.sort(tp.getTestCases());
       for (TestCase tc : tp.getTestCases()) {
         doc.getChildren().add(generateTestCaseDocument(tc));
       }
@@ -916,12 +919,14 @@ public abstract class ResourcebundleLoader {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tcg);
     doc.setId(tcg.getId());
     if (tcg.getTestCaseGroups() != null && !tcg.getTestCaseGroups().isEmpty()) {
+      Collections.sort(tcg.getTestCaseGroups());
       for (TestCaseGroup child : tcg.getTestCaseGroups()) {
         doc.getChildren().add(generateTestCaseDocument(child));
       }
     }
 
     if (tcg.getTestCases() != null && !tcg.getTestCases().isEmpty()) {
+      Collections.sort(tcg.getTestCases());
       for (TestCase tc : tcg.getTestCases()) {
         doc.getChildren().add(generateTestCaseDocument(tc));
       }
@@ -936,6 +941,7 @@ public abstract class ResourcebundleLoader {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tc);
     doc.setId(tc.getId());
     if (tc.getTestSteps() != null && !tc.getTestSteps().isEmpty()) {
+      Collections.sort(tc.getTestSteps());
       for (TestStep ts : tc.getTestSteps()) {
         doc.getChildren().add(generateTestCaseDocument(ts));
       }
@@ -957,6 +963,7 @@ public abstract class ResourcebundleLoader {
     doc = initTestCaseDocument(to, doc);
     doc.setId(to.getId());
     if (to.getChildren() != null && !to.getChildren().isEmpty()) {
+      Collections.sort(to.getChildren());
       for (TestObject child : to.getChildren()) {
         doc.getChildren().add(generateTestCaseDocument(child));
       }

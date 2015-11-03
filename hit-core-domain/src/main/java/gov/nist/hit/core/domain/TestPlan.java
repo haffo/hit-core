@@ -1,8 +1,11 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -17,7 +20,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-
 import javax.persistence.OrderBy;
 
 @Entity
@@ -40,14 +42,12 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JoinTable(name = "tp_tc", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcase_id")})
-  @OrderBy( "position asc")
-  private Set<TestCase> testCases = new LinkedHashSet<TestCase>();
+  private List<TestCase> testCases = new ArrayList<TestCase>();
 
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tp_tcg", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcasegroup_id")})
-  @OrderBy( "position asc")
-  private Set<TestCaseGroup> testCaseGroups = new LinkedHashSet<TestCaseGroup>();
+    private List<TestCaseGroup> testCaseGroups = new ArrayList<TestCaseGroup>();
 
   public Long getId() {
     return id;
@@ -61,19 +61,19 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
     this.testCases.add(testCase);
   }
 
-  public Set<TestCase> getTestCases() {
+  public List<TestCase> getTestCases() {
     return testCases;
   }
 
-  public void setTestCases(Set<TestCase> testCases) {
+  public void setTestCases(List<TestCase> testCases) {
     this.testCases = testCases;
   }
 
-  public Set<TestCaseGroup> getTestCaseGroups() {
-    return testCaseGroups;
+  public List<TestCaseGroup> getTestCaseGroups() {
+     return testCaseGroups;
   }
 
-  public void setTestCaseGroups(Set<TestCaseGroup> testCaseGroups) {
+  public void setTestCaseGroups(List<TestCaseGroup> testCaseGroups) {
     this.testCaseGroups = testCaseGroups;
   }
 

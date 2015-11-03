@@ -16,6 +16,8 @@ import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.repo.TestCaseRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.service.TestCaseService;
+import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 
@@ -47,12 +49,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestArtifactController {
 
   static final Logger logger = LoggerFactory.getLogger(TestArtifactController.class);
-
+  
   @Autowired
-  private TestCaseRepository testCaseRepository;
-
+  private TestCaseService testCaseService;
+  
   @Autowired
-  private TestStepRepository testStepRepository;
+  private TestStepService testStepService;
+  
+  
 
   @RequestMapping(value = "/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
@@ -96,9 +100,9 @@ public class TestArtifactController {
     Map<String, TestArtifact> result = new HashMap<String, TestArtifact>();
     logger.info("Fetching artifacts of " + type + " with id=" + testId);
     if ("TestCase".equalsIgnoreCase(type)) {
-      obj = testCaseRepository.findOne(testId);
+      obj = testCaseService.findOne(testId);
     } else if ("TestStep".equalsIgnoreCase(type)) {
-      obj = testStepRepository.findOne(testId);
+      obj = testStepService.findOne(testId);
     }
     if (obj != null) {
       result.put("jurorDocument", obj.getJurorDocument());
@@ -116,9 +120,9 @@ public class TestArtifactController {
       @PathVariable final Long testId) {
     logger.info("Fetching juror document of testcase/teststep with id=" + testId);
     if ("TestCase".equalsIgnoreCase(type)) {
-      return testCaseRepository.jurorDocument(testId);
+      return testCaseService.jurorDocument(testId);
     } else if ("TestStep".equalsIgnoreCase(type)) {
-      return testStepRepository.jurorDocument(testId);
+      return testStepService.jurorDocument(testId);
     }
     return null;
   }
@@ -128,9 +132,9 @@ public class TestArtifactController {
       @PathVariable final Long testId) {
     logger.info("Fetching messagecontent of testcase/teststep with id=" + testId);
     if ("TestCase".equalsIgnoreCase(type)) {
-      return testCaseRepository.messageContent(testId);
+      return testCaseService.messageContent(testId);
     } else if ("TestStep".equalsIgnoreCase(type)) {
-      return testStepRepository.messageContent(testId);
+      return testStepService.messageContent(testId);
     }
     return null;
   }
@@ -139,9 +143,9 @@ public class TestArtifactController {
   public TestArtifact tcTestStory(@RequestParam("type") String type, @PathVariable final Long testId) {
     logger.info("Fetching teststory of testcase/teststep with id=" + testId);
     if ("TestCase".equalsIgnoreCase(type)) {
-      return testCaseRepository.testStory(testId);
+      return testCaseService.testStory(testId);
     } else if ("TestStep".equalsIgnoreCase(type)) {
-      return testStepRepository.testStory(testId);
+      return testStepService.testStory(testId);
     }
     return null;
   }
@@ -151,9 +155,9 @@ public class TestArtifactController {
       @PathVariable final Long testId) {
     logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testId);
     if ("TestCase".equalsIgnoreCase(type)) {
-      return testCaseRepository.testDataSpecification(testId);
+      return testCaseService.testDataSpecification(testId);
     } else if ("TestStep".equalsIgnoreCase(type)) {
-      return testStepRepository.testDataSpecification(testId);
+      return testStepService.testDataSpecification(testId);
     }
     return null;
   }
@@ -163,9 +167,9 @@ public class TestArtifactController {
       @PathVariable final Long testId) {
     logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testId);
     if ("TestCase".equalsIgnoreCase(type)) {
-      return testCaseRepository.testPackage(testId);
+      return testCaseService.testPackage(testId);
     } else if ("TestStep".equalsIgnoreCase(type)) {
-      return testStepRepository.testPackage(testId);
+      return testStepService.testPackage(testId);
     }
     return null;
   }

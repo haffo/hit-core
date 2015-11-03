@@ -1,8 +1,11 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -19,7 +22,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
-
 import javax.persistence.OrderBy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -58,8 +60,7 @@ public class TestObject extends AbstractTestCase implements Serializable{
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "cf_tc", joinColumns = {@JoinColumn(name = "parent_id")},
       inverseJoinColumns = {@JoinColumn(name = "child_id")})
-  @OrderBy("position asc")
-  private Set<TestObject> children = new LinkedHashSet<TestObject>();
+   private List<TestObject> children = new ArrayList<TestObject>();
 
   public Long getId() {
     return id;
@@ -78,11 +79,11 @@ public class TestObject extends AbstractTestCase implements Serializable{
   }
 
    
-  public Set<TestObject> getChildren() {
-    return children;
+  public List<TestObject> getChildren() {
+     return children;
   }
 
-  public void setChildren(Set<TestObject> children) {
+  public void setChildren(List<TestObject> children) {
     this.children = children;
   }
 

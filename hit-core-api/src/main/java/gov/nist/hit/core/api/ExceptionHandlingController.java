@@ -41,18 +41,27 @@ public class ExceptionHandlingController {
     super();
   }
 
+  
+  @ExceptionHandler(RuntimeException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public String exception(RuntimeException ex) {
+    logger.error(ex.getMessage(), ex);
+    return "Sorry, something went wrong";
+  }
+  
+  
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String exception(Exception ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, an error occurred";
+    return "Sorry, something went wrong";
   }
 
   @ExceptionHandler(TestCaseException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String testCaseException(TestCaseException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, an error occurred";
+    return "Sorry, something went wrong";
   }
 
   @ExceptionHandler(MessageValidationException.class)
