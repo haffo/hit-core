@@ -14,7 +14,9 @@ package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.service.exception.DocumentationException;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
+import gov.nist.hit.core.service.exception.MessageDownloadException;
 import gov.nist.hit.core.service.exception.MessageParserException;
+import gov.nist.hit.core.service.exception.MessageUploadException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.exception.TestCaseException;
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
@@ -34,87 +37,111 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * 
  */
 @ControllerAdvice
-public class ExceptionHandlingController {
-   static final Logger logger = LoggerFactory.getLogger(ExceptionHandlingController.class);
+public class MainExceptionHandler {
+  static final Logger logger = LoggerFactory.getLogger(MainExceptionHandler.class);
 
-  public ExceptionHandlingController() {
+  public MainExceptionHandler() {
     super();
   }
 
-  
+
+
   @ExceptionHandler(RuntimeException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseBody
   public String exception(RuntimeException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, something went wrong";
+    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
   }
-  
-  
+
+  @ResponseBody
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String exception(Exception ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, something went wrong";
+    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
   }
 
+  @ResponseBody
   @ExceptionHandler(TestCaseException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String testCaseException(TestCaseException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, something went wrong";
+    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
   }
 
+  @ResponseBody
   @ExceptionHandler(MessageValidationException.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String messageValidationException(MessageValidationException ex) {
     logger.error(ex.getMessage(), ex);
-     return "Sorry, validation failed \n";
+    return "Sorry, cannot validate the message provided.\n" + ex.getMessage();
   }
 
-
+  @ResponseBody
   @ExceptionHandler(MessageParserException.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String messageParserException(MessageParserException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, message parsing failed: \n";
+    return "Sorry, cannot parse the message provided. \n" + ex.getMessage();
   }
 
+  @ResponseBody
   @ExceptionHandler(ValidationReportException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String reportException(ValidationReportException ex) {
     logger.error(ex.getMessage(), ex);
-    return ex.getMessage();
+    return "Sorry, cannot generate the validation report. \n";
   }
 
-
+  @ResponseBody
   @ExceptionHandler(ProfileParserException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String profileParserExeption(ProfileParserException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, integrationProfile cannot be parsed.\n";
+    return "Sorry, integrationProfile cannot be parsed.\n" + ex.getMessage();
   }
 
-
+  @ResponseBody
   @ExceptionHandler(XmlParserException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String xmlParserException(XmlParserException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Malformed xml content.";
+    return "Malformed xml content:\n" + ex.getMessage();
   }
 
+  @ResponseBody
   @ExceptionHandler(XmlFormatterException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String xmlFormatterException(XmlFormatterException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Malformed xml content.";
-  } 
- 
-  
+    return "Malformed xml content.\n" + ex.getMessage();
+  }
+
+  @ResponseBody
   @ExceptionHandler(DownloadDocumentException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String documentationException(DocumentationException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, Cannot download the document";
+    return ex.getMessage();
   }
+
+  @ResponseBody
+  @ExceptionHandler(MessageUploadException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public String messageUpload(MessageUploadException ex) {
+    logger.error(ex.getMessage(), ex);
+    return "Sorry, cannot upload the message.\n" + "DEBUG:\n" + ex.getMessage();
+  }
+
+  @ResponseBody
+  @ExceptionHandler(MessageDownloadException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public String messageDownload(MessageDownloadException ex) {
+    logger.error(ex.getMessage(), ex);
+    return "Sorry, cannot download the message.\n" + "DEBUG:\n" + ex.getMessage();
+  }
+
+
 
 }

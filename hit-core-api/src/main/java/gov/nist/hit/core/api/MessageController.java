@@ -12,7 +12,9 @@
 
 package gov.nist.hit.core.api;
 
+import gov.nist.hit.core.service.exception.MessageDownloadException;
 import gov.nist.hit.core.service.exception.MessageException;
+import gov.nist.hit.core.service.exception.MessageUploadException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,29 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController {
   static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
-  // /**
-  // *
-  // * @param command
-  // * @param request
-  // * @param response
-  // * @return
-  // * @throws MessageException
-  // */
-  // @RequestMapping(value = "/download", method = RequestMethod.POST)
-  // public String download(MessageCommand command, HttpServletRequest request,
-  // HttpServletResponse response) throws MessageException {
-  // try {
-  // InputStream content = IOUtils.toInputStream(command.getContent(), "UTF-8");
-  // response.setContentType("text/plain");
-  // response.setHeader("Content-disposition",
-  // "attachment;filename=UserMessage-" + (new Date()).getTime() + ".txt");
-  // FileCopyUtils.copy(content, response.getOutputStream());
-  // } catch (IOException e) {
-  // logger.debug("Failed to download the message ");
-  // throw new MessageException("Cannot download the message " + e.getMessage());
-  // }
-  // return null;
-  // }
 
   /**
    * TODO:remove
@@ -79,7 +58,7 @@ public class MessageController {
   @RequestMapping(value = "/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
   public String download(@RequestParam("content") String content, HttpServletRequest request,
-      HttpServletResponse response) throws MessageException {
+      HttpServletResponse response) throws MessageDownloadException {
     try {
       logger.info("Downloading message");
       InputStream io = IOUtils.toInputStream(content, "UTF-8");
@@ -87,9 +66,12 @@ public class MessageController {
       response.setHeader("Content-disposition",
           "attachment;filename=Message-" + new Date().getTime() + ".txt");
       FileCopyUtils.copy(io, response.getOutputStream());
-    } catch (IOException e) {
+    } catch (RuntimeException e) {
       logger.debug("Failed to download the message ");
-      throw new MessageException("Cannot download the message " + e.getMessage());
+      throw new MessageDownloadException(e);
+    } catch (Exception e) {
+      logger.debug("Failed to download the message ");
+      throw new MessageDownloadException(e);
     }
     return null;
   }
@@ -104,17 +86,19 @@ public class MessageController {
   @RequestMapping(value = "/upload", method = RequestMethod.POST,
       consumes = {"multipart/form-data"})
   public Map<String, String> upload(@RequestPart("file") MultipartFile part)
-      throws MessageException {
+      throws MessageUploadException {
     try {
       Map<String, String> map = new HashMap<String, String>();
       InputStream in = part.getInputStream();
       map.put("name", part.getName());
       map.put("size", part.getSize() + "");
-      String content = IOUtils.toString(in);
+      String content = IOUtils.toString(in); 
       map.put("content", content);
       return map;
-    } catch (IOException e) {
-      throw new MessageException(e);
+    } catch (RuntimeException e) {
+      throw new MessageUploadException(e);
+    }catch (Exception e) {
+      throw new MessageUploadException(e);
     }
 
   }
