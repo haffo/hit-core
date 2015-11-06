@@ -46,13 +46,13 @@ public class ResourcebundleHelper {
   // return resolver;
   // }
 
-  private static String pattern(String path) {
+  private static String classpath(String path) {
     return "classpath*:" + path;
   }
 
   public static List<Resource> getResources(String path) {
     try {
-      Resource[] files = resolver.getResources(pattern(path));
+      Resource[] files = resolver.getResources(classpath(path));
       List<Resource> resources = Arrays.asList(files);
       Collections.sort(resources, new Comparator<Resource>() {
 
