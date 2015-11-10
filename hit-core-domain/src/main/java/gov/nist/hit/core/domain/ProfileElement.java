@@ -67,6 +67,8 @@ public class ProfileElement {
 
   protected int order;
   protected String lenght;
+  
+  protected boolean hide;
 
   @JsonIgnore
   protected ProfileElement parent;
@@ -305,7 +307,18 @@ public class ProfileElement {
   public void setRelevent(boolean relevent) {
     this.relevent = relevent;
   }
+  
+  
+  
  
+  public boolean isHide() {
+    return hide;
+  }
+
+  public void setHide(boolean hide) {
+    this.hide = hide;
+  }
+
   @Override
   public ProfileElement clone() throws CloneNotSupportedException {
     ProfileElement element = new ProfileElement();
@@ -332,6 +345,7 @@ public class ProfileElement {
     element.setType(type);
     element.setUsage(usage);
     element.setUsages(usages);
+    element.setHide(hide);
     return element;
   }
 
