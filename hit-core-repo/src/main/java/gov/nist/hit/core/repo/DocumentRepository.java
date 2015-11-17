@@ -13,11 +13,13 @@
 package gov.nist.hit.core.repo;
 
 import gov.nist.hit.core.domain.Document;
+import gov.nist.hit.core.domain.DocumentType;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
@@ -30,5 +32,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
   @Query("select doc from Document doc where doc.type = 'USERDOC' order by doc.position asc")
   public List<Document> findAllUserDocs();
 
+  @Query("select doc from Document doc where doc.type = :type order by doc.name asc")
+  public List<Document> findAllResourceDocs(@Param("type") DocumentType type);
 
 }

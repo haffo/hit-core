@@ -14,8 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
-@WebFilter(urlPatterns = "*", asyncSupported = true, dispatcherTypes = DispatcherType.ASYNC)
+@WebFilter(urlPatterns = "*")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class HTTPSecurityFilter implements Filter {
 
   /*
@@ -50,8 +53,10 @@ public class HTTPSecurityFilter implements Filter {
       httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
       httpResponse.setHeader("Cache-Control", cache);
       httpResponse.setHeader("X-Content-Type-Options", "nosniff");
-      httpResponse.setHeader("Strict-Transport-Security", "max-age=31536000");
+//      httpResponse.setHeader("Strict-Transport-Security", "max-age=31536000");
       httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
+      httpResponse.setHeader("Access-Control-Allow-Headers", "dTime");
+//      httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
     }
 
     chain.doFilter(request, response);

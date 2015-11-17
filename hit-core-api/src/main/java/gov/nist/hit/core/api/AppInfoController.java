@@ -15,10 +15,13 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.AppInfo;
 import gov.nist.hit.core.repo.AppInfoRepository;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,18 +45,19 @@ public class AppInfoController {
     List<AppInfo> infos = appInfoRepository.findAll();
     if (infos != null && !infos.isEmpty()) {
       AppInfo appInfo = infos.get(0);
-      appInfo.setDate(request.getServletContext().getInitParameter("dTime"));      
+      appInfo.setDate(request.getServletContext().getInitParameter("dTime"));
       appInfo.setUrl(getUrl(request));
       return appInfo;
     }
     return new AppInfo();
   }
 
+
   private String getUrl(HttpServletRequest request) {
     String scheme = request.getScheme();
     String host = request.getHeader("Host");
- //    return scheme + "://" + host + "/hit-tool";
-    String url =  scheme + "://" + host + request.getContextPath();
+    // return scheme + "://" + host + "/hit-tool";
+    String url = scheme + "://" + host + request.getContextPath();
     return url;
   }
 }

@@ -13,6 +13,7 @@
 package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.Document;
+import gov.nist.hit.core.domain.DocumentType;
 import gov.nist.hit.core.domain.Message;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestArtifact;
@@ -80,7 +81,7 @@ public class DocumentationController {
 
   @Autowired
   private DocumentRepository documentRepository;
-  
+
   @Autowired
   private ZipGenerator zipGenerator;
 
@@ -115,6 +116,13 @@ public class DocumentationController {
   }
 
 
+  @Cacheable(value = "documentationCache",  key = "#type.name() + 'resource-documentation'")
+  @RequestMapping(value = "/resourcedocs", method = RequestMethod.GET)
+  public List<Document> resourcedocs(@RequestParam("type") DocumentType type) {
+    logger.info("Fetching all resources docs of type=" + type);
+    return documentRepository.findAllResourceDocs(type);
+  }
+
 
   @RequestMapping(value = "/downloadDocument", method = RequestMethod.POST)
   public void downloadDocument(@RequestParam("path") String path, HttpServletRequest request,
@@ -139,6 +147,24 @@ public class DocumentationController {
   }
 
 
+  @RequestMapping(value = "/downloadResourceDocs", method = RequestMethod.POST)
+  public void downloadResourceDocs(@RequestParam("type") DocumentType type,
+      HttpServletRequest request, HttpServletResponse response) throws DownloadDocumentException {
+    try {
+      InputStream stream = zipResourceDocs(type);
+      response.setContentType("application/zip");
+      String name = type.name().toLowerCase();
+      name = name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() + "s";
+      response.setHeader("Content-disposition", "attachment;filename=" + name + ".zip");
+      FileCopyUtils.copy(stream, response.getOutputStream());
+    } catch (IOException e) {
+      logger.debug("Failed to download resource documentation of  " + type);
+      throw new DownloadDocumentException("Failed to download resource documentation of  " + type);
+    } catch (Exception e) {
+      logger.debug("Failed to download the test packages ");
+      throw new DownloadDocumentException("Failed to download resource documentation of  " + type);
+    }
+  }
 
   @RequestMapping(value = "/testPackages", method = RequestMethod.POST)
   public void testPackages(@RequestParam("stage") TestingStage stage, HttpServletRequest request,
@@ -160,8 +186,8 @@ public class DocumentationController {
   }
 
   @RequestMapping(value = "/exampleMessages", method = RequestMethod.POST)
-  public void exampleMessages(@RequestParam("stage") TestingStage stage, HttpServletRequest request,
-      HttpServletResponse response) throws DownloadDocumentException {
+  public void exampleMessages(@RequestParam("stage") TestingStage stage,
+      HttpServletRequest request, HttpServletResponse response) throws DownloadDocumentException {
     try {
       InputStream stream = zipExampleMessages(stage);
       response.setContentType("application/zip");
@@ -216,6 +242,22 @@ public class DocumentationController {
     return generateZip(pattern, name);
   }
 
+  public InputStream zipResourceDocs(DocumentType type) throws Exception {
+    String pattern = null;
+    String name = null;
+    if (type == DocumentType.PROFILE) {
+      pattern = "/*Global/Profiles/**/*.xml";
+      name = "Profiles";
+    } else if (type == DocumentType.TABLE) {
+      pattern = "/*Global/Tables/**/*.xml";
+      name = "Tables";
+    } else if (type == DocumentType.CONSTRAINT) {
+      pattern = "/*Global/Constraints/**/*.xml";
+      name = "Constraints";
+    }
+    return generateZip(pattern, name);
+  }
+
 
   public InputStream zipExampleMessages(TestingStage stage) throws Exception {
     String pattern = null;
@@ -231,18 +273,19 @@ public class DocumentationController {
       name = "IsolatedExampleMessages";
     }
     return generateZip(pattern, name);
-  } 
-  
-  
-  private InputStream generateZip(String pattern, String name) throws Exception{
-    if(pattern != null && name != null){ 
-      String filename =  zipGenerator.generate(pattern, name);
+  }
+
+
+  private InputStream generateZip(String pattern, String name) throws Exception {
+    if (pattern != null && name != null) {
+      String filename = zipGenerator.generate(pattern, name);
       FileInputStream io = new FileInputStream(new File(filename));
       return io;
     }
     return null;
   }
-
+ 
+ 
   private InputStream getContent(String path) {
     InputStream content = null;
     if (!path.startsWith("/")) {

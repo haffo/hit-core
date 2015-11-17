@@ -26,6 +26,9 @@ import gov.nist.hit.core.service.exception.XmlParserException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.core.convert.ConversionFailedException;
+import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,7 +54,7 @@ public class MainExceptionHandler {
   @ResponseBody
   public String exception(RuntimeException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
+    return "Sorry, something went wrong.\n";
   }
 
   @ResponseBody
@@ -59,7 +62,7 @@ public class MainExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String exception(Exception ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
+    return "Sorry, something went wrong.\n";
   }
 
   @ResponseBody
@@ -142,6 +145,41 @@ public class MainExceptionHandler {
     return "Sorry, cannot download the message.\n" + "DEBUG:\n" + ex.getMessage();
   }
 
-
+  @ResponseBody
+  @ExceptionHandler(ConversionFailedException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public String conversionFailedException(ConversionFailedException ex) {
+    logger.error(ex.getMessage(), ex);
+    return "Invalid input.\n";
+  }
+  
+  @ResponseBody
+  @ExceptionHandler(IllegalArgumentException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public String illegalArgumentException(IllegalArgumentException ex) {
+    logger.error(ex.getMessage(), ex);
+    return "Invalid input.\n";
+  }
+  
+  @ResponseBody
+  @ExceptionHandler(TypeMismatchException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public String illegalArgumentException(TypeMismatchException ex) {
+    logger.error(ex.getMessage(), ex);
+    return "Invalid input.\n";
+  } 
+  
+  @ResponseBody
+  @ExceptionHandler(SpelEvaluationException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public String spelEvaluationException(SpelEvaluationException ex) {
+    logger.error(ex.getMessage(), ex);
+    return "Invalid input.\n";
+  } 
+  
+  
+  
+  
+  
 
 }

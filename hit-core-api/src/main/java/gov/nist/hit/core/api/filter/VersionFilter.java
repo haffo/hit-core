@@ -14,8 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
-@WebFilter(urlPatterns = "/api/*")
+@WebFilter(urlPatterns = "*")
 public class VersionFilter implements Filter {
 
   /*
@@ -45,7 +47,6 @@ public class VersionFilter implements Filter {
       throws IOException, ServletException {
       if (response instanceof HttpServletResponse) {
       HttpServletResponse httpResponse = (HttpServletResponse) response;
-      httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
       httpResponse.addHeader("dTime", request.getServletContext().getInitParameter("dTime"));
       }
     chain.doFilter(request, response);

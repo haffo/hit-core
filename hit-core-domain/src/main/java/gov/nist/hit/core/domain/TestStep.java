@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class TestStep extends AbstractTestCase implements Serializable {
@@ -23,7 +24,7 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
  
-  
+  @NotNull
   @Enumerated(EnumType.STRING)
   private TestStepTestingType testingType; 
   

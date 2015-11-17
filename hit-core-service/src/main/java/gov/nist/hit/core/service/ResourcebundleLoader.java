@@ -108,6 +108,7 @@ public abstract class ResourcebundleLoader {
   public static final String VALIDATIONRESULT_INFO_PATTERN = "ValidationResultInfo.html";
   public static final String ACKNOWLEDGMENT_PATTERN = "Acknowledgment.html";
   public static final String HOME_PATTERN = "Home.html";
+  final static public String SCHEMA_PATTERN = "Global/Schema/";
 
   @Autowired
   IntegrationProfileRepository integrationProfileRepository;
@@ -161,6 +162,7 @@ public abstract class ResourcebundleLoader {
     this.loadUserDocs();
     this.loadKownIssues();
     this.loadReleaseNotes();
+    this.loadResourcesDocs();
     cachedRepository.getCachedProfiles().clear();
     cachedRepository.getCachedVocabLibraries().clear();
     cachedRepository.getCachedConstraints().clear();
@@ -303,6 +305,95 @@ public abstract class ResourcebundleLoader {
     }
 
     logger.info("loading user documents...DONE");
+  }
+
+
+  private void loadResourcesDocs() throws IOException {
+    logger.info("loading resource documents...");
+    List<gov.nist.hit.core.domain.Document> resourceDocs =
+        new ArrayList<gov.nist.hit.core.domain.Document>();
+
+    // profiles
+    String doc = FileUtil.getContent(PROFILE_PATTERN + "ProfilesDoc.json");
+    boolean skip = false;
+    if (doc != null) {
+      JsonNode profileDocObj = new ObjectMapper().readTree(doc);
+      skip =
+          profileDocObj.findValue("skip") != null ? Boolean.getBoolean(profileDocObj.findValue(
+              "skip").getTextValue()) : false;
+    }
+    if (!skip) {
+      logger.info("loading integration profiles...");
+      List<Resource> resources = getResources(PROFILE_PATTERN + "*.xml");
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+          document.setTitle(resource.getFilename().substring(0,
+              resource.getFilename().indexOf(".xml")));
+          document.setName(resource.getFilename());
+          document.setPath(PROFILE_PATTERN + resource.getFilename());
+          document.setType(DocumentType.PROFILE);
+          resourceDocs.add(document);
+        }
+      }
+      logger.info("loading integration profiles...DONE");
+    }
+
+    // constraints
+    doc = FileUtil.getContent(CONSTRAINT_PATTERN + "ConstraintsDoc.json");
+    if (doc != null) {
+      JsonNode profileDocObj = new ObjectMapper().readTree(doc);
+      skip =
+          profileDocObj.findValue("skip") != null ? Boolean.getBoolean(profileDocObj.findValue(
+              "skip").getTextValue()) : false;
+    }
+    if (!skip) {
+      logger.info("loading constraints...");
+      List<Resource> resources = getResources(CONSTRAINT_PATTERN + "*.xml");
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+          document.setTitle(resource.getFilename().substring(0,
+              resource.getFilename().indexOf(".xml")));
+          document.setName(resource.getFilename());
+          document.setPath(CONSTRAINT_PATTERN + resource.getFilename());
+          document.setType(DocumentType.CONSTRAINT);
+          resourceDocs.add(document);
+        }
+      }
+      logger.info("loading constraints...DONE");
+    }
+
+    // value sets
+    doc = FileUtil.getContent(VALUESET_PATTERN + "ValueSetsDoc.json");
+    if (doc != null) {
+      JsonNode profileDocObj = new ObjectMapper().readTree(doc);
+      skip =
+          profileDocObj.findValue("skip") != null ? Boolean.getBoolean(profileDocObj.findValue(
+              "skip").getTextValue()) : false;
+    }
+    if (!skip) {
+      logger.info("loading value sets...");
+      List<Resource> resources = getResources(VALUESET_PATTERN + "*.xml");
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+          document.setTitle(resource.getFilename().substring(0,
+              resource.getFilename().indexOf(".xml")));
+          document.setName(resource.getFilename());
+          document.setPath(VALUESET_PATTERN + resource.getFilename());
+          document.setType(DocumentType.TABLE);
+          resourceDocs.add(document);
+        }
+      }
+      logger.info("loading value sets...DONE");
+    }
+
+    if (!resourceDocs.isEmpty()) {
+      documentRepository.save(resourceDocs);
+    }
+
+    logger.info("loading resource documents...DONE");
   }
 
   private void loadKownIssues() throws IOException {
