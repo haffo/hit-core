@@ -12,6 +12,7 @@
 package gov.nist.hit.core.api.config;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -39,6 +40,7 @@ public class WebAppInitializer implements WebApplicationInitializer
     servlet.addMapping("/api/*");
     servlet.setAsyncSupported(true);    
     servletContext.setInitParameter("dTime", new Date().getTime()+"");
+    servletContext.setInitParameter("csrfToken", UUID.randomUUID().toString());
   }
 
 }

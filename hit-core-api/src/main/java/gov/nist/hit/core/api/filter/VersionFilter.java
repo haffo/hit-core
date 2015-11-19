@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -44,11 +45,19 @@ public class VersionFilter implements Filter {
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-      throws IOException, ServletException {
-      if (response instanceof HttpServletResponse) {
-      HttpServletResponse httpResponse = (HttpServletResponse) response;
-      httpResponse.addHeader("dTime", request.getServletContext().getInitParameter("dTime"));
+      throws IOException, ServletException {   
+    HttpServletRequest req = (HttpServletRequest) request;
+    HttpServletResponse res = (HttpServletResponse) response;
+    String path = req.getRequestURI().substring(req.getContextPath().length());
+    String method = req.getMethod();
+    if (path.startsWith("/api/") && !path.equals("/api/appInfo")) {
+      String headerDTime = req.getHeader("dTime");
+      String contextParamDTime = req.getServletContext().getInitParameter("dTime");
+      if (headerDTime != null && contextParamDTime != null && !headerDTime.equals(contextParamDTime)) {
+        res.sendError(403); // forbidden
+        return;
       }
+    }
     chain.doFilter(request, response);
   }
 

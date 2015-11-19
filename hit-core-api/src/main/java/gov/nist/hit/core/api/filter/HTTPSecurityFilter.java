@@ -55,7 +55,7 @@ public class HTTPSecurityFilter implements Filter {
       httpResponse.setHeader("X-Content-Type-Options", "nosniff");
 //      httpResponse.setHeader("Strict-Transport-Security", "max-age=31536000");
       httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
-      httpResponse.setHeader("Access-Control-Allow-Headers", "dTime");
+      httpResponse.setHeader("Access-Control-Allow-Headers", "dTime, csrfToken");
 //      httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
     }
 

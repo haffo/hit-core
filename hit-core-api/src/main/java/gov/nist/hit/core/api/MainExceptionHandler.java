@@ -123,7 +123,7 @@ public class MainExceptionHandler {
 
   @ResponseBody
   @ExceptionHandler(DownloadDocumentException.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String documentationException(DocumentationException ex) {
     logger.error(ex.getMessage(), ex);
     return ex.getMessage();

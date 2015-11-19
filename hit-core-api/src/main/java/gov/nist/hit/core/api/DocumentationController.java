@@ -116,7 +116,7 @@ public class DocumentationController {
   }
 
 
-  @Cacheable(value = "documentationCache",  key = "#type.name() + 'resource-documentation'")
+  @Cacheable(value = "documentationCache", key = "#type.name() + 'resource-documentation'")
   @RequestMapping(value = "/resourcedocs", method = RequestMethod.GET)
   public List<Document> resourcedocs(@RequestParam("type") DocumentType type) {
     logger.info("Fetching all resources docs of type=" + type);
@@ -142,7 +142,7 @@ public class DocumentationController {
       }
     } catch (IOException e) {
       logger.debug("Failed to download the test packages ");
-      throw new DownloadDocumentException("Cannot download the test packages");
+      throw new DownloadDocumentException("Cannot download the document");
     }
   }
 
@@ -165,6 +165,20 @@ public class DocumentationController {
       throw new DownloadDocumentException("Failed to download resource documentation of  " + type);
     }
   }
+
+  @RequestMapping(value = "/doc", method = RequestMethod.GET)
+  public void doc(@RequestParam("name") String name, HttpServletRequest request,
+      HttpServletResponse response) throws DownloadDocumentException {
+    if (name != null) {
+      Document d = documentRepository.findOneByName(name);
+      if (d != null) {
+        downloadDocument(d.getPath(), request, response);
+      }else{
+        throw new DownloadDocumentException("Unknown document");
+      }
+    }
+  }
+
 
   @RequestMapping(value = "/testPackages", method = RequestMethod.POST)
   public void testPackages(@RequestParam("stage") TestingStage stage, HttpServletRequest request,
@@ -284,8 +298,8 @@ public class DocumentationController {
     }
     return null;
   }
- 
- 
+
+
   private InputStream getContent(String path) {
     InputStream content = null;
     if (!path.startsWith("/")) {

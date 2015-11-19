@@ -35,4 +35,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
   @Query("select doc from Document doc where doc.type = :type order by doc.name asc")
   public List<Document> findAllResourceDocs(@Param("type") DocumentType type);
 
+  @Query("select doc from Document doc where doc.name = :name")
+  public Document findOneByName(@Param("name") String name);
+
+
 }

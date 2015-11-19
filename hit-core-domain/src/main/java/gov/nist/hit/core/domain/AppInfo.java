@@ -74,6 +74,8 @@ public class AppInfo  implements Serializable {
   @Column(columnDefinition = "TEXT")
   private String acknowledgment;
   
+  private String csrfToken;
+  
   
   public String getUrl() {
     return url;
@@ -208,6 +210,18 @@ public class AppInfo  implements Serializable {
 
   public void setHomeTitle(String homeTitle) {
     this.homeTitle = homeTitle;
+  }
+
+  
+  
+  
+  
+  public String getCsrfToken() {
+    return csrfToken;
+  }
+
+  public void setCsrfToken(String csrfToken) {
+    this.csrfToken = csrfToken;
   }
 
   @Override
