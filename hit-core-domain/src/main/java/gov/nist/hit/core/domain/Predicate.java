@@ -32,4 +32,24 @@ public class Predicate extends Constraint {
     this.falseUsage = falseUsage;
   }
 
+  @Override
+  protected Predicate clone() throws CloneNotSupportedException {
+    Predicate pred = new Predicate(id,   description,   trueUsage,   falseUsage);
+    return pred;
+  }
+
+  @Override
+  public int hashCode() {
+     int result = super.hashCode();
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+     return super.equals(obj);
+  } 
+  
+  
+ 
+
 }

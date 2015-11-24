@@ -60,4 +60,12 @@ public class Constraint implements Serializable {
     return true;
   }
 
+  @Override
+  protected Constraint clone() throws CloneNotSupportedException {
+    Constraint clone = new Constraint(id, description);
+    return clone;
+  }
+  
+  
+
 }

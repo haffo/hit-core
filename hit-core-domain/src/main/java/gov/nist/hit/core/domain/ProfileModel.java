@@ -13,6 +13,7 @@ package gov.nist.hit.core.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Tree representation of a integrationProfile
@@ -20,26 +21,34 @@ import java.util.List;
  * @author Harold Affo (NIST)
  */
 public class ProfileModel {
-  protected List<ProfileElement> elements;
+  private ProfileElement message; 
+  private Map<String, ProfileElement> datatypes;
+  private Map<String, ProfileElement> segments;    
 
-  public List<ProfileElement> getElements() {
-    return elements;
+  public ProfileElement getMessage() {
+    return message;
   }
 
-  public void setElements(List<ProfileElement> elements) {
-    this.elements = elements;
+  public void setMessage(ProfileElement message) {
+    this.message = message;
   }
 
-  /**
-   * @param type
-   * @param content
-   */
-  public ProfileModel() {
-    elements = new ArrayList<ProfileElement>();
+  public Map<String, ProfileElement> getDatatypes() {
+    return datatypes;
   }
 
-  public ProfileModel(ProfileElement root) {
-    elements = root.getChildren();
+  public void setDatatypes(Map<String, ProfileElement> datatypes) {
+    this.datatypes = datatypes;
   }
+
+  public Map<String, ProfileElement> getSegments() {
+    return segments;
+  }
+
+  public void setSegments(Map<String, ProfileElement> segments) {
+    this.segments = segments;
+  }
+
+  
 
 }

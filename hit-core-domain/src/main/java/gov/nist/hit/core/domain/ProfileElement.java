@@ -11,9 +11,12 @@
  */
 package gov.nist.hit.core.domain;
 
+import gov.nist.hit.core.domain.constraints.ConformanceStatement;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,9 +27,7 @@ public class ProfileElement {
 
   protected String name;
 
-  // protected String cardinality;
-
-  protected String longName;
+  protected String description;
 
   protected String path;
 
@@ -41,35 +42,30 @@ public class ProfileElement {
   protected String type;
 
   protected List<ProfileElement> children;
+  protected List<gov.nist.hit.core.domain.constraints.Predicate> predicates = new ArrayList<gov.nist.hit.core.domain.constraints.Predicate>();
+  protected List<ConformanceStatement> conformanceStatements = new ArrayList<ConformanceStatement>();
 
-  protected Set<String> usages;
 
-  protected SegmentRef reference;
+  protected String ref;
+ 
+  protected Map<Integer, Set<String>> dynamicMaps;
 
-  protected Set<Constraint> conformanceStatements = new HashSet<Constraint>();
-  protected Set<Predicate> predicates = new HashSet<Predicate>();
+  protected String datatype;
 
-  protected String dataType;
+  protected String min;
 
-  protected Object minOccurs;
+  protected String max;
 
-  protected Object maxOccurs;
-
-  // protected String dataTypeDescription;
-  //
-  // protected String dataTypeUsage;
-
-  protected String icon;
+//  protected String icon;
 
   protected String position;
 
   protected boolean relevent;
 
-  protected int order;
-  protected String lenght;
+   protected String lenght;
   
   protected boolean hide;
-
+  
   @JsonIgnore
   protected ProfileElement parent;
   
@@ -78,17 +74,30 @@ public class ProfileElement {
     return name;
   }
 
+  
+  public Map<Integer, Set<String>> getDynamicMaps() {
+    return dynamicMaps;
+  }
+
+  public void setDynamicMaps(Map<Integer, Set<String>> dynamicMaps) {
+    this.dynamicMaps = dynamicMaps;
+  }
+  
   public void setName(String name) {
     this.name = name;
   }
 
-  public String getLongName() {
-    return longName;
+  
+
+  public String getDescription() {
+    return description;
   }
 
-  public void setLongName(String longName) {
-    this.longName = longName;
+
+  public void setDescription(String description) {
+    this.description = description;
   }
+
 
   public String getPath() {
     return path;
@@ -130,29 +139,19 @@ public class ProfileElement {
     this.table = table;
   }
 
-  public String getDataType() {
-    return dataType;
+ 
+  public String getDatatype() {
+    return datatype;
   }
 
-  public void setDataType(String dataType) {
-    this.dataType = dataType;
+
+  public void setDatatype(String datatype) {
+    this.datatype = datatype;
   }
 
-  public Object getMinOccurs() {
-    return minOccurs;
-  }
+  
 
-  public void setMinOccurs(Object minOccurs) {
-    this.minOccurs = minOccurs;
-  }
-
-  public Object getMaxOccurs() {
-    return maxOccurs;
-  }
-
-  public void setMaxOccurs(Object maxOccurs) {
-    this.maxOccurs = maxOccurs;
-  }
+  
 
   // public String getDataTypeDescription() {
   // return dataTypeDescription;
@@ -170,13 +169,33 @@ public class ProfileElement {
   // this.dataTypeUsage = dataTypeUsage;
   // }
 
-  public String getIcon() {
-    return icon;
+//  public String getIcon() {
+//    return icon;
+//  }
+//
+//  public void setIcon(String icon) {
+//    this.icon = icon;
+//  }
+
+  public String getMin() {
+    return min;
   }
 
-  public void setIcon(String icon) {
-    this.icon = icon;
+
+  public void setMin(String min) {
+    this.min = min;
   }
+
+
+  public String getMax() {
+    return max;
+  }
+
+
+  public void setMax(String max) {
+    this.max = max;
+  }
+
 
   public String getPosition() {
     return position;
@@ -184,20 +203,6 @@ public class ProfileElement {
 
   public void setPosition(String position) {
     this.position = position;
-  }
-
-  /**
-   * @return
-   */
-  public int getOrder() {
-    return order;
-  }
-
-  /**
-   * @param order
-   */
-  public void setOrder(int order) {
-    this.order = order;
   }
 
   public String getLenght() {
@@ -242,22 +247,7 @@ public class ProfileElement {
     this.children = children;
   }
 
-  public Set<Constraint> getConformanceStatements() {
-    return conformanceStatements;
-  }
-
-  public void setConformanceStatements(Set<Constraint> conformanceStatements) {
-    this.conformanceStatements = conformanceStatements;
-  }
-
-  public Set<Predicate> getPredicates() {
-    return predicates;
-  }
-
-  public void setPredicates(Set<Predicate> predicates) {
-    this.predicates = predicates;
-  }
-
+ 
   public String getId() {
     return id;
   }
@@ -265,14 +255,8 @@ public class ProfileElement {
   public void setId(String id) {
     this.id = id;
   }
-
-  public SegmentRef getReference() {
-    return reference;
-  }
-
-  public void setReference(SegmentRef reference) {
-    this.reference = reference;
-  }
+ 
+  
 
 //  public String getConstraintPath() {
 //    return constraintPath;
@@ -282,6 +266,16 @@ public class ProfileElement {
 //    this.constraintPath = constraintPath;
 //  }
 
+  public String getRef() {
+    return ref;
+  }
+
+
+  public void setRef(String ref) {
+    this.ref = ref;
+  }
+
+
   public ProfileElement getParent() {
     return parent;
   }
@@ -290,16 +284,7 @@ public class ProfileElement {
     this.parent = parent;
   }
 
-  public Set<String> getUsages() {
-    if (usages == null)
-      usages = new HashSet<String>();
-    return usages;
-  }
-
-  public void setUsages(Set<String> usages) {
-    this.usages = usages;
-  }
-
+  
   public boolean isRelevent() {
     return relevent;
   }
@@ -318,36 +303,94 @@ public class ProfileElement {
   public void setHide(boolean hide) {
     this.hide = hide;
   }
+  
+  
+  
 
+  public List<gov.nist.hit.core.domain.constraints.Predicate> getPredicates() {
+    return predicates;
+  }
+
+
+  public void setPredicates(List<gov.nist.hit.core.domain.constraints.Predicate> predicates) {
+    this.predicates = predicates;
+  }
+
+
+  public List<ConformanceStatement> getConformanceStatements() {
+    return conformanceStatements;
+  }
+
+
+  public void setConformanceStatements(List<ConformanceStatement> conformanceStatements) {
+    this.conformanceStatements = conformanceStatements;
+  }
+
+
+  
+  
   @Override
   public ProfileElement clone() throws CloneNotSupportedException {
     ProfileElement element = new ProfileElement();
-    element.setChildren(children);
-    element.setConformanceStatements(conformanceStatements);
-    element.setDataType(dataType);
-    element.setIcon(icon);
+    element.setChildren(clone(children));
+//    element.setConformanceStatements(cloneConstraints(conformanceStatements));
+    element.setDatatype(datatype);
+//    element.setIcon(icon);
     element.setId(id);
-    element.setLongName(longName);
-    element.setMaxLength(maxLength);
+     element.setMaxLength(maxLength);
     element.setMinLength(minLength);
-    element.setMinOccurs(minOccurs);
+    element.setMin(min);
     element.setName(name);
-    element.setMaxOccurs(maxOccurs);
+    element.setMax(max);
     element.setLenght(lenght);
-    element.setOrder(order);
-    element.setParent(parent);
+     element.setParent(parent);
      element.setPath(path);
     element.setPosition(position);
-    element.setPredicates(predicates);
-    element.setReference(reference);
+//    element.setPredicates(clonePredicates(predicates));
+    element.setRef(ref);
     element.setRelevent(relevent);
     element.setTable(table);
     element.setType(type);
     element.setUsage(usage);
-    element.setUsages(usages);
-    element.setHide(hide);
+     element.setHide(hide);
+     
     return element;
   }
+  
+  public static List<ProfileElement> clone(List<ProfileElement> children) throws CloneNotSupportedException {
+    if( children== null) return null;
+    if( children.size() == 0) return new ArrayList<ProfileElement>();
+    ArrayList<ProfileElement> clones = new ArrayList<ProfileElement>();
+    for (ProfileElement child : children) {
+      ProfileElement clone = child.clone();
+      clones.add(clone);
+    }
+    return clones;
+  }
+  
+  public static Set<Constraint> cloneConstraints(Set<Constraint> constraints) throws CloneNotSupportedException {
+    if( constraints== null) return null;
+    if( constraints.size() == 0) return new HashSet<Constraint>();
+    Set<Constraint> clones = new HashSet<Constraint>();
+    for (Constraint child : constraints) {
+      Constraint clone = child.clone();
+      clones.add(clone);
+    }
+     return clones;
+  }
+  
+  public static Set<Predicate> clonePredicates(Set<Predicate> predicates) throws CloneNotSupportedException {
+    if( predicates== null) return null;
+    if( predicates.size() == 0) return new HashSet<Predicate>();
+    HashSet<Predicate> clones = new HashSet<Predicate>();
+    for (Predicate child : predicates) {
+      Predicate clone = child.clone();
+      clones.add(clone);
+    }
+     return clones;
+  }
+  
+  
 
  
   
