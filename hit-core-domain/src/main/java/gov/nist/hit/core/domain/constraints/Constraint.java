@@ -94,4 +94,39 @@ public abstract class Constraint implements Serializable, Cloneable {
 		c.setId(this.id);
 		return c;
 	}
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((constraintId == null) ? 0 : constraintId.hashCode());
+    result = prime * result + ((constraintTarget == null) ? 0 : constraintTarget.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Constraint other = (Constraint) obj;
+    if (constraintId == null) {
+      if (other.constraintId != null)
+        return false;
+    } else if (!constraintId.equals(other.constraintId))
+      return false;
+    if (constraintTarget == null) {
+      if (other.constraintTarget != null)
+        return false;
+    } else if (!constraintTarget.equals(other.constraintTarget))
+      return false;
+    return true;
+  }
+	
+	
+	
+	
 }

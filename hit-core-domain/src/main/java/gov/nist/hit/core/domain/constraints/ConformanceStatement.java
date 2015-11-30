@@ -27,5 +27,9 @@ import java.io.Serializable;
 	public ConformanceStatement clone() throws CloneNotSupportedException {
 		return (ConformanceStatement) super.clone();
 	}
+	
+	
+	
+	
 
 }
