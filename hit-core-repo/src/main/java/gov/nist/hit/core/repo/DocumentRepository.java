@@ -32,7 +32,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
   @Query("select doc from Document doc where doc.type = 'USERDOC' order by doc.position asc")
   public List<Document> findAllUserDocs();
 
-  @Query("select doc from Document doc where doc.type = :type order by doc.name asc")
+  @Query("select doc from Document doc where doc.type = :type order by doc.position asc")
   public List<Document> findAllResourceDocs(@Param("type") DocumentType type);
 
   @Query("select doc from Document doc where doc.name = :name")

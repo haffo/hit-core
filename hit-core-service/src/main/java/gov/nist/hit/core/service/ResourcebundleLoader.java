@@ -50,8 +50,10 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -109,6 +111,11 @@ public abstract class ResourcebundleLoader {
   public static final String ACKNOWLEDGMENT_PATTERN = "Acknowledgment.html";
   public static final String HOME_PATTERN = "Home.html";
   final static public String SCHEMA_PATTERN = "Global/Schema/";
+  public static final String PROFILES_CONF_FILE_PATTERN = "Profiles.json";
+  public static final String TABLES_CONF_FILE_PATTERN = "Tables.json";
+  public static final String CONSTRAINTS_CONF_FILE_PATTERN = "Constraints.json";
+
+
 
   @Autowired
   IntegrationProfileRepository integrationProfileRepository;
@@ -314,80 +321,90 @@ public abstract class ResourcebundleLoader {
         new ArrayList<gov.nist.hit.core.domain.Document>();
 
     // profiles
-    String doc = FileUtil.getContent(PROFILE_PATTERN + "ProfilesDoc.json");
-    boolean skip = false;
-    if (doc != null) {
-      JsonNode profileDocObj = new ObjectMapper().readTree(doc);
-      skip =
-          profileDocObj.findValue("skip") != null ? Boolean.getBoolean(profileDocObj.findValue(
-              "skip").getTextValue()) : false;
+    logger.info("loading integration profiles...");
+    JsonNode conf = toJsonObj(PROFILE_PATTERN + PROFILES_CONF_FILE_PATTERN);
+    Set<String> skipped = null;
+    JsonNode ordersObj = null;
+    if (conf != null) {
+      skipped = skippedAsList(conf.findValue("skip"));
+      ordersObj = conf.findValue("orders");
+
     }
-    if (!skip) {
-      logger.info("loading integration profiles...");
-      List<Resource> resources = getResources(PROFILE_PATTERN + "*.xml");
-      if (resources != null && !resources.isEmpty()) {
-        for (Resource resource : resources) {
+    List<Resource> resources = getResources(PROFILE_PATTERN + "*.xml");
+    if (resources != null && !resources.isEmpty()) {
+      for (Resource resource : resources) {
+        String fileName = resource.getFilename();
+        if (skipped == null || !skipped.contains(fileName)) {
           gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
           document.setTitle(resource.getFilename().substring(0,
               resource.getFilename().indexOf(".xml")));
           document.setName(resource.getFilename());
           document.setPath(PROFILE_PATTERN + resource.getFilename());
           document.setType(DocumentType.PROFILE);
+          document
+              .setPosition(ordersObj != null && ordersObj.findValue(fileName) != null ? ordersObj
+                  .findValue(fileName).getIntValue() : 0);
           resourceDocs.add(document);
         }
       }
-      logger.info("loading integration profiles...DONE");
     }
+    logger.info("loading integration profiles...DONE");
 
     // constraints
-    doc = FileUtil.getContent(CONSTRAINT_PATTERN + "ConstraintsDoc.json");
-    if (doc != null) {
-      JsonNode profileDocObj = new ObjectMapper().readTree(doc);
-      skip =
-          profileDocObj.findValue("skip") != null ? Boolean.getBoolean(profileDocObj.findValue(
-              "skip").getTextValue()) : false;
+    logger.info("loading constraints...");
+    conf = toJsonObj(CONSTRAINT_PATTERN + CONSTRAINTS_CONF_FILE_PATTERN);
+    skipped = null;
+    if (conf != null) {
+      skipped = skippedAsList(conf.findValue("skip"));
+      ordersObj = conf.findValue("orders");
     }
-    if (!skip) {
-      logger.info("loading constraints...");
-      List<Resource> resources = getResources(CONSTRAINT_PATTERN + "*.xml");
-      if (resources != null && !resources.isEmpty()) {
-        for (Resource resource : resources) {
+    resources = getResources(CONSTRAINT_PATTERN + "*.xml");
+    if (resources != null && !resources.isEmpty()) {
+      for (Resource resource : resources) {
+        String fileName = resource.getFilename();
+        if (skipped == null || !skipped.contains(fileName)) {
           gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
           document.setTitle(resource.getFilename().substring(0,
               resource.getFilename().indexOf(".xml")));
           document.setName(resource.getFilename());
           document.setPath(CONSTRAINT_PATTERN + resource.getFilename());
           document.setType(DocumentType.CONSTRAINT);
+          document
+              .setPosition(ordersObj != null && ordersObj.findValue(fileName) != null ? ordersObj
+                  .findValue(fileName).getIntValue() : 0);
           resourceDocs.add(document);
         }
       }
-      logger.info("loading constraints...DONE");
     }
+    logger.info("loading constraints...DONE");
 
+    logger.info("loading value sets...");
     // value sets
-    doc = FileUtil.getContent(VALUESET_PATTERN + "ValueSetsDoc.json");
-    if (doc != null) {
-      JsonNode profileDocObj = new ObjectMapper().readTree(doc);
-      skip =
-          profileDocObj.findValue("skip") != null ? Boolean.getBoolean(profileDocObj.findValue(
-              "skip").getTextValue()) : false;
+    conf = toJsonObj(VALUESET_PATTERN + TABLES_CONF_FILE_PATTERN);
+    skipped = null;
+    if (conf != null) {
+      skipped = skippedAsList(conf.findValue("skip"));
+      ordersObj = conf.findValue("orders");
     }
-    if (!skip) {
-      logger.info("loading value sets...");
-      List<Resource> resources = getResources(VALUESET_PATTERN + "*.xml");
-      if (resources != null && !resources.isEmpty()) {
-        for (Resource resource : resources) {
+    resources = getResources(VALUESET_PATTERN + "*.xml");
+    if (resources != null && !resources.isEmpty()) {
+      for (Resource resource : resources) {
+        String fileName = resource.getFilename();
+        if (skipped == null || !skipped.contains(fileName)) {
           gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
           document.setTitle(resource.getFilename().substring(0,
               resource.getFilename().indexOf(".xml")));
           document.setName(resource.getFilename());
           document.setPath(VALUESET_PATTERN + resource.getFilename());
           document.setType(DocumentType.TABLE);
+          document
+              .setPosition(ordersObj != null && ordersObj.findValue(fileName) != null ? ordersObj
+                  .findValue(fileName).getIntValue() : 0);
           resourceDocs.add(document);
         }
       }
-      logger.info("loading value sets...DONE");
     }
+    logger.info("loading value sets...DONE");
 
     if (!resourceDocs.isEmpty()) {
       documentRepository.save(resourceDocs);
@@ -492,7 +509,7 @@ public abstract class ResourcebundleLoader {
 
   private void loadConstraints() throws IOException {
     logger.info("loading constraints...");
-    List<Resource> resources = getResources(domainPath(CONSTRAINT_PATTERN) + "*");
+    List<Resource> resources = getResources(domainPath(CONSTRAINT_PATTERN) + "*.xml");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String content = FileUtil.getContent(resource);
@@ -503,10 +520,31 @@ public abstract class ResourcebundleLoader {
     logger.info("loading constraints...DONE");
   }
 
+  private JsonNode toJsonObj(String path) throws IOException {
+    Resource resource = getResource(path);
+    String descriptorContent = FileUtil.getContent(resource);
+    return new ObjectMapper().readTree(descriptorContent);
+  }
+
+
+  private Set<String> skippedAsList(JsonNode arrNode) {
+    Set<String> skipped = null;
+    if (arrNode != null) {
+      if (arrNode.isArray()) {
+        skipped = new HashSet<String>();
+        for (final JsonNode objNode : arrNode) {
+          skipped.add(objNode.getTextValue());
+        }
+      }
+    }
+    return skipped;
+  }
+
   private void loadIntegrationProfiles() throws IOException {
     logger.info("loading integration profiles...");
     List<Resource> resources = getResources(domainPath(PROFILE_PATTERN) + "*.xml");
     if (resources != null && !resources.isEmpty()) {
+
       for (Resource resource : resources) {
         IntegrationProfile integrationProfile = integrationProfile(FileUtil.getContent(resource));
         integrationProfileRepository.save(integrationProfile);
