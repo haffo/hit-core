@@ -4,11 +4,14 @@ import gov.nist.hit.core.transport.event.InboundEvent;
 import gov.nist.hit.core.transport.event.OutboundEvent;
 
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
-public class InboundEventListener implements ApplicationListener<InboundEvent> {
+@Component
+public class InboundEventListener   {
 
-  @Override
-  public void onApplicationEvent(InboundEvent event) {
+  @EventListener
+  public void handleInboundEvent(InboundEvent event) {
      System.out.println(" InboundEvent received ");
   }
 }
