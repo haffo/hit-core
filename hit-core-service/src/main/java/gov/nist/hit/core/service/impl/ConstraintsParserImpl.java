@@ -58,6 +58,8 @@ public class ConstraintsParserImpl implements ConstraintsParser {
           Context datatypeContextObj = new Context();
           Context segmentContextObj = new Context();
           Context groupContextObj = new Context();
+          Context messageContextObj = new Context();
+
           if (elmConstraints.getElementsByTagName("Datatype") != null) {
             this.context((Element) elmConstraints.getElementsByTagName("Datatype").item(0),
                 datatypeContextObj);
@@ -72,6 +74,12 @@ public class ConstraintsParserImpl implements ConstraintsParser {
             this.context((Element) elmConstraints.getElementsByTagName("Group").item(0),
                 groupContextObj);
           }
+
+          if (elmConstraints.getElementsByTagName("Message") != null) {
+            this.context((Element) elmConstraints.getElementsByTagName("Message").item(0),
+                messageContextObj);
+          }
+          constraints.setMessages(messageContextObj);
           constraints.setDatatypes(datatypeContextObj);
           constraints.setSegments(segmentContextObj);
           constraints.setGroups(groupContextObj);
@@ -95,6 +103,7 @@ public class ConstraintsParserImpl implements ConstraintsParser {
           Context datatypeContextObj = new Context();
           Context segmentContextObj = new Context();
           Context groupContextObj = new Context();
+          Context messageContextObj = new Context();
 
           if (elmConstraints.getElementsByTagName("Datatype") != null) {
             this.context((Element) elmConstraints.getElementsByTagName("Datatype").item(0),
@@ -109,6 +118,13 @@ public class ConstraintsParserImpl implements ConstraintsParser {
             this.context((Element) elmConstraints.getElementsByTagName("Group").item(0),
                 groupContextObj);
           }
+
+          if (elmConstraints.getElementsByTagName("Message") != null) {
+            this.context((Element) elmConstraints.getElementsByTagName("Message").item(0),
+                messageContextObj);
+          }
+
+          constraints.setMessages(messageContextObj);
           constraints.setDatatypes(datatypeContextObj);
           constraints.setSegments(segmentContextObj);
           constraints.setGroups(groupContextObj);

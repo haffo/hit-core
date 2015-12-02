@@ -29,6 +29,8 @@ public class Constraints implements Serializable {
 	// @JoinColumn(name = "GROUPS_ID")
 	private Context groups;
 
+	private Context messages ;
+	   
 	public String getId() {
 		return id;
 	}
@@ -60,5 +62,17 @@ public class Constraints implements Serializable {
 	public void setGroups(Context groups) {
 		this.groups = groups;
 	}
+
+  public Context getMessages() {
+    return messages;
+  }
+
+  public void setMessages(Context messages) {
+    this.messages = messages;
+  }
+
+	
+	
+	
 
 }

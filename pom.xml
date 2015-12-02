@@ -18,7 +18,7 @@
 	<properties>
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>4.2.3.RELEASE</spring.version>
+		<spring.version>4.1.1.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
@@ -215,7 +215,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
+<repositories>
 	<repository>
 		<id>com.springsource.repository.bundles.release</id>
 		<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle
@@ -228,5 +228,5 @@
 			Releases</name>
 		<url>http://repository.springsource.com/maven/bundles/external</url>
 	</repository>
-
+</repositories>
 </project>
