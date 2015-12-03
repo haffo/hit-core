@@ -1089,7 +1089,7 @@ public abstract class ResourcebundleLoader {
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(ts.getTestContext());
     doc = initTestCaseDocument(ts, doc);
-    doc.setId(ts.getId());
+    doc.setId(ts.getTestContext().getId());
     return doc;
   }
 
