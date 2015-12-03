@@ -114,6 +114,8 @@ public abstract class ResourcebundleLoader {
   public static final String PROFILES_CONF_FILE_PATTERN = "Profiles.json";
   public static final String TABLES_CONF_FILE_PATTERN = "Tables.json";
   public static final String CONSTRAINTS_CONF_FILE_PATTERN = "Constraints.json";
+  public static final String HELP_DOCS_CONF_FILE_PATTERN = "HelpDocs.json";
+  public static final String HELP_DOCS_PATTERN = "Documentation/HelpDocs/";
 
 
 
@@ -260,6 +262,17 @@ public abstract class ResourcebundleLoader {
     }
 
 
+    JsonNode json =
+        toJsonObj(ResourcebundleLoader.HELP_DOCS_PATTERN
+            + ResourcebundleLoader.HELP_DOCS_CONF_FILE_PATTERN);
+    if (json != null) {
+      String mc =
+          json.findValue("messageContent") != null ? json.findValue("messageContent")
+              .getTextValue() : null;
+      if (mc != null) {
+        appInfo.setMcHelpPath(ResourcebundleLoader.HELP_DOCS_PATTERN + mc);
+      }
+    }
 
     appInfoRepository.save(appInfo);
 
@@ -522,8 +535,8 @@ public abstract class ResourcebundleLoader {
 
   private JsonNode toJsonObj(String path) throws IOException {
     Resource resource = getResource(path);
-    String descriptorContent = FileUtil.getContent(resource);
-    return new ObjectMapper().readTree(descriptorContent);
+    String content = FileUtil.getContent(resource);
+    return content != null ? new ObjectMapper().readTree(content) : null;
   }
 
 

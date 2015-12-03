@@ -34,7 +34,8 @@ public class TestArtifact implements Serializable {
   //@JsonIgnore
   @Column(columnDefinition = "TEXT")
   private String json;
-
+ 
+  
   public TestArtifact() {
     super();
     this.name = null;
@@ -77,7 +78,5 @@ public class TestArtifact implements Serializable {
     this.name = name;
   }
 
-  
-  
-  
+ 
 }

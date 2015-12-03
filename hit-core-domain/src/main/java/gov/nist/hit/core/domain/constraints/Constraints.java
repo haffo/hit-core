@@ -17,19 +17,19 @@ public class Constraints implements Serializable {
 	// @OneToOne(optional = false, fetch = FetchType.EAGER, cascade =
 	// CascadeType.ALL, orphanRemoval = true)
 	// @JoinColumn(name = "DATATYPES_ID")
-	private Context datatypes;
+	private Context datatypes = new Context();
 
 	// @OneToOne(optional = false, fetch = FetchType.EAGER, cascade =
 	// CascadeType.ALL, orphanRemoval = true)
 	// @JoinColumn(name = "SEGMENTS_ID")
-	private Context segments;
+	private Context segments = new Context();
 
 	// @OneToOne(optional = false, fetch = FetchType.EAGER, cascade =
 	// CascadeType.ALL, orphanRemoval = true)
 	// @JoinColumn(name = "GROUPS_ID")
-	private Context groups;
+	private Context groups  = new Context();
 
-	private Context messages ;
+	private Context messages  = new Context();
 	   
 	public String getId() {
 		return id;

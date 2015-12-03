@@ -47,13 +47,13 @@ public class ConstraintsParserImpl implements ConstraintsParser {
 
   @Override
   public Constraints confStatements(String xmlConstraints) {
+    Constraints constraints = new Constraints();
     if (xmlConstraints != null) {
       Document conformanceContextDoc = this.stringToDom(xmlConstraints);
       if (conformanceContextDoc.getElementsByTagName("Constraints") != null) {
         Element elmConstraints =
             (Element) conformanceContextDoc.getElementsByTagName("Constraints").item(0);
         if (elmConstraints != null) {
-          Constraints constraints = new Constraints();
 
           Context datatypeContextObj = new Context();
           Context segmentContextObj = new Context();
@@ -83,23 +83,21 @@ public class ConstraintsParserImpl implements ConstraintsParser {
           constraints.setDatatypes(datatypeContextObj);
           constraints.setSegments(segmentContextObj);
           constraints.setGroups(groupContextObj);
-
-          return constraints;
         }
       }
     }
-    return null;
+    return constraints;
   }
 
   @Override
   public Constraints predicates(String xmlConstraints) {
+    Constraints constraints = new Constraints();
     if (xmlConstraints != null) {
       Document conformanceContextDoc = this.stringToDom(xmlConstraints);
       if (conformanceContextDoc.getElementsByTagName("Predicates") != null) {
         Element elmConstraints =
             (Element) conformanceContextDoc.getElementsByTagName("Predicates").item(0);
         if (elmConstraints != null) {
-          Constraints constraints = new Constraints();
           Context datatypeContextObj = new Context();
           Context segmentContextObj = new Context();
           Context groupContextObj = new Context();
@@ -128,11 +126,10 @@ public class ConstraintsParserImpl implements ConstraintsParser {
           constraints.setDatatypes(datatypeContextObj);
           constraints.setSegments(segmentContextObj);
           constraints.setGroups(groupContextObj);
-          return constraints;
         }
       }
     }
-    return null;
+    return constraints;
   }
 
   private void context(Element elmContext, Context contextObj) {

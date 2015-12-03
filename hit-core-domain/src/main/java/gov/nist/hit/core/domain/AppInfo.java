@@ -48,7 +48,10 @@ public class AppInfo  implements Serializable {
   
   private String adminEmail;
     
-   private String homeTitle; 
+  private String homeTitle; 
+  
+  @Column(columnDefinition = "TEXT")
+  private String mcHelpPath;
   
   @Column(columnDefinition = "TEXT")
   private String homeContent; 
@@ -213,15 +216,22 @@ public class AppInfo  implements Serializable {
   }
 
   
-  
-  
-  
   public String getCsrfToken() {
     return csrfToken;
   }
 
   public void setCsrfToken(String csrfToken) {
     this.csrfToken = csrfToken;
+  }
+  
+ 
+
+  public String getMcHelpPath() {
+    return mcHelpPath;
+  }
+
+  public void setMcHelpPath(String mcHelpPath) {
+    this.mcHelpPath = mcHelpPath;
   }
 
   @Override
