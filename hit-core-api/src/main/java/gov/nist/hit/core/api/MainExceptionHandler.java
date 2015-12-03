@@ -123,7 +123,7 @@ public class MainExceptionHandler {
 
   @ResponseBody
   @ExceptionHandler(DownloadDocumentException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
   public String documentationException(DocumentationException ex) {
     logger.error(ex.getMessage(), ex);
     return ex.getMessage();
@@ -139,7 +139,7 @@ public class MainExceptionHandler {
 
   @ResponseBody
   @ExceptionHandler(MessageDownloadException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
   public String messageDownload(MessageDownloadException ex) {
     logger.error(ex.getMessage(), ex);
     return "Sorry, cannot download the message.\n" + "DEBUG:\n" + ex.getMessage();
