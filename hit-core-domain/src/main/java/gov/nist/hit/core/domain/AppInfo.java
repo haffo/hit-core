@@ -51,7 +51,7 @@ public class AppInfo  implements Serializable {
   private String homeTitle; 
   
   @Column(columnDefinition = "TEXT")
-  private String mcHelpPath;
+  private String messageContentInfo;
   
   @Column(columnDefinition = "TEXT")
   private String homeContent; 
@@ -224,14 +224,14 @@ public class AppInfo  implements Serializable {
     this.csrfToken = csrfToken;
   }
   
- 
+  
 
-  public String getMcHelpPath() {
-    return mcHelpPath;
+  public String getMessageContentInfo() {
+    return messageContentInfo;
   }
 
-  public void setMcHelpPath(String mcHelpPath) {
-    this.mcHelpPath = mcHelpPath;
+  public void setMessageContentInfo(String messageContentInfo) {
+    this.messageContentInfo = messageContentInfo;
   }
 
   @Override

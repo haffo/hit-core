@@ -114,8 +114,7 @@ public abstract class ResourcebundleLoader {
   public static final String PROFILES_CONF_FILE_PATTERN = "Profiles.json";
   public static final String TABLES_CONF_FILE_PATTERN = "Tables.json";
   public static final String CONSTRAINTS_CONF_FILE_PATTERN = "Constraints.json";
-  public static final String HELP_DOCS_CONF_FILE_PATTERN = "HelpDocs.json";
-  public static final String HELP_DOCS_PATTERN = "Documentation/HelpDocs/";
+  public static final String MESSAGECONTENT_INFO_PATTERN = "MessageContentInfo.html";
 
 
 
@@ -262,16 +261,11 @@ public abstract class ResourcebundleLoader {
     }
 
 
-    JsonNode json =
-        toJsonObj(ResourcebundleLoader.HELP_DOCS_PATTERN
-            + ResourcebundleLoader.HELP_DOCS_CONF_FILE_PATTERN);
-    if (json != null) {
-      String mc =
-          json.findValue("messageContent") != null ? json.findValue("messageContent")
-              .getTextValue() : null;
-      if (mc != null) {
-        appInfo.setMcHelpPath(ResourcebundleLoader.HELP_DOCS_PATTERN + mc);
-      }
+    resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
+            + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN);
+    if (resource != null) {
+      appInfo.setMessageContentInfo(FileUtil.getContent(resource));
     }
 
     appInfoRepository.save(appInfo);
