@@ -38,5 +38,11 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
   @Query("select doc from Document doc where doc.name = :name")
   public Document findOneByName(@Param("name") String name);
 
+  @Query("select doc from Document doc where doc.type = 'DELIVERABLE' order by doc.date desc")
+  public List<Document> findAllDeliverableDocs();
+
+  @Query("select doc from Document doc where doc.type = 'INSTALLATION'")
+  public Document findInstallationDoc();
+
 
 }

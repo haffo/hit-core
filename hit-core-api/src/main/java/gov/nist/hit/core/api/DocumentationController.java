@@ -122,8 +122,22 @@ public class DocumentationController {
     logger.info("Fetching all resources docs of type=" + type);
     return documentRepository.findAllResourceDocs(type);
   }
+ 
+  @Cacheable(value = "documentationCache", key = "'deliverables-documentation'")
+  @RequestMapping(value = "/deliverables", method = RequestMethod.GET)
+  public List<Document> toolDownloads() {
+    logger.info("Fetching all tooldownloads");
+    return documentRepository.findAllDeliverableDocs();
+  }
 
-
+  @Cacheable(value = "documentationCache", key = "'installationguide-documentation'")
+  @RequestMapping(value = "/installationguide", method = RequestMethod.GET)
+  public Document installationGuide() {
+    logger.info("Fetching installation guide");
+    Document d = documentRepository.findInstallationDoc();
+    return d;
+  }
+  
   @RequestMapping(value = "/downloadDocument", method = RequestMethod.POST)
   public void downloadDocument(@RequestParam("path") String path, HttpServletRequest request,
       HttpServletResponse response) throws DownloadDocumentException {

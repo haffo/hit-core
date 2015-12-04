@@ -115,8 +115,8 @@ public abstract class ResourcebundleLoader {
   public static final String TABLES_CONF_FILE_PATTERN = "Tables.json";
   public static final String CONSTRAINTS_CONF_FILE_PATTERN = "Constraints.json";
   public static final String MESSAGECONTENT_INFO_PATTERN = "MessageContentInfo.html";
-
-
+  public static final String TOOL_DOWNLOADS_PATTERN = "Documentation/Downloads/";
+  public static final String TOOL_DOWNLOADS_CONF_PATTERN = "Downloads.json";
 
   @Autowired
   IntegrationProfileRepository integrationProfileRepository;
@@ -171,6 +171,7 @@ public abstract class ResourcebundleLoader {
     this.loadKownIssues();
     this.loadReleaseNotes();
     this.loadResourcesDocs();
+    // this.loadToolDownloads();
     cachedRepository.getCachedProfiles().clear();
     cachedRepository.getCachedVocabLibraries().clear();
     cachedRepository.getCachedConstraints().clear();
@@ -498,6 +499,59 @@ public abstract class ResourcebundleLoader {
     logger.info("loading release notes...DONE");
   }
 
+
+  private void loadToolDownloads() throws IOException {
+    logger.info("loading tool download...");
+    JsonNode confObj = toJsonObj(TOOL_DOWNLOADS_PATTERN + TOOL_DOWNLOADS_CONF_PATTERN);
+    if (confObj != null) {
+      if (confObj.findValue("installationGuide") != null) {
+        gov.nist.hit.core.domain.Document installation = new gov.nist.hit.core.domain.Document();
+        JsonNode instructionObj = confObj.findValue("installationGuide");
+        if (instructionObj.findValue("title") == null || instructionObj.findValue("name") == null
+            || instructionObj.findValue("date") == null) {
+          throw new IllegalArgumentException(
+              "The Download installation field is missing one of those: title, link, date");
+        }
+
+        installation.setTitle(instructionObj.findValue("title").getTextValue());
+        installation.setName(instructionObj.findValue("name").getTextValue());
+        installation.setPath(TOOL_DOWNLOADS_PATTERN
+            + instructionObj.findValue("name").getTextValue());
+        installation.setDate(instructionObj.findValue("date").getTextValue());
+        installation.setType(DocumentType.INSTALLATION);
+        documentRepository.save(installation);
+      }
+
+      if (confObj.findValue("downloads") != null) {
+        JsonNode warFilesObj = confObj.findValue("downloads");
+        if (warFilesObj.isArray()) {
+          List<gov.nist.hit.core.domain.Document> docs =
+              new ArrayList<gov.nist.hit.core.domain.Document>();
+          Iterator<JsonNode> it = warFilesObj.getElements();
+          if (it != null) {
+            while (it.hasNext()) {
+              JsonNode node = it.next();
+              gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+              if (node.findValue("title") == null || node.findValue("link") == null
+                  || node.findValue("date") == null) {
+                throw new IllegalArgumentException(
+                    "The Download 'downloads' field is missing one of those: title, link, date");
+              }
+              document.setTitle(node.findValue("title").getTextValue());
+              document.setPath(node.findValue("link").getTextValue());
+              document.setDate(node.findValue("date").getTextValue());
+              document.setType(DocumentType.DELIVERABLE);
+              docs.add(document);
+            }
+            if (!docs.isEmpty()) {
+              documentRepository.save(docs);
+            }
+          }
+        }
+      }
+    }
+    logger.info("loading known issues...DONE");
+  }
 
   private Resource getLatestResource(String pathWithWilcard) throws IOException {
     List<Resource> resources = getResources(pathWithWilcard);
