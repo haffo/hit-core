@@ -171,7 +171,7 @@ public abstract class ResourcebundleLoader {
     this.loadKownIssues();
     this.loadReleaseNotes();
     this.loadResourcesDocs();
-    // this.loadToolDownloads();
+    this.loadToolDownloads();
     cachedRepository.getCachedProfiles().clear();
     cachedRepository.getCachedVocabLibraries().clear();
     cachedRepository.getCachedConstraints().clear();
@@ -1174,7 +1174,7 @@ public abstract class ResourcebundleLoader {
     doc.setMcPath(ts.getMessageContent() != null ? ts.getMessageContent().getPdfPath() : null);
     doc.setTdsPath(ts.getTestDataSpecification() != null ? ts.getTestDataSpecification()
         .getPdfPath() : null);
-    doc.setMcPath(ts.getTestStory() != null ? ts.getTestStory().getPdfPath() : null);
+    doc.setTsPath(ts.getTestStory() != null ? ts.getTestStory().getPdfPath() : null);
     doc.setTpPath(ts.getTestPackage() != null ? ts.getTestPackage().getPdfPath() : null);
     doc.setJdPath(ts.getJurorDocument() != null ? ts.getJurorDocument().getPdfPath() : null);
     return doc;
