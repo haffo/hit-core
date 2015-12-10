@@ -1,4 +1,4 @@
-package gov.nist.hit.core.transport;
+package gov.nist.hit.core.transport.exception;
 
 public class TransportServerException extends RuntimeException {
 	private static final long serialVersionUID = 1L;

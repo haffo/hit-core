@@ -1,4 +1,6 @@
-package gov.nist.hit.core.transport;
+package gov.nist.hit.core.transport.service;
+
+import gov.nist.hit.core.transport.exception.TransportClientException;
 
 public interface TransportClient {
 

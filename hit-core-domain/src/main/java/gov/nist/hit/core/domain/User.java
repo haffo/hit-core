@@ -13,15 +13,9 @@ public class User implements java.io.Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
-
-  @Column(nullable = true, unique = true)
-  protected String username;
-
+ 
   @Column(nullable = true)
-  protected String password;
-
-  @Column(nullable = true)
-  protected String facilityID; 
+  protected String accountInfo; 
   
   @Column(nullable = true)
   protected Long responseMessageId;  
@@ -34,30 +28,6 @@ public class User implements java.io.Serializable {
     this.id = id;
   }
 
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public String getFacilityID() {
-    return facilityID;
-  }
-
-  public void setFacilityID(String facilityID) {
-    this.facilityID = facilityID;
-  }
-
   public Long getResponseMessageId() {
     return responseMessageId;
   }
@@ -66,10 +36,13 @@ public class User implements java.io.Serializable {
     this.responseMessageId = responseMessageId;
   }
 
-  
-  
-  
-  
-  
+  public String getAccountInfo() {
+    return accountInfo;
+  }
 
+  public void setAccountInfo(String accountInfo) {
+    this.accountInfo = accountInfo;
+  }
+
+  
 }

@@ -1,4 +1,4 @@
-package gov.nist.hit.core.transport;
+package gov.nist.hit.core.transport.model;
 
 public class MessageExchanged {
   
