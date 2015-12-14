@@ -31,6 +31,7 @@ import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepTestingType;
 import gov.nist.hit.core.domain.TestingStage;
+import gov.nist.hit.core.domain.TransportForms;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.AppInfoRepository;
 import gov.nist.hit.core.repo.ConstraintsRepository;
@@ -41,6 +42,7 @@ import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
 import gov.nist.hit.core.repo.TestObjectRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
 import gov.nist.hit.core.service.util.ResourcebundleHelper;
@@ -117,6 +119,8 @@ public abstract class ResourcebundleLoader {
   public static final String MESSAGECONTENT_INFO_PATTERN = "MessageContentInfo.html";
   public static final String TOOL_DOWNLOADS_PATTERN = "Documentation/Downloads/";
   public static final String TOOL_DOWNLOADS_CONF_PATTERN = "Downloads.json";
+  public static final String TRANSPORT_PATTERN = "Global/Transport/";
+  public static final String TRANSPORT_CONF_PATTERN = "Transport.json";
 
   @Autowired
   IntegrationProfileRepository integrationProfileRepository;
@@ -148,6 +152,10 @@ public abstract class ResourcebundleLoader {
   @Autowired
   protected CachedRepository cachedRepository;
 
+  @Autowired
+  protected TransportFormsRepository transportFormsRepository;
+
+
   protected com.fasterxml.jackson.databind.ObjectMapper obm;
 
   public ResourcebundleLoader() {
@@ -172,6 +180,7 @@ public abstract class ResourcebundleLoader {
     this.loadReleaseNotes();
     this.loadResourcesDocs();
     this.loadToolDownloads();
+    this.loadTransport();
     cachedRepository.getCachedProfiles().clear();
     cachedRepository.getCachedVocabLibraries().clear();
     cachedRepository.getCachedConstraints().clear();
@@ -322,6 +331,42 @@ public abstract class ResourcebundleLoader {
     logger.info("loading user documents...DONE");
   }
 
+
+  private void loadTransport() throws IOException {
+    logger.info("loading protocols info...");
+    JsonNode json = toJsonObj(TRANSPORT_PATTERN + TRANSPORT_CONF_PATTERN);
+    if (json != null) {
+      List<TransportForms> transportForms = new ArrayList<TransportForms>();
+      if (json.isArray()) {
+        Iterator<JsonNode> it = json.getElements();
+        while (it.hasNext()) {
+          JsonNode node = it.next();
+          if (node.findValue("protocol") != null && node.findValue("domain") != null
+              && node.findValue("forms") != null) {
+            TransportForms tForms = new TransportForms();
+            tForms.setDomain(node.findValue("domain").getTextValue());
+            tForms.setProtocol(node.findValue("protocol").getTextValue());
+            JsonNode forms = node.findValue("forms");
+            if (forms.get("TA_INITIATOR") == null || forms.get("SUT_INITIATOR") == null) {
+              throw new RuntimeException(
+                  "Transport.json TA_INITIATOR or SUT_INITIATOR form is missing");
+            }
+            tForms.setTaInitiatorForm(FileUtil.getContent(getResource(TRANSPORT_PATTERN
+                + forms.get("TA_INITIATOR").getTextValue())));
+            tForms.setSutInitiatorForm(FileUtil.getContent(getResource(TRANSPORT_PATTERN
+                + forms.get("SUT_INITIATOR").getTextValue())));
+            transportForms.add(tForms);
+          }
+        }
+        if (!transportForms.isEmpty()) {
+          transportFormsRepository.save(transportForms);
+        }
+      } else {
+        throw new RuntimeException("Transport.json file content must be an array");
+      }
+    }
+    logger.info("loading protocols info...DONE");
+  }
 
   private void loadResourcesDocs() throws IOException {
     logger.info("loading resource documents...");
@@ -814,6 +859,8 @@ public abstract class ResourcebundleLoader {
     tc.setJurorDocument(jurorDocument(location));
     tc.setMessageContent(messageContent(location));
     tc.setTestDataSpecification(testDataSpecification(location));
+    tc.setDomain(testCaseObj.findValue("domain") != null ? testCaseObj.findValue("domain")
+        .getTextValue() : null);
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").getIntValue());
     }
@@ -844,6 +891,8 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testStepObj = mapper.readTree(descriptorContent);
     testStep.setName(testStepObj.findValue("name").getTextValue());
+    testStep.setProtocol(testStepObj.findValue("protocol") != null ? testStepObj.findValue(
+        "protocol").getTextValue() : null);
     testStep.setDescription(testStepObj.findValue("description").getTextValue());
     JsonNode ttypeObj = testStepObj.findValue("type");
     String tttypeValue = ttypeObj != null ? ttypeObj.getTextValue() : null;

@@ -12,206 +12,80 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.api.util.UserCommand;
+import gov.nist.hit.core.domain.Document;
+import gov.nist.hit.core.domain.DocumentType;
+import gov.nist.hit.core.domain.Json;
+import gov.nist.hit.core.domain.KeyValuePair;
+import gov.nist.hit.core.domain.MessageModel;
+import gov.nist.hit.core.domain.MessageParserCommand;
+import gov.nist.hit.core.domain.MessageValidationCommand;
+import gov.nist.hit.core.domain.MessageValidationResult;
+import gov.nist.hit.core.domain.TestStepTestingType;
 import gov.nist.hit.core.domain.TestingStage;
-import gov.nist.hit.core.domain.TestCase;
-import gov.nist.hit.core.domain.TestPlan;
-import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransactionStatus;
+import gov.nist.hit.core.domain.TransportConfig;
+import gov.nist.hit.core.domain.SendRequest;
 import gov.nist.hit.core.domain.User;
-import gov.nist.hit.core.repo.TestCaseRepository;
-import gov.nist.hit.core.repo.TestPlanRepository;
-import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.repo.TransactionRepository;
+import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.repo.UserRepository;
-import gov.nist.hit.core.service.TestCaseService;
-import gov.nist.hit.core.service.TestPlanService;
+import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.service.TestStepService;
-import gov.nist.hit.core.service.exception.DuplicateTokenIdException;
+import gov.nist.hit.core.service.TransportConfigService;
+import gov.nist.hit.core.service.exception.MessageParserException;
+import gov.nist.hit.core.service.exception.MessageValidationException;
+import gov.nist.hit.core.service.exception.TestCaseException;
+import gov.nist.hit.core.service.exception.UserNotFoundException;
 import gov.nist.hit.core.service.exception.UserTokenIdNotFoundException;
-import gov.nist.hit.iz.domain.SecurityFaultCredentials;
-import gov.nist.hit.iz.repo.SOAPSecurityFaultCredentialsRepository;
-import gov.nist.hit.iz.web.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Harold Affo (NIST)
+ * 
  */
 @RequestMapping("/transport")
 @RestController
-public class TransportController {
+public  class TransportController {
 
-  static final Logger logger = LoggerFactory.getLogger(TransportController.class);
-  
-  
-  @Autowired
-  protected UserRepository userRepository;
-
+  static final Logger logger = LoggerFactory.getLogger(DocumentationController.class);
 
   @Autowired
-  protected TransactionRepository transactionRepository;
+  private TransportFormsRepository transportFormsRepository;
 
-  @Transactional()
-  @RequestMapping(value = "/open", method = RequestMethod.POST)
-  public boolean initIncoming(@RequestBody final User user) throws UserTokenIdNotFoundException {
-    logger.info("Initializing transport for username ... " + user.getId());
-    Transaction transaction = transaction(user);
-    if (transaction != null) {
-      setResponseMessageId(transaction.getUser(), user.getResponseMessageId());
-      transaction.init();;
-      transactionRepository.saveAndFlush(transaction);
-      return true;
-    }
-    return false;
+  @Cacheable(value = "transportCache", key = "#type.name() + '-' + #protocol +  '-' + #domain + '-form'")
+  @RequestMapping(value = "/form", method = RequestMethod.GET)
+  public Json form(@RequestParam("type") TestStepTestingType type,@RequestParam("protocol") String protocol,@RequestParam("domain") String domain ) {
+    String content = null;
+    if(TestStepTestingType.SUT_INITIATOR.equals(type)){
+      content = transportFormsRepository.getSutInitiatorFormByProtocolAndDomain(protocol, domain);
+    }else if(TestStepTestingType.TA_INITIATOR.equals(type)){
+      content = transportFormsRepository.getTaInitiatorFormByProtocolAndDomain(protocol, domain);
+    }   
+    logger.info("Fetching "+  type + " form of domain=" + domain + " and protocol=" + protocol);
+    return new Json(content);
   }
-
-  private void setResponseMessageId(User user, Long messageId) {
-    user.setResponseMessageId(messageId);
-    userRepository.save(user);
-  }
-
-  @Transactional()
-  @RequestMapping(value = "/close", method = RequestMethod.POST)
-  public boolean clearIncoming(@RequestBody final User user) {
-    logger.info("Closing transport for username... " + user.getId());
-    Transaction transaction = transaction(user);
-    if (transaction != null) {
-      setResponseMessageId(transaction.getUser(), null);
-      transaction.close();
-      transactionRepository.saveAndFlush(transaction);
-    }
-    return true;
-  }
-
-  @RequestMapping(method = RequestMethod.POST)
-  public Transaction transaction(@RequestBody final User user) {
-//    logger.info("Get transaction of username ... " + user.getId());
-//    Transaction transaction =
-//        transactionRepository.findByUsernameAndPasswordAndFacilityID(user.getUsername(),
-//            user.getPassword(), user.getFacilityID());
-//    return transaction != null ? transaction : new Transaction();
-    
-    return null;
-  }
+  
+  
 
 
- 
-  public TransactionRepository getTransactionRepository() {
-    return transactionRepository;
-  }
-
-  public void setTransactionRepository(TransactionRepository transactionRepository) {
-    this.transactionRepository = transactionRepository;
-  }
-
-  @ResponseBody
-  @ExceptionHandler(UserTokenIdNotFoundException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String facilityIdNotFound(UserTokenIdNotFoundException ex) {
-    logger.debug(ex.getMessage());
-    return ex.getMessage();
-  }
-
-  @ResponseBody
-  @ExceptionHandler(DuplicateTokenIdException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String DuplicateFacilityIdException(DuplicateTokenIdException ex) {
-    logger.debug(ex.getMessage());
-    return ex.getMessage();
-  }
-
-  @Transactional()
-  @RequestMapping(value = "/{format}/{protocole}/init/{userId}", method = RequestMethod.POST)
-  public UserCommand initUser(@PathVariable("format") String format,@PathVariable("protocole") String protocole,@PathVariable("userId") String userId, HttpServletRequest request) {
-    logger.info("Fetching user information ... ");
-    User user = null;
-    Long id = command.getId();
-
-    if (id == null) {
-      user = new User();
-      userRepository.saveAndFlush(user);
-    } else {
-      user = userRepository.findOne(id);
-    }
-
-    // create a guest user if no token found
-    if (user.getPassword() == null && user.getUsername() == null) { // Guest
-      user.setUsername("vendor_" + user.getId());
-      user.setPassword("vendor_" + user.getId());
-      user.setFacilityID("vendor_" + user.getId());
-      userRepository.saveAndFlush(user);
-    }
-
-    Long userId = user.getId();
-    SecurityFaultCredentials faultCredentials =
-        securityFaultCredentialsRepository.findOneByUserId(user.getId());
-    if (faultCredentials == null) {
-      faultCredentials = new SecurityFaultCredentials();
-      faultCredentials.setFaultUsername("faultUser_" + userId);
-      faultCredentials.setFaultPassword("faultPwd_" + userId);
-      faultCredentials.setUser(user);
-      securityFaultCredentialsRepository.saveAndFlush(faultCredentials);
-    }
-
-    Transaction transaction = transactionRepository.findOneByUserId(userId);
-    if (transaction == null) {
-      transaction = new Transaction();
-      transaction.setUser(user);
-    }
-    transaction.setStatus(TransactionStatus.CLOSE);
-    transactionRepository.saveAndFlush(transaction);
-
-    // User user = null;
-    // List<User> users = userRepository.findAll();
-    // if (users == null || users.isEmpty()) {
-    // user = new User();
-    // user.setUsername("pilot");
-    // user.setPassword("pilot");
-    // user.setFacilityID("pilot");
-    // userRepository.saveAndFlush(user);
-    // } else {
-    // user = users.get(0);
-    // }
-    // Long userId = user.getId();
-    // SecurityFaultCredentials faultCredentials =
-    // securityFaultCredentialsRepository.findOneByUserId(user.getId());
-    // if (faultCredentials == null) {
-    // faultCredentials = new SecurityFaultCredentials();
-    // faultCredentials.setFaultUsername("pilot");
-    // faultCredentials.setFaultPassword("pilot");
-    // faultCredentials.setUser(user);
-    // securityFaultCredentialsRepository.saveAndFlush(faultCredentials);
-    // }
-    // Transaction transaction = transactionRepository.findOneByUserId(userId);
-    // if (transaction == null) {
-    // transaction = new Transaction();
-    // transaction.setUser(user);
-    // }
-    // transaction.setStatus(TransactionStatus.CLOSE);
-    // transactionRepository.saveAndFlush(transaction);
-    return new UserCommand(user.getUsername(), user.getPassword(),
-        faultCredentials.getFaultUsername(), faultCredentials.getFaultPassword(),
-        user.getFacilityID(), Utils.getUrl(request) + "/ws/iisService");
-  }
-
- 
 }

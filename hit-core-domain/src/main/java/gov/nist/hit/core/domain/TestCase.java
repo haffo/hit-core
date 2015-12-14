@@ -49,6 +49,9 @@ public class TestCase extends AbstractTestCase implements Serializable {
       inverseJoinColumns = {@JoinColumn(name = "teststep_id")})
   private List<TestStep> testSteps = new ArrayList<TestStep>();
 
+  
+  private String domain;
+  
   public Long getId() {
     return id;
   }
@@ -71,6 +74,14 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   public void setTestingType(TestCaseTestingType testingType) {
     this.testingType = testingType;
+  }
+
+  public String getDomain() {
+    return domain;
+  }
+
+  public void setDomain(String domain) {
+    this.domain = domain;
   }
 
   

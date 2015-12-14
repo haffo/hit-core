@@ -12,6 +12,6 @@ public interface TransportClient {
 	 * @return
 	 * @throws TransportClientException
 	 */
-	String send(String meessage, Object... arguments)
+	String send(String meessage, String... arguments)
 			throws TransportClientException;
 }

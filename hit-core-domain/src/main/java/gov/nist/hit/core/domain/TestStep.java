@@ -26,7 +26,10 @@ public class TestStep extends AbstractTestCase implements Serializable {
  
   @NotNull
   @Enumerated(EnumType.STRING)
-  private TestStepTestingType testingType; 
+  private TestStepTestingType testingType;  
+  
+  private String protocol;
+  
   
   public TestStep() {
     super();
@@ -64,6 +67,14 @@ public class TestStep extends AbstractTestCase implements Serializable {
 
   public void setTestingType(TestStepTestingType testingType) {
     this.testingType = testingType;
+  }
+
+  public String getProtocol() {
+    return protocol;
+  }
+
+  public void setProtocol(String protocol) {
+    this.protocol = protocol;
   }
 
   

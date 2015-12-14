@@ -11,69 +11,75 @@
 
 package gov.nist.hit.core.domain;
 
+import java.util.Map;
+
 
 /**
  * @author Harold Affo (NIST)
  * 
  */
-public class TransactionCommand extends Command {
+public class TransportResponse {
 
 	private static final long serialVersionUID = 1L; 
 	
-	
-	protected String incoming;
-	protected String outgoing;
-	protected String u; // username
-	protected String p; // password
-	protected String facilityId;
+	private Long testStepId; 
+	private String outgoingMessage;
+	private String incomingMessage;
 
-	public TransactionCommand() {
+ 
+
+	public TransportResponse() {
 		super();
 	}
 
-	public TransactionCommand(String outgoing, String incoming) {
-		this.incoming = incoming;
-		this.outgoing = outgoing;
-	}
 
-	public String getIncoming() {
-		return incoming;
-	}
 
-	public void setIncoming(String incoming) {
-		this.incoming = incoming;
-	}
+  public TransportResponse(Long testStepId, String outgoingMessage, String incomingMessage) {
+    super();
+    this.testStepId = testStepId;
+    this.outgoingMessage = outgoingMessage;
+    this.incomingMessage = incomingMessage;
+  }
 
-	public String getOutgoing() {
-		return outgoing;
-	}
 
-	public void setOutgoing(String outgoing) {
-		this.outgoing = outgoing;
-	}
 
-	public String getU() {
-		return u;
-	}
+  public Long getTestStepId() {
+    return testStepId;
+  }
 
-	public void setU(String u) {
-		this.u = u;
-	}
 
-	public String getP() {
-		return p;
-	}
 
-	public void setP(String p) {
-		this.p = p;
-	}
+  public void setTestStepId(Long testStepId) {
+    this.testStepId = testStepId;
+  }
 
-	public String getFacilityId() {
-		return facilityId;
-	}
 
-	public void setFacilityId(String facilityId) {
-		this.facilityId = facilityId;
-	}
+
+  public String getOutgoingMessage() {
+    return outgoingMessage;
+  }
+
+
+
+  public void setOutgoingMessage(String outgoingMessage) {
+    this.outgoingMessage = outgoingMessage;
+  }
+
+
+
+  public String getIncomingMessage() {
+    return incomingMessage;
+  }
+
+
+
+  public void setIncomingMessage(String incomingMessage) {
+    this.incomingMessage = incomingMessage;
+  }
+
+
+   
+
+	 
 
 }

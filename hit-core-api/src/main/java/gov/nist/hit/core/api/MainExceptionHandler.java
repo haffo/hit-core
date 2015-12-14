@@ -20,6 +20,7 @@ import gov.nist.hit.core.service.exception.MessageUploadException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.exception.TestCaseException;
+import gov.nist.hit.core.service.exception.UserNotFoundException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import gov.nist.hit.core.service.exception.XmlFormatterException;
 import gov.nist.hit.core.service.exception.XmlParserException;
@@ -177,6 +178,13 @@ public class MainExceptionHandler {
     return "Invalid input.\n";
   } 
   
+  @ResponseBody
+  @ExceptionHandler(UserNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public String userNotFoundException(UserNotFoundException ex) {
+    logger.error(ex.getMessage(), ex);
+    return "User not found.\n";
+  } 
   
   
   

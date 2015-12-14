@@ -11,69 +11,72 @@
 
 package gov.nist.hit.core.domain;
 
+import java.util.Map;
+
 
 /**
  * @author Harold Affo (NIST)
  * 
  */
-public class TransactionCommand extends Command {
+public class SendRequest {
 
 	private static final long serialVersionUID = 1L; 
 	
-	
-	protected String incoming;
-	protected String outgoing;
-	protected String u; // username
-	protected String p; // password
-	protected String facilityId;
+	private Map<String, String> config;
+	private Long testStepId; 
+	private String message;
+	private Long userId;
 
-	public TransactionCommand() {
+	public SendRequest() {
 		super();
 	}
 
-	public TransactionCommand(String outgoing, String incoming) {
-		this.incoming = incoming;
-		this.outgoing = outgoing;
-	}
 
-	public String getIncoming() {
-		return incoming;
-	}
+  
+  public Map<String, String> getConfig() {
+    return config;
+  }
 
-	public void setIncoming(String incoming) {
-		this.incoming = incoming;
-	}
 
-	public String getOutgoing() {
-		return outgoing;
-	}
 
-	public void setOutgoing(String outgoing) {
-		this.outgoing = outgoing;
-	}
+  public void setConfig(Map<String, String> config) {
+    this.config = config;
+  }
 
-	public String getU() {
-		return u;
-	}
 
-	public void setU(String u) {
-		this.u = u;
-	}
 
-	public String getP() {
-		return p;
-	}
+  public Long getTestStepId() {
+    return testStepId;
+  }
 
-	public void setP(String p) {
-		this.p = p;
-	}
 
-	public String getFacilityId() {
-		return facilityId;
-	}
+  public void setTestStepId(Long testStepId) {
+    this.testStepId = testStepId;
+  }
 
-	public void setFacilityId(String facilityId) {
-		this.facilityId = facilityId;
-	}
+
+  public String getMessage() {
+    return message;
+  }
+
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+
+
+  public Long getUserId() {
+    return userId;
+  }
+
+
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
+
+  
+	 
 
 }
