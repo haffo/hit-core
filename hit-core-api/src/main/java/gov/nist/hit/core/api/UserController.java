@@ -28,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -42,9 +43,13 @@ public class UserController {
   private UserRepository userRepository;
 
   @RequestMapping(value = "/create", method = RequestMethod.POST)
-  public User create() {
-    User user = new User();
-    userRepository.saveAndFlush(user);
-    return user;
+  public User create(@RequestParam("userId") Long userId) {
+     User  user = new User();
+     userRepository.saveAndFlush(user);
+     return user;
   }
+  
+ 
+  
+  
 }

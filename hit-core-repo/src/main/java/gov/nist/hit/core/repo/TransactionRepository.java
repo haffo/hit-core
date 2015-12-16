@@ -1,7 +1,9 @@
 package gov.nist.hit.core.repo;
 
 
+import gov.nist.hit.core.domain.KeyValuePair;
 import gov.nist.hit.core.domain.Transaction;
+import gov.nist.hit.core.domain.TransactionStatus;
 
 import java.util.List;
 
@@ -26,9 +28,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
   @Query("select transaction from Transaction transaction where transaction.user.id = :userId")
   List<Transaction> findAllByUser(@Param("userId") Long userId);
 
-  // @Query("select transaction from Transaction transaction where transaction.transportAccount.matches(:criteria)")
-  // Transaction findOneByCriteria(@Param("criteria") List<KeyValuePair> criteria);
-  //
+  @Query("select transaction from Transaction transaction where transaction.testStep.id == :testStepId and transaction.matches(:criteria)")
+  Transaction findOneByTestStepIdAndCriteria(@Param("criteria") List<KeyValuePair> criteria,
+      Long testStepId);
+
+  @Query("select transaction from Transaction transaction where transaction.testStep.id == :testStepId and transaction.matches(:criteria)")
+  Transaction findOneByCriteria(@Param("criteria") List<KeyValuePair> criteria);
+
+  @Query("select transaction.status from Transaction transaction where transaction.testStep.id == :testStepId and transaction.matches(:criteria)")
+  TransactionStatus getStatusByCriteria(@Param("criteria") List<KeyValuePair> criteria);
+
+
   // @Query("select transaction from Transaction transaction where transaction.transportAccount.id = :transportAccountId")
   // Transaction findOneByUserId(@Param("transportAccountId") Long transportAccountId);
   //

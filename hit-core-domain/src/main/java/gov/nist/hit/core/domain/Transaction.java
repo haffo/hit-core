@@ -12,8 +12,13 @@
 
 package gov.nist.hit.core.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -22,6 +27,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -53,8 +59,18 @@ public class Transaction implements java.io.Serializable {
   
   @JsonIgnore
   @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
-  protected User user;
-
+  protected User user; 
+  
+  @ElementCollection
+  @CollectionTable(name = "TRANSACTION_CONFIG")
+  @MapKeyColumn(name = "PROPERTY_KEY")
+  @Column(name = "PROPERTY_VALUE")
+  protected Map<String, String> config;
+  
+  @Column(nullable = true)
+  protected Long responseMessageId;
+  
+ 
   public Transaction() {
     super();
     status = TransactionStatus.CLOSE;
@@ -127,8 +143,30 @@ public class Transaction implements java.io.Serializable {
   public void setUser(User user) {
     this.user = user;
   }
+
+  public Map<String, String> getConfig() {
+    return config;
+  }
+
+  public void setConfig(Map<String, String> config) {
+    this.config = config;
+  }
   
-  
+  public Long getResponseMessageId() {
+    return responseMessageId;
+  }
+
+  public void setResponseMessageId(Long responseMessageId) {
+    this.responseMessageId = responseMessageId;
+  }
+
+  public boolean matches(KeyValuePair pair, TestStepTestingType type) {
+    if(config != null){return pair.getKey() != null && config.containsKey(pair.getKey())
+        && config.get(pair.getKey()).equals(pair.getValue());
+    }
+    return false;
+  }
+ 
   
   
   

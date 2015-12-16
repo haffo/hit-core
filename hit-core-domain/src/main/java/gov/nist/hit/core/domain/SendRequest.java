@@ -26,6 +26,7 @@ public class SendRequest {
 	private Long testStepId; 
 	private String message;
 	private Long userId;
+    private Long responseMessageId;
 
 	public SendRequest() {
 		super();
@@ -74,6 +75,18 @@ public class SendRequest {
 
   public void setUserId(Long userId) {
     this.userId = userId;
+  }
+
+
+
+  public Long getResponseMessageId() {
+    return responseMessageId;
+  }
+
+
+
+  public void setResponseMessageId(Long responseMessageId) {
+    this.responseMessageId = responseMessageId;
   }
 
   

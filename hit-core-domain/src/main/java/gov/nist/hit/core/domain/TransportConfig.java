@@ -105,7 +105,7 @@ public class TransportConfig {
   }
 
   public Map<String, String> getConfigInfo(TestStepTestingType type) {
-    return type == TestStepTestingType.SUT_INITIATOR ? taInitiator
+    return type == TestStepTestingType.SUT_INITIATOR ? sutInitiator
         : type == TestStepTestingType.TA_INITIATOR ? taInitiator
             : new HashMap<String, String>();
   }

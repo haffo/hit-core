@@ -20,6 +20,7 @@ import gov.nist.hit.core.domain.MessageModel;
 import gov.nist.hit.core.domain.MessageParserCommand;
 import gov.nist.hit.core.domain.MessageValidationCommand;
 import gov.nist.hit.core.domain.MessageValidationResult;
+import gov.nist.hit.core.domain.SaveConfigRequest;
 import gov.nist.hit.core.domain.TestStepTestingType;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.Transaction;
@@ -71,6 +72,10 @@ public  class TransportController {
 
   @Autowired
   private TransportFormsRepository transportFormsRepository;
+  
+  @Autowired
+  private TransportConfigRepository transportConfigRepository;
+  
 
   @Cacheable(value = "transportCache", key = "#type.name() + '-' + #protocol +  '-' + #domain + '-form'")
   @RequestMapping(value = "/form", method = RequestMethod.GET)
@@ -83,6 +88,19 @@ public  class TransportController {
     }   
     logger.info("Fetching "+  type + " form of domain=" + domain + " and protocol=" + protocol);
     return new Json(content);
+  }
+  
+  @RequestMapping(value = "/config/save", method = RequestMethod.POST)
+  public void saveConfig(SaveConfigRequest request) {
+    TransportConfig config = transportConfigRepository.findOneByUserAndProtocolAndDomain(request.getUserId(), request.getProtocol(), request.getDomain());
+    if(config != null){
+      if(TestStepTestingType.SUT_INITIATOR.equals(request.getType())){
+        config.setSutInitiator(request.getConfig());
+      }else if(TestStepTestingType.TA_INITIATOR.equals(request.getType())){
+        config.setTaInitiator(request.getConfig());
+      }
+      transportConfigRepository.save(config);
+    }
   }
   
   
