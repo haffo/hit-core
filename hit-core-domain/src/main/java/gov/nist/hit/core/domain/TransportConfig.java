@@ -27,11 +27,11 @@ public class TransportConfig {
 
   @Column(name = "PROTOCOL")
   private String protocol;
-  
-  
+
+
   @Column(name = "DOMAIN")
   private String domain;
-  
+
 
   @ElementCollection
   @CollectionTable(name = "SUT_INITIATOR_CONFIG")
@@ -46,7 +46,7 @@ public class TransportConfig {
   protected Map<String, String> taInitiator;
 
   @JsonIgnore
-  @ManyToOne(cascade=CascadeType.ALL)  
+  @ManyToOne(cascade = CascadeType.ALL)
   protected User user;
 
   public TransportConfig() {
@@ -88,8 +88,7 @@ public class TransportConfig {
   public boolean matches(List<KeyValuePair> pairs, TestStepTestingType type) {
     if (!pairs.isEmpty()) {
       for (KeyValuePair pair : pairs) {
-        boolean val = matches(pair, type);
-        if (!val) {
+        if (!matches(pair, type)) {
           return false;
         }
       }
@@ -106,8 +105,7 @@ public class TransportConfig {
 
   public Map<String, String> getConfigInfo(TestStepTestingType type) {
     return type == TestStepTestingType.SUT_INITIATOR ? sutInitiator
-        : type == TestStepTestingType.TA_INITIATOR ? taInitiator
-            : new HashMap<String, String>();
+        : type == TestStepTestingType.TA_INITIATOR ? taInitiator : new HashMap<String, String>();
   }
 
 
@@ -139,9 +137,6 @@ public class TransportConfig {
   public void setDomain(String domain) {
     this.domain = domain;
   }
-
-
-  
 
 
 
