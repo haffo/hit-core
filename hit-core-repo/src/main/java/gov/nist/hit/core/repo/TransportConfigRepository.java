@@ -16,11 +16,11 @@ public interface TransportConfigRepository extends JpaRepository<TransportConfig
   TransportConfig findOneByUserAndProtocolAndDomain(@Param("userId") Long userId,
       @Param("protocol") String protocol, @Param("domain") String domain);
 
-  @Query("select config from TransportConfig config where config.matches(criteria,type) == true")
+  @Query("select config from TransportConfig config where config.matches(:criteria,:type) = true")
   TransportConfig findOneByCriteria(@Param("criteria") KeyValuePair criteria,
       @Param("type") TestStepTestingType type);
 
-  @Query("select config from TransportConfig config where config.matches(criteria,type) == true")
+  @Query("select config from TransportConfig config where config.matches(:criteria,:type) = true")
   TransportConfig findOneByOneMultipleCriteria(@Param("criteria") List<KeyValuePair> criteria,
       @Param("type") TestStepTestingType type);
 
