@@ -24,8 +24,7 @@ public interface TransportConfigService {
    * 
    * @return
    */
-  public TransportConfig findOneByUserAndProtocolAndDomain(Long userId, String protocol,
-      String domain);
+  public TransportConfig findOneByUserAndProtocol(Long userId, String protocol);
 
 
   /**

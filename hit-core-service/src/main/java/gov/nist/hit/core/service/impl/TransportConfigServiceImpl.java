@@ -93,10 +93,10 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
 
   @Override
-  public TransportConfig findOneByUserAndProtocolAndDomain(Long userId, String protocol,
-      String domain) {
-    return transportConfigRepository.findOneByUserAndProtocolAndDomain(userId, protocol, domain);
+  public TransportConfig findOneByUserAndProtocol(Long userId, String protocol) {
+    return transportConfigRepository.findOneByUserAndProtocol(userId, protocol);
   }
+
 
   public TransportConfigRepository getTransportConfigRepository() {
     return transportConfigRepository;

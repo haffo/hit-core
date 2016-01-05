@@ -27,6 +27,7 @@ import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransactionStatus;
 import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.SendRequest;
+import gov.nist.hit.core.domain.TransportFormContent;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.repo.TransactionRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
@@ -77,22 +78,22 @@ public  class TransportController {
   private TransportConfigRepository transportConfigRepository;
   
 
-  @Cacheable(value = "transportCache", key = "#type.name() + '-' + #protocol +  '-' + #domain + '-form'")
-  @RequestMapping(value = "/form", method = RequestMethod.GET)
-  public Json form(@RequestParam("type") TestStepTestingType type,@RequestParam("protocol") String protocol,@RequestParam("domain") String domain ) {
+  //@Cacheable(value = "transportCache", key = "#type.name() + '-' + #protocol +  '-' + #domain + '-form'")
+  @RequestMapping(value = "/config/form", method = RequestMethod.GET)
+  public TransportFormContent form(@RequestParam("type") TestStepTestingType type,@RequestParam("protocol") String protocol ) {
     String content = null;
     if(TestStepTestingType.SUT_INITIATOR.equals(type)){
-      content = transportFormsRepository.getSutInitiatorFormByProtocolAndDomain(protocol, domain);
+      content = transportFormsRepository.getSutInitiatorFormByProtocol(protocol);
     }else if(TestStepTestingType.TA_INITIATOR.equals(type)){
-      content = transportFormsRepository.getTaInitiatorFormByProtocolAndDomain(protocol, domain);
+      content = transportFormsRepository.getTaInitiatorFormByProtocol(protocol);
     }   
-    logger.info("Fetching "+  type + " form of domain=" + domain + " and protocol=" + protocol);
-    return new Json(content);
+    logger.info("Fetching  form of type="+  type + " and protocol=" + protocol);
+    return new TransportFormContent(content);
   }
   
   @RequestMapping(value = "/config/save", method = RequestMethod.POST)
-  public void saveConfig(SaveConfigRequest request) {
-    TransportConfig config = transportConfigRepository.findOneByUserAndProtocolAndDomain(request.getUserId(), request.getProtocol(), request.getDomain());
+  public boolean saveConfig(@RequestBody SaveConfigRequest request) {
+    TransportConfig config = transportConfigRepository.findOneByUserAndProtocol(request.getUserId(), request.getProtocol());
     if(config != null){
       if(TestStepTestingType.SUT_INITIATOR.equals(request.getType())){
         config.setSutInitiator(request.getConfig());
@@ -101,6 +102,7 @@ public  class TransportController {
       }
       transportConfigRepository.save(config);
     }
+    return true;
   }
   
   

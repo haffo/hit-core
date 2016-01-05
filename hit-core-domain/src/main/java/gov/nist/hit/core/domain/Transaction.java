@@ -13,6 +13,7 @@
 package gov.nist.hit.core.domain;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
@@ -61,11 +62,11 @@ public class Transaction implements java.io.Serializable {
   @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
   protected User user; 
   
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "TRANSACTION_CONFIG")
   @MapKeyColumn(name = "PROPERTY_KEY")
   @Column(name = "PROPERTY_VALUE")
-  protected Map<String, String> config;
+  protected Map<String, String> config = new HashMap<String, String>();
   
   @Column(nullable = true)
   protected Long responseMessageId;
@@ -160,13 +161,26 @@ public class Transaction implements java.io.Serializable {
     this.responseMessageId = responseMessageId;
   }
 
-  public boolean matches(KeyValuePair pair, TestStepTestingType type) {
-    if(config != null){return pair.getKey() != null && config.containsKey(pair.getKey())
+  public boolean matches(KeyValuePair pair) {
+    if(config != null){
+      return pair.getKey() != null && config.containsKey(pair.getKey())
         && config.get(pair.getKey()).equals(pair.getValue());
     }
     return false;
   }
  
+  public boolean matches(List<KeyValuePair> pairs) {
+    if (!pairs.isEmpty()) {
+      for (KeyValuePair pair : pairs) {
+        if (!matches(pair)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
   
   
   

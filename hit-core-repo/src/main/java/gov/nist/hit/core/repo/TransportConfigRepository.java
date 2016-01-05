@@ -12,16 +12,22 @@ import org.springframework.data.repository.query.Param;
 
 public interface TransportConfigRepository extends JpaRepository<TransportConfig, Long> {
 
-  @Query("select config from TransportConfig config where config.user.id = :userId and config.protocol = :protocol and config.domain = :domain")
-  TransportConfig findOneByUserAndProtocolAndDomain(@Param("userId") Long userId,
-      @Param("protocol") String protocol, @Param("domain") String domain);
+  @Query("select tconfig from TransportConfig tconfig where tconfig.user.id = :userId and tconfig.protocol = :protocol")
+  TransportConfig findOneByUserAndProtocol(@Param("userId") Long userId,
+      @Param("protocol") String protocol);
 
-  @Query("select config from TransportConfig config where config.matches(:criteria,:type) = true")
+  @Query("select tconfig from TransportConfig tconfig where tconfig.matches(:criteria,:type) = true")
   TransportConfig findOneByCriteria(@Param("criteria") KeyValuePair criteria,
       @Param("type") TestStepTestingType type);
 
-  @Query("select config from TransportConfig config where config.matches(:criteria,:type) = true")
+  @Query("select tconfig from TransportConfig tconfig where tconfig.matches(:criteria,:type) = true")
   TransportConfig findOneByOneMultipleCriteria(@Param("criteria") List<KeyValuePair> criteria,
       @Param("type") TestStepTestingType type);
+
+  @Query("select tconfig from TransportConfig tconfig where tconfig.user.id = :userId")
+  List<TransportConfig> findAllByUser(@Param("userId") Long userId);
+
+  @Query("delete from TransportConfig tconfig where tconfig.user.id = :userId")
+  void deleteAllByUser(@Param("userId") Long userId);
 
 }

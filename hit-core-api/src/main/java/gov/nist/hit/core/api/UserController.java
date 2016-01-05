@@ -13,8 +13,12 @@
 package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.AppInfo;
+import gov.nist.hit.core.domain.Transaction;
+import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.repo.AppInfoRepository;
+import gov.nist.hit.core.repo.TransactionRepository;
+import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.repo.UserRepository;
 
 import java.util.Collections;
@@ -26,6 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,14 +49,37 @@ public class UserController {
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private TransportConfigRepository transportConfigRepository;
+  
+  @Autowired
+  private TransactionRepository transactionRepository;
+  
+  
+  @Transactional()
   @RequestMapping(value = "/create", method = RequestMethod.POST)
-  public User create(@RequestParam("userId") Long userId) {
-     User  user = new User();
-     userRepository.saveAndFlush(user);
-     return user;
+  public User create() {
+    User user = new User();
+    userRepository.saveAndFlush(user);
+    return user;
   }
-  
- 
-  
-  
+
+  @Modifying  
+  @Transactional
+  @RequestMapping(value = "/{userId}/delete", method = RequestMethod.POST)
+  public boolean delete(@PathVariable Long userId) {
+    List<TransportConfig> configs = transportConfigRepository.findAllByUser(userId);
+    if(configs != null){
+      transportConfigRepository.delete(configs);
+    }
+    
+    List<Transaction> transactions = transactionRepository.findAllByUser(userId);
+    if(transactionRepository != null){
+      transactionRepository.delete(transactions);
+    }
+
+    userRepository.delete(userId);
+    return true;
+  }
+
 }

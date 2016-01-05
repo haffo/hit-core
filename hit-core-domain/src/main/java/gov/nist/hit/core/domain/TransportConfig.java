@@ -27,23 +27,18 @@ public class TransportConfig {
 
   @Column(name = "PROTOCOL")
   private String protocol;
-
-
-  @Column(name = "DOMAIN")
-  private String domain;
-
-
-  @ElementCollection
+ 
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "SUT_INITIATOR_CONFIG")
   @MapKeyColumn(name = "PROPERTY_KEY")
   @Column(name = "PROPERTY_VALUE")
-  protected Map<String, String> sutInitiator;
+  protected Map<String, String> sutInitiator = new HashMap<String, String>();;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "TA_INITIATOR_CONFIG")
   @MapKeyColumn(name = "PROPERTY_KEY")
   @Column(name = "PROPERTY_VALUE")
-  protected Map<String, String> taInitiator;
+  protected Map<String, String> taInitiator = new HashMap<String, String>();;
 
   @JsonIgnore
   @ManyToOne(cascade = CascadeType.ALL)
@@ -51,8 +46,6 @@ public class TransportConfig {
 
   public TransportConfig() {
     super();
-    sutInitiator = new HashMap<String, String>();
-    taInitiator = new HashMap<String, String>();
   }
 
 
@@ -128,16 +121,7 @@ public class TransportConfig {
     this.taInitiator = taInitiator;
   }
 
-
-  public String getDomain() {
-    return domain;
-  }
-
-
-  public void setDomain(String domain) {
-    this.domain = domain;
-  }
-
+ 
 
 
 }

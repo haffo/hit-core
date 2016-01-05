@@ -341,10 +341,8 @@ public abstract class ResourcebundleLoader {
         Iterator<JsonNode> it = json.getElements();
         while (it.hasNext()) {
           JsonNode node = it.next();
-          if (node.findValue("protocol") != null && node.findValue("domain") != null
-              && node.findValue("forms") != null) {
+          if (node.findValue("protocol") != null && node.findValue("forms") != null) {
             TransportForms tForms = new TransportForms();
-            tForms.setDomain(node.findValue("domain").getTextValue());
             tForms.setProtocol(node.findValue("protocol").getTextValue());
             JsonNode forms = node.findValue("forms");
             if (forms.get("TA_INITIATOR") == null || forms.get("SUT_INITIATOR") == null) {
@@ -356,6 +354,8 @@ public abstract class ResourcebundleLoader {
             tForms.setSutInitiatorForm(FileUtil.getContent(getResource(TRANSPORT_PATTERN
                 + forms.get("SUT_INITIATOR").getTextValue())));
             transportForms.add(tForms);
+          } else {
+            throw new RuntimeException("Properties protocol or forms not found in Transport.json");
           }
         }
         if (!transportForms.isEmpty()) {
@@ -1192,7 +1192,9 @@ public abstract class ResourcebundleLoader {
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(ts.getTestContext());
     doc = initTestCaseDocument(ts, doc);
-    doc.setId(ts.getTestContext().getId());
+    if (ts.getTestContext() != null) {
+      doc.setId(ts.getTestContext().getId());
+    }
     return doc;
   }
 

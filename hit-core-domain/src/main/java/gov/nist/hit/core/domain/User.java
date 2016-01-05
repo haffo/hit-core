@@ -46,7 +46,7 @@ public class User implements java.io.Serializable {
   
   public void addConfig(TransportConfig config){
     if(config.getUser() != null)
-      throw new RuntimeException("The configuration provided belongs already to a user");
+      throw new RuntimeException("The configuration provided belongs already to another user");
 //    this.getConfigs().add(config);
     config.setUser(this);
   }
