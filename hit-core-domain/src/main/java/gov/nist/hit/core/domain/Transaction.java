@@ -30,6 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -43,39 +44,39 @@ public class Transaction implements java.io.Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
+ 
 
-  @Column(nullable = true)
-  @Enumerated(EnumType.STRING)
-  protected TransactionStatus status;
-
-  @Column(nullable = true, columnDefinition = "LONGTEXT")
+  @NotNull
+  @Column(nullable = false, columnDefinition = "LONGTEXT")
   protected String incoming;
 
-  @Column(nullable = true, columnDefinition = "LONGTEXT")
+  @NotNull
+  @Column(nullable = false, columnDefinition = "LONGTEXT")
   protected String outgoing;
   
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.DETACH, optional = false, fetch = FetchType.LAZY)
+  @OneToOne(cascade = CascadeType.DETACH, optional = true, fetch = FetchType.LAZY)
   protected TestStep testStep;
   
   @JsonIgnore
-  @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+  @OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
   protected User user; 
   
+  @JsonIgnore
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "TRANSACTION_CONFIG")
+  @CollectionTable(name="TRANSACTION_CONFIG", joinColumns=@JoinColumn(name="TRANSACTION_ID"))
   @MapKeyColumn(name = "PROPERTY_KEY")
   @Column(name = "PROPERTY_VALUE")
-  protected Map<String, String> config = new HashMap<String, String>();
+  protected Map<String, String> properties = new HashMap<String, String>();
   
+  @JsonIgnore
   @Column(nullable = true)
   protected Long responseMessageId;
   
  
   public Transaction() {
     super();
-    status = TransactionStatus.CLOSE;
-  }
+   }
 
   public Long getId() {
     return id;
@@ -106,18 +107,10 @@ public class Transaction implements java.io.Serializable {
     this.outgoing = outgoing;
   }
 
-  public TransactionStatus getStatus() {
-    return status;
-  }
-
-  public void setStatus(TransactionStatus status) {
-    this.status = status;
-  }
 
   public void close() {
     clear();
-    this.status = TransactionStatus.CLOSE;
-  }
+   }
 
   private void clear() {
     this.incoming = null;
@@ -126,8 +119,7 @@ public class Transaction implements java.io.Serializable {
 
   public void init() {
     clear();
-    this.status = TransactionStatus.OPEN;
-  }
+   }
 
   public TestStep getTestStep() {
     return testStep;
@@ -145,14 +137,15 @@ public class Transaction implements java.io.Serializable {
     this.user = user;
   }
 
-  public Map<String, String> getConfig() {
-    return config;
+ 
+  public Map<String, String> getProperties() {
+    return properties;
   }
 
-  public void setConfig(Map<String, String> config) {
-    this.config = config;
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
   }
-  
+
   public Long getResponseMessageId() {
     return responseMessageId;
   }
@@ -161,24 +154,31 @@ public class Transaction implements java.io.Serializable {
     this.responseMessageId = responseMessageId;
   }
 
-  public boolean matches(KeyValuePair pair) {
-    if(config != null){
-      return pair.getKey() != null && config.containsKey(pair.getKey())
-        && config.get(pair.getKey()).equals(pair.getValue());
+  public boolean matches(String key, String value) {
+    if(properties != null){
+      return key != null && properties.containsKey(key)
+        && properties.get(key).equals(value);
     }
     return false;
   }
  
-  public boolean matches(List<KeyValuePair> pairs) {
-    if (!pairs.isEmpty()) {
-      for (KeyValuePair pair : pairs) {
-        if (!matches(pair)) {
+  public boolean matches(Map<String, String> criteria) {
+     if (!criteria.isEmpty()) {
+      for(String key: criteria.keySet()){
+        if (!matches(key, criteria.get(key))) {
           return false;
-        }
+        } 
       }
       return true;
     }
     return false;
+  }
+
+  @Override
+  public String toString() {
+    return "Transaction [id=" + id + ", incoming=" + incoming
+        + ", outgoing=" + outgoing + ", testStep=" + testStep + ", user=" + user + ", properties="
+        + properties + ", responseMessageId=" + responseMessageId + "]";
   }
 
   

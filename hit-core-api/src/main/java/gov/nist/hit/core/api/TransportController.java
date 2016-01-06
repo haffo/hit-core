@@ -77,6 +77,9 @@ public  class TransportController {
   @Autowired
   private TransportConfigRepository transportConfigRepository;
   
+  @Autowired
+  private TransactionRepository transactionRepository;
+  
 
   //@Cacheable(value = "transportCache", key = "#type.name() + '-' + #protocol +  '-' + #domain + '-form'")
   @RequestMapping(value = "/config/form", method = RequestMethod.GET)
@@ -102,6 +105,12 @@ public  class TransportController {
       }
       transportConfigRepository.save(config);
     }
+    return true;
+  }
+  
+  @RequestMapping(value = "/transaction/{transactionId}/delete", method = RequestMethod.POST)
+  public boolean deleteTransaction(@PathVariable Long transactionId) {
+    transactionRepository.delete(transactionId);
     return true;
   }
   

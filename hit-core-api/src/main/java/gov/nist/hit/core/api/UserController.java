@@ -13,22 +13,27 @@
 package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.AppInfo;
+import gov.nist.hit.core.domain.KeyValuePair;
 import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.repo.AppInfoRepository;
 import gov.nist.hit.core.repo.TransactionRepository;
+import gov.nist.hit.core.repo.TransactionSpecs;
 import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.repo.UserRepository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.hibernate.annotations.Where;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import static org.springframework.data.jpa.domain.Specifications.where;
 
 /**
  * @author Harold Affo (NIST)
@@ -55,12 +61,33 @@ public class UserController {
   @Autowired
   private TransactionRepository transactionRepository;
   
+//  /**
+//   * TODO:REMOVE
+//   * @return
+//   */
+//  @Transactional()
+//  @RequestMapping(value = "/test", method = RequestMethod.GET)
+//  public boolean checkProperties() {
+//    Map<String,String> properties = new HashMap<String,String>();
+//    properties.put("username", "dev-1");
+//    properties.put("password", "dev-1");
+//    properties.put("facilityID", "dev-1");
+//    Transaction transaction = new Transaction();
+//    transaction.setIncoming("ddsddsds");
+//    transaction.setOutgoing("dddd");
+//    transaction.setProperties(properties);
+//    transactionRepository.saveAndFlush(transaction);
+//    transaction = transactionRepository.findOne((where(TransactionSpecs.matches(properties))));
+////    transaction = transactionRepository.findOneByProperties(properties);
+//
+//    return transaction != null ;   
+//  }
   
   @Transactional()
   @RequestMapping(value = "/create", method = RequestMethod.POST)
   public User create() {
     User user = new User();
-    userRepository.saveAndFlush(user);
+    userRepository.saveAndFlush(user); 
     return user;
   }
 

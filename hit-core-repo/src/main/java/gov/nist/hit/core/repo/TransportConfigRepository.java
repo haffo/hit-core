@@ -17,17 +17,10 @@ public interface TransportConfigRepository extends JpaRepository<TransportConfig
       @Param("protocol") String protocol);
 
   @Query("select tconfig from TransportConfig tconfig where tconfig.matches(:criteria,:type) = true")
-  TransportConfig findOneByCriteria(@Param("criteria") KeyValuePair criteria,
-      @Param("type") TestStepTestingType type);
-
-  @Query("select tconfig from TransportConfig tconfig where tconfig.matches(:criteria,:type) = true")
-  TransportConfig findOneByOneMultipleCriteria(@Param("criteria") List<KeyValuePair> criteria,
+  TransportConfig findOneByCriteria(@Param("criteria") List<KeyValuePair> criteria,
       @Param("type") TestStepTestingType type);
 
   @Query("select tconfig from TransportConfig tconfig where tconfig.user.id = :userId")
   List<TransportConfig> findAllByUser(@Param("userId") Long userId);
-
-  @Query("delete from TransportConfig tconfig where tconfig.user.id = :userId")
-  void deleteAllByUser(@Param("userId") Long userId);
 
 }

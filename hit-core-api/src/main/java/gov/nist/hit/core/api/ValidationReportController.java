@@ -71,7 +71,7 @@ import org.springframework.web.bind.annotation.RestController;
 
   @RequestMapping(value = "/downloadAs/{format}", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public void download(@PathVariable String format, @RequestParam("json") String json,
+  public void download(@PathVariable String format, @RequestParam("json") String json,@RequestParam("title") String title,
       HttpServletRequest request, HttpServletResponse response) {
     try {
       logger.info("Downloading validation report in " + format);
@@ -87,22 +87,22 @@ import org.springframework.web.bind.annotation.RestController;
         content = IOUtils.toInputStream(createHtml(xmlReport), "UTF-8");
         response.setContentType("text/html");
         response.setHeader("Content-disposition",
-            "attachment;filename=MessageValidationReport.html");
+            "attachment;filename="+ title + "-ValidationReport.html");
       } else if ("DOC".equalsIgnoreCase(format)) {
         content = IOUtils.toInputStream(createHtml(xmlReport), "UTF-8");
         response.setContentType("application/msword");
         response
-            .setHeader("Content-disposition", "attachment;filename=MessageValidationReport.doc");
+            .setHeader("Content-disposition", "attachment;filename="+ title + "-ValidationReport.doc");
       } else if ("XML".equalsIgnoreCase(format)) {
         content = IOUtils.toInputStream(xmlReport, "UTF-8");
         response.setContentType("application/xml");
         response
-            .setHeader("Content-disposition", "attachment;filename=MessageValidationReport.xml");
+            .setHeader("Content-disposition", "attachment;filename="+ title + "-ValidationReport.xml");
       } else if ("PDF".equalsIgnoreCase(format)) {
         content = getValidationReportGenerator().toPDF(xmlReport);
         response.setContentType("application/pdf");
         response
-            .setHeader("Content-disposition", "attachment;filename=MessageValidationReport.pdf");
+            .setHeader("Content-disposition", "attachment;filename="+ title + "-ValidationReport.pdf");
       } else {
         throw new ValidationReportException("Unsupported validation report format " + format);
       }

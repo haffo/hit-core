@@ -33,23 +33,13 @@ public interface TransportConfigService {
    */
   public TransportConfig save(TransportConfig config);
 
-
   /**
    * 
    * @param criteria
    * @param type
    * @return
    */
-  public TransportConfig findOneByCriteria(KeyValuePair criteria, TestStepTestingType type);
-
-  /**
-   * 
-   * @param criteria
-   * @param type
-   * @return
-   */
-  public TransportConfig findOneByOneMultipleCriteria(List<KeyValuePair> criteria,
-      TestStepTestingType type);
+  public TransportConfig findOneByCriteria(List<KeyValuePair> criteria, TestStepTestingType type);
 
   // /**
   // *
