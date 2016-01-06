@@ -22,6 +22,7 @@ import gov.nist.hit.core.repo.TransactionRepository;
 import gov.nist.hit.core.repo.TransactionSpecs;
 import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.repo.UserRepository;
+import gov.nist.hit.core.service.TransactionService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import static org.springframework.data.jpa.domain.Specifications.where;
 
 /**
@@ -59,7 +61,11 @@ public class UserController {
   private TransportConfigRepository transportConfigRepository;
   
   @Autowired
-  private TransactionRepository transactionRepository;
+  private TransactionService transactionService;
+  
+  
+  
+  
   
 //  /**
 //   * TODO:REMOVE
@@ -83,6 +89,30 @@ public class UserController {
 //    return transaction != null ;   
 //  }
   
+  public UserRepository getUserRepository() {
+    return userRepository;
+  }
+
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
+
+  public TransportConfigRepository getTransportConfigRepository() {
+    return transportConfigRepository;
+  }
+
+  public void setTransportConfigRepository(TransportConfigRepository transportConfigRepository) {
+    this.transportConfigRepository = transportConfigRepository;
+  }
+
+  public TransactionService getTransactionService() {
+    return transactionService;
+  }
+
+  public void setTransactionService(TransactionService transactionService) {
+    this.transactionService = transactionService;
+  }
+
   @Transactional()
   @RequestMapping(value = "/create", method = RequestMethod.POST)
   public User create() {
@@ -100,9 +130,9 @@ public class UserController {
       transportConfigRepository.delete(configs);
     }
     
-    List<Transaction> transactions = transactionRepository.findAllByUser(userId);
-    if(transactionRepository != null){
-      transactionRepository.delete(transactions);
+    List<Transaction> transactions = transactionService.findAllByUser(userId);
+    if(transactions != null){
+      transactionService.delete(transactions);
     }
 
     userRepository.delete(userId);
