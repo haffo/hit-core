@@ -33,20 +33,6 @@ public interface TransportConfigService {
    */
   public TransportConfig save(TransportConfig config);
 
-  /**
-   * 
-   * @param criteria
-   * @param type
-   * @return
-   */
-  public TransportConfig findOneByCriteria(List<KeyValuePair> criteria, TestStepTestingType type);
-
-  // /**
-  // *
-  // * @param pairs
-  // * @return
-  // */
-  // public TransportConfig set(List<KeyValuePair> pairs, TestStepTestingType type);
 
   /**
    * 

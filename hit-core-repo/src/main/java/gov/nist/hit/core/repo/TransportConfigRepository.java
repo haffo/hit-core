@@ -1,7 +1,5 @@
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.KeyValuePair;
-import gov.nist.hit.core.domain.TestStepTestingType;
 import gov.nist.hit.core.domain.TransportConfig;
 
 import java.util.List;
@@ -15,10 +13,6 @@ public interface TransportConfigRepository extends JpaRepository<TransportConfig
   @Query("select tconfig from TransportConfig tconfig where tconfig.user.id = :userId and tconfig.protocol = :protocol")
   TransportConfig findOneByUserAndProtocol(@Param("userId") Long userId,
       @Param("protocol") String protocol);
-
-  @Query("select tconfig from TransportConfig tconfig where tconfig.matches(:criteria,:type) = true")
-  TransportConfig findOneByCriteria(@Param("criteria") List<KeyValuePair> criteria,
-      @Param("type") TestStepTestingType type);
 
   @Query("select tconfig from TransportConfig tconfig where tconfig.user.id = :userId")
   List<TransportConfig> findAllByUser(@Param("userId") Long userId);

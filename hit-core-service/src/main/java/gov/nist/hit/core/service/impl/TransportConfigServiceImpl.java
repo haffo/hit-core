@@ -23,11 +23,6 @@ public class TransportConfigServiceImpl implements TransportConfigService {
     return config;
   }
 
-  @Override
-  public TransportConfig findOneByCriteria(List<KeyValuePair> criteria, TestStepTestingType type) {
-    return transportConfigRepository.findOneByCriteria(criteria, type);
-  }
-
 
   /**
    * 
