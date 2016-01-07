@@ -82,8 +82,8 @@ public class UserController {
 //    transaction.setIncoming("ddsddsds");
 //    transaction.setOutgoing("dddd");
 //    transaction.setProperties(properties);
-//    transactionRepository.saveAndFlush(transaction);
-//    transaction = transactionRepository.findOne((where(TransactionSpecs.matches(properties))));
+//    transactionService.save(transaction);
+//    transaction = transactionService.findOneByProperties(properties);
 ////    transaction = transactionRepository.findOneByProperties(properties);
 //
 //    return transaction != null ;   

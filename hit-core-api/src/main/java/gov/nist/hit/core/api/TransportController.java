@@ -34,6 +34,7 @@ import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.repo.UserRepository;
 import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.service.TestStepService;
+import gov.nist.hit.core.service.TransactionService;
 import gov.nist.hit.core.service.TransportConfigService;
 import gov.nist.hit.core.service.exception.MessageParserException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
@@ -78,7 +79,7 @@ public  class TransportController {
   private TransportConfigRepository transportConfigRepository;
   
   @Autowired
-  private TransactionRepository transactionRepository;
+  private TransactionService transactionService;
   
 
   //@Cacheable(value = "transportCache", key = "#type.name() + '-' + #protocol +  '-' + #domain + '-form'")
@@ -110,11 +111,15 @@ public  class TransportController {
   
   @RequestMapping(value = "/transaction/{transactionId}/delete", method = RequestMethod.POST)
   public boolean deleteTransaction(@PathVariable Long transactionId) {
-    transactionRepository.delete(transactionId);
+    transactionService.delete(transactionId);
     return true;
   }
   
+  @RequestMapping(value = "/transaction/{transactionId}", method = RequestMethod.GET)
+  public Transaction getTransaction(@PathVariable Long transactionId) {
+    return transactionService.findOne(transactionId);
+  }
   
-
+ 
 
 }

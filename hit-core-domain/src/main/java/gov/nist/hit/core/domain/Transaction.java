@@ -37,7 +37,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * @(#) UserTransaction.java
  */
-@Entity( name= "TRANSACTION")
+@Entity
 public class Transaction implements java.io.Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -64,9 +64,9 @@ public class Transaction implements java.io.Serializable {
   
   @JsonIgnore
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name="TRANSACTION_CONFIG", joinColumns=@JoinColumn(name="TRANSACTION_ID"))
-  @MapKeyColumn(name = "PROPERTY_KEY")
-  @Column(name = "PROPERTY_VALUE")
+  @CollectionTable(name="transaction_config", joinColumns=@JoinColumn(name="transaction_id"))
+  @MapKeyColumn(name = "property_key")
+  @Column(name = "property_value")
   protected Map<String, String> properties = new HashMap<String, String>();
   
   @JsonIgnore

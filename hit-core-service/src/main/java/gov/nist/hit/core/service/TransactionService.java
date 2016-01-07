@@ -18,16 +18,19 @@ public interface TransactionService {
 
   Transaction findOneByTestStepIdAndProperties(Map<String, String> criteria, Long testStepId);
 
-  Transaction findOneByProperties(Map<String, String> criteria, Long testStepId);
-
   Transaction findOneByProperties(Map<String, String> criteria);
 
   void delete(List<Transaction> transactions);
 
   void delete(Transaction transaction);
 
+  void delete(Long id);
+
   Transaction save(Transaction transaction);
 
   List<Transaction> save(List<Transaction> transactions);
+
+  Transaction findOne(Long id);
+
 
 }
