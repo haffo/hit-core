@@ -19,7 +19,6 @@ import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.repo.AppInfoRepository;
 import gov.nist.hit.core.repo.TransactionRepository;
-import gov.nist.hit.core.repo.TransactionSpecs;
 import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.repo.UserRepository;
 import gov.nist.hit.core.service.TransactionService;

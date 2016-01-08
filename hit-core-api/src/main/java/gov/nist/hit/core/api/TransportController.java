@@ -26,7 +26,7 @@ import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransactionStatus;
 import gov.nist.hit.core.domain.TransportConfig;
-import gov.nist.hit.core.domain.SendRequest;
+import gov.nist.hit.core.domain.TransportRequest;
 import gov.nist.hit.core.domain.TransportFormContent;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.repo.TransactionRepository;

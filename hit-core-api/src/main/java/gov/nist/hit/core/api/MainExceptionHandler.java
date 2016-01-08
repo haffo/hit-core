@@ -20,6 +20,7 @@ import gov.nist.hit.core.service.exception.MessageUploadException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.exception.TestCaseException;
+import gov.nist.hit.core.service.exception.TransportException;
 import gov.nist.hit.core.service.exception.UserNotFoundException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import gov.nist.hit.core.service.exception.XmlFormatterException;
@@ -80,7 +81,16 @@ public class MainExceptionHandler {
   public String messageValidationException(MessageValidationException ex) {
     logger.error(ex.getMessage(), ex);
     return "Sorry, cannot validate the message provided.\n" + ex.getMessage();
+  } 
+  
+  @ResponseBody
+  @ExceptionHandler(TransportException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public String transportException(TransportException ex) {
+    logger.error(ex.getMessage(), ex);
+    return ex.getMessage();
   }
+  
 
   @ResponseBody
   @ExceptionHandler(MessageParserException.class)

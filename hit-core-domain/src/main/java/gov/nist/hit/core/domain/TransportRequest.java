@@ -18,7 +18,7 @@ import java.util.Map;
  * @author Harold Affo (NIST)
  * 
  */
-public class SendRequest {
+public class TransportRequest {
 
 	private static final long serialVersionUID = 1L; 
 	
@@ -28,7 +28,7 @@ public class SendRequest {
 	private Long userId;
     private Long responseMessageId;
 
-	public SendRequest() {
+	public TransportRequest() {
 		super();
 	}
 
