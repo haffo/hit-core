@@ -861,6 +861,7 @@ public abstract class ResourcebundleLoader {
     tc.setTestDataSpecification(testDataSpecification(location));
     tc.setDomain(testCaseObj.findValue("domain") != null ? testCaseObj.findValue("domain")
         .getTextValue() : null);
+    logger.info("Domain is " + tc.getDomain());
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").getIntValue());
     }
