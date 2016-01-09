@@ -22,11 +22,11 @@ public class TransportRequest {
 
 	private static final long serialVersionUID = 1L; 
 	
-	private Map<String, String> config;
+	private Map<String, String> config; // required
 	private Long testStepId; 
 	private String message;
-	private Long userId;
-    private Long responseMessageId;
+	private Long userId; // required
+    private Long responseMessageId; // required
 
 	public TransportRequest() {
 		super();

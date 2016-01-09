@@ -13,15 +13,15 @@ import org.springframework.data.repository.query.Param;
 public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     JpaSpecificationExecutor<Transaction> {
 
-  @Query("select transaction.incoming from Transaction transaction where transaction.user.id = :userId and transaction.testStep.id = :testStepId")
+  @Query("select transaction.incoming from Transaction transaction where transaction.user.id = :userId and transaction.testStepId = :testStepId")
   String getIncomingMessageByUserIdAndTestStepId(@Param("userId") Long userId,
       @Param("testStepId") Long testStepId);
 
-  @Query("select transaction.outgoing from Transaction transaction where transaction.user.id = :userId and transaction.testStep.id = :testStepId")
+  @Query("select transaction.outgoing from Transaction transaction where transaction.user.id = :userId and transaction.testStepId = :testStepId")
   String getOutgoingMessageByUserIdAndTestStepId(@Param("userId") Long userId,
       @Param("testStepId") Long testStepId);
 
-  @Query("select transaction from Transaction transaction where transaction.user.id = :userId and transaction.testStep.id = :testStepId")
+  @Query("select transaction from Transaction transaction where transaction.user.id = :userId and transaction.testStepId = :testStepId")
   Transaction findOneByUserAndTestStep(@Param("userId") Long userId,
       @Param("testStepId") Long testStepId);
 

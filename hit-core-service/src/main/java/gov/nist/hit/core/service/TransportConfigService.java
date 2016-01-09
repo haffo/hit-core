@@ -5,6 +5,7 @@ import gov.nist.hit.core.domain.TestStepTestingType;
 import gov.nist.hit.core.domain.TransportConfig;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TransportConfigService {
   /**
@@ -51,6 +52,8 @@ public interface TransportConfigService {
   public TransportConfig set(List<KeyValuePair> pairs, TestStepTestingType type,
       TransportConfig config);
 
+  public TransportConfig findOneByPropertiesAndProtocol(Map<String, String> criteria,
+      TestStepTestingType type, String protocol);
 
 
 }

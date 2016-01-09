@@ -50,7 +50,7 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public Transaction findOneByTestStepIdAndProperties(Map<String, String> criteria, Long testStepId) {
     String sql = toQuery(criteria);
-    sql = sql + " AND tr.teststep_id = " + testStepId;
+    sql = sql + " AND tr.testStepId = " + testStepId;
     Query q = entityManager.createNativeQuery(sql, Transaction.class);
     Transaction tr = getSingleResult(q);
     return tr;

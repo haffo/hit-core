@@ -13,6 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 
@@ -29,15 +30,15 @@ public class TransportConfig {
   private String protocol;
  
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "SUT_INITIATOR_CONFIG")
-  @MapKeyColumn(name = "PROPERTY_KEY")
-  @Column(name = "PROPERTY_VALUE")
+  @CollectionTable(name = "sut_initiator_config", joinColumns=@JoinColumn(name="transport_config_id"))
+  @MapKeyColumn(name = "property_key")
+  @Column(name = "property_value")
   protected Map<String, String> sutInitiator = new HashMap<String, String>();;
 
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "TA_INITIATOR_CONFIG")
-  @MapKeyColumn(name = "PROPERTY_KEY")
-  @Column(name = "PROPERTY_VALUE")
+  @CollectionTable(name = "ta_initiator_config", joinColumns=@JoinColumn(name="transport_config_id"))
+  @MapKeyColumn(name = "property_key")
+  @Column(name = "property_value")
   protected Map<String, String> taInitiator = new HashMap<String, String>();;
 
   @JsonIgnore

@@ -13,7 +13,6 @@
 package gov.nist.hit.core.domain;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
@@ -21,8 +20,6 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -53,10 +50,8 @@ public class Transaction implements java.io.Serializable {
   @NotNull
   @Column(nullable = false, columnDefinition = "LONGTEXT")
   protected String outgoing;
-  
-  @JsonIgnore
-  @OneToOne(cascade = CascadeType.DETACH, optional = true, fetch = FetchType.LAZY)
-  protected TestStep testStep;
+ 
+  protected Long testStepId;
   
   @JsonIgnore
   @OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
@@ -108,25 +103,12 @@ public class Transaction implements java.io.Serializable {
   }
 
 
-  public void close() {
-    clear();
-   }
-
-  private void clear() {
-    this.incoming = null;
-    this.outgoing = null;
+  public Long getTestStepId() {
+    return testStepId;
   }
 
-  public void init() {
-    clear();
-   }
-
-  public TestStep getTestStep() {
-    return testStep;
-  }
-
-  public void setTestStep(TestStep testStep) {
-    this.testStep = testStep;
+  public void setTestStepId(Long testStepId) {
+    this.testStepId = testStepId;
   }
 
   public User getUser() {
@@ -154,30 +136,11 @@ public class Transaction implements java.io.Serializable {
     this.responseMessageId = responseMessageId;
   }
 
-  public boolean matches(String key, String value) {
-    if(properties != null){
-      return key != null && properties.containsKey(key)
-        && properties.get(key).equals(value);
-    }
-    return false;
-  }
- 
-  public boolean matches(Map<String, String> criteria) {
-     if (!criteria.isEmpty()) {
-      for(String key: criteria.keySet()){
-        if (!matches(key, criteria.get(key))) {
-          return false;
-        } 
-      }
-      return true;
-    }
-    return false;
-  }
 
   @Override
   public String toString() {
     return "Transaction [id=" + id + ", incoming=" + incoming
-        + ", outgoing=" + outgoing + ", testStep=" + testStep + ", user=" + user + ", properties="
+        + ", outgoing=" + outgoing + ", testStepId=" + testStepId + ", user=" + user + ", properties="
         + properties + ", responseMessageId=" + responseMessageId + "]";
   }
 
