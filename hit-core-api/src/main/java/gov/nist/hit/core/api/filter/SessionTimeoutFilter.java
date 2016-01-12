@@ -1,5 +1,7 @@
 package gov.nist.hit.core.api.filter;
 
+import gov.nist.hit.core.api.SessionContext;
+
 import java.io.IOException;
 
 import javax.servlet.DispatcherType;
@@ -12,14 +14,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
-//@WebFilter(urlPatterns = "*")
-public class VersionFilter implements Filter {
+@WebFilter(urlPatterns = "/api/*")
+public class SessionTimeoutFilter implements Filter {
 
   /*
    * flaw: Browser Mime Sniffing - fix: X-Content-Type-Options flaw: Cached SSL Content - fix:
@@ -45,17 +48,19 @@ public class VersionFilter implements Filter {
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-      throws IOException, ServletException {   
+      throws IOException, ServletException {
     HttpServletRequest req = (HttpServletRequest) request;
     HttpServletResponse res = (HttpServletResponse) response;
     String path = req.getRequestURI().substring(req.getContextPath().length());
-    if (path.startsWith("/api/") && !path.equals("/api/appInfo")) {
-      String headerDTime = req.getHeader("dTime");
-      String contextParamDTime = req.getServletContext().getInitParameter("dTime");
-      if (headerDTime != null && contextParamDTime != null && !headerDTime.equals(contextParamDTime)) {
-        res.sendError(403, "STATE_CHANGED"); // State changed
-        return;
-      }
+    HttpSession session = req.getSession(false);
+    String headerDTime = req.getHeader("dTime");
+    String contextParamDTime = req.getServletContext().getInitParameter("dTime");
+    if ((!path.equals("/api/session/create")
+            && (session == null || SessionContext.getCurrentUserId(session) == null)) || (!path
+            .equals("/api/appInfo") && (headerDTime != null && contextParamDTime != null && !headerDTime
+            .equals(contextParamDTime)))) {
+      res.sendError(403, "SESSION_EXPIRED"); // session timeout
+      return;
     }
     chain.doFilter(request, response);
   }

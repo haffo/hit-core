@@ -2,11 +2,12 @@ package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.Transaction;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 
-public interface TransactionService {
+public interface TransactionService extends Serializable {
 
   String getIncomingMessageByUserIdAndTestStepId(Long userId, Long testStepId);
 

@@ -10,6 +10,10 @@
 		<artifactId>hit-core</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
+	
+	<properties>
+		 <spring-security.version>3.1.4.RELEASE</spring-security.version>
+	</properties>
 
 	<build>
 		<pluginManagement>
@@ -199,6 +203,17 @@
 			<version>3.4.4</version>
 		</dependency>
 
+<!--   <dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring-security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring-security.version}</version>
+		</dependency> -->
+		  
 	</dependencies>
 
 	

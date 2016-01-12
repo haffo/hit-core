@@ -22,8 +22,6 @@ import gov.nist.hit.core.repo.TransactionRepository;
 import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.repo.UserRepository;
 import gov.nist.hit.core.service.TransactionService;
-import gov.nist.hit.core.service.UserService;
-import gov.nist.hit.core.service.exception.UserNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,36 +51,23 @@ import static org.springframework.data.jpa.domain.Specifications.where;
  * 
  */
 @RestController
-@RequestMapping("/user")
-public class UserController {
+@RequestMapping("/session")
+public class SessionController {
 
-  @Autowired
-  private UserService userService;
-
-  public UserService getUserService() {
-    return userService;
-  }
-
-  public void setUserService(UserService userService) {
-    this.userService = userService;
-  }
-
-  @Transactional()
-  @RequestMapping(value = "/current", method = RequestMethod.POST)
-  public User create(HttpSession session) throws UserNotFoundException {
-    User user = null;
-    Long id = SessionContext.getCurrentUserId(session);
-    if (id != null) {
-      user = userService.findOne(id);
+  @RequestMapping(value = "/destroy", method = RequestMethod.POST)
+  public boolean destroy(HttpServletRequest request) {
+    HttpSession session = request.getSession(false);
+    if(session != null){
+      session.invalidate();
     }
-    if (user == null) {
-      user = new User();
-      userService.save(user);
-      SessionContext.setCurrentUserId(session, user.getId());
-    }
-    return user;
+    return true;
+  } 
+  
+  @RequestMapping(value = "/create", method = RequestMethod.POST)
+  public boolean create(HttpServletRequest request) {
+    HttpSession session = request.getSession(true);   
+    return true;
   }
-
-
-
+  
+ 
 }

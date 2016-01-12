@@ -1,12 +1,15 @@
 package gov.nist.hit.core.service.impl;
 
 import gov.nist.hit.core.domain.TestStepTestingType;
+import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.repo.UserRepository;
+import gov.nist.hit.core.service.TransactionService;
 import gov.nist.hit.core.service.TransportConfigService;
 import gov.nist.hit.core.service.UserService;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -14,11 +17,14 @@ import javax.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service(value = "userService")
 public class UserServiceImpl implements UserService {
 
   @Autowired
   protected UserRepository userRepository;
+
+  @Autowired
+  private TransactionService transactionService;
 
   //
   @Autowired
@@ -52,7 +58,17 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void delete(Long id) {
-    userRepository.delete(id);
+    if (id != null) {
+      List<TransportConfig> configs = transportConfigService.findAllByUser(id);
+      if (configs != null) {
+        transportConfigService.delete(configs);
+      }
+      List<Transaction> transactions = transactionService.findAllByUser(id);
+      if (transactions != null) {
+        transactionService.delete(transactions);
+      }
+      userRepository.delete(id);
+    }
   }
 
   @Override

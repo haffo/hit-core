@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
+  private static final long serialVersionUID = 1L;
+
   @Autowired
   protected TransactionRepository transactionRepository;
 

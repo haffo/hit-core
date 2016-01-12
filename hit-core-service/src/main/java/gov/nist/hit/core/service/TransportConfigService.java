@@ -8,52 +8,24 @@ import java.util.List;
 import java.util.Map;
 
 public interface TransportConfigService {
-  /**
-   * 
-   * @return
-   */
-  public TransportConfig create(String protocole);
 
+  TransportConfig create(String protocole);
 
-  /**
-   * 
-   * @return
-   */
-  public TransportConfig findOne(Long id);
+  TransportConfig findOne(Long id);
 
-  /**
-   * 
-   * @return
-   */
-  public TransportConfig findOneByUserAndProtocol(Long userId, String protocol);
+  TransportConfig findOneByUserAndProtocol(Long userId, String protocol);
 
+  TransportConfig save(TransportConfig config);
 
-  /**
-   * 
-   * @return
-   */
-  public TransportConfig save(TransportConfig config);
+  TransportConfig set(KeyValuePair pair, TestStepTestingType type, TransportConfig config);
 
+  TransportConfig set(List<KeyValuePair> pairs, TestStepTestingType type, TransportConfig config);
 
-  /**
-   * 
-   * @param pair
-   * @param config
-   * @return
-   */
-  public TransportConfig set(KeyValuePair pair, TestStepTestingType type, TransportConfig config);
-
-  /**
-   * 
-   * @param pairs
-   * @param config
-   * @return
-   */
-  public TransportConfig set(List<KeyValuePair> pairs, TestStepTestingType type,
-      TransportConfig config);
-
-  public TransportConfig findOneByPropertiesAndProtocol(Map<String, String> criteria,
+  TransportConfig findOneByPropertiesAndProtocol(Map<String, String> criteria,
       TestStepTestingType type, String protocol);
 
+  List<TransportConfig> findAllByUser(Long userId);
+
+  void delete(List<TransportConfig> configs);
 
 }

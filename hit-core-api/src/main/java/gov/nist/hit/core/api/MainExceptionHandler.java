@@ -190,10 +190,10 @@ public class MainExceptionHandler {
   
   @ResponseBody
   @ExceptionHandler(UserNotFoundException.class)
-  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String userNotFoundException(UserNotFoundException ex) {
     logger.error(ex.getMessage(), ex);
-    return "User not found.\n";
+    return "User could not be found.\n";
   } 
   
   

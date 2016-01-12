@@ -16,6 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -124,6 +125,13 @@ public class TransportConfigServiceImpl implements TransportConfigService {
     return tr;
   }
 
+
+  @Override
+  public List<TransportConfig> findAllByUser(@Param("userId") Long userId) {
+    return transportConfigRepository.findAllByUser(userId);
+  }
+
+
   private TransportConfig getSingleResult(Query query) {
     query.setMaxResults(1);
     List<TransportConfig> list = query.getResultList();
@@ -141,6 +149,12 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
   public void setTransportConfigRepository(TransportConfigRepository transportConfigRepository) {
     this.transportConfigRepository = transportConfigRepository;
+  }
+
+
+  @Override
+  public void delete(List<TransportConfig> configs) {
+    transportConfigRepository.delete(configs);
   }
 
 

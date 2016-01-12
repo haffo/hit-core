@@ -46,17 +46,15 @@ public class HTTPSecurityFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
-    String cache = "no-cache, no-store, must-revalidate";
-
+ 
     if (response instanceof HttpServletResponse) {
       HttpServletResponse httpResponse = (HttpServletResponse) response;
       httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
-      httpResponse.setHeader("Cache-Control", cache);
+      httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       httpResponse.setHeader("X-Content-Type-Options", "nosniff");
-//      httpResponse.setHeader("Strict-Transport-Security", "max-age=31536000");
-      httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
+       httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
       httpResponse.setHeader("Access-Control-Allow-Headers", "dTime, csrfToken");
-      
+ 
 //      httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
     }
 
