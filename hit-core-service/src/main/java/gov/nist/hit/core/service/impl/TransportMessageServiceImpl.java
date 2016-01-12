@@ -72,6 +72,8 @@ public class TransportMessageServiceImpl implements TransportMessageService {
     return list.get(0);
   }
 
+
+
   private Long getMessageIdResult(Query query) {
     query.setMaxResults(1);
     List<Long> list = query.getResultList();
@@ -106,9 +108,21 @@ public class TransportMessageServiceImpl implements TransportMessageService {
   }
 
   @Override
+  public void delete(List<TransportMessage> confs) {
+    transportMessageRepository.delete(confs);
+  }
+
+  @Override
   public Long findMessageIdByProperties(Map<String, String> criteria) {
     TransportMessage tm = findOneByProperties(criteria);
     return tm != null ? tm.getMessageId() : null;
+  }
+
+  @Override
+  public List<TransportMessage> findAllByProperties(Map<String, String> criteria) {
+    String sql = findOneQuery(criteria);
+    Query q = entityManager.createNativeQuery(sql, TransportMessage.class);
+    return q.getResultList();
   }
 
 }

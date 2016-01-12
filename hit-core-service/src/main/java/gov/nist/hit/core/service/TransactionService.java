@@ -21,6 +21,8 @@ public interface TransactionService extends Serializable {
 
   Transaction findOneByProperties(Map<String, String> criteria);
 
+  List<Transaction> findAllByProperties(Map<String, String> criteria);
+
   void delete(List<Transaction> transactions);
 
   void delete(Transaction transaction);

@@ -2,6 +2,7 @@ package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.TransportMessage;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -28,6 +29,10 @@ public interface TransportMessageService {
   // List<TransportMessage> save(List<TransportMessage> messages);
 
   TransportMessage findOne(Long id);
+
+  List<TransportMessage> findAllByProperties(Map<String, String> criteria);
+
+  void delete(List<TransportMessage> confs);
 
 
 }

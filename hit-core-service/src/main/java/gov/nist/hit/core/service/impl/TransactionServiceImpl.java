@@ -135,5 +135,12 @@ public class TransactionServiceImpl implements TransactionService {
     return transactionRepository.findOne(id);
   }
 
+  @Override
+  public List<Transaction> findAllByProperties(Map<String, String> criteria) {
+    String sql = toQuery(criteria);
+    Query q = entityManager.createNativeQuery(sql, Transaction.class);
+    return q.getResultList();
+  }
+
 
 }
