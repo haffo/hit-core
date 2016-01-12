@@ -37,7 +37,6 @@ public class UserSessionListerner implements HttpSessionListener {
   
   @Override
   public void sessionCreated(HttpSessionEvent sessionEvent) {
-    System.out.println("new session created");
     logger.info("New Session Created");
     sessionEvent.getSession().setMaxInactiveInterval(3600);
     User user = new User();
@@ -52,7 +51,6 @@ public class UserSessionListerner implements HttpSessionListener {
     UserService userService = getUserService(sessionEvent);
     userService.delete(userId);
     logger.info("Session deleted"); 
-    System.out.println("session deleted");
   }
  
   private UserService getUserService(HttpSessionEvent sessionEvent){
