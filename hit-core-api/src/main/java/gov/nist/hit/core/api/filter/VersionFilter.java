@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
-//@WebFilter(urlPatterns = "*")
+@WebFilter(urlPatterns = "/api/*")
 public class VersionFilter implements Filter {
 
   /*
@@ -49,11 +49,11 @@ public class VersionFilter implements Filter {
     HttpServletRequest req = (HttpServletRequest) request;
     HttpServletResponse res = (HttpServletResponse) response;
     String path = req.getRequestURI().substring(req.getContextPath().length());
-    if (path.startsWith("/api/") && !path.equals("/api/appInfo")) {
-      String headerDTime = req.getHeader("dTime");
-      String contextParamDTime = req.getServletContext().getInitParameter("dTime");
-      if (headerDTime != null && contextParamDTime != null && !headerDTime.equals(contextParamDTime)) {
-        res.sendError(403, "STATE_CHANGED"); // State changed
+    if (!path.equals("/api/appInfo")) {
+      String headerRsbVersion = req.getHeader("rsbVersion");
+      String contextRsbVersion = req.getServletContext().getInitParameter("rsbVersion");
+      if (headerRsbVersion != null && contextRsbVersion != null && !headerRsbVersion.equals(contextRsbVersion)) {
+        res.sendError(403, "RSB_CHANGED"); // State changed
         return;
       }
     }

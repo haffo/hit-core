@@ -39,17 +39,8 @@ public class UserServiceImpl implements UserService {
     TransportConfig config =
         transportConfigService.findOneByPropertiesAndProtocol(criteria,
             TestStepTestingType.SUT_INITIATOR, protocol);
-    return config != null && config.getUser() != null;
+    return config != null && config.getUserId() != null;
   }
-
-  @Override
-  public User findOneBySutInitiatorConfigAndProtocol(Map<String, String> criteria, String protocol) {
-    TransportConfig config =
-        transportConfigService.findOneByPropertiesAndProtocol(criteria,
-            TestStepTestingType.SUT_INITIATOR, protocol);
-    return config != null ? config.getUser() : null;
-  }
-
 
   @Override
   public void delete(User user) {

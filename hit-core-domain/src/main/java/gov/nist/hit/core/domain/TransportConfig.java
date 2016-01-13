@@ -28,6 +28,9 @@ public class TransportConfig {
 
   @Column(name = "PROTOCOL")
   private String protocol;
+  
+  @Column(name = "USERID")
+  private Long userId;
  
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "sut_initiator_config", joinColumns=@JoinColumn(name="transport_config_id"))
@@ -40,10 +43,6 @@ public class TransportConfig {
   @MapKeyColumn(name = "property_key")
   @Column(name = "property_value")
   protected Map<String, String> taInitiator = new HashMap<String, String>();;
-
-  @JsonIgnore
-  @ManyToOne(cascade = CascadeType.ALL)
-  protected User user;
 
   public TransportConfig() {
     super();
@@ -71,13 +70,7 @@ public class TransportConfig {
     this.id = id;
   }
 
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
+ 
 
   public boolean matches(List<KeyValuePair> pairs, TestStepTestingType type) {
     if (!pairs.isEmpty()) {
@@ -120,6 +113,16 @@ public class TransportConfig {
 
   public void setTaInitiator(Map<String, String> taInitiator) {
     this.taInitiator = taInitiator;
+  }
+
+
+  public Long getUserId() {
+    return userId;
+  }
+
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
   }
 
  

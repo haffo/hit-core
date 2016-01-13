@@ -53,12 +53,9 @@ public class SessionTimeoutFilter implements Filter {
     HttpServletResponse res = (HttpServletResponse) response;
     String path = req.getRequestURI().substring(req.getContextPath().length());
     HttpSession session = req.getSession(false);
-    String headerDTime = req.getHeader("dTime");
-    String contextParamDTime = req.getServletContext().getInitParameter("dTime");
-    if ((!path.equals("/api/session/create")
-            && (session == null || SessionContext.getCurrentUserId(session) == null)) || (!path
-            .equals("/api/appInfo") && (headerDTime != null && contextParamDTime != null && !headerDTime
-            .equals(contextParamDTime)))) {
+    if (!path.equals("/api/session/create") && !path.startsWith("/api/ws/")
+        && !path.startsWith("/api/cb/testcases") && !path.startsWith("/api/cf/testcases") && !path.startsWith("/api/isolated/testcases")
+        && (session == null || SessionContext.getCurrentUserId(session) == null)) {
       res.sendError(403, "SESSION_EXPIRED"); // session timeout
       return;
     }

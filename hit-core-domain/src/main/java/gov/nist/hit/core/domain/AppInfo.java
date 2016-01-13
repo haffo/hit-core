@@ -79,6 +79,7 @@ public class AppInfo  implements Serializable {
   
   private String csrfToken;
   
+  private String rsbVersion;
   
   public String getUrl() {
     return url;
@@ -232,6 +233,17 @@ public class AppInfo  implements Serializable {
 
   public void setMessageContentInfo(String messageContentInfo) {
     this.messageContentInfo = messageContentInfo;
+  } 
+  
+  
+  
+
+  public String getRsbVersion() {
+    return rsbVersion;
+  }
+
+  public void setRsbVersion(String rsbVersion) {
+    this.rsbVersion = rsbVersion;
   }
 
   @Override

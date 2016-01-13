@@ -166,25 +166,30 @@ public abstract class ResourcebundleLoader {
 
 
   public void load() throws JsonProcessingException, IOException, ProfileParserException {
-    logger.info("loading resource bundle...");
-    this.loadAppInfo();
-    this.loadConstraints();
-    this.loadVocabularyLibraries();
-    this.loadIntegrationProfiles();
-    this.loadCfTestCases();
-    this.loadCbTestCases();
-    this.loadIsolatedTestCases();
-    this.loadTestCasesDocumentation();
-    this.loadUserDocs();
-    this.loadKownIssues();
-    this.loadReleaseNotes();
-    this.loadResourcesDocs();
-    this.loadToolDownloads();
-    this.loadTransport();
-    cachedRepository.getCachedProfiles().clear();
-    cachedRepository.getCachedVocabLibraries().clear();
-    cachedRepository.getCachedConstraints().clear();
-    logger.info("loading resource bundle...DONE");
+    String rsbVersion = getRsbleVersion();
+    String oldRsbVersion = appInfoRepository.getRsbVersion();
+    if ((rsbVersion == null && oldRsbVersion == null) || (rsbVersion != oldRsbVersion)) {
+      logger.info("loading resource bundle...");
+      // TODO: clear DB
+      this.loadAppInfo();
+      this.loadConstraints();
+      this.loadVocabularyLibraries();
+      this.loadIntegrationProfiles();
+      this.loadCfTestCases();
+      this.loadCbTestCases();
+      this.loadIsolatedTestCases();
+      this.loadTestCasesDocumentation();
+      this.loadUserDocs();
+      this.loadKownIssues();
+      this.loadReleaseNotes();
+      this.loadResourcesDocs();
+      this.loadToolDownloads();
+      this.loadTransport();
+      cachedRepository.getCachedProfiles().clear();
+      cachedRepository.getCachedVocabLibraries().clear();
+      cachedRepository.getCachedConstraints().clear();
+      logger.info("loading resource bundle...DONE");
+    }
   }
 
 
@@ -211,6 +216,8 @@ public abstract class ResourcebundleLoader {
     AppInfo appInfo = new AppInfo();
     ObjectMapper mapper = new ObjectMapper();
     JsonNode appInfoJson = mapper.readTree(FileUtil.getContent(resource));
+    appInfo.setRsbVersion(appInfoJson.get("rsbVersion") != null ? appInfoJson.get("rsbVersion")
+        .getTextValue() : null);
     appInfo.setAdminEmail(appInfoJson.get("adminEmail").getTextValue());
     appInfo.setDomain(appInfoJson.get("domain").getTextValue());
     appInfo.setHeader(appInfoJson.get("header").getTextValue());
@@ -1253,6 +1260,21 @@ public abstract class ResourcebundleLoader {
     return location.replaceAll("%20", " ");
   }
 
+
+  public static String getRsbleVersion() throws JsonProcessingException, IOException {
+    JsonNode metaData = getMetaData();
+    return metaData.get("rsbVersion") != null ? metaData.get("rsbVersion").getTextValue() : null;
+  }
+
+
+  public static JsonNode getMetaData() throws JsonProcessingException, IOException {
+    Resource resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN + "MetaData.json");
+    if (resource == null)
+      throw new RuntimeException("No MetaData.json found in the resource bundle");
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.readTree(FileUtil.getContent(resource));
+  }
 
 
   public TestPlanRepository getTestPlanRepository() {

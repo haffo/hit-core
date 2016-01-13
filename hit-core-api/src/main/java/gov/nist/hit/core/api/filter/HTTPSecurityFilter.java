@@ -53,7 +53,7 @@ public class HTTPSecurityFilter implements Filter {
       httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       httpResponse.setHeader("X-Content-Type-Options", "nosniff");
        httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
-      httpResponse.setHeader("Access-Control-Allow-Headers", "dTime, csrfToken");
+      httpResponse.setHeader("Access-Control-Allow-Headers", "rsbVersion");
  
 //      httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
     }

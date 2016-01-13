@@ -9,8 +9,6 @@ public interface UserService {
 
   boolean exitBySutInitiatorPropertiesAndProtocol(Map<String, String> criteria, String protocol);
 
-  User findOneBySutInitiatorConfigAndProtocol(Map<String, String> criteria, String protocol);
-
   void delete(User user);
 
   void delete(Long id);

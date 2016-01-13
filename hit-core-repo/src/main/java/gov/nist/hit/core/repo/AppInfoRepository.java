@@ -15,7 +15,11 @@ package gov.nist.hit.core.repo;
 import gov.nist.hit.core.domain.AppInfo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface AppInfoRepository extends JpaRepository<AppInfo, Long> {
+
+  @Query("select appInfo.rsbVersion from AppInfo appInfo")
+  public String getRsbVersion();
 
 }

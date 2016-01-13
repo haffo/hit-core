@@ -45,10 +45,10 @@ public class User implements java.io.Serializable {
 
   
   public void addConfig(TransportConfig config){
-    if(config.getUser() != null)
+    if(config.getUserId() != null)
       throw new RuntimeException("The configuration provided belongs already to another user");
 //    this.getConfigs().add(config);
-    config.setUser(this);
+    config.setUserId(this.getId());
   }
  
   public Long getId() {
