@@ -3,6 +3,7 @@ package gov.nist.hit.core.api.filter;
 import gov.nist.hit.core.api.SessionContext;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
@@ -18,11 +19,12 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.impl.xpath.regex.Match;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 @WebFilter(urlPatterns = "/api/*")
-public class SessionTimeoutFilter implements Filter {
+public class SessionTmeoutFilter implements Filter {
 
   /*
    * flaw: Browser Mime Sniffing - fix: X-Content-Type-Options flaw: Cached SSL Content - fix:
@@ -53,10 +55,12 @@ public class SessionTimeoutFilter implements Filter {
     HttpServletResponse res = (HttpServletResponse) response;
     String path = req.getRequestURI().substring(req.getContextPath().length());
     HttpSession session = req.getSession(false);
-    if (!path.equals("/api/session/create") && !path.startsWith("/api/ws/")
-        && !path.startsWith("/api/cb/testcases") && !path.startsWith("/api/cf/testcases") && !path.startsWith("/api/isolated/testcases")
-        && (session == null || SessionContext.getCurrentUserId(session) == null)) {
-      res.sendError(403, "SESSION_EXPIRED"); // session timeout
+    if (!Pattern.compile("\\/api\\/appInfo").matcher(path).find() && !Pattern.compile("\\/api\\/session\\/create").matcher(path).find() && !Pattern.compile("\\/api\\/ws\\/").matcher(path).find()
+        && !Pattern.compile("\\/api\\/(\\w+)\\/testcases").matcher(path).find()
+        && !Pattern.compile("\\/api\\/testcase").matcher(path).find()
+        && !Pattern.compile("\\/api\\/documentation\\/doc").matcher(path).find()
+        && (session == null)) {
+      res.sendError(440); // session timeout
       return;
     }
     chain.doFilter(request, response);

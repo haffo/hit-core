@@ -47,9 +47,13 @@ public class UserSessionListerner implements HttpSessionListener {
 
   @Override
   public void sessionDestroyed(HttpSessionEvent sessionEvent) {
+    try{
     Long userId = SessionContext.getCurrentUserId(sessionEvent.getSession());
     UserService userService = getUserService(sessionEvent);
     userService.delete(userId);
+    }catch(RuntimeException e){
+    }catch(Exception e){
+    }
     logger.info("Session deleted"); 
   }
  

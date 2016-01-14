@@ -102,10 +102,10 @@ public class MainExceptionHandler {
 
   @ResponseBody
   @ExceptionHandler(ValidationReportException.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String reportException(ValidationReportException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, cannot generate the validation report. \n";
+    return ex.getMessage() + ". \n";
   }
 
   @ResponseBody

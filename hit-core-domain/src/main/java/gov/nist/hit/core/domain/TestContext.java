@@ -35,6 +35,7 @@ public class TestContext implements Serializable {
   @JoinColumn(unique = true, nullable = true, insertable = true, updatable = true)
   protected Message message;
 
+
   @JsonIgnore
   @Enumerated(EnumType.STRING)
   protected TestingStage stage;
@@ -77,7 +78,5 @@ public class TestContext implements Serializable {
   public void setStage(TestingStage stage) {
     this.stage = stage;
   }
-
-
 
 }

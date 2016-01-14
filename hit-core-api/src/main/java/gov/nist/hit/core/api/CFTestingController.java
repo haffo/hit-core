@@ -12,8 +12,8 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.TestObject;
-import gov.nist.hit.core.repo.TestObjectRepository;
+import gov.nist.hit.core.domain.CFTestInstance;
+import gov.nist.hit.core.repo.CFTestInstanceRepository;
 import gov.nist.hit.core.service.TestObjectService;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class CFTestingController {
 
   @Cacheable(value = "testCaseCache", key = "'cf-testcases'")
   @RequestMapping(value = "/testcases")
-  public List<TestObject> testCases() {
+  public List<CFTestInstance> testCases() {
     logger.info("Fetching all testCases...");
     return testObjectService.findAllAsRoot();
   }

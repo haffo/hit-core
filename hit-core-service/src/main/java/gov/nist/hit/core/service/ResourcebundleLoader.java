@@ -14,6 +14,7 @@ package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.AppInfo;
+import gov.nist.hit.core.domain.CFTestInstance;
 import gov.nist.hit.core.domain.Constraints;
 import gov.nist.hit.core.domain.DocumentType;
 import gov.nist.hit.core.domain.IntegrationProfile;
@@ -26,7 +27,6 @@ import gov.nist.hit.core.domain.TestCaseDocumentation;
 import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.domain.TestCaseTestingType;
 import gov.nist.hit.core.domain.TestContext;
-import gov.nist.hit.core.domain.TestObject;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepTestingType;
@@ -34,15 +34,20 @@ import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TransportForms;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.AppInfoRepository;
+import gov.nist.hit.core.repo.CFTestInstanceRepository;
 import gov.nist.hit.core.repo.ConstraintsRepository;
 import gov.nist.hit.core.repo.DocumentRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.MessageRepository;
+import gov.nist.hit.core.repo.MessageValidationResultRepository;
 import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
-import gov.nist.hit.core.repo.TestObjectRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.repo.TransactionRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
+import gov.nist.hit.core.repo.TransportMessageRepository;
+import gov.nist.hit.core.repo.UserRepository;
+import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
 import gov.nist.hit.core.service.util.ResourcebundleHelper;
@@ -52,6 +57,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -141,7 +147,7 @@ public abstract class ResourcebundleLoader {
   protected TestPlanRepository testPlanRepository;
 
   @Autowired
-  protected TestObjectRepository testObjectRepository;
+  protected CFTestInstanceRepository testInstanceRepository;
 
   @Autowired
   protected TestStepRepository testStepRepository;
@@ -155,22 +161,59 @@ public abstract class ResourcebundleLoader {
   @Autowired
   protected TransportFormsRepository transportFormsRepository;
 
+  @Autowired
+  protected DBService dbService;
+
+  @Autowired
+  protected UserRepository userRepository;
+
+  @Autowired
+  protected TransportMessageRepository transportMessageRepository;
+
+  @Autowired
+  protected TransactionRepository transactionRepository;
+
+  @Autowired
+  protected MessageValidationResultRepository validationResultRepository;
 
   protected com.fasterxml.jackson.databind.ObjectMapper obm;
+
+  @Autowired
+  protected AppInfoService appInfoService;
+
+  @Autowired
+  protected VocabularyLibraryRepository vocabularyLibraryRepository;
 
   public ResourcebundleLoader() {
     obm = new com.fasterxml.jackson.databind.ObjectMapper();
     obm.setSerializationInclusion(Include.NON_NULL);
   }
 
+  public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
+    String rsbVersion = getRsbleVersion();
+    String oldRsbVersion = appInfoService.getRsbVersion();
+    return oldRsbVersion == null || !rsbVersion.equals(oldRsbVersion);
+  }
 
+  public void clearDB() {
+    appInfoRepository.deleteAll();
+    validationResultRepository.deleteAll();
+    testPlanRepository.deleteAll();
+    testInstanceRepository.deleteAll();
+    constraintsRepository.deleteAll();
+    vocabularyLibraryRepository.deleteAll();
+    integrationProfileRepository.deleteAll();
+    testCaseDocumentationRepository.deleteAll();
+    transportFormsRepository.deleteAll();
+    documentRepository.deleteAll();
+    transportMessageRepository.deleteAll();
+    transactionRepository.deleteAll();
+  }
 
   public void load() throws JsonProcessingException, IOException, ProfileParserException {
-    String rsbVersion = getRsbleVersion();
-    String oldRsbVersion = appInfoRepository.getRsbVersion();
-    if ((rsbVersion == null && oldRsbVersion == null) || (rsbVersion != oldRsbVersion)) {
-      logger.info("loading resource bundle...");
-      // TODO: clear DB
+    if (isNewResourcebundle()) {
+      logger.info("clearing tables...");
+      clearDB();
       this.loadAppInfo();
       this.loadConstraints();
       this.loadVocabularyLibraries();
@@ -188,10 +231,9 @@ public abstract class ResourcebundleLoader {
       cachedRepository.getCachedProfiles().clear();
       cachedRepository.getCachedVocabLibraries().clear();
       cachedRepository.getCachedConstraints().clear();
-      logger.info("loading resource bundle...DONE");
+      logger.info("resource bundle loaded successfully...");
     }
   }
-
 
   public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage)
       throws IOException;
@@ -209,25 +251,21 @@ public abstract class ResourcebundleLoader {
 
   private void loadAppInfo() throws JsonProcessingException, IOException {
     logger.info("loading app info...");
-    Resource resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN + "MetaData.json");
-    if (resource == null)
-      throw new RuntimeException("No MetaData.json found in the resource bundle");
     AppInfo appInfo = new AppInfo();
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode appInfoJson = mapper.readTree(FileUtil.getContent(resource));
-    appInfo.setRsbVersion(appInfoJson.get("rsbVersion") != null ? appInfoJson.get("rsbVersion")
+    JsonNode metaData = getMetaData();
+    String rsbVersion = getRsbleVersion();
+    appInfo.setRsbVersion(rsbVersion);
+    appInfo.setAdminEmail(metaData.get("adminEmail").getTextValue());
+    appInfo.setDomain(metaData.get("domain").getTextValue());
+    appInfo.setHeader(metaData.get("header").getTextValue());
+    appInfo.setHomeTitle(metaData.get("homeTitle") != null ? metaData.get("homeTitle")
         .getTextValue() : null);
-    appInfo.setAdminEmail(appInfoJson.get("adminEmail").getTextValue());
-    appInfo.setDomain(appInfoJson.get("domain").getTextValue());
-    appInfo.setHeader(appInfoJson.get("header").getTextValue());
-    appInfo.setHomeTitle(appInfoJson.get("homeTitle") != null ? appInfoJson.get("homeTitle")
-        .getTextValue() : null);
-    appInfo.setHomeContent(appInfoJson.get("homeContent") != null ? appInfoJson.get("homeContent")
+    appInfo.setHomeContent(metaData.get("homeContent") != null ? metaData.get("homeContent")
         .getTextValue() : null); // backward compatibility
-    appInfo.setName(appInfoJson.get("name").getTextValue());
-    appInfo.setVersion(appInfoJson.get("version").getTextValue());
-    resource =
+    appInfo.setName(metaData.get("name").getTextValue());
+    appInfo.setVersion(metaData.get("version").getTextValue());
+    appInfo.setDate(new Date().getTime() + "");
+    Resource resource =
         ResourcebundleHelper.getResource(ResourcebundleLoader.PROFILE_PATTERN
             + PROFILE_INFO_PATTERN);
     if (resource != null) {
@@ -240,8 +278,6 @@ public abstract class ResourcebundleLoader {
     if (resource != null) {
       appInfo.setValueSetCopyright(FileUtil.getContent(resource));
     }
-
-
     resource =
         ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
             + ResourcebundleLoader.CONFIDENTIALITY_PATTERN);
@@ -276,7 +312,6 @@ public abstract class ResourcebundleLoader {
     if (resource != null) {
       appInfo.setHomeContent(FileUtil.getContent(resource));
     }
-
 
     resource =
         ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
@@ -408,7 +443,6 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
-    logger.info("loading integration profiles...DONE");
 
     // constraints
     logger.info("loading constraints...");
@@ -436,7 +470,6 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
-    logger.info("loading constraints...DONE");
 
     logger.info("loading value sets...");
     // value sets
@@ -464,13 +497,11 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
-    logger.info("loading value sets...DONE");
 
     if (!resourceDocs.isEmpty()) {
       documentRepository.save(resourceDocs);
     }
 
-    logger.info("loading resource documents...DONE");
   }
 
   private void loadKownIssues() throws IOException {
@@ -509,7 +540,6 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
-    logger.info("loading known issues...DONE");
   }
 
   private void loadReleaseNotes() throws IOException {
@@ -548,12 +578,11 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
-    logger.info("loading release notes...DONE");
   }
 
 
   private void loadToolDownloads() throws IOException {
-    logger.info("loading tool download...");
+    logger.info("loading tool downloads...");
     JsonNode confObj = toJsonObj(TOOL_DOWNLOADS_PATTERN + TOOL_DOWNLOADS_CONF_PATTERN);
     if (confObj != null) {
       if (confObj.findValue("installationGuide") != null) {
@@ -602,7 +631,6 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
-    logger.info("loading known issues...DONE");
   }
 
   private Resource getLatestResource(String pathWithWilcard) throws IOException {
@@ -630,7 +658,6 @@ public abstract class ResourcebundleLoader {
         cachedRepository.getCachedConstraints().put(constraints.getSourceId(), constraints);
       }
     }
-    logger.info("loading constraints...DONE");
   }
 
   private JsonNode toJsonObj(String path) throws IOException {
@@ -663,7 +690,6 @@ public abstract class ResourcebundleLoader {
         integrationProfileRepository.save(integrationProfile);
       }
     }
-    logger.info("loading integration profiles...DONE");
   }
 
   private void loadVocabularyLibraries() throws IOException {
@@ -679,7 +705,6 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
-    logger.info("loading value set libraries...DONE");
   }
 
 
@@ -776,7 +801,7 @@ public abstract class ResourcebundleLoader {
     IntegrationProfile p = cachedRepository.getCachedProfiles().get(id);
     if (p == null) {
       throw new IllegalArgumentException(
-          "Cannot find IntegrationProfile associated to ConformanceProfile with id = " + id);
+          "Cannot find integration profile of conformance profile with id = " + id);
     }
 
     return p;
@@ -839,19 +864,19 @@ public abstract class ResourcebundleLoader {
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
-        TestObject testObject =
+        CFTestInstance testObject =
             testObject(fileName.substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)),
                 fileName.length()));
         if (testObject != null) {
           testObject.setRoot(true);
-          testObjectRepository.save(testObject);
+          testInstanceRepository.save(testObject);
         }
       }
     }
   }
 
   private TestCase testCase(String location, TestingStage stage) throws IOException {
-    logger.info("Processing test case at:" + location);
+    logger.info("Processing test case located at:" + location);
     TestCase tc = new TestCase();
     Resource res = ResourcebundleHelper.getResource(location + "TestCase.json");
     if (res == null)
@@ -1054,7 +1079,7 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  private TestObject testObject(String testObjectPath) throws IOException {
+  private CFTestInstance testObject(String testObjectPath) throws IOException {
     logger.info("Processing test object at:" + testObjectPath);
     Resource res = ResourcebundleHelper.getResource(testObjectPath + "TestObject.json");
     if (res == null)
@@ -1063,7 +1088,7 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").getBooleanValue()) {
-      TestObject parent = new TestObject();
+      CFTestInstance parent = new CFTestInstance();
       parent.setName(testPlanObj.findValue("name").getTextValue());
       if (testPlanObj.findValue("position") != null) {
         parent.setPosition(testPlanObj.findValue("position").getIntValue());
@@ -1074,7 +1099,7 @@ public abstract class ResourcebundleLoader {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
-        TestObject testObject = testObject(location);
+        CFTestInstance testObject = testObject(location);
         if (testObject != null) {
           parent.getChildren().add(testObject);
         }
@@ -1088,7 +1113,7 @@ public abstract class ResourcebundleLoader {
   private void loadTestCasesDocumentation() throws IOException {
     TestCaseDocumentation doc =
         generateTestObjectDocumentation("Context-free", TestingStage.CF,
-            testObjectRepository.findAllAsRoot());
+            testInstanceRepository.findAllAsRoot());
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
       testCaseDocumentationRepository.save(doc);
@@ -1126,13 +1151,13 @@ public abstract class ResourcebundleLoader {
   }
 
   private TestCaseDocumentation generateTestObjectDocumentation(String title, TestingStage stage,
-      List<TestObject> tos) throws IOException {
+      List<CFTestInstance> tos) throws IOException {
     if (tos != null && !tos.isEmpty()) {
       TestCaseDocumentation documentation = new TestCaseDocumentation();
       documentation.setTitle(title);
       documentation.setStage(stage);
       Collections.sort(tos);
-      for (TestObject to : tos) {
+      for (CFTestInstance to : tos) {
         documentation.getChildren().add(generateTestCaseDocument(to));
       }
       return documentation;
@@ -1206,14 +1231,14 @@ public abstract class ResourcebundleLoader {
     return doc;
   }
 
-  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestObject to)
+  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(CFTestInstance to)
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(to.getTestContext());
     doc = initTestCaseDocument(to, doc);
     doc.setId(to.getId());
     if (to.getChildren() != null && !to.getChildren().isEmpty()) {
       Collections.sort(to.getChildren());
-      for (TestObject child : to.getChildren()) {
+      for (CFTestInstance child : to.getChildren()) {
         doc.getChildren().add(generateTestCaseDocument(child));
       }
     }
@@ -1263,9 +1288,10 @@ public abstract class ResourcebundleLoader {
 
   public static String getRsbleVersion() throws JsonProcessingException, IOException {
     JsonNode metaData = getMetaData();
-    return metaData.get("rsbVersion") != null ? metaData.get("rsbVersion").getTextValue() : null;
+    if (metaData.get("rsbVersion") == null || "".equals(metaData.get("rsbVersion").getTextValue()))
+      throw new RuntimeException("rsbVersion not set or found in MetaData.json");
+    return metaData.get("rsbVersion").getTextValue();
   }
-
 
   public static JsonNode getMetaData() throws JsonProcessingException, IOException {
     Resource resource =
@@ -1287,15 +1313,103 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  public TestObjectRepository getTestObjectRepository() {
-    return testObjectRepository;
+
+  public AppInfoRepository getAppInfoRepository() {
+    return appInfoRepository;
   }
 
-
-  public void setTestObjectRepository(TestObjectRepository testObjectRepository) {
-    this.testObjectRepository = testObjectRepository;
+  public void setAppInfoRepository(AppInfoRepository appInfoRepository) {
+    this.appInfoRepository = appInfoRepository;
   }
 
+  public DocumentRepository getDocumentRepository() {
+    return documentRepository;
+  }
+
+  public void setDocumentRepository(DocumentRepository documentRepository) {
+    this.documentRepository = documentRepository;
+  }
+
+  public CFTestInstanceRepository getTestInstanceRepository() {
+    return testInstanceRepository;
+  }
+
+  public void setTestInstanceRepository(CFTestInstanceRepository testInstanceRepository) {
+    this.testInstanceRepository = testInstanceRepository;
+  }
+
+  public CachedRepository getCachedRepository() {
+    return cachedRepository;
+  }
+
+  public void setCachedRepository(CachedRepository cachedRepository) {
+    this.cachedRepository = cachedRepository;
+  }
+
+  public TransportFormsRepository getTransportFormsRepository() {
+    return transportFormsRepository;
+  }
+
+  public void setTransportFormsRepository(TransportFormsRepository transportFormsRepository) {
+    this.transportFormsRepository = transportFormsRepository;
+  }
+
+  public DBService getDbService() {
+    return dbService;
+  }
+
+  public void setDbService(DBService dbService) {
+    this.dbService = dbService;
+  }
+
+  public UserRepository getUserRepository() {
+    return userRepository;
+  }
+
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
+
+  public TransportMessageRepository getTransportMessageRepository() {
+    return transportMessageRepository;
+  }
+
+  public void setTransportMessageRepository(TransportMessageRepository transportMessageRepository) {
+    this.transportMessageRepository = transportMessageRepository;
+  }
+
+  public TransactionRepository getTransactionRepository() {
+    return transactionRepository;
+  }
+
+  public void setTransactionRepository(TransactionRepository transactionRepository) {
+    this.transactionRepository = transactionRepository;
+  }
+
+  public MessageValidationResultRepository getValidationResultRepository() {
+    return validationResultRepository;
+  }
+
+  public void setValidationResultRepository(
+      MessageValidationResultRepository validationResultRepository) {
+    this.validationResultRepository = validationResultRepository;
+  }
+
+  public AppInfoService getAppInfoService() {
+    return appInfoService;
+  }
+
+  public void setAppInfoService(AppInfoService appInfoService) {
+    this.appInfoService = appInfoService;
+  }
+
+  public VocabularyLibraryRepository getVocabularyLibraryRepository() {
+    return vocabularyLibraryRepository;
+  }
+
+  public void setVocabularyLibraryRepository(VocabularyLibraryRepository vocabularyLibraryRepository) {
+    this.vocabularyLibraryRepository = vocabularyLibraryRepository;
+  }
 
   public TestStepRepository getTestStepRepository() {
     return testStepRepository;

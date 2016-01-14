@@ -46,9 +46,8 @@ public class WebAppInitializer implements WebApplicationInitializer
     try {
       servletContext.setInitParameter("rsbVersion",ResourcebundleLoader.getRsbleVersion());
     } catch (Exception e) {
-       throw new RuntimeException("Could not set the rsbVersion");
+       throw new RuntimeException(e);
     } 
-    servletContext.setInitParameter("csrfToken", UUID.randomUUID().toString());
   }
 
 }

@@ -12,10 +12,23 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.AppInfo;
+import gov.nist.hit.core.domain.MessageValidationResult;
+
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface AppInfoRepository extends JpaRepository<AppInfo, Long> {
+public interface MessageValidationResultRepository extends
+    JpaRepository<MessageValidationResult, Long> {
+
+  @Query("select report from MessageValidationResult report where report.user.id = :userId and report.testStep.id = :testStepId")
+  MessageValidationResult findOneByTestStepAndUser(@Param("userId") Long userId,
+      @Param("testStepId") Long testStepId);
+
+  @Query("select report from MessageValidationResult report where report.user.id = :userId and report.testStep.id IN (:testStepIds)")
+  List<MessageValidationResult> findAllByTestSteps(@Param("userId") Long userId,
+      @Param("testStepIds") List<Long> testStepIds);
 
 }

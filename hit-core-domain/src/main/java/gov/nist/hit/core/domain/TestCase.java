@@ -44,7 +44,7 @@ public class TestCase extends AbstractTestCase implements Serializable {
     this.testingType = TestCaseTestingType.DATAINSTANCE;
    }
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @OneToMany(orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tc_ts", joinColumns = {@JoinColumn(name = "testcase_id")},
       inverseJoinColumns = {@JoinColumn(name = "teststep_id")})
   private List<TestStep> testSteps = new ArrayList<TestStep>();

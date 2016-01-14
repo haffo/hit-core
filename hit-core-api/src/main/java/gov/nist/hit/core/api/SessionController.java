@@ -54,7 +54,7 @@ import static org.springframework.data.jpa.domain.Specifications.where;
 @RequestMapping("/session")
 public class SessionController {
 
-  @RequestMapping(value = "/destroy", method = RequestMethod.POST)
+  @RequestMapping(value = "/delete", method = RequestMethod.POST)
   public boolean destroy(HttpServletRequest request) {
     HttpSession session = request.getSession(false);
     if(session != null){

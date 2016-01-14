@@ -45,8 +45,6 @@ public class AppInfoController {
     List<AppInfo> infos = appInfoRepository.findAll();
     if (infos != null && !infos.isEmpty()) {
       AppInfo appInfo = infos.get(0);
-      appInfo.setDate(request.getServletContext().getInitParameter("dTime"));
-      appInfo.setCsrfToken(request.getServletContext().getInitParameter("csrfToken"));
       appInfo.setUrl(getUrl(request));
       return appInfo;
     }

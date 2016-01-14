@@ -81,6 +81,17 @@ public class UserController {
       SessionContext.setCurrentUserId(session, user.getId());
     }
     return user;
+  } 
+  
+  @Transactional()
+  @RequestMapping(value = "/delete", method = RequestMethod.POST)
+  public boolean delete(HttpSession session) throws UserNotFoundException {
+    Long id = SessionContext.getCurrentUserId(session);
+    if (id != null) {
+       userService.delete(id);
+    }
+    SessionContext.setCurrentUserId(session, null);
+    return true;
   }
 
 

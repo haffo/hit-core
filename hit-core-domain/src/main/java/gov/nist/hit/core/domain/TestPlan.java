@@ -39,12 +39,12 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
     this.type = ObjectType.TestPlan;
   }
   
-  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  @OneToMany(orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JoinTable(name = "tp_tc", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcase_id")})
   private List<TestCase> testCases = new ArrayList<TestCase>();
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @OneToMany(orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tp_tcg", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcasegroup_id")})
     private List<TestCaseGroup> testCaseGroups = new ArrayList<TestCaseGroup>();

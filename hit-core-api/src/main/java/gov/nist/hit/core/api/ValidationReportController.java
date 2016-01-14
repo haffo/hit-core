@@ -12,7 +12,14 @@
 
 package gov.nist.hit.core.api;
 
+import gov.nist.hit.core.domain.MessageValidationResult;
+import gov.nist.hit.core.domain.TestStep;
+import gov.nist.hit.core.domain.User;
+import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.service.TestStepService;
+import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationReportGenerator;
+import gov.nist.hit.core.service.MessageValidationResultService;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 
 import java.io.IOException;
@@ -22,6 +29,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -39,29 +47,33 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Harold Affo (NIST)
  * 
  */
- public abstract class ValidationReportController  {
+public abstract class ValidationReportController {
 
   static final Logger logger = LoggerFactory.getLogger(ValidationReportController.class);
- 
-  
+
+
   public abstract ValidationReportGenerator getValidationReportGenerator();
 
-  @RequestMapping(value = "/generateAs/{format}", method = RequestMethod.POST,
+
+  @Autowired
+  private MessageValidationResultService validationResultService;
+
+  @Autowired
+  private TestStepService testStepService;
+
+  @Autowired
+  private UserService userService;
+
+  @RequestMapping(value = "/generate", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public Map<String, String> generate(@PathVariable final String format,
-      @RequestParam("xmlReport") final String xmlReport) {
-    logger.info("Generating validation report in " + format);
+  public Map<String, String> generate(@RequestParam("xmlReport") final String xmlReport) {
+    logger.info("Generating html validation report");
     if (xmlReport == null) {
       throw new ValidationReportException("No xml report provided");
     }
-    if ("HTML".equalsIgnoreCase(format)) {
-      HashMap<String, String> map = new HashMap<String, String>();
-      map.put("htmlReport", createHtml(xmlReport));
-      logger.info(format + " validation report generated!");
-      return map;
-    } else {
-      throw new ValidationReportException("Unsupported validation report format " + format);
-    }
+    HashMap<String, String> map = new HashMap<String, String>();
+    map.put("htmlReport", createHtml(xmlReport));
+    return map;
   }
 
   private String createHtml(String xmlReport) {
@@ -69,54 +81,53 @@ import org.springframework.web.bind.annotation.RestController;
     return htmlReport;
   }
 
-  @RequestMapping(value = "/downloadAs/{format}", method = RequestMethod.POST,
+  @RequestMapping(value = "/{resultId}/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public void download(@PathVariable String format, @RequestParam("json") String json,@RequestParam("title") String title,
-      HttpServletRequest request, HttpServletResponse response) {
+  public void download(@RequestParam("format") String format,
+      @PathVariable("resultId") Long resultId, HttpServletRequest request,
+      HttpServletResponse response) {
     try {
-      logger.info("Downloading validation report in " + format);
-      if (json == null) {
-        throw new ValidationReportException("No report generated");
-      }
-      String xmlReport = getValidationReportGenerator().toXML(json);
-      if(xmlReport == null){
+      logger.info("Downloading validation report " + resultId + " in " + format);
+
+      if(format == null)
+        throw new ValidationReportException("No format specified");
+      MessageValidationResult result = validationResultService.findOne(resultId);
+      if (result == null)
+        throw new ValidationReportException("No validation report found");
+      TestStep testStep =  result.getTestStep();
+      if(testStep == null)
+           throw new ValidationReportException("No associated test step found");
+      String title = testStep.getName();
+      String ext = format.toLowerCase();
+      String content = result.getJson();
+      String xmlReport = getValidationReportGenerator().toXML(content);
+      if (xmlReport == null) {
         throw new ValidationReportException("Cannot parse the report");
       }
-      InputStream content = null;
+      InputStream io = null;
       if ("HTML".equalsIgnoreCase(format)) {
-        content = IOUtils.toInputStream(createHtml(xmlReport), "UTF-8");
+        io = IOUtils.toInputStream(createHtml(xmlReport), "UTF-8");
         response.setContentType("text/html");
-        response.setHeader("Content-disposition",
-            "attachment;filename="+ title + "-ValidationReport.html");
       } else if ("DOC".equalsIgnoreCase(format)) {
-        content = IOUtils.toInputStream(createHtml(xmlReport), "UTF-8");
+        io = IOUtils.toInputStream(createHtml(xmlReport), "UTF-8");
         response.setContentType("application/msword");
-        response
-            .setHeader("Content-disposition", "attachment;filename="+ title + "-ValidationReport.doc");
       } else if ("XML".equalsIgnoreCase(format)) {
-        content = IOUtils.toInputStream(xmlReport, "UTF-8");
+        io = IOUtils.toInputStream(xmlReport, "UTF-8");
         response.setContentType("application/xml");
-        response
-            .setHeader("Content-disposition", "attachment;filename="+ title + "-ValidationReport.xml");
       } else if ("PDF".equalsIgnoreCase(format)) {
-        content = getValidationReportGenerator().toPDF(xmlReport);
+        io = getValidationReportGenerator().toPDF(xmlReport);
         response.setContentType("application/pdf");
-        response
-            .setHeader("Content-disposition", "attachment;filename="+ title + "-ValidationReport.pdf");
       } else {
-        throw new ValidationReportException("Unsupported validation report format " + format);
+        throw new ValidationReportException("Unsupported report format " + format);
       }
-      FileCopyUtils.copy(content, response.getOutputStream());
+      response.setHeader("Content-disposition", "attachment;filename=" + title
+          + "-ValidationReport." + ext);
+      FileCopyUtils.copy(io, response.getOutputStream());
     } catch (ValidationReportException | IOException e) {
-      logger.debug("Failed to download the validation report ");
-      throw new ValidationReportException("Failed to download the validation report");
+      throw new ValidationReportException("Failed to download the report");
     } catch (Exception e) {
-      logger.debug("Failed to download the validation report ");
-      throw new ValidationReportException("Failed to download the validation report");
+      throw new ValidationReportException("Failed to download the report");
     }
-   } 
-  
-  
-  
+  }
 
 }

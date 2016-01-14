@@ -1,6 +1,9 @@
 package gov.nist.hit.core.api.filter;
 
+import gov.nist.hit.core.api.SessionContext;
+
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
@@ -12,6 +15,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +23,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 @WebFilter(urlPatterns = "/api/*")
-public class VersionFilter implements Filter {
+public class VersionChangedFilter implements Filter {
 
   /*
    * flaw: Browser Mime Sniffing - fix: X-Content-Type-Options flaw: Cached SSL Content - fix:
@@ -49,11 +53,11 @@ public class VersionFilter implements Filter {
     HttpServletRequest req = (HttpServletRequest) request;
     HttpServletResponse res = (HttpServletResponse) response;
     String path = req.getRequestURI().substring(req.getContextPath().length());
-    if (!path.equals("/api/appInfo")) {
+    if (!Pattern.compile("\\/api\\/appInfo").matcher(path).find()) {
       String headerRsbVersion = req.getHeader("rsbVersion");
       String contextRsbVersion = req.getServletContext().getInitParameter("rsbVersion");
-      if (headerRsbVersion != null && contextRsbVersion != null && !headerRsbVersion.equals(contextRsbVersion)) {
-        res.sendError(403, "RSB_CHANGED"); // State changed
+      if (headerRsbVersion != null && !headerRsbVersion.equals(contextRsbVersion)) {
+        res.sendError(498); // Resource bundle has changed
         return;
       }
     }

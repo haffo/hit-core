@@ -12,9 +12,9 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestStep;
+import gov.nist.hit.core.domain.TestingStage;
 
 import java.util.List;
 
@@ -23,24 +23,28 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface TestStepRepository extends JpaRepository<TestStep, Long> {
-  @Query("select ts from TestStep ts where ts.stage = :stage")
+  @Query("select testStep from TestStep testStep where testStep.stage = :stage")
   public List<TestStep> findAllByStage(@Param("stage") TestingStage stage);
 
-  @Query("select ts.jurorDocument from TestStep ts where ts.id = :id")
+  @Query("select testStep.jurorDocument from TestStep testStep where testStep.id = :id")
   public TestArtifact jurorDocument(@Param("id") Long id);
 
-  @Query("select ts.testPackage from TestStep ts where ts.id = :id")
+  @Query("select testStep.testPackage from TestStep testStep where testStep.id = :id")
   public TestArtifact testPackage(@Param("id") Long id);
 
 
-  @Query("select ts.testStory from TestStep ts where ts.id = :id")
+  @Query("select testStep.testStory from TestStep testStep where testStep.id = :id")
   public TestArtifact testStory(@Param("id") Long id);
 
 
-  @Query("select ts.messageContent from TestStep ts where ts.id = :id")
+  @Query("select testStep.messageContent from TestStep testStep where testStep.id = :id")
   public TestArtifact messageContent(@Param("id") Long id);
 
-  @Query("select ts.testDataSpecification from TestStep ts where ts.id = :id")
+  @Query("select testStep.testDataSpecification from TestStep testStep where testStep.id = :id")
   public TestArtifact testDataSpecification(@Param("id") Long id);
+
+  @Query("select testStep from TestStep testStep where testStep.testContext != null and  testStep.testContext.id = :testContextId")
+  public TestStep findOneByTestContextId(@Param("testContextId") Long testContextId);
+
 
 }

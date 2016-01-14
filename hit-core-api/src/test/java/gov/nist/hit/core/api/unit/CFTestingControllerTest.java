@@ -12,7 +12,7 @@
 package gov.nist.hit.core.api.unit;
 
 import gov.nist.hit.core.api.CFTestingController;
-import gov.nist.hit.core.repo.TestObjectRepository;
+import gov.nist.hit.core.repo.CFTestInstanceRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.TestContextRepository;
 import gov.nist.hit.core.service.TestObjectService;

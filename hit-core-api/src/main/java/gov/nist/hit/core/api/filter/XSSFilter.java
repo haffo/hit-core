@@ -17,7 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-@WebFilter(urlPatterns = "*")
+//@WebFilter(urlPatterns = "*")
 public class XSSFilter implements Filter{
 
 	protected final Log logger = LogFactory.getLog(getClass());

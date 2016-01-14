@@ -65,23 +65,23 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
   protected int position;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testPackage;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testStory;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact jurorDocument;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact messageContent;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true)
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testDataSpecification;
 
 
