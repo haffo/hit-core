@@ -931,7 +931,7 @@ public abstract class ResourcebundleLoader {
     JsonNode ttypeObj = testStepObj.findValue("type");
     String tttypeValue = ttypeObj != null ? ttypeObj.getTextValue() : null;
     TestStepTestingType testingType =
-        tttypeValue != null ? TestStepTestingType.valueOf(tttypeValue)
+        tttypeValue != null && !"".equals(tttypeValue) ? TestStepTestingType.valueOf(tttypeValue)
             : TestStepTestingType.DATAINSTANCE;
     testStep.setTestingType(testingType);
     if (!testingType.equals(TestStepTestingType.SUT_MANUAL)
@@ -1058,8 +1058,8 @@ public abstract class ResourcebundleLoader {
       tp.setDescription(testPlanObj.findValue("description").getTextValue());
       tp.setTestStory(testStory(location));
       tp.setStage(stage);
-      tp.setTransport(testPlanObj.findValue("transport") != null ? testPlanObj.findValue("name")
-          .getBooleanValue() : false);
+      tp.setTransport(testPlanObj.findValue("transport") != null ? testPlanObj.findValue(
+          "transport").getBooleanValue() : false);
       if (testPlanObj.findValue("position") != null) {
         tp.setPosition(testPlanObj.findValue("position").getIntValue());
       } else {
