@@ -12,30 +12,30 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.MessageValidationResult;
+import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.User;
-import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.domain.ValidationReport;
+import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.UserService;
-import gov.nist.hit.core.service.ValidationReportGenerator;
-import gov.nist.hit.core.service.MessageValidationResultService;
+import gov.nist.hit.core.service.ValidationReportService;
+import gov.nist.hit.core.service.exception.MessageValidationException;
+import gov.nist.hit.core.service.exception.TestCaseException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,75 +47,94 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Harold Affo (NIST)
  * 
  */
-public abstract class ValidationReportController {
+@RestController
+@RequestMapping("/report")
+public class ValidationReportController {
 
   static final Logger logger = LoggerFactory.getLogger(ValidationReportController.class);
 
-
-  public abstract ValidationReportGenerator getValidationReportGenerator();
-
-
   @Autowired
-  private MessageValidationResultService validationResultService;
+  private ValidationReportService validationReportService;
 
   @Autowired
   private TestStepService testStepService;
 
   @Autowired
+  private TestCaseService testCaseService;
+
+  @Autowired
   private UserService userService;
 
-  @RequestMapping(value = "/generate", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public Map<String, String> generate(@RequestParam("xmlReport") final String xmlReport) {
-    logger.info("Generating html validation report");
-    if (xmlReport == null) {
-      throw new ValidationReportException("No xml report provided");
-    }
-    HashMap<String, String> map = new HashMap<String, String>();
-    map.put("htmlReport", createHtml(xmlReport));
-    return map;
-  }
 
-  private String createHtml(String xmlReport) {
-    String htmlReport = getValidationReportGenerator().toHTML(xmlReport);
-    return htmlReport;
-  }
-
-  @RequestMapping(value = "/{resultId}/download", method = RequestMethod.POST,
+  @RequestMapping(value = "/save", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public void download(@RequestParam("format") String format,
-      @PathVariable("resultId") Long resultId, HttpServletRequest request,
+  public ValidationReport save(@RequestParam("xmlReport") String xmlReport,
+      @RequestParam("testStepId") Long testStepId, HttpServletRequest request,
       HttpServletResponse response) {
     try {
-      logger.info("Downloading validation report " + resultId + " in " + format);
+      logger.info("Saving validation report");
+      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+      User user = null;
+      if (userId == null || ((user = userService.findOne(userId)) == null))
+        throw new MessageValidationException("Invalid user credentials");
 
-      if(format == null)
+      TestStep testStep = testStepService.findOne(testStepId);
+      if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
+        throw new ValidationReportException("No test step or unknown test step specified");
+
+      ValidationReport report =
+          validationReportService.findOneByTestStepAndUser(testStepId, userId);
+      if (report == null) {
+        report = new ValidationReport();
+        report.setTestStep(testStep);
+        report.setUser(user);
+      }
+      report.setXml(xmlReport);
+      validationReportService.save(report);
+      return report;
+    } catch (ValidationReportException e) {
+      throw new ValidationReportException("Failed to download the report");
+    } catch (Exception e) {
+      throw new ValidationReportException("Failed to download the report");
+    }
+  }
+
+  @RequestMapping(value = "/teststep/{testStepId}/download", method = RequestMethod.POST,
+      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+  public void download(@RequestParam("format") String format,
+      @PathVariable("testStepId") Long testStepId, HttpServletRequest request,
+      HttpServletResponse response) {
+    try {
+      logger.info("Downloading validation report  in " + format);
+      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+      User user = null;
+      if (userId == null || ((user = userService.findOne(userId)) == null))
+        throw new MessageValidationException("Invalid user credentials");
+      if (format == null)
         throw new ValidationReportException("No format specified");
-      MessageValidationResult result = validationResultService.findOne(resultId);
-      if (result == null)
-        throw new ValidationReportException("No validation report found");
-      TestStep testStep =  result.getTestStep();
-      if(testStep == null)
-           throw new ValidationReportException("No associated test step found");
+      ValidationReport report =
+          validationReportService.findOneByTestStepAndUser(testStepId, userId);
+      String xmlReport = null;
+      if (report == null || ((xmlReport = report.getXml()) == null)) {
+        throw new ValidationReportException("No validation report available for this test step");
+      }
+      TestStep testStep = report.getTestStep();
+      if (testStep == null)
+        throw new ValidationReportException("No associated test step found");
       String title = testStep.getName();
       String ext = format.toLowerCase();
-      String content = result.getJson();
-      String xmlReport = getValidationReportGenerator().toXML(content);
-      if (xmlReport == null) {
-        throw new ValidationReportException("Cannot parse the report");
-      }
       InputStream io = null;
       if ("HTML".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(createHtml(xmlReport), "UTF-8");
+        io = IOUtils.toInputStream(html(xmlReport), "UTF-8");
         response.setContentType("text/html");
       } else if ("DOC".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(createHtml(xmlReport), "UTF-8");
+        io = IOUtils.toInputStream(html(xmlReport), "UTF-8");
         response.setContentType("application/msword");
       } else if ("XML".equalsIgnoreCase(format)) {
         io = IOUtils.toInputStream(xmlReport, "UTF-8");
         response.setContentType("application/xml");
       } else if ("PDF".equalsIgnoreCase(format)) {
-        io = getValidationReportGenerator().toPDF(xmlReport);
+        io = validationReportService.toPDF(xmlReport);
         response.setContentType("application/pdf");
       } else {
         throw new ValidationReportException("Unsupported report format " + format);
@@ -129,5 +148,56 @@ public abstract class ValidationReportController {
       throw new ValidationReportException("Failed to download the report");
     }
   }
+
+  public InputStream pdf(ValidationReport report) {
+    try {
+      String xmlReport = report.getXml();
+      InputStream io = validationReportService.toPDF(xmlReport);
+      return io;
+    } catch (ValidationReportException e) {
+      throw new ValidationReportException("Failed to download the report");
+    } catch (Exception e) {
+      throw new ValidationReportException("Failed to download the report");
+    }
+  }
+
+  @RequestMapping(value = "/testcase/{testCaseId}/download", method = RequestMethod.POST,
+      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+  public boolean zipReports(@PathVariable("testCaseId") final Long testCaseId,
+      HttpServletRequest request, HttpServletResponse response) throws ValidationReportException {
+    try {
+      logger.info("Clearing user records for testcase " + testCaseId);
+      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+      if (userId == null || userService.findOne(userId) == null)
+        throw new ValidationReportException("Invalid user credentials");
+      TestCase testCase = testCaseService.findOne(testCaseId);
+      if (testCase == null)
+        throw new TestCaseException(testCaseId);
+      List<ValidationReport> results =
+          validationReportService.findAllByTestCaseAndUser(testCaseId, userId);
+      if (results != null && !results.isEmpty()) {
+        HashMap<String, InputStream> resultStreams =
+            new HashMap<String, InputStream>(results.size());
+        for (ValidationReport result : results) {
+          TestStep tesStep = result.getTestStep();
+          InputStream pdf = pdf(result);
+          resultStreams.put(tesStep.getName().concat("-ValidationReport.pdf"), pdf);
+        }
+        InputStream io = validationReportService.zipReports(testCase.getName(), resultStreams);
+        response.setContentType("application/zip");
+        response.setHeader("Content-disposition", "attachment;filename=" + testCase.getName()
+            + "-ValidationReports.zip");
+        FileCopyUtils.copy(io, response.getOutputStream());
+      }
+    } catch (Exception e) {
+      throw new ValidationReportException("Failed to download the reports");
+    }
+    return true;
+  }
+
+  private String html(String xmlReport) {
+    return validationReportService.toHTML(xmlReport);
+  }
+
 
 }

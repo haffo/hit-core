@@ -39,9 +39,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/cb")
 @RestController
-public class CBTestingController {
+public class ContextBasedController {
 
-  static final Logger logger = LoggerFactory.getLogger(CBTestingController.class);
+  static final Logger logger = LoggerFactory.getLogger(ContextBasedController.class);
 
   @Autowired
   private TestPlanService testPlanService;

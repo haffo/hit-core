@@ -48,6 +48,10 @@ public class TestStep extends AbstractTestCase implements Serializable {
       orphanRemoval = true)
   protected TestContext testContext;
 
+  @JsonIgnore
+  @ManyToOne(optional=true)
+  protected TestCase testCase;
+  
  
   public TestStep(String name) {
     super();
@@ -84,6 +88,14 @@ public class TestStep extends AbstractTestCase implements Serializable {
 
   public void setProtocol(String protocol) {
     this.protocol = protocol;
+  }
+
+  public TestCase getTestCase() {
+    return testCase;
+  }
+
+  public void setTestCase(TestCase testCase) {
+    this.testCase = testCase;
   }
 
   

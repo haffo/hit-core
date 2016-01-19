@@ -49,6 +49,8 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
       inverseJoinColumns = {@JoinColumn(name = "testcasegroup_id")})
     private List<TestCaseGroup> testCaseGroups = new ArrayList<TestCaseGroup>();
 
+  private boolean transport;
+   
   public Long getId() {
     return id;
   }
@@ -83,6 +85,14 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
 
   public void setTestProcedure(TestArtifact testProcedure) {
     this.testProcedure = testProcedure;
+  }
+
+  public boolean isTransport() {
+    return transport;
+  }
+
+  public void setTransport(boolean transport) {
+    this.transport = transport;
   }
 
   

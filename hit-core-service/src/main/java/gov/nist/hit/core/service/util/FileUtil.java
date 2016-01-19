@@ -1,6 +1,7 @@
 package gov.nist.hit.core.service.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
@@ -21,7 +22,11 @@ public class FileUtil {
 
 
   public static byte[] getByteArray(String path) throws IOException {
-    return IOUtils.toByteArray(FileUtil.class.getResourceAsStream(path));
+    return getByteArray(FileUtil.class.getResourceAsStream(path));
+  }
+
+  public static byte[] getByteArray(InputStream io) throws IOException {
+    return IOUtils.toByteArray(io);
   }
 
   public static String getContent(Resource resource) {

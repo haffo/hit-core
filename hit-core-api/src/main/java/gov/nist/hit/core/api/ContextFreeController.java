@@ -31,9 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/cf")
 @RestController
-public class CFTestingController {
+public class ContextFreeController {
 
-  static final Logger logger = LoggerFactory.getLogger(CFTestingController.class);
+  static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
 
   @Autowired
   private TestObjectService testObjectService;

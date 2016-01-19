@@ -2,7 +2,7 @@ package gov.nist.hit.core.domain;
 
 public enum ContentDefinitionType {
 
-  Extensional("Extensional"), intensional("intensional");
+  Extensional("Extensional"), Intensional("Intensional");
   private final String value;
 
   ContentDefinitionType(String v) {

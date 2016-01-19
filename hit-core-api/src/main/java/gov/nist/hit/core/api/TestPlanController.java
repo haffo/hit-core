@@ -12,13 +12,17 @@
 
 package gov.nist.hit.core.api;
 
+import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.TestCaseException;
+import gov.nist.hit.core.service.exception.TestPlanException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,5 +74,26 @@ public class TestPlanController {
     }
     return null;
   }
+
+  @RequestMapping(value = "/{testPlanId}")
+  public TestPlan testPlan(@PathVariable final Long testPlanId) {
+    logger.info("Fetching test plan with id=" + testPlanId);
+    TestPlan testPlan = testPlanRepository.findOne(testPlanId);
+    if (testPlan == null) {
+      throw new TestPlanException(testPlanId);
+    }
+    return testPlan;
+  }
+
+  @RequestMapping(value = "/{testPlanId}/details", method = RequestMethod.GET)
+  public Map<String, TestArtifact> details(@PathVariable final Long testPlanId) {
+    logger.info("Fetching artifacts of testplan with id=" + testPlanId);
+    TestPlan testPlan = testPlan(testPlanId);
+    Map<String, TestArtifact> result = new HashMap<String, TestArtifact>();
+    result.put("testStory", testPlan.getTestStory());
+    return result;
+  }
+
+
 
 }

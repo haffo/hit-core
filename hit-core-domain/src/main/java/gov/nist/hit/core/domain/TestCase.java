@@ -18,11 +18,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
@@ -44,12 +47,9 @@ public class TestCase extends AbstractTestCase implements Serializable {
     this.testingType = TestCaseTestingType.DATAINSTANCE;
    }
 
-  @OneToMany(orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
-  @JoinTable(name = "tc_ts", joinColumns = {@JoinColumn(name = "testcase_id")},
-      inverseJoinColumns = {@JoinColumn(name = "teststep_id")})
+  @OneToMany(mappedBy = "testCase", orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   private List<TestStep> testSteps = new ArrayList<TestStep>();
 
-  
   private String domain;
   
   public Long getId() {
@@ -84,6 +84,14 @@ public class TestCase extends AbstractTestCase implements Serializable {
     this.domain = domain;
   }
 
+  
+  public void addTestStep(TestStep testStep){
+    if(testStep.getTestCase() != null){
+      throw new RuntimeException("Test step belongs to a different test case");
+    } 
+    getTestSteps().add(testStep);
+    testStep.setTestCase(this);
+  }
   
 
  

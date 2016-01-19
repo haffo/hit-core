@@ -11,7 +11,7 @@
  */
 package gov.nist.hit.core.api.unit;
 
-import gov.nist.hit.core.api.CFTestingController;
+import gov.nist.hit.core.api.ContextFreeController;
 import gov.nist.hit.core.repo.CFTestInstanceRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.TestContextRepository;
@@ -47,7 +47,7 @@ public class CFTestingControllerTest {
 
 
   @InjectMocks
-  CFTestingController controller;
+  ContextFreeController controller;
 
   MockMvc mockMvc;
 

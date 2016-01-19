@@ -4,10 +4,12 @@ import gov.nist.hit.core.domain.TestStepTestingType;
 import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.User;
+import gov.nist.hit.core.domain.ValidationReport;
 import gov.nist.hit.core.repo.UserRepository;
 import gov.nist.hit.core.service.TransactionService;
 import gov.nist.hit.core.service.TransportConfigService;
 import gov.nist.hit.core.service.UserService;
+import gov.nist.hit.core.service.ValidationReportService;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   protected TransportConfigService transportConfigService;
+
+  @Autowired
+  protected ValidationReportService validationReportService;
 
   @Override
   public boolean exitBySutInitiatorPropertiesAndProtocol(Map<String, String> criteria,
@@ -58,6 +63,11 @@ public class UserServiceImpl implements UserService {
       if (transactions != null) {
         transactionService.delete(transactions);
       }
+
+      List<ValidationReport> reports = validationReportService.findAllByUser(id);
+      if (reports != null)
+        validationReportService.delete(reports);
+
       userRepository.delete(id);
     }
   }

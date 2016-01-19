@@ -1,11 +1,8 @@
 package gov.nist.hit.core.api.filter;
 
-import gov.nist.hit.core.api.SessionContext;
-
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -19,9 +16,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xerces.impl.xpath.regex.Match;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 
 @WebFilter(urlPatterns = "/api/*")
 public class SessionTmeoutFilter implements Filter {
@@ -55,15 +49,20 @@ public class SessionTmeoutFilter implements Filter {
     HttpServletResponse res = (HttpServletResponse) response;
     String path = req.getRequestURI().substring(req.getContextPath().length());
     HttpSession session = req.getSession(false);
-    if (!Pattern.compile("\\/api\\/appInfo").matcher(path).find() && !Pattern.compile("\\/api\\/session\\/create").matcher(path).find() && !Pattern.compile("\\/api\\/ws\\/").matcher(path).find()
-        && !Pattern.compile("\\/api\\/(\\w+)\\/testcases").matcher(path).find()
-        && !Pattern.compile("\\/api\\/testcase").matcher(path).find()
-        && !Pattern.compile("\\/api\\/documentation\\/doc").matcher(path).find()
-        && (session == null)) {
+    if (session == null
+        && ((Pattern.compile("\\/api\\/(\\w+)\\/clearRecords").matcher(path).find()) || ((!Pattern
+            .compile("\\/api\\/appInfo").matcher(path).find()
+            && !Pattern.compile("\\/api\\/session\\/create").matcher(path).find()
+            && !Pattern.compile("\\/api\\/ws\\/").matcher(path).find()
+            && !Pattern.compile("\\/api\\/(\\w+)\\/testcases").matcher(path).find()
+            && !Pattern.compile("\\/api\\/testcases").matcher(path).find()
+            && !Pattern.compile("\\/api\\/teststeps").matcher(path).find()
+            && !Pattern.compile("\\/api\\/testplans").matcher(path).find()
+            && !Pattern.compile("\\/api\\/testcasegroups").matcher(path).find() && !Pattern
+            .compile("\\/api\\/documentation\\/doc").matcher(path).find())))) {
       res.sendError(440); // session timeout
       return;
     }
     chain.doFilter(request, response);
   }
-
 }

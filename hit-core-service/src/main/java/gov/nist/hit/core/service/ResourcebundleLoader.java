@@ -39,7 +39,6 @@ import gov.nist.hit.core.repo.ConstraintsRepository;
 import gov.nist.hit.core.repo.DocumentRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.MessageRepository;
-import gov.nist.hit.core.repo.MessageValidationResultRepository;
 import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
@@ -47,6 +46,7 @@ import gov.nist.hit.core.repo.TransactionRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.repo.TransportMessageRepository;
 import gov.nist.hit.core.repo.UserRepository;
+import gov.nist.hit.core.repo.ValidationReportRepository;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
@@ -174,7 +174,7 @@ public abstract class ResourcebundleLoader {
   protected TransactionRepository transactionRepository;
 
   @Autowired
-  protected MessageValidationResultRepository validationResultRepository;
+  protected ValidationReportRepository validationResultRepository;
 
   protected com.fasterxml.jackson.databind.ObjectMapper obm;
 
@@ -218,9 +218,8 @@ public abstract class ResourcebundleLoader {
       this.loadConstraints();
       this.loadVocabularyLibraries();
       this.loadIntegrationProfiles();
-      this.loadCfTestCases();
-      this.loadCbTestCases();
-      this.loadIsolatedTestCases();
+      this.loadContextFreeTestCases();
+      this.loadContextBasedTestCases();
       this.loadTestCasesDocumentation();
       this.loadUserDocs();
       this.loadKownIssues();
@@ -369,8 +368,6 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
-
-    logger.info("loading user documents...DONE");
   }
 
 
@@ -407,16 +404,12 @@ public abstract class ResourcebundleLoader {
         throw new RuntimeException("Transport.json file content must be an array");
       }
     }
-    logger.info("loading protocols info...DONE");
   }
 
-  private void loadResourcesDocs() throws IOException {
-    logger.info("loading resource documents...");
+  private List<gov.nist.hit.core.domain.Document> getProfilesDocs() throws IOException {
+    logger.info("loading integration profiles...");
     List<gov.nist.hit.core.domain.Document> resourceDocs =
         new ArrayList<gov.nist.hit.core.domain.Document>();
-
-    // profiles
-    logger.info("loading integration profiles...");
     JsonNode conf = toJsonObj(PROFILE_PATTERN + PROFILES_CONF_FILE_PATTERN);
     Set<String> skipped = null;
     JsonNode ordersObj = null;
@@ -443,16 +436,21 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
+    return resourceDocs;
+  }
 
-    // constraints
+  private List<gov.nist.hit.core.domain.Document> getConstraintsDocs() throws IOException {
     logger.info("loading constraints...");
-    conf = toJsonObj(CONSTRAINT_PATTERN + CONSTRAINTS_CONF_FILE_PATTERN);
-    skipped = null;
+    List<gov.nist.hit.core.domain.Document> resourceDocs =
+        new ArrayList<gov.nist.hit.core.domain.Document>();
+    JsonNode conf = toJsonObj(CONSTRAINT_PATTERN + CONSTRAINTS_CONF_FILE_PATTERN);
+    Set<String> skipped = null;
+    JsonNode ordersObj = null;
     if (conf != null) {
       skipped = skippedAsList(conf.findValue("skip"));
       ordersObj = conf.findValue("orders");
     }
-    resources = getResources(CONSTRAINT_PATTERN + "*.xml");
+    List<Resource> resources = getResources(CONSTRAINT_PATTERN + "*.xml");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = resource.getFilename();
@@ -470,16 +468,25 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
+    return resourceDocs;
+  }
 
+
+  private List<gov.nist.hit.core.domain.Document> getValueSetsDocs() throws IOException {
+    logger.info("loading constraints...");
+    List<gov.nist.hit.core.domain.Document> resourceDocs =
+        new ArrayList<gov.nist.hit.core.domain.Document>();
+    JsonNode conf = toJsonObj(VALUESET_PATTERN + TABLES_CONF_FILE_PATTERN);
+    Set<String> skipped = null;
+    JsonNode ordersObj = null;
     logger.info("loading value sets...");
     // value sets
-    conf = toJsonObj(VALUESET_PATTERN + TABLES_CONF_FILE_PATTERN);
     skipped = null;
     if (conf != null) {
       skipped = skippedAsList(conf.findValue("skip"));
       ordersObj = conf.findValue("orders");
     }
-    resources = getResources(VALUESET_PATTERN + "*.xml");
+    List<Resource> resources = getResources(VALUESET_PATTERN + "*.xml");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = resource.getFilename();
@@ -497,11 +504,21 @@ public abstract class ResourcebundleLoader {
         }
       }
     }
+    return resourceDocs;
+  }
 
+
+
+  private void loadResourcesDocs() throws IOException {
+    logger.info("loading resource documents...");
+    List<gov.nist.hit.core.domain.Document> resourceDocs =
+        new ArrayList<gov.nist.hit.core.domain.Document>();
+    resourceDocs.addAll(getProfilesDocs());
+    resourceDocs.addAll(getConstraintsDocs());
+    resourceDocs.addAll(getValueSetsDocs());
     if (!resourceDocs.isEmpty()) {
       documentRepository.save(resourceDocs);
     }
-
   }
 
   private void loadKownIssues() throws IOException {
@@ -829,22 +846,7 @@ public abstract class ResourcebundleLoader {
     return path;
   }
 
-
-  private void loadIsolatedTestCases() throws IOException {
-    List<Resource> resources = getDirectories(domainPath(ISOLATED_PATTERN) + "*/");
-    if (resources != null && !resources.isEmpty()) {
-      for (Resource resource : resources) {
-        String fileName = fileName(resource);
-        String location =
-            fileName.substring(fileName.indexOf(domainPath(ISOLATED_PATTERN)), fileName.length());
-        TestPlan testPlan = testPlan(location, TestingStage.ISOLATED);
-        if (testPlan != null)
-          testPlanRepository.save(testPlan);
-      }
-    }
-  }
-
-  private void loadCbTestCases() throws IOException {
+  private void loadContextBasedTestCases() throws IOException {
     List<Resource> resources = getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
@@ -859,7 +861,7 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private void loadCfTestCases() throws IOException, ProfileParserException {
+  private void loadContextFreeTestCases() throws IOException, ProfileParserException {
     List<Resource> resources = getDirectories(domainPath(CONTEXTFREE_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
@@ -907,8 +909,7 @@ public abstract class ResourcebundleLoader {
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
       TestStep testStep = testStep(tcLocation, stage);
       testStep.setParentName(tc.getName());
-
-      tc.getTestSteps().add(testStep);
+      tc.addTestStep(testStep);
     }
 
     return tc;
@@ -962,18 +963,21 @@ public abstract class ResourcebundleLoader {
 
   private TestArtifact artifact(String location, String type) throws IOException {
     TestArtifact doc = null;
-    String path = location + type + ".pdf";
+
+    String path = location + type + ".html";
     Resource resource = ResourcebundleHelper.getResource(path);
-    if (resource != null) {
-      doc = new TestArtifact(type);
-      doc.setPdfPath(path);
-    }
-    path = location + type + ".html";
-    resource = ResourcebundleHelper.getResource(path);
     if (resource != null) {
       doc = doc == null ? new TestArtifact(type) : doc;
       doc.setHtml(FileUtil.getContent(resource));
     }
+
+    path = location + type + ".pdf";
+    resource = ResourcebundleHelper.getResource(path);
+    if (resource != null) {
+      doc = doc == null ? new TestArtifact(type) : doc;
+      doc.setPdfPath(path);
+    }
+
 
     if (type.equals("TestStory")) { // TODO: Temporary hack
       path = location + type + ".json";
@@ -1013,6 +1017,7 @@ public abstract class ResourcebundleLoader {
       TestCaseGroup tcg = new TestCaseGroup();
       tcg.setName(testPlanObj.findValue("name").getTextValue());
       tcg.setDescription(testPlanObj.findValue("description").getTextValue());
+      tcg.setTestStory(testStory(location));
       if (testPlanObj.findValue("position") != null) {
         tcg.setPosition(testPlanObj.findValue("position").getIntValue());
       } else {
@@ -1039,11 +1044,11 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private TestPlan testPlan(String testPlanPath, TestingStage stage) throws IOException {
-    logger.info("Processing test plan  at:" + testPlanPath);
-    Resource res = ResourcebundleHelper.getResource(testPlanPath + "TestPlan.json");
+  private TestPlan testPlan(String location, TestingStage stage) throws IOException {
+    logger.info("Processing test plan  at:" + location);
+    Resource res = ResourcebundleHelper.getResource(location + "TestPlan.json");
     if (res == null)
-      throw new IllegalArgumentException("No TestPlan.json found at " + testPlanPath);
+      throw new IllegalArgumentException("No TestPlan.json found at " + location);
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
@@ -1051,25 +1056,28 @@ public abstract class ResourcebundleLoader {
       TestPlan tp = new TestPlan();
       tp.setName(testPlanObj.findValue("name").getTextValue());
       tp.setDescription(testPlanObj.findValue("description").getTextValue());
+      tp.setTestStory(testStory(location));
       tp.setStage(stage);
+      tp.setTransport(testPlanObj.findValue("transport") != null ? testPlanObj.findValue("name")
+          .getBooleanValue() : false);
       if (testPlanObj.findValue("position") != null) {
         tp.setPosition(testPlanObj.findValue("position").getIntValue());
       } else {
         tp.setPosition(1);
       }
-      tp.setTestProcedure(testProcedure(testPlanPath));
-      tp.setTestPackage(testPackage(testPlanPath));
-      List<Resource> resources = getDirectories(testPlanPath + "*/");
+      tp.setTestProcedure(testProcedure(location));
+      tp.setTestPackage(testPackage(location));
+      List<Resource> resources = getDirectories(location + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
-        String location = fileName.substring(fileName.indexOf(testPlanPath), fileName.length());
-        Resource descriptorResource = getDescriptorResource(location);
+        String loca = fileName.substring(fileName.indexOf(location), fileName.length());
+        Resource descriptorResource = getDescriptorResource(loca);
         String filename = descriptorResource.getFilename();
         if (filename.endsWith("TestCaseGroup.json")) {
-          TestCaseGroup testCaseGroup = testCaseGroup(location, stage);
+          TestCaseGroup testCaseGroup = testCaseGroup(loca, stage);
           tp.getTestCaseGroups().add(testCaseGroup);
         } else if (filename.endsWith("TestCase.json")) {
-          TestCase testCase = testCase(location, stage);
+          TestCase testCase = testCase(loca, stage);
           testCase.setParentName(tp.getName());
           tp.getTestCases().add(testCase);
         }
@@ -1122,14 +1130,6 @@ public abstract class ResourcebundleLoader {
     doc =
         generateTestCaseDocumentation("Context-based", TestingStage.CB,
             testPlanRepository.findAllByStage(TestingStage.CB));
-    if (doc != null) {
-      doc.setJson(obm.writeValueAsString(doc));
-      testCaseDocumentationRepository.save(doc);
-    }
-
-    doc =
-        generateTestCaseDocumentation("Isolated", TestingStage.ISOLATED,
-            testPlanRepository.findAllByStage(TestingStage.ISOLATED));
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
       testCaseDocumentationRepository.save(doc);
@@ -1386,12 +1386,11 @@ public abstract class ResourcebundleLoader {
     this.transactionRepository = transactionRepository;
   }
 
-  public MessageValidationResultRepository getValidationResultRepository() {
+  public ValidationReportRepository getValidationResultRepository() {
     return validationResultRepository;
   }
 
-  public void setValidationResultRepository(
-      MessageValidationResultRepository validationResultRepository) {
+  public void setValidationResultRepository(ValidationReportRepository validationResultRepository) {
     this.validationResultRepository = validationResultRepository;
   }
 
