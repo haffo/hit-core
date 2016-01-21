@@ -8,10 +8,10 @@
 	<description>hit-core</description>
 	<packaging>pom</packaging>
 	<modules>
-		<module>hit-core-service</module>
 		<module>hit-core-domain</module>
-		<module>hit-core-transport</module>
+		<module>hit-core-service</module>
 		<module>hit-core-repo</module>
+		<module>hit-core-transport</module>
 		<module>hit-core-api</module>
 	</modules>
 
