@@ -52,7 +52,7 @@
 		<dependency>
 			<groupId>gov.nist.hit.core</groupId>
 			<artifactId>hit-core-service</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+						<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
