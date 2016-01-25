@@ -218,7 +218,6 @@
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<releaseProfiles>release</releaseProfiles>
-						<goals>install animal-sniffer:check deploy site</goals>
 					</configuration>
 					<dependencies>
 						<dependency>
