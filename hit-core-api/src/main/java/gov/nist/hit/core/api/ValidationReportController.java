@@ -181,7 +181,8 @@ public class ValidationReportController {
         for (ValidationReport result : results) {
           TestStep tesStep = result.getTestStep();
           InputStream pdf = pdf(result);
-          resultStreams.put(tesStep.getName().concat("-ValidationReport.pdf"), pdf);
+          resultStreams.put(
+              tesStep.getPosition() + "." + tesStep.getName().concat("-ValidationReport.pdf"), pdf);
         }
         InputStream io = validationReportService.zipReports(testCase.getName(), resultStreams);
         response.setContentType("application/zip");
