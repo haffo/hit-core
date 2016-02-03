@@ -33,7 +33,13 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   
   @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(unique = true)
-  protected TestArtifact testProcedure; 
+  protected TestArtifact testProcedure;  
+  
+  @OneToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(unique = true)
+  protected TestArtifact quickTestCaseReferenceGuide; 
+
+  
 
   public TestPlan() {
     this.type = ObjectType.TestPlan;
@@ -93,6 +99,14 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
 
   public void setTransport(boolean transport) {
     this.transport = transport;
+  }
+
+  public TestArtifact getQuickTestCaseReferenceGuide() {
+    return quickTestCaseReferenceGuide;
+  }
+
+  public void setQuickTestCaseReferenceGuide(TestArtifact quickTestCaseReferenceGuide) {
+    this.quickTestCaseReferenceGuide = quickTestCaseReferenceGuide;
   }
 
   

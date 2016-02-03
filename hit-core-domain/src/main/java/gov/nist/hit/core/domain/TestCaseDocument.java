@@ -19,12 +19,13 @@ public class TestCaseDocument {
   protected Long id;
   protected String type;
   protected String title;
-  protected String mcPath;
-  protected String tdsPath;
-  protected String tpPath;
-  protected String jdPath;
-  protected String tsPath;
-  protected String csPath;
+  protected String mcPath; // message content 
+  protected String tdsPath; // test data specification
+  protected String tpPath; // test procedure
+  protected String qtrgPath; // quick test reference guide
+  protected String jdPath; // juror document 
+  protected String tsPath; // test story 
+  protected String csPath; // constraint 
   protected String format;
 
 
@@ -122,6 +123,16 @@ public class TestCaseDocument {
   public void setFormat(String format) {
     this.format = format;
   }
+
+  public String getQtrgPath() {
+    return qtrgPath;
+  }
+
+  public void setQtrgPath(String qtrgPath) {
+    this.qtrgPath = qtrgPath;
+  }
+
+   
 
   
 

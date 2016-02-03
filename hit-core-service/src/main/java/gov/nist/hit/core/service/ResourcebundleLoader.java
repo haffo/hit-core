@@ -1005,6 +1005,12 @@ public abstract class ResourcebundleLoader {
   }
 
 
+  private TestArtifact quickTestCaseReferenceGuide(String location) throws IOException {
+    return artifact(location, "QuickTestCaseReferenceGuide");
+  }
+
+
+
   private TestCaseGroup testCaseGroup(String location, TestingStage stage) throws IOException {
     logger.info("Processing test case group at:" + location);
     Resource descriptorRsrce = ResourcebundleHelper.getResource(location + "TestCaseGroup.json");
@@ -1067,6 +1073,7 @@ public abstract class ResourcebundleLoader {
       }
       tp.setTestProcedure(testProcedure(location));
       tp.setTestPackage(testPackage(location));
+      tp.setQuickTestCaseReferenceGuide(quickTestCaseReferenceGuide(location));
       List<Resource> resources = getDirectories(location + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
@@ -1171,6 +1178,9 @@ public abstract class ResourcebundleLoader {
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
     doc.setId(tp.getId());
+    doc.setQtrgPath(tp.getQuickTestCaseReferenceGuide() != null ? tp
+        .getQuickTestCaseReferenceGuide().getPdfPath() : null);
+    doc.setTpPath(tp.getTestPackage() != null ? tp.getTestPackage().getPdfPath() : null);
     if (tp.getTestCaseGroups() != null && !tp.getTestCaseGroups().isEmpty()) {
       Collections.sort(tp.getTestCaseGroups());
       for (TestCaseGroup tcg : tp.getTestCaseGroups()) {
