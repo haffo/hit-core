@@ -21,22 +21,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface TestCaseRepository extends JpaRepository<TestCase, Long> {
 
-
-  @Query("select tc.jurorDocument from TestCase tc where tc.id = :id")
-  public TestArtifact jurorDocument(@Param("id") Long id);
-
-  @Query("select tc.testPackage from TestCase tc where tc.id = :id")
-  public TestArtifact testPackage(@Param("id") Long id);
-
-
   @Query("select tc.testStory from TestCase tc where tc.id = :id")
   public TestArtifact testStory(@Param("id") Long id);
-
-
-  @Query("select tc.messageContent from TestCase tc where tc.id = :id")
-  public TestArtifact messageContent(@Param("id") Long id);
-
-  @Query("select tc.testDataSpecification from TestCase tc where tc.id = :id")
-  public TestArtifact testDataSpecification(@Param("id") Long id);
 
 }

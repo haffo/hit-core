@@ -889,10 +889,6 @@ public abstract class ResourcebundleLoader {
     tc.setName(testCaseObj.findValue("name").getTextValue());
     tc.setDescription(testCaseObj.findValue("description").getTextValue());
     tc.setTestStory(testStory(location));
-    tc.setTestPackage(testPackage(location));
-    tc.setJurorDocument(jurorDocument(location));
-    tc.setMessageContent(messageContent(location));
-    tc.setTestDataSpecification(testDataSpecification(location));
     tc.setDomain(testCaseObj.findValue("domain") != null ? testCaseObj.findValue("domain")
         .getTextValue() : null);
     logger.info("Domain is " + tc.getDomain());
@@ -939,7 +935,6 @@ public abstract class ResourcebundleLoader {
       testStep.setTestContext(testContext(location, testStepObj, stage));
     }
     testStep.setTestStory(testStory(location));
-    testStep.setTestPackage(testPackage(location));
     testStep.setJurorDocument(jurorDocument(location));
     testStep.setMessageContent(messageContent(location));
     testStep.setTestDataSpecification(testDataSpecification(location));
@@ -1005,8 +1000,9 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private TestArtifact quickTestCaseReferenceGuide(String location) throws IOException {
+  private TestArtifact testPlanSummary(String location) throws IOException {
     return artifact(location, "QuickTestCaseReferenceGuide");
+    // return artifact(location, "TestPlanSummary");
   }
 
 
@@ -1071,9 +1067,8 @@ public abstract class ResourcebundleLoader {
       } else {
         tp.setPosition(1);
       }
-      tp.setTestProcedure(testProcedure(location));
       tp.setTestPackage(testPackage(location));
-      tp.setQuickTestCaseReferenceGuide(quickTestCaseReferenceGuide(location));
+      tp.setTestPlanSummary(testPlanSummary(location));
       List<Resource> resources = getDirectories(location + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
@@ -1178,9 +1173,6 @@ public abstract class ResourcebundleLoader {
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
     doc.setId(tp.getId());
-    doc.setQtrgPath(tp.getQuickTestCaseReferenceGuide() != null ? tp
-        .getQuickTestCaseReferenceGuide().getPdfPath() : null);
-    doc.setTpPath(tp.getTestPackage() != null ? tp.getTestPackage().getPdfPath() : null);
     if (tp.getTestCaseGroups() != null && !tp.getTestCaseGroups().isEmpty()) {
       Collections.sort(tp.getTestCaseGroups());
       for (TestCaseGroup tcg : tp.getTestCaseGroups()) {
@@ -1265,16 +1257,21 @@ public abstract class ResourcebundleLoader {
       TestCaseDocument doc) throws IOException {
     doc.setTitle(ts.getName());
     doc.setType(ts.getType().toString());
-    doc.setMcPath(ts.getMessageContent() != null ? ts.getMessageContent().getPdfPath() : null);
-    doc.setTdsPath(ts.getTestDataSpecification() != null ? ts.getTestDataSpecification()
-        .getPdfPath() : null);
     doc.setTsPath(ts.getTestStory() != null ? ts.getTestStory().getPdfPath() : null);
-    doc.setTpPath(ts.getTestPackage() != null ? ts.getTestPackage().getPdfPath() : null);
-    doc.setJdPath(ts.getJurorDocument() != null ? ts.getJurorDocument().getPdfPath() : null);
+    if (ts instanceof TestPlan) {
+      TestPlan tp = (TestPlan) ts;
+      doc.setTpPath(tp.getTestPackage() != null ? tp.getTestPackage().getPdfPath() : null);
+      doc.setTpsPath(tp.getTestPlanSummary() != null ? tp.getTestPlanSummary().getPdfPath() : null);
+    } else if (ts instanceof TestStep) {
+      TestStep tStep = (TestStep) ts;
+      doc.setMcPath(tStep.getMessageContent() != null ? tStep.getMessageContent().getPdfPath()
+          : null);
+      doc.setTdsPath(tStep.getTestDataSpecification() != null ? tStep.getTestDataSpecification()
+          .getPdfPath() : null);
+      doc.setJdPath(tStep.getJurorDocument() != null ? tStep.getJurorDocument().getPdfPath() : null);
+    }
     return doc;
   }
-
-
 
   protected Resource getDescriptorResource(String location) throws IOException {
     Resource resource = ResourcebundleHelper.getResource(location + "TestPlan.json");

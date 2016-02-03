@@ -18,8 +18,6 @@ public interface TestStepService {
 
   public TestArtifact jurorDocument(Long id);
 
-  public TestArtifact testPackage(Long id);
-
   public TestArtifact testStory(Long id);
 
   public TestArtifact messageContent(Long id);

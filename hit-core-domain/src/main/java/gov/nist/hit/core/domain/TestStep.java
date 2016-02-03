@@ -37,6 +37,19 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @Enumerated(EnumType.STRING)
   protected TestStepTestingType testingType;  
   
+  
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  protected TestArtifact jurorDocument;
+
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  protected TestArtifact messageContent;
+
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  protected TestArtifact testDataSpecification;
+  
   protected String protocol;
   
   public TestStep() {
@@ -96,6 +109,30 @@ public class TestStep extends AbstractTestCase implements Serializable {
 
   public void setTestCase(TestCase testCase) {
     this.testCase = testCase;
+  }
+
+  public TestArtifact getJurorDocument() {
+    return jurorDocument;
+  }
+
+  public void setJurorDocument(TestArtifact jurorDocument) {
+    this.jurorDocument = jurorDocument;
+  }
+
+  public TestArtifact getMessageContent() {
+    return messageContent;
+  }
+
+  public void setMessageContent(TestArtifact messageContent) {
+    this.messageContent = messageContent;
+  }
+
+  public TestArtifact getTestDataSpecification() {
+    return testDataSpecification;
+  }
+
+  public void setTestDataSpecification(TestArtifact testDataSpecification) {
+    this.testDataSpecification = testDataSpecification;
   }
 
   

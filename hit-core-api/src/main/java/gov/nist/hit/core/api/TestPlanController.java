@@ -15,22 +15,14 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.repo.TestPlanRepository;
-import gov.nist.hit.core.service.exception.MessageException;
-import gov.nist.hit.core.service.exception.TestCaseException;
 import gov.nist.hit.core.service.exception.TestPlanException;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,31 +41,6 @@ public class TestPlanController {
 
   @Autowired
   protected TestPlanRepository testPlanRepository;
-
-  @RequestMapping(value = "/{testPlanId}/downloadTestProcedure", method = RequestMethod.POST)
-  public String testProcedure(@PathVariable Long testPlanId, HttpServletRequest request,
-      HttpServletResponse response) throws MessageException {
-    try {
-      TestPlan testPlan = testPlanRepository.findOne(testPlanId);
-      if (testPlan == null) {
-        throw new IllegalArgumentException("The test plan cannot be retrieved");
-      }
-      String path = testPlan.getTestProcedure().getPdfPath();
-      if (path == null) {
-        throw new IllegalArgumentException("No test procedure found");
-      }
-      InputStream content = TestPlanController.class.getResourceAsStream(path);
-      response
-          .setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-      response.setHeader("Content-disposition", "attachment;filename=" + "TestProcedure-"
-          + testPlan.getName() + ".docx");
-      FileCopyUtils.copy(content, response.getOutputStream());
-    } catch (IOException e) {
-      logger.debug("Failed to download the test procedure ");
-      throw new TestCaseException("Cannot download the procedure " + e.getMessage());
-    }
-    return null;
-  }
 
   @RequestMapping(value = "/{testPlanId}")
   public TestPlan testPlan(@PathVariable final Long testPlanId) {

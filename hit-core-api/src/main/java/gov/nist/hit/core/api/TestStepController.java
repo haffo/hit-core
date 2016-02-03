@@ -130,7 +130,6 @@ public class TestStepController {
     result.put("messageContent", testStep.getMessageContent());
     result.put("testDataSpecification", testStep.getTestDataSpecification());
     result.put("testStory", testStep.getTestStory());
-    result.put("testPackage", testStep.getTestPackage());
     return result;
   }
 
@@ -162,17 +161,7 @@ public class TestStepController {
   @RequestMapping(value = "/{testStepId}/tds", method = RequestMethod.GET)
   public TestArtifact tcTestDataSpecification(@PathVariable final Long testStepId) {
     logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testStepId);
-
     return testStepService.testDataSpecification(testStepId);
-
-  }
-
-  @RequestMapping(value = "/{testStepId}/testpackage", method = RequestMethod.GET)
-  public TestArtifact tcTestPackage(@PathVariable final Long testStepId) {
-    logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testStepId);
-
-    return testStepService.testPackage(testStepId);
-
   }
 
 

@@ -24,11 +24,6 @@ public class TestStepServiceImpl implements TestStepService {
   }
 
   @Override
-  public TestArtifact testPackage(Long id) {
-    return testStepRepository.testPackage(id);
-  }
-
-  @Override
   public TestArtifact testStory(Long id) {
     return testStepRepository.testStory(id);
   }
