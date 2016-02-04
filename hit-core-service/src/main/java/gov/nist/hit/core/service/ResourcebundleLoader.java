@@ -1001,8 +1001,8 @@ public abstract class ResourcebundleLoader {
 
 
   private TestArtifact testPlanSummary(String location) throws IOException {
-    return artifact(location, "QuickTestCaseReferenceGuide");
-    // return artifact(location, "TestPlanSummary");
+    // return artifact(location, "QuickTestCaseReferenceGuide");
+    return artifact(location, "TestPlanSummary");
   }
 
 
