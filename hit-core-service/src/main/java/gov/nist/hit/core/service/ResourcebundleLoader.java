@@ -12,27 +12,7 @@
 
 package gov.nist.hit.core.service;
 
-import gov.nist.hit.core.domain.AbstractTestCase;
-import gov.nist.hit.core.domain.AppInfo;
-import gov.nist.hit.core.domain.CFTestInstance;
-import gov.nist.hit.core.domain.Constraints;
-import gov.nist.hit.core.domain.DocumentType;
-import gov.nist.hit.core.domain.IntegrationProfile;
-import gov.nist.hit.core.domain.Message;
-import gov.nist.hit.core.domain.ProfileModel;
-import gov.nist.hit.core.domain.TestArtifact;
-import gov.nist.hit.core.domain.TestCase;
-import gov.nist.hit.core.domain.TestCaseDocument;
-import gov.nist.hit.core.domain.TestCaseDocumentation;
-import gov.nist.hit.core.domain.TestCaseGroup;
-import gov.nist.hit.core.domain.TestCaseTestingType;
-import gov.nist.hit.core.domain.TestContext;
-import gov.nist.hit.core.domain.TestPlan;
-import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStepTestingType;
-import gov.nist.hit.core.domain.TestingStage;
-import gov.nist.hit.core.domain.TransportForms;
-import gov.nist.hit.core.domain.VocabularyLibrary;
+import gov.nist.hit.core.domain.*;
 import gov.nist.hit.core.repo.AppInfoRepository;
 import gov.nist.hit.core.repo.CFTestInstanceRepository;
 import gov.nist.hit.core.repo.ConstraintsRepository;
@@ -54,14 +34,7 @@ import gov.nist.hit.core.service.util.ResourcebundleHelper;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -911,8 +884,39 @@ public abstract class ResourcebundleLoader {
       testStep.setParentName(tc.getName());
       tc.addTestStep(testStep);
     }
-
+    Collection<DataMapping> dataMappings = new HashSet<>();
+    if(testCaseObj.findValue("mapping") != null){
+      Iterator<JsonNode> it = testCaseObj.findValue("mapping").getElements();
+      while(it.hasNext()){
+        JsonNode node = it.next();
+        Map.Entry<String,JsonNode> sourcePair = node.findValue("source").getFields().next();
+        TestStepFieldPair source = new TestStepFieldPair(findTestStep(tc.getTestSteps(),parseTestStepPosition(sourcePair.getKey())),sourcePair.getValue().asText());
+        Map.Entry<String,JsonNode> targetPair = node.findValue("target").getFields().next();
+        TestStepFieldPair target = new TestStepFieldPair(findTestStep(tc.getTestSteps(),parseTestStepPosition(targetPair.getKey())),targetPair.getValue().asText());
+        DataMapping dataMapping = new DataMapping(source,target,tc,new TestCaseExecutionData());
+        dataMapping.getTestCaseExecutionData().setDataMapping(dataMapping);
+        logger.info("Saving data mapping : "+dataMapping.toString());
+        dataMappings.add(dataMapping);
+      }
+      tc.setDataMappings(dataMappings);
+    }
     return tc;
+  }
+
+  private int parseTestStepPosition(String testCaseId) {
+    if(testCaseId.toLowerCase().startsWith("teststep")){
+      return Integer.parseInt(testCaseId.toLowerCase().substring("teststep".length()));
+    }
+    return 0;
+  }
+
+  private TestStep findTestStep(List<TestStep> testStepMap, int position){
+    for(TestStep testStep : testStepMap){
+      if(testStep.getPosition()==position){
+        return testStep;
+      }
+    }
+    return null;
   }
 
   private TestStep testStep(String location, TestingStage stage) throws IOException {

@@ -51,6 +51,9 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @JsonIgnore
   @ManyToOne(optional=true)
   protected TestCase testCase;
+
+  /*@OneToMany(mappedBy = "testStep", orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  protected TestStepFieldPair testStepFieldPair;*/
   
  
   public TestStep(String name) {
@@ -98,11 +101,12 @@ public class TestStep extends AbstractTestCase implements Serializable {
     this.testCase = testCase;
   }
 
-  
-  
- 
-  
- 
 
+  /*public TestStepFieldPair getTestStepFieldPair() {
+    return testStepFieldPair;
+  }
 
+  public void setTestStepFieldPair(TestStepFieldPair testStepFieldPair) {
+    this.testStepFieldPair = testStepFieldPair;
+  }*/
 }
