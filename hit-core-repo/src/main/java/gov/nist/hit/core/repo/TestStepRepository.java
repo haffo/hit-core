@@ -29,10 +29,6 @@ public interface TestStepRepository extends JpaRepository<TestStep, Long> {
   @Query("select testStep.jurorDocument from TestStep testStep where testStep.id = :id")
   public TestArtifact jurorDocument(@Param("id") Long id);
 
-  @Query("select testStep.testPackage from TestStep testStep where testStep.id = :id")
-  public TestArtifact testPackage(@Param("id") Long id);
-
-
   @Query("select testStep.testStory from TestStep testStep where testStep.id = :id")
   public TestArtifact testStory(@Param("id") Long id);
 

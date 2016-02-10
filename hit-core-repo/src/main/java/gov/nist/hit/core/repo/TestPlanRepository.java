@@ -12,9 +12,9 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestingStage;
 
 import java.util.List;
 
@@ -27,10 +27,18 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
   @Query("select tp from TestPlan tp where tp.stage = :stage")
   public List<TestPlan> findAllByStage(@Param("stage") TestingStage stage);
 
-
-
   @Query("select tp.testPackage from TestPlan tp where tp.stage = :stage")
   public List<TestArtifact> findAllTestPackages(@Param("stage") TestingStage stage);
+
+  @Query("select tp.testPlanSummary from TestPlan tp where tp.stage = :stage")
+  public List<TestArtifact> findAllTestPlanSummary(@Param("stage") TestingStage stage);
+
+  @Query("select tp.testPlanSummary from TestPlan tp where tp.id = :id")
+  public TestArtifact testPlanSummary(@Param("id") Long id);
+
+  @Query("select tp.testPackage from TestPlan tp where tp.id = :id")
+  public TestArtifact testPackage(@Param("id") Long id);
+
 
 
 }

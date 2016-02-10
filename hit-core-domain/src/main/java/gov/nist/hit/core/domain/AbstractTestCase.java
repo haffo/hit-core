@@ -66,25 +66,9 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
 
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
-  protected TestArtifact testPackage;
-
-  @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testStory;
 
-  @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
-  protected TestArtifact jurorDocument;
-
-  @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
-  protected TestArtifact messageContent;
-
-  @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
-  protected TestArtifact testDataSpecification;
-
-
+  
   public String getName() {
     return name;
   }
@@ -126,14 +110,7 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
     this.stage = stage;
   }
 
-  public TestArtifact getTestPackage() {
-    return testPackage;
-  }
-
-  public void setTestPackage(TestArtifact testPackage) {
-    this.testPackage = testPackage;
-  }
-
+ 
 
 
   public TestArtifact getTestStory() {
@@ -144,30 +121,7 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
     this.testStory = testStory;
   }
 
-  public TestArtifact getJurorDocument() {
-    return jurorDocument;
-  }
-
-  public void setJurorDocument(TestArtifact jurorDocument) {
-    this.jurorDocument = jurorDocument;
-  }
-
-  public TestArtifact getMessageContent() {
-    return messageContent;
-  }
-
-  public void setMessageContent(TestArtifact messageContent) {
-    this.messageContent = messageContent;
-  }
-
-  public TestArtifact getTestDataSpecification() {
-    return testDataSpecification;
-  }
-
-  public void setTestDataSpecification(TestArtifact testDataSpecification) {
-    this.testDataSpecification = testDataSpecification;
-  }
-
+ 
   public String getParentName() {
     return parentName;
   }

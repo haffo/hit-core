@@ -22,7 +22,7 @@ public class TestCaseDocument {
   protected String mcPath; // message content 
   protected String tdsPath; // test data specification
   protected String tpPath; // test procedure
-  protected String qtrgPath; // quick test reference guide
+  protected String tpsPath; // test plan summary
   protected String jdPath; // juror document 
   protected String tsPath; // test story 
   protected String csPath; // constraint 
@@ -124,14 +124,15 @@ public class TestCaseDocument {
     this.format = format;
   }
 
-  public String getQtrgPath() {
-    return qtrgPath;
+  public String getTpsPath() {
+    return tpsPath;
   }
 
-  public void setQtrgPath(String qtrgPath) {
-    this.qtrgPath = qtrgPath;
+  public void setTpsPath(String tpsPath) {
+    this.tpsPath = tpsPath;
   }
 
+  
    
 
   

@@ -110,35 +110,10 @@ public class TestCaseController {
     Map<String, TestArtifact> result = new HashMap<String, TestArtifact>();
     logger.info("Fetching testcase " + testCaseId + " artifacts ");
     TestCase testCase = testCase(testCaseId);
-    result.put("jurorDocument", testCase.getJurorDocument());
-    result.put("messageContent", testCase.getMessageContent());
-    result.put("testDataSpecification", testCase.getTestDataSpecification());
     result.put("testStory", testCase.getTestStory());
-    result.put("testPackage", testCase.getTestPackage());
     return result;
   }
 
-  /**
-   * 
-   * @param testCaseId
-   * @return
-   */
-  @RequestMapping(value = "/{testCaseId}/jurordocument", method = RequestMethod.GET)
-  public TestArtifact tcJurordocument(@PathVariable("testCaseId") final Long testCaseId) {
-    logger.info("Fetching juror document of testcase with id=" + testCaseId);
-    return testCaseService.jurorDocument(testCaseId);
-  }
-
-  /**
-   * 
-   * @param testCaseId
-   * @return
-   */
-  @RequestMapping(value = "/{testCaseId}/messagecontent", method = RequestMethod.GET)
-  public TestArtifact tcMessageContent(@PathVariable("testCaseId") final Long testCaseId) {
-    logger.info("Fetching messagecontent of testcase with id=" + testCaseId);
-    return testCaseService.messageContent(testCaseId);
-  }
 
   /**
    * 
@@ -149,28 +124,6 @@ public class TestCaseController {
   public TestArtifact tcTestStory(@PathVariable("testCaseId") Long testCaseId) {
     logger.info("Fetching teststory of testcase/teststep with id=" + testCaseId);
     return testCaseService.testStory(testCaseId);
-  }
-
-  /**
-   * 
-   * @param testCaseId
-   * @return
-   */
-  @RequestMapping(value = "/{testCaseId}/tds", method = RequestMethod.GET)
-  public TestArtifact tcTestDataSpecification(@PathVariable("testCaseId") final Long testCaseId) {
-    logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testCaseId);
-    return testCaseService.testDataSpecification(testCaseId);
-  }
-
-  /**
-   * 
-   * @param testCaseId
-   * @return
-   */
-  @RequestMapping(value = "/{testCaseId}/testpackage", method = RequestMethod.GET)
-  public TestArtifact tcTestPackage(@PathVariable("testCaseId") final Long testCaseId) {
-    logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testCaseId);
-    return testCaseService.testPackage(testCaseId);
   }
 
 

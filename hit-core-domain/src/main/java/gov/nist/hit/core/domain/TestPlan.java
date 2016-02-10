@@ -22,6 +22,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class TestPlan extends AbstractTestCase  implements Serializable {
 
@@ -30,15 +32,12 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id; 
-  
-  @OneToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(unique = true)
-  protected TestArtifact testProcedure;  
-  
-  @OneToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(unique = true)
-  protected TestArtifact quickTestCaseReferenceGuide; 
+   
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  protected TestArtifact testPlanSummary; 
 
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  protected TestArtifact testPackage;
   
 
   public TestPlan() {
@@ -84,15 +83,7 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   public void setTestCaseGroups(List<TestCaseGroup> testCaseGroups) {
     this.testCaseGroups = testCaseGroups;
   }
-
-  public TestArtifact getTestProcedure() {
-    return testProcedure;
-  }
-
-  public void setTestProcedure(TestArtifact testProcedure) {
-    this.testProcedure = testProcedure;
-  }
-
+  
   public boolean isTransport() {
     return transport;
   }
@@ -101,12 +92,20 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
     this.transport = transport;
   }
 
-  public TestArtifact getQuickTestCaseReferenceGuide() {
-    return quickTestCaseReferenceGuide;
+  public TestArtifact getTestPlanSummary() {
+    return testPlanSummary;
   }
 
-  public void setQuickTestCaseReferenceGuide(TestArtifact quickTestCaseReferenceGuide) {
-    this.quickTestCaseReferenceGuide = quickTestCaseReferenceGuide;
+  public void setTestPlanSummary(TestArtifact testPlanSummary) {
+    this.testPlanSummary = testPlanSummary;
+  }
+
+  public TestArtifact getTestPackage() {
+    return testPackage;
+  }
+
+  public void setTestPackage(TestArtifact testPackage) {
+    this.testPackage = testPackage;
   }
 
   

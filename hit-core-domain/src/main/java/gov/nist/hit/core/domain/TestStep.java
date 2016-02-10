@@ -37,6 +37,19 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @Enumerated(EnumType.STRING)
   protected TestStepTestingType testingType;  
   
+  
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  protected TestArtifact jurorDocument;
+
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  protected TestArtifact messageContent;
+
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  protected TestArtifact testDataSpecification;
+  
   protected String protocol;
   
   public TestStep() {
@@ -51,9 +64,6 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @JsonIgnore
   @ManyToOne(optional=true)
   protected TestCase testCase;
-
-  /*@OneToMany(mappedBy = "testStep", orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
-  protected TestStepFieldPair testStepFieldPair;*/
   
  
   public TestStep(String name) {
@@ -101,12 +111,35 @@ public class TestStep extends AbstractTestCase implements Serializable {
     this.testCase = testCase;
   }
 
-
-  /*public TestStepFieldPair getTestStepFieldPair() {
-    return testStepFieldPair;
+  public TestArtifact getJurorDocument() {
+    return jurorDocument;
   }
 
-  public void setTestStepFieldPair(TestStepFieldPair testStepFieldPair) {
-    this.testStepFieldPair = testStepFieldPair;
-  }*/
+  public void setJurorDocument(TestArtifact jurorDocument) {
+    this.jurorDocument = jurorDocument;
+  }
+
+  public TestArtifact getMessageContent() {
+    return messageContent;
+  }
+
+  public void setMessageContent(TestArtifact messageContent) {
+    this.messageContent = messageContent;
+  }
+
+  public TestArtifact getTestDataSpecification() {
+    return testDataSpecification;
+  }
+
+  public void setTestDataSpecification(TestArtifact testDataSpecification) {
+    this.testDataSpecification = testDataSpecification;
+  }
+
+  
+  
+ 
+  
+ 
+
+
 }
