@@ -30,7 +30,7 @@ public class DataMapping implements Serializable{
 
     @NotNull
     @OneToOne(cascade = CascadeType.ALL)
-    protected TestStepFieldPair source;
+    protected MappingSource source;
 
     @NotNull
     @OneToOne(cascade = CascadeType.ALL)
@@ -47,7 +47,7 @@ public class DataMapping implements Serializable{
         super();
     }
 
-    public DataMapping(TestStepFieldPair source, TestStepFieldPair target, TestCase testCase, TestCaseExecutionData testCaseExecutionData) {
+    public DataMapping(MappingSource source, TestStepFieldPair target, TestCase testCase, TestCaseExecutionData testCaseExecutionData) {
         this.source = source;
         this.target = target;
         this.testCase = testCase;
@@ -66,7 +66,7 @@ public class DataMapping implements Serializable{
         this.id = id;
     }
 
-    public TestStepFieldPair getSource() {
+    public MappingSource getSource() {
         return source;
     }
 

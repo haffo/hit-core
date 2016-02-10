@@ -1,9 +1,6 @@
 package gov.nist.hit.core.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -17,45 +14,12 @@ import java.io.Serializable;
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  * <p/>
- * Created by Maxence Lefort on 1/28/16.
+ * Created by Maxence Lefort on 2/9/16.
  */
 @Entity
-public class TestStepFieldPair extends MappingSource implements Serializable {
-    /*@Id
+public abstract class MappingSource implements Serializable {
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;*/
+    protected Long id;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    protected TestStep testStep;
-
-    @NotNull
-    @Column
-    protected String field;
-
-    public TestStepFieldPair(TestStep testStep, String field) {
-        super();
-        this.testStep = testStep;
-        this.field = field;
-    }
-
-    public TestStepFieldPair() {
-        super();
-    }
-
-    public TestStep getTestStep() {
-        return testStep;
-    }
-
-    public void setTestStep(TestStep testStep) {
-        this.testStep = testStep;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public void setField(String field) {
-        this.field = field;
-    }
 }
