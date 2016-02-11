@@ -45,4 +45,13 @@ public class TestCaseExecutionServiceImpl implements TestCaseExecutionService {
     public void delete(Long testCaseExecutionId) {
         testCaseExecutionRepository.delete(testCaseExecutionId);
     }
+
+    @Override
+    public TestCaseExecution findOneByUserConfigId(Long userConfigId) {
+        Long testCaseExecutionId = testCaseExecutionRepository.getTestCaseExecutionIdFromUserId(userConfigId);
+        if(testCaseExecutionId!=null) {
+            return testCaseExecutionRepository.findOne(testCaseExecutionId);
+        }
+        return null;
+    }
 }

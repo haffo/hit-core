@@ -25,4 +25,6 @@ public interface TestCaseExecutionService {
 
     public void delete(Long testCaseExecutionId);
 
+    public TestCaseExecution findOneByUserConfigId(Long userConfigId);
+
 }
