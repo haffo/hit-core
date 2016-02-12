@@ -58,4 +58,8 @@ public class TestStepFieldPair extends MappingSource implements Serializable {
     public void setField(String field) {
         this.field = field;
     }
+
+    public Long getId(){
+        return super.getId();
+    }
 }
