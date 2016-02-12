@@ -31,6 +31,9 @@ public class TestCaseExecution implements Serializable{
     @OneToOne
     protected UserConfig userConfig;
 
+    @Column
+    protected Long nextTestStepId;
+
     public TestCaseExecution() {
         super();
     }
@@ -68,5 +71,13 @@ public class TestCaseExecution implements Serializable{
 
     public void setUserConfig(UserConfig userConfig) {
         this.userConfig = userConfig;
+    }
+
+    public Long getNextTestStepId() {
+        return nextTestStepId;
+    }
+
+    public void setNextTestStepId(Long nextTestStepId) {
+        this.nextTestStepId = nextTestStepId;
     }
 }
