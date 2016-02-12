@@ -20,6 +20,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface TestCaseExecutionDataRepository extends JpaRepository<TestCaseExecutionData, Long> {
-  @Query("select * from TestCaseExecutionData tced where tced.dataMapping.id = :id")
-  public List<TestCaseExecutionData> getAllTestCaseExecutionDataFromDataMappingId(@Param("id") Long id);
+  @Query("select * from TestCaseExecutionData tced where tced.testStepFieldPair.id = :id")
+  public TestCaseExecutionData getTestCaseExecutionDataFromTestStepFieldPairId(@Param("id") Long id);
 }

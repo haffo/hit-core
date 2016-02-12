@@ -26,8 +26,8 @@ public class TestCaseExecutionData implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 
-    @ManyToOne
-    protected DataMapping dataMapping;
+    @OneToOne
+    protected TestStepFieldPair testStepFieldPair;
 
     @Column
     protected String data;
@@ -36,18 +36,17 @@ public class TestCaseExecutionData implements Serializable {
         super();
     }
 
-    public TestCaseExecutionData(DataMapping dataMapping, String data) {
-        super();
-        this.dataMapping = dataMapping;
+    public TestCaseExecutionData(TestStepFieldPair testStepFieldPair, String data) {
+        this.testStepFieldPair = testStepFieldPair;
         this.data = data;
     }
 
-    public DataMapping getDataMapping() {
-        return dataMapping;
+    public TestStepFieldPair getTestStepFieldPair() {
+        return testStepFieldPair;
     }
 
-    public void setDataMapping(DataMapping dataMapping) {
-        this.dataMapping = dataMapping;
+    public void setTestStepFieldPair(TestStepFieldPair testStepFieldPair) {
+        this.testStepFieldPair = testStepFieldPair;
     }
 
     public String getData() {

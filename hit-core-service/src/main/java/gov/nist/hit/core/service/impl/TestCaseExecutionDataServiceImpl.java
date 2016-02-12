@@ -28,8 +28,8 @@ public class TestCaseExecutionDataServiceImpl implements TestCaseExecutionDataSe
     TestCaseExecutionDataRepository testCaseExecutionDataRepository;
 
     @Override
-    public List<TestCaseExecutionData> getAllTestCaseExecutionData(Long dataMappingId) {
-        return testCaseExecutionDataRepository.getAllTestCaseExecutionDataFromDataMappingId(dataMappingId);
+    public TestCaseExecutionData getTestCaseExecutionData(Long testStepFieldPairId) {
+        return testCaseExecutionDataRepository.getTestCaseExecutionDataFromTestStepFieldPairId(testStepFieldPairId);
     }
 
     @Override
