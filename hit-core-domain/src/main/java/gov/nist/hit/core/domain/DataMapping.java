@@ -40,18 +40,14 @@ public class DataMapping implements Serializable{
     @ManyToOne(optional=true, cascade=CascadeType.ALL)
     protected TestCase testCase;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    protected TestCaseExecutionData testCaseExecutionData;
-
     public DataMapping(){
         super();
     }
 
-    public DataMapping(MappingSource source, TestStepFieldPair target, TestCase testCase, TestCaseExecutionData testCaseExecutionData) {
+    public DataMapping(MappingSource source, TestStepFieldPair target, TestCase testCase) {
         this.source = source;
         this.target = target;
         this.testCase = testCase;
-        this.testCaseExecutionData = testCaseExecutionData;
     }
 
     public static long getSerialVersionUID() {
@@ -90,14 +86,6 @@ public class DataMapping implements Serializable{
         this.testCase = testCase;
     }
 
-    public TestCaseExecutionData getTestCaseExecutionData() {
-        return testCaseExecutionData;
-    }
-
-    public void setTestCaseExecutionData(TestCaseExecutionData testCaseExecutionData) {
-        this.testCaseExecutionData = testCaseExecutionData;
-    }
-
     @Override
     public String toString() {
         return "DataMapping{" +
@@ -105,7 +93,6 @@ public class DataMapping implements Serializable{
                 ", source=" + source +
                 ", target=" + target +
                 ", testCase=" + testCase +
-                ", testCaseExecutionData=" + testCaseExecutionData +
                 '}';
     }
 }
