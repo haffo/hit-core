@@ -26,7 +26,7 @@ public class TestCaseExecutionData implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 
-    @OneToOne(optional = false)
+    @ManyToOne
     protected DataMapping dataMapping;
 
     @Column

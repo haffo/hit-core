@@ -901,8 +901,7 @@ public abstract class ResourcebundleLoader {
                 }
                 Map.Entry<String, JsonNode> targetPair = node.findValue("target").getFields().next();
                 TestStepFieldPair target = new TestStepFieldPair(findTestStep(tc.getTestSteps(), parseTestStepPosition(targetPair.getKey())), targetPair.getValue().asText());
-                DataMapping dataMapping = new DataMapping(source, target, tc, new TestCaseExecutionData());
-                dataMapping.getTestCaseExecutionData().setDataMapping(dataMapping);
+                DataMapping dataMapping = new DataMapping(source, target, tc);
                 logger.info("Saving data mapping : " + dataMapping.toString());
                 dataMappings.add(dataMapping);
             }
