@@ -32,7 +32,7 @@ public class TestCaseExecution implements Serializable{
     protected UserConfig userConfig;
 
     @Column
-    protected Long nextTestStepId;
+    protected Long currentTestStepId;
 
     public TestCaseExecution() {
         super();
@@ -73,11 +73,11 @@ public class TestCaseExecution implements Serializable{
         this.userConfig = userConfig;
     }
 
-    public Long getNextTestStepId() {
-        return nextTestStepId;
+    public Long getCurrentTestStepId() {
+        return currentTestStepId;
     }
 
-    public void setNextTestStepId(Long nextTestStepId) {
-        this.nextTestStepId = nextTestStepId;
+    public void setCurrentTestStepId(Long currentTestStepId) {
+        this.currentTestStepId = currentTestStepId;
     }
 }

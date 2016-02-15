@@ -27,4 +27,6 @@ public interface TestCaseExecutionService {
 
     public TestCaseExecution findOneByUserConfigId(Long userConfigId);
 
+    public TestCaseExecution saveOrUpdate(TestCaseExecution testCaseExecution);
+
 }

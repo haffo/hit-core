@@ -59,6 +59,11 @@ public class UserConfigServiceImpl implements UserConfigService {
         userConfigRepository.delete(userConfigList);
     }
 
+    @Override
+    public UserConfig findOne(Long userConfigId) {
+        return userConfigRepository.findOne(userConfigId);
+    }
+
     private String findOneQuery(Map<String, String> criteria) {
         String sql = "SELECT ID FROM USERCONFIG uc";
         ArrayList<String> conditions = new ArrayList<>();

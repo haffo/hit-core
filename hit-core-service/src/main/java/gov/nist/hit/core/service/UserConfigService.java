@@ -21,5 +21,6 @@ public interface UserConfigService {
 
   void delete(List<UserConfig> confs);
 
+  UserConfig findOne(Long userConfigId);
 
 }

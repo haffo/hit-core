@@ -54,4 +54,20 @@ public class TestCaseExecutionServiceImpl implements TestCaseExecutionService {
         }
         return null;
     }
+
+    @Override
+    public TestCaseExecution saveOrUpdate(TestCaseExecution testCaseExecution) {
+        if(exists(testCaseExecution.getUserConfig().getId())){
+            testCaseExecutionRepository.delete(testCaseExecution.getId());
+        }
+        return testCaseExecutionRepository.save(testCaseExecution);
+    }
+
+    private boolean exists(Long userConfigId){
+        if(testCaseExecutionRepository.getTestCaseExecutionIdFromUserId(userConfigId)==null){
+            return true;
+        }
+        return false;
+    }
+
 }
