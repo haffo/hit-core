@@ -16,7 +16,6 @@ import gov.nist.hit.core.service.exception.MessageDownloadException;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.MessageUploadException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
@@ -57,14 +56,15 @@ public class MessageController {
    */
   @RequestMapping(value = "/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public String download(@RequestParam("content") String content, HttpServletRequest request,
-      HttpServletResponse response) throws MessageDownloadException {
+  public String download(@RequestParam("content") String content, @RequestParam(value = "content",
+      required = false) String title, HttpServletRequest request, HttpServletResponse response)
+      throws MessageDownloadException {
     try {
       logger.info("Downloading message");
       InputStream io = IOUtils.toInputStream(content, "UTF-8");
       response.setContentType("text/plain");
-      response.setHeader("Content-disposition",
-          "attachment;filename=Message-" + new Date().getTime() + ".txt");
+      String fileName = title == null ? "Message-" + new Date().getTime() + ".txt" : title + ".txt";
+      response.setHeader("Content-disposition", "attachment;filename=" + fileName);
       FileCopyUtils.copy(io, response.getOutputStream());
     } catch (RuntimeException e) {
       logger.debug("Failed to download the message ");
@@ -92,12 +92,12 @@ public class MessageController {
       InputStream in = part.getInputStream();
       map.put("name", part.getName());
       map.put("size", part.getSize() + "");
-      String content = IOUtils.toString(in); 
+      String content = IOUtils.toString(in);
       map.put("content", content);
       return map;
     } catch (RuntimeException e) {
       throw new MessageUploadException(e);
-    }catch (Exception e) {
+    } catch (Exception e) {
       throw new MessageUploadException(e);
     }
 
