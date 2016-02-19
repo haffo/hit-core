@@ -176,7 +176,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+ 
 	</dependencies>
 
 
@@ -252,6 +252,8 @@
 		<url>scm:git:https://haffo@github.com/haffo/hit-core.git</url>
 		<developerConnection>scm:git:https://haffo@github.com/haffo/hit-core.git</developerConnection>
 	  <tag>HEAD</tag>
-  </scm>
+  </scm> 
+  
+
 
 </project>

@@ -12,28 +12,18 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.AbstractTestCase;
-import gov.nist.hit.core.domain.TestArtifact;
-import gov.nist.hit.core.repo.TestCaseRepository;
-import gov.nist.hit.core.repo.TestStepRepository;
-import gov.nist.hit.core.service.TestCaseService;
-import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,30 +42,28 @@ public class TestArtifactController {
 
   @RequestMapping(value = "/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public String download(@RequestParam("path") String path, HttpServletRequest request,
-      HttpServletResponse response) throws MessageException {
+  public String download(@RequestParam("path") String path, @RequestParam(value = "title",
+      required = false) String title, HttpServletRequest request, HttpServletResponse response)
+      throws MessageException {
     try {
-      if (path != null && path.endsWith("pdf")) {
+
+      if (path != null && (path.endsWith("pdf") || path.endsWith("docx"))) {
+        String fileName =
+            title == null ? path.substring(path.lastIndexOf("/") + 1) : title
+                + path.substring(path.lastIndexOf("."));
         InputStream content = null;
-        String fileName = path.substring(path.lastIndexOf("/") + 1);
-        content = TestArtifactController.class.getResourceAsStream("/" + path);
-        response.setContentType("application/pdf");
-        response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-        FileCopyUtils.copy(content, response.getOutputStream());
-      } else if (path != null && path.endsWith("docx")) {
-        InputStream content = null;
-        String fileName = path.substring(path.lastIndexOf("/") + 1);
         if (!path.startsWith("/")) {
           content = TestArtifactController.class.getResourceAsStream("/" + path);
         } else {
           content = TestArtifactController.class.getResourceAsStream(path);
         }
-        response
-            .setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        String contentType =
+            path.endsWith("pdf") ? "application/pdf"
+                : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        response.setContentType(contentType);
         response.setHeader("Content-disposition", "attachment;filename=" + fileName);
         FileCopyUtils.copy(content, response.getOutputStream());
       }
-
       throw new IllegalArgumentException("Invalid Path Provided");
     } catch (IOException e) {
       logger.debug("Failed to download the test package ");
