@@ -52,6 +52,8 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   private String domain;
   
+  private String protocol;
+  
   public Long getId() {
     return id;
   }
@@ -85,6 +87,15 @@ public class TestCase extends AbstractTestCase implements Serializable {
   }
 
   
+  
+  public String getProtocol() {
+    return protocol;
+  }
+
+  public void setProtocol(String protocol) {
+    this.protocol = protocol;
+  }
+
   public void addTestStep(TestStep testStep){
     if(testStep.getTestCase() != null){
       throw new RuntimeException("Test step belongs to a different test case");

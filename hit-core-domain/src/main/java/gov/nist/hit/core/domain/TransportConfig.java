@@ -27,7 +27,10 @@ public class TransportConfig {
   protected Long id;
 
   @Column(name = "PROTOCOL")
-  private String protocol;
+  private String protocol; 
+  
+  @Column(name = "DOMAIN")
+  private String domain;
   
   @Column(name = "USERID")
   private Long userId;
@@ -49,9 +52,10 @@ public class TransportConfig {
   }
 
 
-  public TransportConfig(String protocol) {
+  public TransportConfig(String protocol,String domain) {
     this();
     this.protocol = protocol;
+    this.domain = domain;
   }
 
   public String getProtocol() {

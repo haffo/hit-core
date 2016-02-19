@@ -38,7 +38,7 @@ public class ContextFreeController {
   @Autowired
   private TestObjectService testObjectService;
 
-  @Cacheable(value = "testCaseCache", key = "'cf-testcases'")
+  @Cacheable(value = "HitCache", key = "'cf-testcases'")
   @RequestMapping(value = "/testcases")
   public List<CFTestInstance> testCases() {
     logger.info("Fetching all testCases...");

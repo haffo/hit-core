@@ -380,9 +380,11 @@ public abstract class ResourcebundleLoader {
         Iterator<JsonNode> it = json.getElements();
         while (it.hasNext()) {
           JsonNode node = it.next();
-          if (node.findValue("protocol") != null && node.findValue("forms") != null) {
+          if (node.findValue("protocol") != null && node.findValue("forms") != null
+              && node.findValue("domain") != null) {
             TransportForms tForms = new TransportForms();
             tForms.setProtocol(node.findValue("protocol").getTextValue());
+            tForms.setDomain(node.findValue("domain").getTextValue());
             JsonNode forms = node.findValue("forms");
             if (forms.get("TA_INITIATOR") == null || forms.get("SUT_INITIATOR") == null) {
               throw new RuntimeException(
@@ -394,7 +396,8 @@ public abstract class ResourcebundleLoader {
                 + forms.get("SUT_INITIATOR").getTextValue())));
             transportForms.add(tForms);
           } else {
-            throw new RuntimeException("Properties protocol or forms not found in Transport.json");
+            throw new RuntimeException(
+                "Properties protocol, domain or forms not found in Transport.json");
           }
         }
         if (!transportForms.isEmpty()) {
@@ -891,6 +894,8 @@ public abstract class ResourcebundleLoader {
     tc.setTestStory(testStory(location));
     tc.setDomain(testCaseObj.findValue("domain") != null ? testCaseObj.findValue("domain")
         .getTextValue() : null);
+    tc.setProtocol(testCaseObj.findValue("protocol") != null ? testCaseObj.findValue("protocol")
+        .getTextValue() : null);
     logger.info("Domain is " + tc.getDomain());
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").getIntValue());
@@ -921,8 +926,8 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testStepObj = mapper.readTree(descriptorContent);
     testStep.setName(testStepObj.findValue("name").getTextValue());
-    testStep.setProtocol(testStepObj.findValue("protocol") != null ? testStepObj.findValue(
-        "protocol").getTextValue() : null);
+    // testStep.setProtocol(testStepObj.findValue("protocol") != null ? testStepObj.findValue(
+    // "protocol").getTextValue() : null);
     testStep.setDescription(testStepObj.findValue("description").getTextValue());
     JsonNode ttypeObj = testStepObj.findValue("type");
     String tttypeValue = ttypeObj != null ? ttypeObj.getTextValue() : null;

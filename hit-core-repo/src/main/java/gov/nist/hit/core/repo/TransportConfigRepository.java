@@ -11,8 +11,8 @@ import org.springframework.data.repository.query.Param;
 public interface TransportConfigRepository extends JpaRepository<TransportConfig, Long> {
 
   @Query("select tconfig from TransportConfig tconfig where tconfig.userId = :userId and tconfig.protocol = :protocol")
-  TransportConfig findOneByUserAndProtocol(@Param("userId") Long userId,
-      @Param("protocol") String protocol);
+  TransportConfig findOneByUserAndProtocolAndDomain(@Param("userId") Long userId,
+      @Param("protocol") String protocol, @Param("domain") String domain);
 
   @Query("select tconfig from TransportConfig tconfig where tconfig.userId = :userId")
   List<TransportConfig> findAllByUser(@Param("userId") Long userId);

@@ -44,7 +44,7 @@ public class TestStepServiceImpl implements TestStepService {
   }
 
   @Override
-  @Cacheable(value = "testCaseCache", key = "#stage.name() + 'TestSteps'")
+  @Cacheable(value = "HitCache", key = "#stage.name() + 'TestSteps'")
   public List<TestStep> findAllByStage(TestingStage stage) {
     return testStepRepository.findAllByStage(stage);
   }

@@ -9,11 +9,11 @@ import java.util.Map;
 
 public interface TransportConfigService {
 
-  TransportConfig create(String protocole);
+  TransportConfig create(String protocole, String domain);
 
   TransportConfig findOne(Long id);
 
-  TransportConfig findOneByUserAndProtocol(Long userId, String protocol);
+  TransportConfig findOneByUserAndProtocolAndDomain(Long userId, String protocol, String domain);
 
   TransportConfig save(TransportConfig config);
 

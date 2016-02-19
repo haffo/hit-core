@@ -86,7 +86,7 @@ public class DocumentationController {
   private ZipGenerator zipGenerator;
 
 
-  @Cacheable(value = "documentationCache", key = "#stage.name() + 'testcases-documentation'")
+  @Cacheable(value = "HitCache", key = "#stage.name() + 'testcases-documentation'")
   @RequestMapping(value = "/testcases", method = RequestMethod.GET)
   public TestCaseDocumentation testCases(@RequestParam("stage") TestingStage stage) {
     logger.info("Fetching " + stage + " test case documentation");
@@ -94,21 +94,21 @@ public class DocumentationController {
     return doc;
   }
 
-  @Cacheable(value = "documentationCache", key = "'releasenotes'")
+  @Cacheable(value = "HitCache", key = "'releasenotes'")
   @RequestMapping(value = "/releasenotes", method = RequestMethod.GET)
   public List<Document> releaseNotes() {
     logger.info("Fetching  all release notes");
     return documentRepository.findAllReleaseNotes();
   }
 
-  @Cacheable(value = "documentationCache", key = "'userdocs'")
+  @Cacheable(value = "HitCache", key = "'userdocs'")
   @RequestMapping(value = "/userdocs", method = RequestMethod.GET)
   public List<Document> userDocs() {
     logger.info("Fetching  all release notes");
     return documentRepository.findAllUserDocs();
   }
 
-  @Cacheable(value = "documentationCache", key = "'knownissues'")
+  @Cacheable(value = "HitCache", key = "'knownissues'")
   @RequestMapping(value = "/knownissues", method = RequestMethod.GET)
   public List<Document> knownIssues() {
     logger.info("Fetching  all known issues");
@@ -116,21 +116,21 @@ public class DocumentationController {
   }
 
 
-  @Cacheable(value = "documentationCache", key = "#type.name() + 'resource-documentation'")
+  @Cacheable(value = "HitCache", key = "#type.name() + 'resource-documentation'")
   @RequestMapping(value = "/resourcedocs", method = RequestMethod.GET)
   public List<Document> resourcedocs(@RequestParam("type") DocumentType type) {
     logger.info("Fetching all resources docs of type=" + type);
     return documentRepository.findAllResourceDocs(type);
   }
  
-  @Cacheable(value = "documentationCache", key = "'deliverables-documentation'")
+  @Cacheable(value = "HitCache", key = "'deliverables-documentation'")
   @RequestMapping(value = "/deliverables", method = RequestMethod.GET)
   public List<Document> toolDownloads() {
     logger.info("Fetching all tooldownloads");
     return documentRepository.findAllDeliverableDocs();
   }
 
-  @Cacheable(value = "documentationCache", key = "'installationguide-documentation'")
+  @Cacheable(value = "HitCache", key = "'installationguide-documentation'")
   @RequestMapping(value = "/installationguide", method = RequestMethod.GET)
   public Document installationGuide() {
     logger.info("Fetching installation guide");

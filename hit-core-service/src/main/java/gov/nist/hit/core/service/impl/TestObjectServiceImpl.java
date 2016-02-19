@@ -21,7 +21,7 @@ public class TestObjectServiceImpl implements TestObjectService {
   }
 
   @Override
-  // @Cacheable(value = "testCaseCache", key = "'TestObjects'")
+  // @Cacheable(value = "HitCache", key = "'TestObjects'")
   public List<CFTestInstance> findAllAsRoot() {
     return testObjectRepository.findAllAsRoot();
   }
