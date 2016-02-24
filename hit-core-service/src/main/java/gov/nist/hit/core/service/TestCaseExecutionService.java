@@ -17,16 +17,12 @@ import gov.nist.hit.core.domain.TestCaseExecution;
  */
 public interface TestCaseExecutionService {
 
-    public TestCaseExecution getTestCaseExecution(Long userConfigId);
-
     public TestCaseExecution save(TestCaseExecution testCaseExecution);
 
     public void delete(TestCaseExecution testCaseExecution);
 
     public void delete(Long testCaseExecutionId);
 
-    public TestCaseExecution findOneByUserConfigId(Long userConfigId);
-
-    public TestCaseExecution saveOrUpdate(TestCaseExecution testCaseExecution);
+    public TestCaseExecution findOneByUserId(Long userId);
 
 }

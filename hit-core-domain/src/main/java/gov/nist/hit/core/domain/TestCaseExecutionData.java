@@ -29,6 +29,9 @@ public class TestCaseExecutionData implements Serializable {
     @OneToOne
     protected TestStepFieldPair testStepFieldPair;
 
+    @OneToOne
+    protected TestCaseExecution testCaseExecution;
+
     @Column
     protected String data;
 
@@ -36,9 +39,10 @@ public class TestCaseExecutionData implements Serializable {
         super();
     }
 
-    public TestCaseExecutionData(TestStepFieldPair testStepFieldPair, String data) {
+    public TestCaseExecutionData(TestStepFieldPair testStepFieldPair, String data, TestCaseExecution testCaseExecution) {
         this.testStepFieldPair = testStepFieldPair;
         this.data = data;
+        this.testCaseExecution = testCaseExecution;
     }
 
     public TestStepFieldPair getTestStepFieldPair() {
@@ -56,4 +60,13 @@ public class TestCaseExecutionData implements Serializable {
     public void setData(String data) {
         this.data = data;
     }
+
+    public TestCaseExecution getTestCaseExecution() {
+        return testCaseExecution;
+    }
+
+    public void setTestCaseExecution(TestCaseExecution testCaseExecution) {
+        this.testCaseExecution = testCaseExecution;
+    }
+
 }

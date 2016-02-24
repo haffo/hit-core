@@ -33,10 +33,13 @@ public class UserConfig implements Serializable{
     @Column(name = "property_value")
     protected Map<String, String> properties = new HashMap<String, String>();
 
-    public UserConfig(Long id, Map<String, String> properties) {
+    @Column
+    protected Long userId;
+
+    public UserConfig(Map<String, String> properties,Long userId) {
         super();
-        this.id = id;
         this.properties = properties;
+        this.userId = userId;
     }
 
     public UserConfig() {
@@ -57,5 +60,13 @@ public class UserConfig implements Serializable{
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

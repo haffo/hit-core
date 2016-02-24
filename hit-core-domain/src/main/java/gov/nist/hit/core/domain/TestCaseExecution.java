@@ -28,8 +28,8 @@ public class TestCaseExecution implements Serializable{
     @ManyToOne
     protected TestCase testCase;
 
-    @OneToOne
-    protected UserConfig userConfig;
+    @Column
+    protected Long userId;
 
     @Column
     protected Long currentTestStepId;
@@ -38,11 +38,11 @@ public class TestCaseExecution implements Serializable{
         super();
     }
 
-    public TestCaseExecution(Long id, TestCase testCase, UserConfig userConfig) {
+    public TestCaseExecution(Long id, TestCase testCase, Long userId) {
         super();
         this.id = id;
         this.testCase = testCase;
-        this.userConfig = userConfig;
+        this.userId = userId;
     }
 
     public static long getSerialVersionUID() {
@@ -65,19 +65,19 @@ public class TestCaseExecution implements Serializable{
         this.testCase = testCase;
     }
 
-    public UserConfig getUserConfig() {
-        return userConfig;
-    }
-
-    public void setUserConfig(UserConfig userConfig) {
-        this.userConfig = userConfig;
-    }
-
     public Long getCurrentTestStepId() {
         return currentTestStepId;
     }
 
     public void setCurrentTestStepId(Long currentTestStepId) {
         this.currentTestStepId = currentTestStepId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

@@ -6,8 +6,6 @@ import gov.nist.hit.core.service.TestCaseExecutionDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
  * the Federal Government in the course of their official duties. Pursuant to title 17 Section 105
@@ -28,8 +26,8 @@ public class TestCaseExecutionDataServiceImpl implements TestCaseExecutionDataSe
     TestCaseExecutionDataRepository testCaseExecutionDataRepository;
 
     @Override
-    public TestCaseExecutionData getTestCaseExecutionData(Long testStepFieldPairId) {
-        return testCaseExecutionDataRepository.getTestCaseExecutionDataFromTestStepFieldPairId(testStepFieldPairId);
+    public TestCaseExecutionData getTestCaseExecutionData(Long testStepFieldPairId, Long testCaseExecutionId) {
+        return testCaseExecutionDataRepository.getTestCaseExecutionDataFromTestStepFieldPairIdAndTestCaseExecutionId(testStepFieldPairId,testCaseExecutionId);
     }
 
     @Override

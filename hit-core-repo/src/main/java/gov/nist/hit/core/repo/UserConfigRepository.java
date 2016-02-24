@@ -2,6 +2,8 @@ package gov.nist.hit.core.repo;
 
 import gov.nist.hit.core.domain.UserConfig;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -17,4 +19,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Created by Maxence Lefort on 2/10/16.
  */
 public interface UserConfigRepository extends JpaRepository<UserConfig,Long> {
+
+    @Query("select uc from UserConfig uc where uc.userId = :userId")
+    public UserConfig getUserConfigByUserId(@Param("userId") Long userId);
 }

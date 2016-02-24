@@ -3,8 +3,11 @@ package gov.nist.hit.core.service.impl;
 import gov.nist.hit.core.domain.TestCaseExecution;
 import gov.nist.hit.core.repo.TestCaseExecutionRepository;
 import gov.nist.hit.core.service.TestCaseExecutionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -22,18 +25,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestCaseExecutionServiceImpl implements TestCaseExecutionService {
 
+    private Logger logger = LoggerFactory.getLogger(TestCaseExecutionService.class);
+
     @Autowired
     TestCaseExecutionRepository testCaseExecutionRepository;
 
     @Override
-    public TestCaseExecution getTestCaseExecution(Long userConfigId) {
-        Long testCaseExecutionId = testCaseExecutionRepository.getTestCaseExecutionIdFromUserId(userConfigId);
-        return testCaseExecutionRepository.findOne(testCaseExecutionId);
-    }
-
-    @Override
+    @Transactional
     public TestCaseExecution save(TestCaseExecution testCaseExecution) {
-        return testCaseExecutionRepository.saveAndFlush(testCaseExecution);
+        TestCaseExecution testCaseExecutionSaved = testCaseExecutionRepository.saveAndFlush(testCaseExecution);
+        logger.info("Test case execution saved : "+testCaseExecutionSaved.getId());
+
+        return testCaseExecutionSaved;
     }
 
     @Override
@@ -47,27 +50,8 @@ public class TestCaseExecutionServiceImpl implements TestCaseExecutionService {
     }
 
     @Override
-    public TestCaseExecution findOneByUserConfigId(Long userConfigId) {
-        Long testCaseExecutionId = testCaseExecutionRepository.getTestCaseExecutionIdFromUserId(userConfigId);
-        if(testCaseExecutionId!=null) {
-            return testCaseExecutionRepository.findOne(testCaseExecutionId);
-        }
-        return null;
-    }
-
-    @Override
-    public TestCaseExecution saveOrUpdate(TestCaseExecution testCaseExecution) {
-        if(exists(testCaseExecution.getUserConfig().getId())){
-            testCaseExecutionRepository.delete(testCaseExecution.getId());
-        }
-        return testCaseExecutionRepository.save(testCaseExecution);
-    }
-
-    private boolean exists(Long userConfigId){
-        if(testCaseExecutionRepository.getTestCaseExecutionIdFromUserId(userConfigId)==null){
-            return true;
-        }
-        return false;
+    public TestCaseExecution findOneByUserId(Long userId) {
+        return testCaseExecutionRepository.getTestCaseExecutionFromUserId(userId);
     }
 
 }

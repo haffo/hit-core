@@ -20,7 +20,7 @@ import java.util.List;
  */
 public interface TestCaseExecutionDataService {
 
-    public TestCaseExecutionData getTestCaseExecutionData(Long testStepFieldPairId);
+    public TestCaseExecutionData getTestCaseExecutionData(Long testStepFieldPairId, Long testCaseExecutionId);
 
     public TestCaseExecutionData save(TestCaseExecutionData testCaseExecutionData);
 

@@ -17,10 +17,10 @@ public interface UserConfigService {
 
   UserConfig save(UserConfig config);
 
-  List<UserConfig> findAllByProperties(Map<String, String> criteria);
-
   void delete(List<UserConfig> confs);
 
   UserConfig findOne(Long userConfigId);
+
+  UserConfig findOneByUserId(Long userId);
 
 }

@@ -18,6 +18,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface TestCaseExecutionRepository extends JpaRepository<TestCaseExecution, Long> {
-  @Query("select tce.id from TestCaseExecution tce where tce.userConfig.id = :id")
+  @Query("select tce.id from TestCaseExecution tce where tce.userId = :id")
   public Long getTestCaseExecutionIdFromUserId(@Param("id") Long id);
+
+  @Query("select tce from TestCaseExecution tce where tce.userId = :id")
+  public TestCaseExecution getTestCaseExecutionFromUserId(@Param("id") Long id);
+
 }
