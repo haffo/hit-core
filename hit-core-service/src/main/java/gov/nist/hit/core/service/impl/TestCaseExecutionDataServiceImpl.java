@@ -32,6 +32,10 @@ public class TestCaseExecutionDataServiceImpl implements TestCaseExecutionDataSe
 
     @Override
     public TestCaseExecutionData save(TestCaseExecutionData testCaseExecutionData) {
+        TestCaseExecutionData existingTestCaseExecutionData;
+        if((existingTestCaseExecutionData = testCaseExecutionDataRepository.getTestCaseExecutionDataFromTestStepFieldPairIdAndTestCaseExecutionId(testCaseExecutionData.getTestStepFieldPair().getId(),testCaseExecutionData.getTestCaseExecution().getId()))!=null){
+            testCaseExecutionData.setId(existingTestCaseExecutionData.getId());
+        }
         return testCaseExecutionDataRepository.saveAndFlush(testCaseExecutionData);
     }
 
