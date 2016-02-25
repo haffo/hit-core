@@ -1,12 +1,7 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -49,7 +44,11 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   @OneToMany(mappedBy = "testCase", orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   private List<TestStep> testSteps = new ArrayList<TestStep>();
-  
+
+  @OneToMany(mappedBy = "testCase", orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  protected Collection<DataMapping> dataMappings;
+
+
   private String protocol;
   
   public Long getId() {
@@ -93,7 +92,14 @@ public class TestCase extends AbstractTestCase implements Serializable {
     getTestSteps().add(testStep);
     testStep.setTestCase(this);
   }
-  
+
+  public Collection<DataMapping> getDataMappings() {
+    return dataMappings;
+  }
+
+  public void setDataMappings(Collection<DataMapping> dataMappings) {
+    this.dataMappings = dataMappings;
+  }
 
  
  
