@@ -30,8 +30,8 @@ public class TransportConfigServiceImpl implements TransportConfigService {
   protected EntityManager entityManager;
 
   @Override
-  public TransportConfig create(String protocol) {
-    TransportConfig config = new TransportConfig(protocol);
+  public TransportConfig create(String protocol, String domain) {
+    TransportConfig config = new TransportConfig(protocol, domain);
     return config;
   }
 
@@ -78,8 +78,9 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
 
   @Override
-  public TransportConfig findOneByUserAndProtocol(Long userId, String protocol) {
-    return transportConfigRepository.findOneByUserAndProtocol(userId, protocol);
+  public TransportConfig findOneByUserAndProtocolAndDomain(Long userId, String protocol,
+      String domain) {
+    return transportConfigRepository.findOneByUserAndProtocolAndDomain(userId, protocol, domain);
   }
 
 

@@ -25,7 +25,7 @@ public class ZipGeneratorImpl implements ZipGenerator {
   }
 
   @Override
-  @Cacheable(value = "zipCache", key = "#type")
+  @Cacheable(value = "HitCache", key = "#type")
   public String generate(String pattern, String type) throws Exception {
     List<Resource> resources = ResourcebundleHelper.getResources(pattern);
     if (resources != null) {

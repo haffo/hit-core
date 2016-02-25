@@ -49,9 +49,7 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testDataSpecification;
-  
-  protected String protocol;
-  
+    
   public TestStep() {
     super();
     this.type = ObjectType.TestStep;
@@ -95,13 +93,6 @@ public class TestStep extends AbstractTestCase implements Serializable {
     this.testingType = testingType;
   }
 
-  public String getProtocol() {
-    return protocol;
-  }
-
-  public void setProtocol(String protocol) {
-    this.protocol = protocol;
-  }
 
   public TestCase getTestCase() {
     return testCase;

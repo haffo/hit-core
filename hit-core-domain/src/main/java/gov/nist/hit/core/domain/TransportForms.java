@@ -21,7 +21,10 @@ public class TransportForms  implements Serializable {
   
   @NotNull
   private String protocol; 
-   
+  
+  @NotNull
+  private String domain; 
+  
   
   @NotNull
   @Column(columnDefinition = "LONGTEXT")
@@ -55,6 +58,12 @@ public class TransportForms  implements Serializable {
   }
   public void setId(Long id) {
     this.id = id;
+  }
+  public String getDomain() {
+    return domain;
+  }
+  public void setDomain(String domain) {
+    this.domain = domain;
   }
  
   

@@ -54,7 +54,7 @@ public class ContextBasedController {
   
 
 
-  @Cacheable(value = "testCaseCache", key = "'cb-testcases'")
+  @Cacheable(value = "HitCache", key = "'cb-testcases'")
   @RequestMapping(value = "/testcases", method = RequestMethod.GET)
   public List<TestPlan> testCases() {
     logger.info("Fetching all testCases...");

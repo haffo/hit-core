@@ -12,49 +12,22 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.Document;
-import gov.nist.hit.core.domain.DocumentType;
-import gov.nist.hit.core.domain.Json;
-import gov.nist.hit.core.domain.KeyValuePair;
-import gov.nist.hit.core.domain.MessageModel;
-import gov.nist.hit.core.domain.MessageParserCommand;
-import gov.nist.hit.core.domain.MessageValidationCommand;
-import gov.nist.hit.core.domain.MessageValidationResult;
 import gov.nist.hit.core.domain.SaveConfigRequest;
 import gov.nist.hit.core.domain.TestStepTestingType;
-import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.Transaction;
-import gov.nist.hit.core.domain.TransactionStatus;
 import gov.nist.hit.core.domain.TransportConfig;
-import gov.nist.hit.core.domain.TransportRequest;
 import gov.nist.hit.core.domain.TransportFormContent;
-import gov.nist.hit.core.domain.User;
-import gov.nist.hit.core.repo.TransactionRepository;
-import gov.nist.hit.core.repo.TransportFormsRepository;
-import gov.nist.hit.core.repo.UserRepository;
+import gov.nist.hit.core.domain.TransportForms;
 import gov.nist.hit.core.repo.TransportConfigRepository;
-import gov.nist.hit.core.service.TestStepService;
+import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.service.TransactionService;
-import gov.nist.hit.core.service.TransportConfigService;
-import gov.nist.hit.core.service.exception.MessageParserException;
-import gov.nist.hit.core.service.exception.MessageValidationException;
-import gov.nist.hit.core.service.exception.TestCaseException;
-import gov.nist.hit.core.service.exception.UserNotFoundException;
-import gov.nist.hit.core.service.exception.UserTokenIdNotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,58 +41,66 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/transport")
 @RestController
-public  class TransportController {
+public class TransportController {
 
   static final Logger logger = LoggerFactory.getLogger(DocumentationController.class);
 
   @Autowired
   private TransportFormsRepository transportFormsRepository;
-  
+
   @Autowired
   private TransportConfigRepository transportConfigRepository;
-  
+
   @Autowired
   private TransactionService transactionService;
-  
 
-  //@Cacheable(value = "transportCache", key = "#type.name() + '-' + #protocol +  '-' + #domain + '-form'")
   @RequestMapping(value = "/config/form", method = RequestMethod.GET)
-  public TransportFormContent form(@RequestParam("type") TestStepTestingType type,@RequestParam("protocol") String protocol ) {
+  public TransportFormContent form(@RequestParam("type") TestStepTestingType type,
+      @RequestParam("protocol") String protocol, @RequestParam("domain") String domain) {
     String content = null;
-    if(TestStepTestingType.SUT_INITIATOR.equals(type)){
-      content = transportFormsRepository.getSutInitiatorFormByProtocol(protocol);
-    }else if(TestStepTestingType.TA_INITIATOR.equals(type)){
-      content = transportFormsRepository.getTaInitiatorFormByProtocol(protocol);
-    }   
-    logger.info("Fetching  form of type="+  type + " and protocol=" + protocol);
+    if (TestStepTestingType.SUT_INITIATOR.equals(type)) {
+      content = transportFormsRepository.getSutInitiatorFormByProtocolAndDomain(protocol, domain);
+    } else if (TestStepTestingType.TA_INITIATOR.equals(type)) {
+      content = transportFormsRepository.getTaInitiatorFormByProtocolAndDomain(protocol, domain);
+    }
+    logger.info("Fetching  form of type=" + type + " and protocol=" + protocol + " and domain="
+        + domain);
     return new TransportFormContent(content);
   }
-  
+
   @RequestMapping(value = "/config/save", method = RequestMethod.POST)
   public boolean saveConfig(@RequestBody SaveConfigRequest request) {
-    TransportConfig config = transportConfigRepository.findOneByUserAndProtocol(request.getUserId(), request.getProtocol());
-    if(config != null){
-      if(TestStepTestingType.SUT_INITIATOR.equals(request.getType())){
+    TransportConfig config =
+        transportConfigRepository.findOneByUserAndProtocolAndDomain(request.getUserId(),
+            request.getProtocol(), request.getDomain());
+    if (config != null) {
+      if (TestStepTestingType.SUT_INITIATOR.equals(request.getType())) {
         config.setSutInitiator(request.getConfig());
-      }else if(TestStepTestingType.TA_INITIATOR.equals(request.getType())){
+      } else if (TestStepTestingType.TA_INITIATOR.equals(request.getType())) {
         config.setTaInitiator(request.getConfig());
       }
       transportConfigRepository.save(config);
     }
     return true;
   }
-  
+
   @RequestMapping(value = "/transaction/{transactionId}/delete", method = RequestMethod.POST)
   public boolean deleteTransaction(@PathVariable Long transactionId) {
     transactionService.delete(transactionId);
     return true;
   }
-  
+
   @RequestMapping(value = "/transaction/{transactionId}", method = RequestMethod.GET)
   public Transaction getTransaction(@PathVariable Long transactionId) {
     return transactionService.findOne(transactionId);
   }
-  
- 
+
+  @Cacheable(value = "HitCache", key = "'transport-forms'")
+  @RequestMapping(value = "/config/forms", method = RequestMethod.GET)
+  public List<TransportForms> forms() {
+    logger.info("Fetching  all transports form");
+    return transportFormsRepository.findAll();
+  }
+
 
 }
