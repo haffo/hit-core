@@ -880,7 +880,8 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private TestCase testCase(String location, TestingStage stage) throws IOException {
+  private TestCase testCase(String location, TestingStage stage, boolean transportSupported)
+      throws IOException {
     logger.info("Processing test case located at:" + location);
     TestCase tc = new TestCase();
     Resource res = ResourcebundleHelper.getResource(location + "TestCase.json");
@@ -892,11 +893,18 @@ public abstract class ResourcebundleLoader {
     tc.setName(testCaseObj.findValue("name").getTextValue());
     tc.setDescription(testCaseObj.findValue("description").getTextValue());
     tc.setTestStory(testStory(location));
-    tc.setDomain(testCaseObj.findValue("domain") != null ? testCaseObj.findValue("domain")
-        .getTextValue() : null);
+
+    if (transportSupported
+        && (testCaseObj.findValue("protocol") == null
+            || testCaseObj.findValue("protocol").getTextValue() == null || testCaseObj
+            .findValue("protocol").getTextValue().equals(""))) {
+      throw new IllegalArgumentException(
+          "Transport is supported for the following test case but no protocol is defined. TestCase location="
+              + location);
+    }
+
     tc.setProtocol(testCaseObj.findValue("protocol") != null ? testCaseObj.findValue("protocol")
         .getTextValue() : null);
-    logger.info("Domain is " + tc.getDomain());
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").getIntValue());
     }
@@ -951,10 +959,6 @@ public abstract class ResourcebundleLoader {
 
   private TestArtifact testStory(String location) throws IOException {
     return artifact(location, "TestStory");
-  }
-
-  private TestArtifact testProcedure(String location) throws IOException {
-    return artifact(location, "TestProcedure");
   }
 
   private TestArtifact jurorDocument(String location) throws IOException {
@@ -1012,7 +1016,8 @@ public abstract class ResourcebundleLoader {
 
 
 
-  private TestCaseGroup testCaseGroup(String location, TestingStage stage) throws IOException {
+  private TestCaseGroup testCaseGroup(String location, TestingStage stage, boolean transportEnabled)
+      throws IOException {
     logger.info("Processing test case group at:" + location);
     Resource descriptorRsrce = ResourcebundleHelper.getResource(location + "TestCaseGroup.json");
     if (descriptorRsrce == null)
@@ -1037,10 +1042,10 @@ public abstract class ResourcebundleLoader {
         Resource descriptorResource = getDescriptorResource(tcLocation);
         String filename = descriptorResource.getFilename();
         if (filename.endsWith("TestCaseGroup.json")) {
-          TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage);
+          TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage, transportEnabled);
           tcg.getTestCaseGroups().add(testCaseGroup);
         } else if (filename.endsWith("TestCase.json")) {
-          TestCase testCase = testCase(tcLocation, stage);
+          TestCase testCase = testCase(tcLocation, stage, transportEnabled);
           testCase.setParentName(tcg.getName());
           tcg.getTestCases().add(testCase);
         }
@@ -1065,6 +1070,18 @@ public abstract class ResourcebundleLoader {
       tp.setDescription(testPlanObj.findValue("description").getTextValue());
       tp.setTestStory(testStory(location));
       tp.setStage(stage);
+
+      if (testPlanObj.findValue("transport") != null
+          && testPlanObj.findValue("transport").getBooleanValue()
+          && (testPlanObj.findValue("domain") == null
+              || testPlanObj.findValue("domain").getTextValue() == null || testPlanObj.findValue(
+              "domain").getTextValue() == "")) {
+        throw new IllegalArgumentException(
+            "Transport is supported for the following test plan but no domain is defined. Test Plan location="
+                + location);
+      }
+      tp.setDomain(testPlanObj.findValue("domain") != null ? testPlanObj.findValue("domain")
+          .getTextValue() : null);
       tp.setTransport(testPlanObj.findValue("transport") != null ? testPlanObj.findValue(
           "transport").getBooleanValue() : false);
       if (testPlanObj.findValue("position") != null) {
@@ -1081,11 +1098,12 @@ public abstract class ResourcebundleLoader {
         Resource descriptorResource = getDescriptorResource(loca);
         String filename = descriptorResource.getFilename();
         if (filename.endsWith("TestCaseGroup.json")) {
-          TestCaseGroup testCaseGroup = testCaseGroup(loca, stage);
+          TestCaseGroup testCaseGroup = testCaseGroup(loca, stage, tp.isTransport());
           tp.getTestCaseGroups().add(testCaseGroup);
         } else if (filename.endsWith("TestCase.json")) {
-          TestCase testCase = testCase(loca, stage);
+          TestCase testCase = testCase(loca, stage, tp.isTransport());
           testCase.setParentName(tp.getName());
+
           tp.getTestCases().add(testCase);
         }
       }

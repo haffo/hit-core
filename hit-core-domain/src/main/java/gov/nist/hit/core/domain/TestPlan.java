@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -21,6 +22,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -55,6 +57,9 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
     private List<TestCaseGroup> testCaseGroups = new ArrayList<TestCaseGroup>();
 
   private boolean transport;
+  
+  @Column(nullable = true)
+  private String domain;
    
   public Long getId() {
     return id;
@@ -106,6 +111,14 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
 
   public void setTestPackage(TestArtifact testPackage) {
     this.testPackage = testPackage;
+  }
+
+  public String getDomain() {
+    return domain;
+  }
+
+  public void setDomain(String domain) {
+    this.domain = domain;
   }
 
   

@@ -129,6 +129,16 @@ public class TransportConfig {
     this.userId = userId;
   }
 
+
+  public String getDomain() {
+    return domain;
+  }
+
+
+  public void setDomain(String domain) {
+    this.domain = domain;
+  }
+
  
 
 

@@ -49,8 +49,6 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   @OneToMany(mappedBy = "testCase", orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   private List<TestStep> testSteps = new ArrayList<TestStep>();
-
-  private String domain;
   
   private String protocol;
   
@@ -76,14 +74,6 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   public void setTestingType(TestCaseTestingType testingType) {
     this.testingType = testingType;
-  }
-
-  public String getDomain() {
-    return domain;
-  }
-
-  public void setDomain(String domain) {
-    this.domain = domain;
   }
 
   
