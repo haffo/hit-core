@@ -35,7 +35,7 @@ public class TestStep extends AbstractTestCase implements Serializable {
  
   @NotNull
   @Enumerated(EnumType.STRING)
-  protected TestStepTestingType testingType;  
+  protected TestingType testingType;  
   
   
   @JsonIgnore
@@ -60,7 +60,7 @@ public class TestStep extends AbstractTestCase implements Serializable {
   protected TestContext testContext;
 
   @JsonIgnore
-  @ManyToOne(optional=true)
+  @ManyToOne(optional=true,fetch = FetchType.LAZY)
   protected TestCase testCase;
   
  
@@ -85,11 +85,11 @@ public class TestStep extends AbstractTestCase implements Serializable {
     this.testContext = testContext;
    }
 
-  public TestStepTestingType getTestingType() {
+  public TestingType getTestingType() {
     return testingType;
   }
 
-  public void setTestingType(TestStepTestingType testingType) {
+  public void setTestingType(TestingType testingType) {
     this.testingType = testingType;
   }
 

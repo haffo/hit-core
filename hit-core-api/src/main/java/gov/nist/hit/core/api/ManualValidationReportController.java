@@ -16,15 +16,16 @@ import gov.nist.hit.core.domain.ManualValidationResult;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.domain.ValidationReport;
-import gov.nist.hit.core.service.ManualValidationReportService;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.UserService;
+import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,7 +54,7 @@ public class ManualValidationReportController {
   static final Logger logger = LoggerFactory.getLogger(ManualValidationReportController.class);
 
   @Autowired
-  private ManualValidationReportService validationReportService;
+  private ValidationReportService validationReportService;
 
   @Autowired
   private TestStepService testStepService;
@@ -64,7 +65,7 @@ public class ManualValidationReportController {
 
   @RequestMapping(value = "/teststep/{testStepId}/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public void download(@RequestParam("format") String format,
+  public void downloadManualReport(@RequestParam("format") String format,
       @PathVariable("testStepId") Long testStepId, HttpServletRequest request,
       HttpServletResponse response) {
     try {
@@ -88,16 +89,16 @@ public class ManualValidationReportController {
       String ext = format.toLowerCase();
       InputStream io = null;
       if ("HTML".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(html(xmlReport), "UTF-8");
+        io = IOUtils.toInputStream(manualHtml(xmlReport), "UTF-8");
         response.setContentType("text/html");
       } else if ("DOC".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(html(xmlReport), "UTF-8");
+        io = IOUtils.toInputStream(manualHtml(xmlReport), "UTF-8");
         response.setContentType("application/msword");
       } else if ("XML".equalsIgnoreCase(format)) {
         io = IOUtils.toInputStream(xmlReport, "UTF-8");
         response.setContentType("application/xml");
       } else if ("PDF".equalsIgnoreCase(format)) {
-        io = validationReportService.toPDF(xmlReport);
+        io = validationReportService.toManualPDF(xmlReport);
         response.setContentType("application/pdf");
       } else {
         throw new ValidationReportException("Unsupported report format " + format);
@@ -112,10 +113,10 @@ public class ManualValidationReportController {
     }
   }
 
-  public InputStream pdf(ValidationReport report) {
+  public InputStream toManualPdf(ValidationReport report) {
     try {
       String xmlReport = report.getXml();
-      InputStream io = validationReportService.toPDF(xmlReport);
+      InputStream io = validationReportService.toManualPDF(xmlReport);
       return io;
     } catch (ValidationReportException e) {
       throw new ValidationReportException("Failed to download the report");
@@ -138,15 +139,22 @@ public class ManualValidationReportController {
       TestStep testStep = testStepService.findOne(testStepId);
       if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
         throw new ValidationReportException("No test step or unknown test step specified");
-      ValidationReport report =
-          validationReportService.findOneByTestStepAndUser(testStepId, userId);
-      if (report == null) {
+      ValidationReport report = null;
+      List<ValidationReport> reports =
+          validationReportService.findAllByTestStepAndUser(testStepId, userId);
+      if (reports != null && !reports.isEmpty()) {
+        if (reports.size() == 1) {
+          report = reports.get(0);
+        } else {
+          validationReportService.delete(reports);
+          report = new ValidationReport();
+        }
+      } else {
         report = new ValidationReport();
-        report.setTestStep(testStep);
-        report.setUser(user);
       }
-
-      String xml = validationReportService.toXML(validationResult);
+      report.setTestStep(testStep);
+      report.setUser(user);
+      String xml = validationReportService.toManualXML(validationResult);
       report.setXml(xml);
       validationReportService.save(report);
       return report;
@@ -160,10 +168,10 @@ public class ManualValidationReportController {
 
   @RequestMapping(value = "/html", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public Map<String, String> toHTML(@RequestParam("xmlReport") String content,
+  public Map<String, String> toManualHTML(@RequestParam("xmlReport") String content,
       HttpServletRequest request, HttpServletResponse response) {
     try {
-      String html = validationReportService.toHTML(content);
+      String html = validationReportService.toManualHTML(content);
       Map<String, String> res = new HashMap<String, String>(1);
       res.put("html", html);
       return res;
@@ -174,8 +182,8 @@ public class ManualValidationReportController {
     }
   }
 
-  private String html(String xml) {
-    return validationReportService.toHTML(xml);
+  private String manualHtml(String xml) {
+    return validationReportService.toManualHTML(xml);
   }
 
 }

@@ -15,10 +15,9 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStepTestingType;
+import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.ValidationReport;
 import gov.nist.hit.core.repo.TestContextRepository;
-import gov.nist.hit.core.service.ManualValidationReportService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationReportService;
@@ -65,12 +64,7 @@ public class TestCaseController {
   private UserService userService;
 
   @Autowired
-  private ValidationReportService messageValidationReportService;
-
-
-  @Autowired
-  private ManualValidationReportService manualValidationReportService;
-
+  private ValidationReportService validationReportService;
 
 
   /**
@@ -105,9 +99,9 @@ public class TestCaseController {
     if (userId == null || userService.findOne(userId) == null)
       throw new ValidationReportException("Invalid user credentials");
     List<ValidationReport> results =
-        messageValidationReportService.findAllByTestCaseAndUser(testCaseId, userId);
+        validationReportService.findAllByTestCaseAndUser(testCaseId, userId);
     if (results != null && !results.isEmpty()) {
-      messageValidationReportService.delete(results);
+      validationReportService.delete(results);
     }
     return true;
   }
@@ -151,7 +145,7 @@ public class TestCaseController {
       if (testCase == null)
         throw new TestCaseException(testCaseId);
       List<ValidationReport> results =
-          messageValidationReportService.findAllByTestCaseAndUser(testCaseId, userId);
+          validationReportService.findAllByTestCaseAndUser(testCaseId, userId);
       if (results != null && !results.isEmpty()) {
         HashMap<String, InputStream> resultStreams =
             new HashMap<String, InputStream>(results.size());
@@ -161,8 +155,7 @@ public class TestCaseController {
           resultStreams.put(
               tesStep.getPosition() + "." + tesStep.getName().concat("-ValidationReport.pdf"), pdf);
         }
-        InputStream io =
-            messageValidationReportService.zipReports(testCase.getName(), resultStreams);
+        InputStream io = validationReportService.zipReports(testCase.getName(), resultStreams);
         response.setContentType("application/zip");
         response.setHeader("Content-disposition", "attachment;filename=" + testCase.getName()
             + "-ValidationReports.zip");
@@ -179,11 +172,11 @@ public class TestCaseController {
       InputStream io = null;
       String xmlReport = report.getXml();
       TestStep testStep = report.getTestStep();
-      if (testStep.getTestingType().equals(TestStepTestingType.SUT_MANUAL)
-          || testStep.getTestingType().equals(TestStepTestingType.SUT_MANUAL)) {
-        io = manualValidationReportService.toPDF(xmlReport);
+      if (testStep.getTestingType().equals(TestingType.SUT_MANUAL)
+          || testStep.getTestingType().equals(TestingType.SUT_MANUAL)) {
+        io = validationReportService.toManualPDF(xmlReport);
       } else {
-        io = messageValidationReportService.toPDF(xmlReport);
+        io = validationReportService.toAutoPDF(xmlReport);
       }
       return io;
     } catch (ValidationReportException e) {

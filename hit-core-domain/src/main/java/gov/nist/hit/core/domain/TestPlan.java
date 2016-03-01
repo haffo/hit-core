@@ -25,6 +25,7 @@ import javax.persistence.OrderBy;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class TestPlan extends AbstractTestCase  implements Serializable {
@@ -34,10 +35,12 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id; 
-   
+  
+  @JsonIgnoreProperties(value = {"html","json"})
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testPlanSummary; 
 
+  @JsonIgnoreProperties(value = {"html","json"})
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testPackage;
   

@@ -26,6 +26,10 @@ public interface ValidationReportRepository extends JpaRepository<ValidationRepo
   ValidationReport findOneByTestStepAndUser(@Param("userId") Long userId,
       @Param("testStepId") Long testStepId);
 
+  @Query("select report from ValidationReport report where report.user.id = :userId and report.testStep.id = :testStepId")
+  List<ValidationReport> findAllByTestStepAndUser(@Param("userId") Long userId,
+      @Param("testStepId") Long testStepId);
+
   @Query("select report from ValidationReport report where report.user.id = :userId and report.testStep.id IN (:testStepIds)")
   List<ValidationReport> findAllByTestSteps(@Param("userId") Long userId,
       @Param("testStepIds") List<Long> testStepIds);

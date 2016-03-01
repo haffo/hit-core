@@ -25,12 +25,11 @@ import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseDocument;
 import gov.nist.hit.core.domain.TestCaseDocumentation;
 import gov.nist.hit.core.domain.TestCaseGroup;
-import gov.nist.hit.core.domain.TestCaseTestingType;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStepTestingType;
 import gov.nist.hit.core.domain.TestingStage;
+import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.TransportForms;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.AppInfoRepository;
@@ -67,11 +66,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +77,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class ResourcebundleLoader {
 
@@ -254,15 +253,15 @@ public abstract class ResourcebundleLoader {
     JsonNode metaData = getMetaData();
     String rsbVersion = getRsbleVersion();
     appInfo.setRsbVersion(rsbVersion);
-    appInfo.setAdminEmail(metaData.get("adminEmail").getTextValue());
-    appInfo.setDomain(metaData.get("domain").getTextValue());
-    appInfo.setHeader(metaData.get("header").getTextValue());
-    appInfo.setHomeTitle(metaData.get("homeTitle") != null ? metaData.get("homeTitle")
-        .getTextValue() : null);
+    appInfo.setAdminEmail(metaData.get("adminEmail").textValue());
+    appInfo.setDomain(metaData.get("domain").textValue());
+    appInfo.setHeader(metaData.get("header").textValue());
+    appInfo.setHomeTitle(metaData.get("homeTitle") != null ? metaData.get("homeTitle").textValue()
+        : null);
     appInfo.setHomeContent(metaData.get("homeContent") != null ? metaData.get("homeContent")
-        .getTextValue() : null); // backward compatibility
-    appInfo.setName(metaData.get("name").getTextValue());
-    appInfo.setVersion(metaData.get("version").getTextValue());
+        .textValue() : null); // backward compatibility
+    appInfo.setName(metaData.get("name").textValue());
+    appInfo.setVersion(metaData.get("version").textValue());
     appInfo.setDate(new Date().getTime() + "");
     Resource resource =
         ResourcebundleHelper.getResource(ResourcebundleLoader.PROFILE_PATTERN
@@ -334,32 +333,32 @@ public abstract class ResourcebundleLoader {
       List<gov.nist.hit.core.domain.Document> userDocs =
           new ArrayList<gov.nist.hit.core.domain.Document>();
       if (userDocsObj.isArray()) {
-        Iterator<JsonNode> it = userDocsObj.getElements();
+        Iterator<JsonNode> it = userDocsObj.elements();
         if (it != null) {
           while (it.hasNext()) {
             JsonNode node = it.next();
             gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
             document.setPosition(node.findValue("order") != null ? node.findValue("order")
-                .getIntValue() : userDocs.size() + 1);
-            document.setTitle(node.findValue("title") != null ? node.findValue("title")
-                .getTextValue() : null);
+                .intValue() : userDocs.size() + 1);
+            document.setTitle(node.findValue("title") != null ? node.findValue("title").textValue()
+                : null);
             if (node.findValue("name") != null) {
-              String path = node.findValue("name").getTextValue();
+              String path = node.findValue("name").textValue();
               if (path.endsWith("*")) {
                 Resource rs =
-                    getLatestResource(USERDOCS_PATTERN + node.findValue("name").getTextValue());
+                    getLatestResource(USERDOCS_PATTERN + node.findValue("name").textValue());
                 path = rs.getFilename();
               }
               document.setName(path);
               document.setPath(USERDOCS_PATTERN + path);
             } else if (node.findValue("link") != null) {
-              document.setPath(node.findValue("link").getTextValue());
+              document.setPath(node.findValue("link").textValue());
             }
-            document.setDate(node.findValue("date") != null ? node.findValue("date").getTextValue()
+            document.setDate(node.findValue("date") != null ? node.findValue("date").textValue()
                 : null);
             document.setType(DocumentType.USERDOC);
             document.setComments(node.findValue("comments") != null ? node.findValue("comments")
-                .getTextValue() : null);
+                .textValue() : null);
             userDocs.add(document);
           }
           if (!userDocs.isEmpty()) {
@@ -377,23 +376,23 @@ public abstract class ResourcebundleLoader {
     if (json != null) {
       List<TransportForms> transportForms = new ArrayList<TransportForms>();
       if (json.isArray()) {
-        Iterator<JsonNode> it = json.getElements();
+        Iterator<JsonNode> it = json.elements();
         while (it.hasNext()) {
           JsonNode node = it.next();
           if (node.findValue("protocol") != null && node.findValue("forms") != null
               && node.findValue("domain") != null) {
             TransportForms tForms = new TransportForms();
-            tForms.setProtocol(node.findValue("protocol").getTextValue());
-            tForms.setDomain(node.findValue("domain").getTextValue());
+            tForms.setProtocol(node.findValue("protocol").textValue());
+            tForms.setDomain(node.findValue("domain").textValue());
             JsonNode forms = node.findValue("forms");
             if (forms.get("TA_INITIATOR") == null || forms.get("SUT_INITIATOR") == null) {
               throw new RuntimeException(
                   "Transport.json TA_INITIATOR or SUT_INITIATOR form is missing");
             }
             tForms.setTaInitiatorForm(FileUtil.getContent(getResource(TRANSPORT_PATTERN
-                + forms.get("TA_INITIATOR").getTextValue())));
+                + forms.get("TA_INITIATOR").textValue())));
             tForms.setSutInitiatorForm(FileUtil.getContent(getResource(TRANSPORT_PATTERN
-                + forms.get("SUT_INITIATOR").getTextValue())));
+                + forms.get("SUT_INITIATOR").textValue())));
             transportForms.add(tForms);
           } else {
             throw new RuntimeException(
@@ -434,7 +433,7 @@ public abstract class ResourcebundleLoader {
           document.setType(DocumentType.PROFILE);
           document
               .setPosition(ordersObj != null && ordersObj.findValue(fileName) != null ? ordersObj
-                  .findValue(fileName).getIntValue() : 0);
+                  .findValue(fileName).intValue() : 0);
           resourceDocs.add(document);
         }
       }
@@ -466,7 +465,7 @@ public abstract class ResourcebundleLoader {
           document.setType(DocumentType.CONSTRAINT);
           document
               .setPosition(ordersObj != null && ordersObj.findValue(fileName) != null ? ordersObj
-                  .findValue(fileName).getIntValue() : 0);
+                  .findValue(fileName).intValue() : 0);
           resourceDocs.add(document);
         }
       }
@@ -502,7 +501,7 @@ public abstract class ResourcebundleLoader {
           document.setType(DocumentType.TABLE);
           document
               .setPosition(ordersObj != null && ordersObj.findValue(fileName) != null ? ordersObj
-                  .findValue(fileName).getIntValue() : 0);
+                  .findValue(fileName).intValue() : 0);
           resourceDocs.add(document);
         }
       }
@@ -534,24 +533,24 @@ public abstract class ResourcebundleLoader {
       List<gov.nist.hit.core.domain.Document> knownIssues =
           new ArrayList<gov.nist.hit.core.domain.Document>();
       if (knownIssueObj.isArray()) {
-        Iterator<JsonNode> it = knownIssueObj.getElements();
+        Iterator<JsonNode> it = knownIssueObj.elements();
         if (it != null) {
           while (it.hasNext()) {
             JsonNode node = it.next();
             gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
             document.setVersion(node.findValue("version") != null ? node.findValue("version")
-                .getTextValue() : null);
-            document.setTitle(node.findValue("title") != null ? node.findValue("title")
-                .getTextValue() : null);
-            document.setName(node.findValue("name") != null ? node.findValue("name").getTextValue()
+                .textValue() : null);
+            document.setTitle(node.findValue("title") != null ? node.findValue("title").textValue()
+                : null);
+            document.setName(node.findValue("name") != null ? node.findValue("name").textValue()
                 : null);
             document.setPath(node.findValue("name") != null ? KNOWNISSUE_PATTERN
-                + node.findValue("name").getTextValue() : null);
-            document.setDate(node.findValue("date") != null ? node.findValue("date").getTextValue()
+                + node.findValue("name").textValue() : null);
+            document.setDate(node.findValue("date") != null ? node.findValue("date").textValue()
                 : null);
             document.setType(DocumentType.KNOWNISSUE);
             document.setComments(node.findValue("comments") != null ? node.findValue("comments")
-                .getTextValue() : null);
+                .textValue() : null);
             knownIssues.add(document);
           }
           if (!knownIssues.isEmpty()) {
@@ -572,24 +571,24 @@ public abstract class ResourcebundleLoader {
       List<gov.nist.hit.core.domain.Document> releaseNotes =
           new ArrayList<gov.nist.hit.core.domain.Document>();
       if (releaseNoteObj.isArray()) {
-        Iterator<JsonNode> it = releaseNoteObj.getElements();
+        Iterator<JsonNode> it = releaseNoteObj.elements();
         if (it != null) {
           while (it.hasNext()) {
             JsonNode node = it.next();
             gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
             document.setVersion(node.findValue("version") != null ? node.findValue("version")
-                .getTextValue() : null);
-            document.setTitle(node.findValue("title") != null ? node.findValue("title")
-                .getTextValue() : null);
-            document.setName(node.findValue("name") != null ? node.findValue("name").getTextValue()
+                .textValue() : null);
+            document.setTitle(node.findValue("title") != null ? node.findValue("title").textValue()
+                : null);
+            document.setName(node.findValue("name") != null ? node.findValue("name").textValue()
                 : null);
             document.setPath(node.findValue("name") != null ? RELEASENOTE_PATTERN
-                + node.findValue("name").getTextValue() : null);
-            document.setDate(node.findValue("date") != null ? node.findValue("date").getTextValue()
+                + node.findValue("name").textValue() : null);
+            document.setDate(node.findValue("date") != null ? node.findValue("date").textValue()
                 : null);
             document.setType(DocumentType.RELEASENOTE);
             document.setComments(node.findValue("comments") != null ? node.findValue("comments")
-                .getTextValue() : null);
+                .textValue() : null);
             releaseNotes.add(document);
           }
           if (!releaseNotes.isEmpty()) {
@@ -614,11 +613,10 @@ public abstract class ResourcebundleLoader {
               "The Download installation field is missing one of those: title, link, date");
         }
 
-        installation.setTitle(instructionObj.findValue("title").getTextValue());
-        installation.setName(instructionObj.findValue("name").getTextValue());
-        installation.setPath(TOOL_DOWNLOADS_PATTERN
-            + instructionObj.findValue("name").getTextValue());
-        installation.setDate(instructionObj.findValue("date").getTextValue());
+        installation.setTitle(instructionObj.findValue("title").textValue());
+        installation.setName(instructionObj.findValue("name").textValue());
+        installation.setPath(TOOL_DOWNLOADS_PATTERN + instructionObj.findValue("name").textValue());
+        installation.setDate(instructionObj.findValue("date").textValue());
         installation.setType(DocumentType.INSTALLATION);
         documentRepository.save(installation);
       }
@@ -628,7 +626,7 @@ public abstract class ResourcebundleLoader {
         if (warFilesObj.isArray()) {
           List<gov.nist.hit.core.domain.Document> docs =
               new ArrayList<gov.nist.hit.core.domain.Document>();
-          Iterator<JsonNode> it = warFilesObj.getElements();
+          Iterator<JsonNode> it = warFilesObj.elements();
           if (it != null) {
             while (it.hasNext()) {
               JsonNode node = it.next();
@@ -638,9 +636,9 @@ public abstract class ResourcebundleLoader {
                 throw new IllegalArgumentException(
                     "The Download 'downloads' field is missing one of those: title, link, date");
               }
-              document.setTitle(node.findValue("title").getTextValue());
-              document.setPath(node.findValue("link").getTextValue());
-              document.setDate(node.findValue("date").getTextValue());
+              document.setTitle(node.findValue("title").textValue());
+              document.setPath(node.findValue("link").textValue());
+              document.setDate(node.findValue("date").textValue());
               document.setType(DocumentType.DELIVERABLE);
               docs.add(document);
             }
@@ -693,7 +691,7 @@ public abstract class ResourcebundleLoader {
       if (arrNode.isArray()) {
         skipped = new HashSet<String>();
         for (final JsonNode objNode : arrNode) {
-          skipped.add(objNode.getTextValue());
+          skipped.add(objNode.textValue());
         }
       }
     }
@@ -890,34 +888,29 @@ public abstract class ResourcebundleLoader {
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testCaseObj = mapper.readTree(descriptorContent);
-    tc.setName(testCaseObj.findValue("name").getTextValue());
-    tc.setDescription(testCaseObj.findValue("description").getTextValue());
+    tc.setName(testCaseObj.findValue("name").textValue());
+    tc.setDescription(testCaseObj.findValue("description").textValue());
     tc.setTestStory(testStory(location));
 
     if (transportSupported
         && (testCaseObj.findValue("protocol") == null
-            || testCaseObj.findValue("protocol").getTextValue() == null || testCaseObj
-            .findValue("protocol").getTextValue().equals(""))) {
+            || testCaseObj.findValue("protocol").textValue() == null || testCaseObj
+            .findValue("protocol").textValue().equals(""))) {
       throw new IllegalArgumentException(
           "Transport is supported for the following test case but no protocol is defined. TestCase location="
               + location);
     }
 
     tc.setProtocol(testCaseObj.findValue("protocol") != null ? testCaseObj.findValue("protocol")
-        .getTextValue() : null);
+        .textValue() : null);
     if (testCaseObj.findValue("position") != null) {
-      tc.setPosition(testCaseObj.findValue("position").getIntValue());
-    }
-    if (testCaseObj.findValue("type") != null) {
-      tc.setTestingType(TestCaseTestingType.valueOf(testCaseObj.findValue("type").getTextValue()
-          .toUpperCase()));
+      tc.setPosition(testCaseObj.findValue("position").intValue());
     }
     List<Resource> resources = getDirectories(location + "*");
     for (Resource resource : resources) {
       String fileName = fileName(resource);
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
       TestStep testStep = testStep(tcLocation, stage);
-      testStep.setParentName(tc.getName());
       tc.addTestStep(testStep);
     }
 
@@ -933,18 +926,17 @@ public abstract class ResourcebundleLoader {
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testStepObj = mapper.readTree(descriptorContent);
-    testStep.setName(testStepObj.findValue("name").getTextValue());
+    testStep.setName(testStepObj.findValue("name").textValue());
     // testStep.setProtocol(testStepObj.findValue("protocol") != null ? testStepObj.findValue(
-    // "protocol").getTextValue() : null);
-    testStep.setDescription(testStepObj.findValue("description").getTextValue());
+    // "protocol").textValue() : null);
+    testStep.setDescription(testStepObj.findValue("description").textValue());
     JsonNode ttypeObj = testStepObj.findValue("type");
-    String tttypeValue = ttypeObj != null ? ttypeObj.getTextValue() : null;
-    TestStepTestingType testingType =
-        tttypeValue != null && !"".equals(tttypeValue) ? TestStepTestingType.valueOf(tttypeValue)
-            : TestStepTestingType.DATAINSTANCE;
+    String tttypeValue = ttypeObj != null ? ttypeObj.textValue() : null;
+    TestingType testingType =
+        tttypeValue != null && !"".equals(tttypeValue) ? TestingType.valueOf(tttypeValue)
+            : TestingType.DATAINSTANCE;
     testStep.setTestingType(testingType);
-    if (!testingType.equals(TestStepTestingType.SUT_MANUAL)
-        && !testingType.equals(TestStepTestingType.TA_MANUAL)) {
+    if (!testingType.equals(TestingType.SUT_MANUAL) && !testingType.equals(TestingType.TA_MANUAL)) {
       testStep.setTestContext(testContext(location, testStepObj, stage));
     }
     testStep.setTestStory(testStory(location));
@@ -952,7 +944,7 @@ public abstract class ResourcebundleLoader {
     testStep.setMessageContent(messageContent(location));
     testStep.setTestDataSpecification(testDataSpecification(location));
     if (testStepObj.findValue("position") != null) {
-      testStep.setPosition(testStepObj.findValue("position").getIntValue());
+      testStep.setPosition(testStepObj.findValue("position").intValue());
     }
     return testStep;
   }
@@ -1025,13 +1017,13 @@ public abstract class ResourcebundleLoader {
     String descriptorContent = FileUtil.getContent(descriptorRsrce);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
-    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").getBooleanValue()) {
+    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       TestCaseGroup tcg = new TestCaseGroup();
-      tcg.setName(testPlanObj.findValue("name").getTextValue());
-      tcg.setDescription(testPlanObj.findValue("description").getTextValue());
+      tcg.setName(testPlanObj.findValue("name").textValue());
+      tcg.setDescription(testPlanObj.findValue("description").textValue());
       tcg.setTestStory(testStory(location));
       if (testPlanObj.findValue("position") != null) {
-        tcg.setPosition(testPlanObj.findValue("position").getIntValue());
+        tcg.setPosition(testPlanObj.findValue("position").intValue());
       } else {
         tcg.setPosition(1);
       }
@@ -1046,7 +1038,6 @@ public abstract class ResourcebundleLoader {
           tcg.getTestCaseGroups().add(testCaseGroup);
         } else if (filename.endsWith("TestCase.json")) {
           TestCase testCase = testCase(tcLocation, stage, transportEnabled);
-          testCase.setParentName(tcg.getName());
           tcg.getTestCases().add(testCase);
         }
       }
@@ -1064,28 +1055,28 @@ public abstract class ResourcebundleLoader {
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
-    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").getBooleanValue()) {
+    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       TestPlan tp = new TestPlan();
-      tp.setName(testPlanObj.findValue("name").getTextValue());
-      tp.setDescription(testPlanObj.findValue("description").getTextValue());
+      tp.setName(testPlanObj.findValue("name").textValue());
+      tp.setDescription(testPlanObj.findValue("description").textValue());
       tp.setTestStory(testStory(location));
       tp.setStage(stage);
 
       if (testPlanObj.findValue("transport") != null
-          && testPlanObj.findValue("transport").getBooleanValue()
+          && testPlanObj.findValue("transport").booleanValue()
           && (testPlanObj.findValue("domain") == null
-              || testPlanObj.findValue("domain").getTextValue() == null || testPlanObj.findValue(
-              "domain").getTextValue() == "")) {
+              || testPlanObj.findValue("domain").textValue() == null || testPlanObj.findValue(
+              "domain").textValue() == "")) {
         throw new IllegalArgumentException(
             "Transport is supported for the following test plan but no domain is defined. Test Plan location="
                 + location);
       }
       tp.setDomain(testPlanObj.findValue("domain") != null ? testPlanObj.findValue("domain")
-          .getTextValue() : null);
+          .textValue() : null);
       tp.setTransport(testPlanObj.findValue("transport") != null ? testPlanObj.findValue(
-          "transport").getBooleanValue() : false);
+          "transport").booleanValue() : false);
       if (testPlanObj.findValue("position") != null) {
-        tp.setPosition(testPlanObj.findValue("position").getIntValue());
+        tp.setPosition(testPlanObj.findValue("position").intValue());
       } else {
         tp.setPosition(1);
       }
@@ -1102,8 +1093,6 @@ public abstract class ResourcebundleLoader {
           tp.getTestCaseGroups().add(testCaseGroup);
         } else if (filename.endsWith("TestCase.json")) {
           TestCase testCase = testCase(loca, stage, tp.isTransport());
-          testCase.setParentName(tp.getName());
-
           tp.getTestCases().add(testCase);
         }
       }
@@ -1120,13 +1109,13 @@ public abstract class ResourcebundleLoader {
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
-    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").getBooleanValue()) {
+    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       CFTestInstance parent = new CFTestInstance();
-      parent.setName(testPlanObj.findValue("name").getTextValue());
+      parent.setName(testPlanObj.findValue("name").textValue());
       if (testPlanObj.findValue("position") != null) {
-        parent.setPosition(testPlanObj.findValue("position").getIntValue());
+        parent.setPosition(testPlanObj.findValue("position").intValue());
       }
-      parent.setDescription(testPlanObj.findValue("description").getTextValue());
+      parent.setDescription(testPlanObj.findValue("description").textValue());
       parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
       List<Resource> resources = getDirectories(testObjectPath + "*/");
       for (Resource resource : resources) {
@@ -1318,9 +1307,9 @@ public abstract class ResourcebundleLoader {
 
   public static String getRsbleVersion() throws JsonProcessingException, IOException {
     JsonNode metaData = getMetaData();
-    if (metaData.get("rsbVersion") == null || "".equals(metaData.get("rsbVersion").getTextValue()))
+    if (metaData.get("rsbVersion") == null || "".equals(metaData.get("rsbVersion").textValue()))
       throw new RuntimeException("rsbVersion not set or found in MetaData.json");
-    return metaData.get("rsbVersion").getTextValue();
+    return metaData.get("rsbVersion").textValue();
   }
 
   public static JsonNode getMetaData() throws JsonProcessingException, IOException {

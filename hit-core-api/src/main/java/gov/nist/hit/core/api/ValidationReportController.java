@@ -13,7 +13,7 @@
 package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStepTestingType;
+import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.domain.ValidationReport;
 import gov.nist.hit.core.service.TestCaseService;
@@ -25,6 +25,7 @@ import gov.nist.hit.core.service.exception.ValidationReportException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -74,18 +75,25 @@ public class ValidationReportController {
       User user = null;
       if (userId == null || ((user = userService.findOne(userId)) == null))
         throw new MessageValidationException("Invalid user credentials");
-
-      TestStep testStep = testStepService.findOne(testStepId);
+      TestStep testStep = null;
       if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
         throw new ValidationReportException("No test step or unknown test step specified");
 
-      ValidationReport report =
-          validationReportService.findOneByTestStepAndUser(testStepId, userId);
-      if (report == null) {
+      ValidationReport report = null;
+      List<ValidationReport> reports =
+          validationReportService.findAllByTestStepAndUser(testStepId, userId);
+      if (reports != null && !reports.isEmpty()) {
+        if (reports.size() == 1) {
+          report = reports.get(0);
+        } else {
+          validationReportService.delete(reports);
+          report = new ValidationReport();
+        }
+      } else {
         report = new ValidationReport();
-        report.setTestStep(testStep);
-        report.setUser(user);
       }
+      report.setTestStep(testStep);
+      report.setUser(user);
       report.setXml(content);
       validationReportService.save(report);
       return report;
@@ -122,16 +130,16 @@ public class ValidationReportController {
       String ext = format.toLowerCase();
       InputStream io = null;
       if ("HTML".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(html(xmlReport), "UTF-8");
+        io = IOUtils.toInputStream(autoHtml(xmlReport), "UTF-8");
         response.setContentType("text/html");
       } else if ("DOC".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(html(xmlReport), "UTF-8");
+        io = IOUtils.toInputStream(autoHtml(xmlReport), "UTF-8");
         response.setContentType("application/msword");
       } else if ("XML".equalsIgnoreCase(format)) {
         io = IOUtils.toInputStream(xmlReport, "UTF-8");
         response.setContentType("application/xml");
       } else if ("PDF".equalsIgnoreCase(format)) {
-        io = validationReportService.toPDF(xmlReport);
+        io = validationReportService.toAutoPDF(xmlReport);
         response.setContentType("application/pdf");
       } else {
         throw new ValidationReportException("Unsupported report format " + format);
@@ -151,11 +159,11 @@ public class ValidationReportController {
       InputStream io = null;
       String xmlReport = report.getXml();
       TestStep testStep = report.getTestStep();
-      if (testStep.getTestingType().equals(TestStepTestingType.SUT_MANUAL)
-          || testStep.getTestingType().equals(TestStepTestingType.SUT_MANUAL)) {
-        io = validationReportService.toPDF(xmlReport);
+      if (testStep.getTestingType().equals(TestingType.SUT_MANUAL)
+          || testStep.getTestingType().equals(TestingType.SUT_MANUAL)) {
+        io = validationReportService.toManualPDF(xmlReport);
       } else {
-        io = validationReportService.toPDF(xmlReport);
+        io = validationReportService.toAutoPDF(xmlReport);
       }
       return io;
     } catch (ValidationReportException e) {
@@ -167,8 +175,8 @@ public class ValidationReportController {
 
 
 
-  private String html(String xmlReport) {
-    return validationReportService.toHTML(xmlReport);
+  private String autoHtml(String xmlReport) {
+    return validationReportService.toAutoHTML(xmlReport);
   }
 
 

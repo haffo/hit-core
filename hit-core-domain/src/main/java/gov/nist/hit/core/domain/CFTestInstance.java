@@ -37,7 +37,7 @@ public class CFTestInstance extends TestStep implements Serializable {
   public CFTestInstance() {
     super();
     this.type = ObjectType.TestObject;
-    this.testingType = TestStepTestingType.DATAINSTANCE;
+    this.testingType = TestingType.DATAINSTANCE;
   }
 
 
@@ -77,11 +77,11 @@ public class CFTestInstance extends TestStep implements Serializable {
     this.root = root;
   }
 
-  public TestStepTestingType getTestingType() {
+  public TestingType getTestingType() {
     return testingType;
   }
 
-  public void setTestingType(TestStepTestingType testingType) {
+  public void setTestingType(TestingType testingType) {
     this.testingType = testingType;
   }
 

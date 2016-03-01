@@ -7,6 +7,7 @@ import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
@@ -16,7 +17,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.codehaus.jackson.map.annotate.JsonView;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,20 +33,20 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
   protected String name;
 
 
-  @Column
-  private String parentName;
-
-  @Column
-  private String testCaseName;
-
-  @Column
-  private String testPlanName;
-
-  @Column
-  private String testCaseGroupName;
-
-  @Column
-  private String testStepName;
+//  @Column
+//  private String parentName;
+//
+//  @Column
+//  private String testCaseName;
+//
+//  @Column
+//  private String testPlanName;
+//
+//  @Column
+//  private String testCaseGroupName;
+//
+//  @Column
+//  private String testStepName;
 
 
   @Column(columnDefinition = "TEXT")
@@ -122,45 +122,45 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
   }
 
  
-  public String getParentName() {
-    return parentName;
-  }
-
-  public void setParentName(String parentName) {
-    this.parentName = parentName;
-  }
-
-  public String getTestCaseName() {
-    return testCaseName;
-  }
-
-  public void setTestCaseName(String testCaseName) {
-    this.testCaseName = testCaseName;
-  }
-
-  public String getTestPlanName() {
-    return testPlanName;
-  }
-
-  public void setTestPlanName(String testPlanName) {
-    this.testPlanName = testPlanName;
-  }
-
-  public String getTestCaseGroupName() {
-    return testCaseGroupName;
-  }
-
-  public void setTestCaseGroupName(String testCaseGroupName) {
-    this.testCaseGroupName = testCaseGroupName;
-  }
-
-  public String getTestStepName() {
-    return testStepName;
-  }
-
-  public void setTestStepName(String testStepName) {
-    this.testStepName = testStepName;
-  }
+//  public String getParentName() {
+//    return parentName;
+//  }
+//
+//  public void setParentName(String parentName) {
+//    this.parentName = parentName;
+//  }
+//
+//  public String getTestCaseName() {
+//    return testCaseName;
+//  }
+//
+//  public void setTestCaseName(String testCaseName) {
+//    this.testCaseName = testCaseName;
+//  }
+//
+//  public String getTestPlanName() {
+//    return testPlanName;
+//  }
+//
+//  public void setTestPlanName(String testPlanName) {
+//    this.testPlanName = testPlanName;
+//  }
+//
+//  public String getTestCaseGroupName() {
+//    return testCaseGroupName;
+//  }
+//
+//  public void setTestCaseGroupName(String testCaseGroupName) {
+//    this.testCaseGroupName = testCaseGroupName;
+//  }
+//
+//  public String getTestStepName() {
+//    return testStepName;
+//  }
+//
+//  public void setTestStepName(String testStepName) {
+//    this.testStepName = testStepName;
+//  }
 
   @Override
   public int compareTo(AbstractTestCase o) {

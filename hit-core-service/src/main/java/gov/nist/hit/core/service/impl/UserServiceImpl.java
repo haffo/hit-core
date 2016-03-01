@@ -1,6 +1,6 @@
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.hit.core.domain.TestStepTestingType;
+import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.User;
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
       String protocol) {
     TransportConfig config =
         transportConfigService.findOneByPropertiesAndProtocol(criteria,
-            TestStepTestingType.SUT_INITIATOR, protocol);
+            TestingType.SUT_INITIATOR, protocol);
     return config != null && config.getUserId() != null;
   }
 

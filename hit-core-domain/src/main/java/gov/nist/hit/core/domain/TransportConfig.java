@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Entity
 public class TransportConfig {
@@ -76,7 +75,7 @@ public class TransportConfig {
 
  
 
-  public boolean matches(List<KeyValuePair> pairs, TestStepTestingType type) {
+  public boolean matches(List<KeyValuePair> pairs, TestingType type) {
     if (!pairs.isEmpty()) {
       for (KeyValuePair pair : pairs) {
         if (!matches(pair, type)) {
@@ -88,15 +87,15 @@ public class TransportConfig {
     return false;
   }
 
-  public boolean matches(KeyValuePair pair, TestStepTestingType type) {
+  public boolean matches(KeyValuePair pair, TestingType type) {
     Map<String, String> info = getConfigInfo(type);
     return pair.getKey() != null && info.containsKey(pair.getKey())
         && info.get(pair.getKey()).equals(pair.getValue());
   }
 
-  public Map<String, String> getConfigInfo(TestStepTestingType type) {
-    return type == TestStepTestingType.SUT_INITIATOR ? sutInitiator
-        : type == TestStepTestingType.TA_INITIATOR ? taInitiator : new HashMap<String, String>();
+  public Map<String, String> getConfigInfo(TestingType type) {
+    return type == TestingType.SUT_INITIATOR ? sutInitiator
+        : type == TestingType.TA_INITIATOR ? taInitiator : new HashMap<String, String>();
   }
 
 

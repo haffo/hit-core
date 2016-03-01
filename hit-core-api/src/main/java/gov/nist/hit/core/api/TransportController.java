@@ -13,7 +13,7 @@
 package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.SaveConfigRequest;
-import gov.nist.hit.core.domain.TestStepTestingType;
+import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.TransportFormContent;
@@ -55,12 +55,12 @@ public class TransportController {
   private TransactionService transactionService;
 
   @RequestMapping(value = "/config/form", method = RequestMethod.GET)
-  public TransportFormContent form(@RequestParam("type") TestStepTestingType type,
+  public TransportFormContent form(@RequestParam("type") TestingType type,
       @RequestParam("protocol") String protocol, @RequestParam("domain") String domain) {
     String content = null;
-    if (TestStepTestingType.SUT_INITIATOR.equals(type)) {
+    if (TestingType.SUT_INITIATOR.equals(type)) {
       content = transportFormsRepository.getSutInitiatorFormByProtocolAndDomain(protocol, domain);
-    } else if (TestStepTestingType.TA_INITIATOR.equals(type)) {
+    } else if (TestingType.TA_INITIATOR.equals(type)) {
       content = transportFormsRepository.getTaInitiatorFormByProtocolAndDomain(protocol, domain);
     }
     logger.info("Fetching  form of type=" + type + " and protocol=" + protocol + " and domain="
@@ -74,9 +74,9 @@ public class TransportController {
         transportConfigRepository.findOneByUserAndProtocolAndDomain(request.getUserId(),
             request.getProtocol(), request.getDomain());
     if (config != null) {
-      if (TestStepTestingType.SUT_INITIATOR.equals(request.getType())) {
+      if (TestingType.SUT_INITIATOR.equals(request.getType())) {
         config.setSutInitiator(request.getConfig());
-      } else if (TestStepTestingType.TA_INITIATOR.equals(request.getType())) {
+      } else if (TestingType.TA_INITIATOR.equals(request.getType())) {
         config.setTaInitiator(request.getConfig());
       }
       transportConfigRepository.save(config);

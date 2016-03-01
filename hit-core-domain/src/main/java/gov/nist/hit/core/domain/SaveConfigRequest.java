@@ -16,12 +16,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 
  public class SaveConfigRequest {
    private Long userId;
    private Map<String, String> config;
-   private TestStepTestingType type;
+   private TestingType type;
    private String protocol;
    private String domain;
   public Long getUserId() {
@@ -36,10 +35,10 @@ import org.codehaus.jackson.annotate.JsonIgnore;
   public void setConfig(Map<String, String> config) {
     this.config = config;
   }
-  public TestStepTestingType getType() {
+  public TestingType getType() {
     return type;
   }
-  public void setType(TestStepTestingType type) {
+  public void setType(TestingType type) {
     this.type = type;
   }
   public String getProtocol() {
