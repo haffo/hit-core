@@ -41,12 +41,12 @@ public class ValidationReportServiceImpl implements ValidationReportService {
   private final static Logger logger = Logger.getLogger(ValidationReportServiceImpl.class);
   private static final String HTML_XSL = "/report/report-html.xsl";
   private static final String PDF_XSL = "/report/report-pdf.xsl";
-  private static final String CSS = "/report.css";
-  private String css = "";
+  protected static final String CSS = "/report.css";
+  protected String css = "";
 
 
   @Autowired
-  private ValidationReportRepository validationReportRepository;
+  protected ValidationReportRepository validationReportRepository;
 
 
   public ValidationReportServiceImpl() {
@@ -117,7 +117,7 @@ public class ValidationReportServiceImpl implements ValidationReportService {
       Transformer transformer =
           TransformerFactory.newInstance().newTransformer(
               new StreamSource(new StringReader(IOUtils.toString(ValidationReportServiceImpl.class
-                  .getResourceAsStream(HTML_XSL)))));
+                  .getResourceAsStream(getHtmlCss())))));
       StreamSource source = new StreamSource(new StringReader(xml));
       ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
       StreamResult result = new StreamResult(resultStream);
@@ -139,7 +139,7 @@ public class ValidationReportServiceImpl implements ValidationReportService {
       Transformer transformer =
           TransformerFactory.newInstance().newTransformer(
               new StreamSource(new StringReader(IOUtils.toString(ValidationReportServiceImpl.class
-                  .getResourceAsStream(PDF_XSL)))));
+                  .getResourceAsStream(getPdfCss())))));
       StreamSource source = new StreamSource(new StringReader(xml));
       ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
       StreamResult result = new StreamResult(resultStream);
@@ -245,7 +245,7 @@ public class ValidationReportServiceImpl implements ValidationReportService {
     FileUtils.copyInputStreamToFile(report, file);
   }
 
-  private String addCss(String htmlReport) throws IOException {
+  public String addCss(String htmlReport) throws IOException {
     StringBuffer sb = new StringBuffer();
     sb.append("<html xmlns='http://www.w3.org/1999/xhtml'>");
     sb.append("<head>");
@@ -258,6 +258,15 @@ public class ValidationReportServiceImpl implements ValidationReportService {
     sb.append("</body></html>");
     return sb.toString();
   }
+
+  public String getHtmlCss() {
+    return HTML_XSL;
+  }
+
+  public String getPdfCss() {
+    return PDF_XSL;
+  }
+
 
 
 }

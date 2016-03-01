@@ -1,14 +1,13 @@
 package gov.nist.hit.core.service;
 
+import gov.nist.hit.core.domain.ManualValidationResult;
 import gov.nist.hit.core.domain.ValidationReport;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 
-public interface ValidationReportService {
-
+public interface ManualValidationReportService {
 
   void delete(ValidationReport resutl);
 
@@ -36,8 +35,6 @@ public interface ValidationReportService {
 
   InputStream toPDF(String content) throws ValidationReportException;
 
-  InputStream zipReports(String folderName, HashMap<String, InputStream> reports)
-      throws ValidationReportException;
-
+  String toXML(ManualValidationResult request) throws ValidationReportException;
 
 }

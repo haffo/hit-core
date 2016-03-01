@@ -12,19 +12,20 @@
 
 package gov.nist.hit.core.api;
 
+import gov.nist.hit.core.domain.ManualValidationResult;
 import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStepTestingType;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.domain.ValidationReport;
-import gov.nist.hit.core.service.TestCaseService;
+import gov.nist.hit.core.service.ManualValidationReportService;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.UserService;
-import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,56 +47,20 @@ import org.springframework.web.bind.annotation.RestController;
  * 
  */
 @RestController
-@RequestMapping("/report")
-public class ValidationReportController {
+@RequestMapping("/manual/report")
+public class ManualValidationReportController {
 
-  static final Logger logger = LoggerFactory.getLogger(ValidationReportController.class);
+  static final Logger logger = LoggerFactory.getLogger(ManualValidationReportController.class);
 
   @Autowired
-  private ValidationReportService validationReportService;
+  private ManualValidationReportService validationReportService;
 
   @Autowired
   private TestStepService testStepService;
 
   @Autowired
-  private TestCaseService testCaseService;
-
-  @Autowired
   private UserService userService;
 
-
-  @RequestMapping(value = "/save", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public ValidationReport save(@RequestParam("xmlReport") String content,
-      @RequestParam("testStepId") Long testStepId, HttpServletRequest request,
-      HttpServletResponse response) {
-    try {
-      logger.info("Saving validation report");
-      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      User user = null;
-      if (userId == null || ((user = userService.findOne(userId)) == null))
-        throw new MessageValidationException("Invalid user credentials");
-
-      TestStep testStep = testStepService.findOne(testStepId);
-      if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
-        throw new ValidationReportException("No test step or unknown test step specified");
-
-      ValidationReport report =
-          validationReportService.findOneByTestStepAndUser(testStepId, userId);
-      if (report == null) {
-        report = new ValidationReport();
-        report.setTestStep(testStep);
-        report.setUser(user);
-      }
-      report.setXml(content);
-      validationReportService.save(report);
-      return report;
-    } catch (ValidationReportException e) {
-      throw new ValidationReportException("Failed to download the report");
-    } catch (Exception e) {
-      throw new ValidationReportException("Failed to download the report");
-    }
-  }
 
   @RequestMapping(value = "/teststep/{testStepId}/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
@@ -148,28 +114,68 @@ public class ValidationReportController {
 
   public InputStream pdf(ValidationReport report) {
     try {
-      InputStream io = null;
       String xmlReport = report.getXml();
-      TestStep testStep = report.getTestStep();
-      if (testStep.getTestingType().equals(TestStepTestingType.SUT_MANUAL)
-          || testStep.getTestingType().equals(TestStepTestingType.SUT_MANUAL)) {
-        io = validationReportService.toPDF(xmlReport);
-      } else {
-        io = validationReportService.toPDF(xmlReport);
-      }
+      InputStream io = validationReportService.toPDF(xmlReport);
       return io;
     } catch (ValidationReportException e) {
-      throw new ValidationReportException("Failed to generate the report pdf");
+      throw new ValidationReportException("Failed to download the report");
     } catch (Exception e) {
-      throw new ValidationReportException("Failed to generate the report pdf");
+      throw new ValidationReportException("Failed to download the report");
+    }
+  }
+
+  @RequestMapping(value = "/save", method = RequestMethod.POST)
+  public ValidationReport saveManualReport(@RequestBody ManualValidationResult validationResult,
+      HttpServletRequest request, HttpServletResponse response) {
+    try {
+      logger.info("Saving validation report");
+      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+      User user = null;
+      if (userId == null || ((user = userService.findOne(userId)) == null))
+        throw new MessageValidationException("Invalid user credentials");
+
+      Long testStepId = validationResult.getTestStepId();
+      TestStep testStep = testStepService.findOne(testStepId);
+      if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
+        throw new ValidationReportException("No test step or unknown test step specified");
+      ValidationReport report =
+          validationReportService.findOneByTestStepAndUser(testStepId, userId);
+      if (report == null) {
+        report = new ValidationReport();
+        report.setTestStep(testStep);
+        report.setUser(user);
+      }
+
+      String xml = validationReportService.toXML(validationResult);
+      report.setXml(xml);
+      validationReportService.save(report);
+      return report;
+    } catch (ValidationReportException e) {
+      throw new ValidationReportException("Failed to download the report");
+    } catch (Exception e) {
+      throw new ValidationReportException("Failed to download the report");
     }
   }
 
 
-
-  private String html(String xmlReport) {
-    return validationReportService.toHTML(xmlReport);
+  @RequestMapping(value = "/html", method = RequestMethod.POST,
+      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+  public Map<String, String> toHTML(@RequestParam("xmlReport") String content,
+      HttpServletRequest request, HttpServletResponse response) {
+    try {
+      String html = validationReportService.toHTML(content);
+      Map<String, String> res = new HashMap<String, String>(1);
+      res.put("html", html);
+      return res;
+    } catch (ValidationReportException e) {
+      throw new ValidationReportException("Failed to download the report");
+    } catch (Exception e) {
+      throw new ValidationReportException("Failed to download the report");
+    }
   }
 
+  private String html(String xml) {
+    return validationReportService.toHTML(xml);
+  }
 
 }
