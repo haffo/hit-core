@@ -56,6 +56,10 @@ public class ValidationReportServiceImpl implements ValidationReportService {
   protected static final String CSS = "/report.css";
   protected String css = "";
 
+  private static final String MANUAL_HTML_XSL = "/report/manual-report-html.xsl";
+  private static final String MANUAL_PDF_XSL = "/report/manual-report-pdf.xsl";
+
+
 
   @Autowired
   protected ValidationReportRepository validationReportRepository;
@@ -284,10 +288,6 @@ public class ValidationReportServiceImpl implements ValidationReportService {
   public List<ValidationReport> findAllByTestStepAndUser(Long testStepId, Long userId) {
     return validationReportRepository.findAllByTestStepAndUser(userId, testStepId);
   }
-
-
-  private static final String MANUAL_HTML_XSL = "/report/manual-report-html.xsl";
-  private static final String MANUAL_PDF_XSL = "/report/manual-report-pdf.xsl";
 
 
   @Override
