@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hit-core-api</artifactId>
 	<packaging>jar</packaging>
@@ -9,9 +10,9 @@
 		<artifactId>hit-core</artifactId>
 		<version>1.0.4-SNAPSHOT</version>
 	</parent>
-	
+
 	<properties>
-		 <spring-security.version>3.1.4.RELEASE</spring-security.version>
+		<spring-security.version>3.1.4.RELEASE</spring-security.version>
 	</properties>
 
 	<build>
@@ -184,18 +185,31 @@
 			<version>3.4.4</version>
 		</dependency>
 
-<!--   <dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-			<version>${spring-security.version}</version>
-		</dependency>
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-			<version>${spring-security.version}</version>
-		</dependency> -->
-		  
-	</dependencies>
+			<groupId>com.mangofactory</groupId>
+			<artifactId>swagger-springmvc</artifactId>
+			<version>1.0.2</version>
+		</dependency>
 
+		<dependency>
+			<groupId>org.ajar</groupId>
+			<artifactId>swagger-spring-mvc-ui</artifactId>
+			<version>0.4</version>
+		</dependency>
+
+	</dependencies>
 	
+	<repositories>
+		<repository>
+			<id>oss-jfrog-artifactory</id>
+			<name>oss-jfrog-artifactory-releases</name>
+			<url>http://oss.jfrog.org/artifactory/oss-release-local</url>
+		</repository>
+
+		 <repository>
+    <id>spring-releases</id>
+    <url>http://repo.spring.io/libs-release-remote/</url>
+  </repository>
+	</repositories>
+
 </project>
