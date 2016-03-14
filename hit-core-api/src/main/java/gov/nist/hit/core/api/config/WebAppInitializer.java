@@ -39,9 +39,10 @@ public class WebAppInitializer implements WebApplicationInitializer
     apiServlet.addMapping("/api/*");
     apiServlet.setAsyncSupported(true);
 
-    Dynamic apiDocsServlet = servletContext.addServlet("hit-api-docs", new DispatcherServlet(root));
-    apiDocsServlet.setLoadOnStartup(2);
-    apiDocsServlet.addMapping("/api-docs/*");
+    // Dynamic apiDocsServlet = servletContext.addServlet("hit-api-docs", new
+    // DispatcherServlet(root));
+    // apiDocsServlet.setLoadOnStartup(2);
+    // apiDocsServlet.addMapping("/api-docs/*");
     try {
       servletContext.setInitParameter("rsbVersion", ResourcebundleLoader.getRsbleVersion());
     } catch (Exception e) {
