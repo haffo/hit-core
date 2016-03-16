@@ -13,15 +13,10 @@ package gov.nist.hit.core.api.config;
 
 import gov.nist.hit.core.service.ResourcebundleLoader;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.UUID;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration.Dynamic;
 
-import org.codehaus.jackson.JsonProcessingException;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -42,12 +37,12 @@ public class WebAppInitializer implements WebApplicationInitializer
     Dynamic servlet = servletContext.addServlet("hit-api", new DispatcherServlet(root));
     servlet.setLoadOnStartup(1);
     servlet.addMapping("/api/*");
-    servlet.setAsyncSupported(true);    
+    servlet.setAsyncSupported(true);
     try {
-      servletContext.setInitParameter("rsbVersion",ResourcebundleLoader.getRsbleVersion());
+      servletContext.setInitParameter("rsbVersion", ResourcebundleLoader.getRsbleVersion());
     } catch (Exception e) {
-       throw new RuntimeException(e);
-    } 
+      throw new RuntimeException(e);
+    }
   }
 
 }

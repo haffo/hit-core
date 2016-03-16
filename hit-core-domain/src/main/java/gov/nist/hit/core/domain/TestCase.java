@@ -31,16 +31,11 @@ public class TestCase extends AbstractTestCase implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id; 
-  
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  private TestCaseTestingType testingType;
-  
+ 
   public TestCase() {
     super();
     this.type = ObjectType.TestCase;
-    this.testingType = TestCaseTestingType.DATAINSTANCE;
-   }
+    }
 
   @OneToMany(mappedBy = "testCase", orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   private List<TestStep> testSteps = new ArrayList<TestStep>();
@@ -67,16 +62,6 @@ public class TestCase extends AbstractTestCase implements Serializable {
     this.testSteps = testSteps;
   }
 
-  public TestCaseTestingType getTestingType() {
-    return testingType;
-  }
-
-  public void setTestingType(TestCaseTestingType testingType) {
-    this.testingType = testingType;
-  }
-
-  
-  
   public String getProtocol() {
     return protocol;
   }

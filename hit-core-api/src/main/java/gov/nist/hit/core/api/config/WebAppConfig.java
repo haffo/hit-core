@@ -67,6 +67,14 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 
   }
 
+  // public GsonHttpMessageConverter gsonHttpMessageConverter() {
+  // Gson gson =
+  // new GsonBuilder().setExclusionStrategies(new AnnotationExclusionStrategy()).create();
+  // GsonHttpMessageConverter converter = new GsonHttpMessageConverter(gson);
+  // converter.setGson(gson);
+  // return converter;
+  // }
+
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
     // Here we add our custom-configured HttpMessageConverter

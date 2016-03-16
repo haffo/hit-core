@@ -1,7 +1,7 @@
 package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.KeyValuePair;
-import gov.nist.hit.core.domain.TestStepTestingType;
+import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.TransportConfig;
 
 import java.util.List;
@@ -17,12 +17,12 @@ public interface TransportConfigService {
 
   TransportConfig save(TransportConfig config);
 
-  TransportConfig set(KeyValuePair pair, TestStepTestingType type, TransportConfig config);
+  TransportConfig set(KeyValuePair pair, TestingType type, TransportConfig config);
 
-  TransportConfig set(List<KeyValuePair> pairs, TestStepTestingType type, TransportConfig config);
+  TransportConfig set(List<KeyValuePair> pairs, TestingType type, TransportConfig config);
 
   TransportConfig findOneByPropertiesAndProtocol(Map<String, String> criteria,
-      TestStepTestingType type, String protocol);
+      TestingType type, String protocol);
 
   List<TransportConfig> findAllByUser(Long userId);
 

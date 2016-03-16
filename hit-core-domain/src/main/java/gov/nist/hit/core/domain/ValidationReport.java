@@ -31,14 +31,13 @@ public class ValidationReport implements Serializable {
   @ManyToOne(optional=false)
   private User user; 
   
-  @JsonIgnore
   @Column(columnDefinition = "TEXT")
   private String xml; 
   
   
-  public ValidationReport(String xml,TestStep testStep, User user) {
+  public ValidationReport(String content,TestStep testStep, User user) {
     super();
-    this.xml = xml;
+    this.xml = content;
     this.testStep  =testStep;
     this.user = user;
   }
@@ -48,6 +47,8 @@ public class ValidationReport implements Serializable {
    }
 
    
+  
+
 
   public String getXml() {
     return xml;

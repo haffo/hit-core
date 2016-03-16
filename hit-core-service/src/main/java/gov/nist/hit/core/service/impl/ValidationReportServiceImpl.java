@@ -1,5 +1,7 @@
 package gov.nist.hit.core.service.impl;
 
+import gov.nist.hit.core.domain.ManualValidationResult;
+import gov.nist.hit.core.domain.ManualValidationResultType;
 import gov.nist.hit.core.domain.ValidationReport;
 import gov.nist.hit.core.repo.ValidationReportRepository;
 import gov.nist.hit.core.service.ValidationReportService;
@@ -16,17 +18,25 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
+import nu.xom.Attribute;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -35,18 +45,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import com.ibm.icu.util.Calendar;
+
 @Service
 public class ValidationReportServiceImpl implements ValidationReportService {
 
   private final static Logger logger = Logger.getLogger(ValidationReportServiceImpl.class);
   private static final String HTML_XSL = "/report/report-html.xsl";
   private static final String PDF_XSL = "/report/report-pdf.xsl";
-  private static final String CSS = "/report.css";
-  private String css = "";
+  protected static final String CSS = "/report.css";
+  protected String css = "";
+
+  private static final String MANUAL_HTML_XSL = "/report/manual-report-html.xsl";
+  private static final String MANUAL_PDF_XSL = "/report/manual-report-pdf.xsl";
+
 
 
   @Autowired
-  private ValidationReportRepository validationReportRepository;
+  protected ValidationReportRepository validationReportRepository;
 
 
   public ValidationReportServiceImpl() {
@@ -112,12 +128,12 @@ public class ValidationReportServiceImpl implements ValidationReportService {
 
 
   @Override
-  public String toHTML(String xml) throws ValidationReportException {
+  public String toAutoHTML(String xml) throws ValidationReportException {
     try {
       Transformer transformer =
           TransformerFactory.newInstance().newTransformer(
               new StreamSource(new StringReader(IOUtils.toString(ValidationReportServiceImpl.class
-                  .getResourceAsStream(HTML_XSL)))));
+                  .getResourceAsStream(getHtmlCss())))));
       StreamSource source = new StreamSource(new StringReader(xml));
       ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
       StreamResult result = new StreamResult(resultStream);
@@ -134,12 +150,12 @@ public class ValidationReportServiceImpl implements ValidationReportService {
 
 
   @Override
-  public String toXHTML(String xml) throws ValidationReportException {
+  public String toAutoXHTML(String xml) throws ValidationReportException {
     try {
       Transformer transformer =
           TransformerFactory.newInstance().newTransformer(
               new StreamSource(new StringReader(IOUtils.toString(ValidationReportServiceImpl.class
-                  .getResourceAsStream(PDF_XSL)))));
+                  .getResourceAsStream(getPdfCss())))));
       StreamSource source = new StreamSource(new StringReader(xml));
       ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
       StreamResult result = new StreamResult(resultStream);
@@ -155,9 +171,9 @@ public class ValidationReportServiceImpl implements ValidationReportService {
   }
 
   @Override
-  public InputStream toPDF(String xml) throws ValidationReportException {
+  public InputStream toAutoPDF(String xml) throws ValidationReportException {
     try {
-      String xhtml = toXHTML(xml).replaceAll("<br>", "<br/>");
+      String xhtml = toAutoXHTML(xml).replaceAll("<br>", "<br/>");
       ITextRenderer renderer = new ITextRenderer();
       renderer.setDocumentFromString(xhtml);
       renderer.layout();
@@ -245,7 +261,7 @@ public class ValidationReportServiceImpl implements ValidationReportService {
     FileUtils.copyInputStreamToFile(report, file);
   }
 
-  private String addCss(String htmlReport) throws IOException {
+  public String addCss(String htmlReport) throws IOException {
     StringBuffer sb = new StringBuffer();
     sb.append("<html xmlns='http://www.w3.org/1999/xhtml'>");
     sb.append("<head>");
@@ -258,6 +274,171 @@ public class ValidationReportServiceImpl implements ValidationReportService {
     sb.append("</body></html>");
     return sb.toString();
   }
+
+  public String getHtmlCss() {
+    return HTML_XSL;
+  }
+
+  public String getPdfCss() {
+    return PDF_XSL;
+  }
+
+
+  @Override
+  public List<ValidationReport> findAllByTestStepAndUser(Long testStepId, Long userId) {
+    return validationReportRepository.findAllByTestStepAndUser(userId, testStepId);
+  }
+
+
+  @Override
+  public InputStream toManualPDF(String xml) throws ValidationReportException {
+    try {
+      String xhtml = toManualXHTML(xml).replaceAll("<br>", "<br/>");
+      ITextRenderer renderer = new ITextRenderer();
+      renderer.setDocumentFromString(xhtml);
+      renderer.layout();
+      File temp = File.createTempFile("ManualValidationReport", ".pdf");
+      temp.deleteOnExit();
+      OutputStream os;
+      os = new FileOutputStream(temp);
+      renderer.createPDF(os);
+      os.close();
+      return new FileInputStream(temp);
+    } catch (Exception e) {
+      throw new ValidationReportException(e);
+    } catch (TransformerFactoryConfigurationError e) {
+      throw new ValidationReportException(e.getMessage());
+    }
+  }
+
+  @Override
+  public String toManualXML(ManualValidationResult validationResult)
+      throws ValidationReportException {
+    try {
+      nu.xom.Element report = new nu.xom.Element("ManualValidationReport");
+      nu.xom.Element headerReport = new nu.xom.Element("HeaderReport");
+      report.appendChild(headerReport);
+
+      nu.xom.Element serviceProvider = new nu.xom.Element("ServiceProvider");
+      serviceProvider.appendChild("NIST");
+      headerReport.appendChild(serviceProvider);
+
+      nu.xom.Element validationType = new nu.xom.Element("ValidationType");
+      validationType.appendChild("Context-Based");
+      headerReport.appendChild(validationType);
+
+      nu.xom.Element type = new nu.xom.Element("Type");
+      type.appendChild("Manual");
+      headerReport.appendChild(type);
+
+      nu.xom.Element dateOfTest = new nu.xom.Element("DateOfTest");
+      dateOfTest.appendChild(dateOfTest(validationResult.getDate() != null ? validationResult
+          .getDate() : Calendar.getInstance().getTime()));
+      headerReport.appendChild(dateOfTest);
+
+
+      Map<String, String> nav = validationResult.getNav();
+      if (nav != null && !nav.isEmpty()) {
+        nu.xom.Element testCaseReference = new nu.xom.Element("TestCaseReference");
+        report.appendChild(testCaseReference);
+
+        nu.xom.Element testCase = new nu.xom.Element("TestCase");
+        testCase.appendChild(nav.get("testCase"));
+        testCaseReference.appendChild(testCase);
+
+        nu.xom.Element testPlan = new nu.xom.Element("TestPlan");
+        testPlan.appendChild(nav.get("testPlan"));
+        testCaseReference.appendChild(testPlan);
+
+        nu.xom.Element testStep = new nu.xom.Element("TestStep");
+        testStep.appendChild(nav.get("testStep"));
+        testCaseReference.appendChild(testStep);
+
+        nu.xom.Element testGroup = new nu.xom.Element("TestGroup");
+        testGroup.appendChild(nav.get("testGroup"));
+        testCaseReference.appendChild(testGroup);
+      }
+
+      nu.xom.Element specificReport = new nu.xom.Element("SpecificReport");
+      report.appendChild(specificReport);
+      specificReport.addAttribute(new Attribute("Result", ManualValidationResultType.valueOf(
+          validationResult.getValue()).value()));
+      nu.xom.Element comments = new nu.xom.Element("Comments");
+      specificReport.appendChild(comments);
+      comments.appendChild(validationResult.getComments());
+      return report.toXML();
+    } catch (Exception e) {
+      throw new ValidationReportException(e);
+    } catch (TransformerFactoryConfigurationError e) {
+      throw new ValidationReportException(e.getMessage());
+    }
+  }
+
+  private String dateOfTest(Date date) throws ParseException, DatatypeConfigurationException {
+    DateFormat df = new SimpleDateFormat("MM dd yyyy', 'HH:mm:ss.SSSXXX");
+    return df.format(date);
+  }
+
+
+  public String addManualCss(String htmlReport) throws IOException {
+    StringBuffer sb = new StringBuffer();
+    sb.append("<html xmlns='http://www.w3.org/1999/xhtml'>");
+    sb.append("<head>");
+    sb.append("<title>Manual Validation Report</title>");
+    sb.append("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
+    sb.append("<style>");
+    sb.append(css);
+    sb.append("</style></head><body>");
+    sb.append(htmlReport);
+    sb.append("</body></html>");
+    return sb.toString();
+  }
+
+
+
+  @Override
+  public String toManualHTML(String xml) throws ValidationReportException {
+    try {
+      Transformer transformer =
+          TransformerFactory.newInstance().newTransformer(
+              new StreamSource(new StringReader(IOUtils.toString(ValidationReportServiceImpl.class
+                  .getResourceAsStream(MANUAL_HTML_XSL)))));
+      StreamSource source = new StreamSource(new StringReader(xml));
+      ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
+      StreamResult result = new StreamResult(resultStream);
+      transformer.transform(source, result);
+      String htmlReport = HtmlUtil.repairStyle(new String(resultStream.toByteArray()));
+      logger.info("HTML validation report generated");
+      return addManualCss(htmlReport);
+    } catch (Exception e) {
+      throw new ValidationReportException(e);
+    } catch (TransformerFactoryConfigurationError e) {
+      throw new ValidationReportException(e.getMessage());
+    }
+  }
+
+
+  @Override
+  public String toManualXHTML(String xml) throws ValidationReportException {
+    try {
+      Transformer transformer =
+          TransformerFactory.newInstance().newTransformer(
+              new StreamSource(new StringReader(IOUtils.toString(ValidationReportServiceImpl.class
+                  .getResourceAsStream(MANUAL_PDF_XSL)))));
+      StreamSource source = new StreamSource(new StringReader(xml));
+      ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
+      StreamResult result = new StreamResult(resultStream);
+      transformer.transform(source, result);
+      String html = HtmlUtil.repairStyle(new String(resultStream.toByteArray()));
+      logger.info("XHTML validation report generated");
+      return addManualCss(html);
+    } catch (Exception e) {
+      throw new ValidationReportException(e);
+    } catch (TransformerFactoryConfigurationError e) {
+      throw new ValidationReportException(e.getMessage());
+    }
+  }
+
 
 
 }

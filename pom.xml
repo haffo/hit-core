@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gov.nist.hit.core</groupId>
 	<artifactId>hit-core</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.5-SNAPSHOT</version>
 	<name>hit-core</name>
 	<description>hit-core</description>
 	<packaging>pom</packaging>
@@ -83,24 +83,28 @@
 			<version>2.2.2</version>
 		</dependency>
 
-		<dependency>
+<!-- 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-hibernate4</artifactId>
 			<version>2.2.3</version>
-		</dependency>
+		</dependency> -->
 
-		<dependency>
+ 		<!-- <dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.13</version>
-		</dependency>
+		</dependency>  
 
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-core-asl</artifactId>
 			<version>1.9.13</version>
-		</dependency>
-
+		</dependency> -->
+<!-- <dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.3.1</version>
+</dependency> -->
 
 		<dependency>
 			<groupId>org.jdom</groupId>

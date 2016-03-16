@@ -1,7 +1,7 @@
 package gov.nist.hit.core.service.impl;
 
 import gov.nist.hit.core.domain.KeyValuePair;
-import gov.nist.hit.core.domain.TestStepTestingType;
+import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.service.TransportConfigService;
@@ -43,7 +43,7 @@ public class TransportConfigServiceImpl implements TransportConfigService {
    * @return
    */
   @Override
-  public TransportConfig set(KeyValuePair pair, TestStepTestingType type, TransportConfig config) {
+  public TransportConfig set(KeyValuePair pair, TestingType type, TransportConfig config) {
     config.getConfigInfo(type).put(pair.getKey(), pair.getValue());
     return config;
   }
@@ -55,7 +55,7 @@ public class TransportConfigServiceImpl implements TransportConfigService {
    * @return
    */
   @Override
-  public TransportConfig set(List<KeyValuePair> pairs, TestStepTestingType type,
+  public TransportConfig set(List<KeyValuePair> pairs, TestingType type,
       TransportConfig config) {
     if (pairs.isEmpty())
       return config;
@@ -85,10 +85,10 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
 
 
-  private String toInitiatorQuery(Map<String, String> criteria, TestStepTestingType type,
+  private String toInitiatorQuery(Map<String, String> criteria, TestingType type,
       String protocol) {
     String table =
-        type == TestStepTestingType.SUT_INITIATOR ? "sut_initiator_config" : "ta_initiator_config";
+        type == TestingType.SUT_INITIATOR ? "sut_initiator_config" : "ta_initiator_config";
     String sql = "SELECT * FROM transportconfig tr";
     ArrayList<String> conditions = new ArrayList<>();
     Iterator<Entry<String, String>> it = criteria.entrySet().iterator();
@@ -119,7 +119,7 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
   @Override
   public TransportConfig findOneByPropertiesAndProtocol(Map<String, String> criteria,
-      TestStepTestingType type, String protocol) {
+      TestingType type, String protocol) {
     String sql = toInitiatorQuery(criteria, type, protocol);
     Query q = entityManager.createNativeQuery(sql, TransportConfig.class);
     TransportConfig tr = getSingleResult(q);
