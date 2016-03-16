@@ -891,18 +891,6 @@ public abstract class ResourcebundleLoader {
     tc.setName(testCaseObj.findValue("name").textValue());
     tc.setDescription(testCaseObj.findValue("description").textValue());
     tc.setTestStory(testStory(location));
-
-    if (transportSupported
-        && (testCaseObj.findValue("protocol") == null
-            || testCaseObj.findValue("protocol").textValue() == null || testCaseObj
-            .findValue("protocol").textValue().equals(""))) {
-      throw new IllegalArgumentException(
-          "Transport is supported for the following test case but no protocol is defined. TestCase location="
-              + location);
-    }
-
-    tc.setProtocol(testCaseObj.findValue("protocol") != null ? testCaseObj.findValue("protocol")
-        .textValue() : null);
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").intValue());
     }
@@ -910,14 +898,15 @@ public abstract class ResourcebundleLoader {
     for (Resource resource : resources) {
       String fileName = fileName(resource);
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
-      TestStep testStep = testStep(tcLocation, stage);
+      TestStep testStep = testStep(tcLocation, stage, transportSupported);
       tc.addTestStep(testStep);
     }
 
     return tc;
   }
 
-  private TestStep testStep(String location, TestingStage stage) throws IOException {
+  private TestStep testStep(String location, TestingStage stage, boolean transportSupported)
+      throws IOException {
     logger.info("Processing test step at:" + location);
     TestStep testStep = new TestStep();
     Resource res = ResourcebundleHelper.getResource(location + "TestStep.json");
@@ -927,8 +916,6 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testStepObj = mapper.readTree(descriptorContent);
     testStep.setName(testStepObj.findValue("name").textValue());
-    // testStep.setProtocol(testStepObj.findValue("protocol") != null ? testStepObj.findValue(
-    // "protocol").textValue() : null);
     testStep.setDescription(testStepObj.findValue("description").textValue());
     JsonNode ttypeObj = testStepObj.findValue("type");
     String tttypeValue = ttypeObj != null ? ttypeObj.textValue() : null;
@@ -936,6 +923,20 @@ public abstract class ResourcebundleLoader {
         tttypeValue != null && !"".equals(tttypeValue) ? TestingType.valueOf(tttypeValue)
             : TestingType.DATAINSTANCE;
     testStep.setTestingType(testingType);
+    if (transportSupported
+        && (TestingType.SUT_INITIATOR.equals(testingType) || TestingType.TA_INITIATOR
+            .equals(testingType))) {
+      JsonNode protocolsNode = testStepObj.findValue("protocols");
+      if (protocolsNode == null || !protocolsNode.isArray()) {
+        throw new IllegalArgumentException(
+            "Transport is supported but no protocol defined. Test Step location=" + location);
+      }
+      for (int i = 0; i < protocolsNode.size(); i++) {
+        String protocol = protocolsNode.get(i).textValue();
+        testStep.getProtocols().add(protocol);
+      }
+    }
+
     if (!testingType.equals(TestingType.SUT_MANUAL) && !testingType.equals(TestingType.TA_MANUAL)) {
       testStep.setTestContext(testContext(location, testStepObj, stage));
     }
