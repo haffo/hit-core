@@ -13,21 +13,7 @@
 package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.*;
-import gov.nist.hit.core.repo.AppInfoRepository;
-import gov.nist.hit.core.repo.CFTestInstanceRepository;
-import gov.nist.hit.core.repo.ConstraintsRepository;
-import gov.nist.hit.core.repo.DocumentRepository;
-import gov.nist.hit.core.repo.IntegrationProfileRepository;
-import gov.nist.hit.core.repo.MessageRepository;
-import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
-import gov.nist.hit.core.repo.TestPlanRepository;
-import gov.nist.hit.core.repo.TestStepRepository;
-import gov.nist.hit.core.repo.TransactionRepository;
-import gov.nist.hit.core.repo.TransportFormsRepository;
-import gov.nist.hit.core.repo.TransportMessageRepository;
-import gov.nist.hit.core.repo.UserRepository;
-import gov.nist.hit.core.repo.ValidationReportRepository;
-import gov.nist.hit.core.repo.VocabularyLibraryRepository;
+import gov.nist.hit.core.repo.*;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
 import gov.nist.hit.core.service.util.ResourcebundleHelper;
@@ -156,6 +142,9 @@ public abstract class ResourcebundleLoader {
 
   @Autowired
   protected VocabularyLibraryRepository vocabularyLibraryRepository;
+
+  @Autowired
+  protected DataMappingRepository dataMappingRepository;
 
   public ResourcebundleLoader() {
     obm = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -901,7 +890,18 @@ public abstract class ResourcebundleLoader {
               Map.Entry<String, JsonNode> sourcePair = node.findValue("source").getFields().next();
               MappingSource source = null;
               if (sourcePair.getKey().toLowerCase().startsWith("teststep")) {
-                  source = new TestStepFieldPair(findTestStep(tc.getTestSteps(), parseTestStepPosition(sourcePair.getKey())), sourcePair.getValue().asText());
+                TestStep testStep = findTestStep(tc.getTestSteps(), parseTestStepPosition(sourcePair.getKey()));
+                String field = sourcePair.getValue().asText();
+                if(testStep != null) {
+                  DataMapping dm = dataMappingRepository.getDataMappingByTestStepIdAndField(testStep.getId(), field);
+                  if (dm != null) {
+                    source = dm.getSource();
+                  } else {
+                    source = new TestStepFieldPair(testStep, field);
+                  }
+                } else {
+                  logger.error("Unable to find testStep "+parseTestStepPosition(sourcePair.getKey())+" in test case "+tc.getId() +"("+tc.getTestCaseName()+")");
+                }
               } else {
                   switch (sourcePair.getKey()) {
                       case "random":
@@ -917,9 +917,11 @@ public abstract class ResourcebundleLoader {
               }
               Map.Entry<String, JsonNode> targetPair = node.findValue("target").getFields().next();
               TestStepFieldPair target = new TestStepFieldPair(findTestStep(tc.getTestSteps(), parseTestStepPosition(targetPair.getKey())), targetPair.getValue().asText());
-              DataMapping dataMapping = new DataMapping(source, target, tc);
-              logger.info("Saving data mapping : " + dataMapping.toString());
-              dataMappings.add(dataMapping);
+              if(source!=null&&target!=null) {
+                DataMapping dataMapping = new DataMapping(source, target, tc);
+                logger.info("Saving data mapping : " + dataMapping.toString());
+                dataMappings.add(dataMapping);
+              }
           }
           tc.setDataMappings(dataMappings);
       }

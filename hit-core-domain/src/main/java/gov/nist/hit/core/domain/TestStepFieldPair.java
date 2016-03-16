@@ -26,7 +26,7 @@ public class TestStepFieldPair extends MappingSource implements Serializable {
     protected Long id;*/
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     protected TestStep testStep;
 
     @NotNull

@@ -29,7 +29,7 @@ public class DataMapping implements Serializable{
     protected Long id;
 
     @NotNull
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     protected MappingSource source;
 
     @NotNull
@@ -37,7 +37,7 @@ public class DataMapping implements Serializable{
     protected TestStepFieldPair target;
 
     @JsonIgnore
-    @ManyToOne(optional=true, cascade=CascadeType.ALL)
+    @ManyToOne(optional=true, cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     protected TestCase testCase;
 
     public DataMapping(){
