@@ -144,6 +144,7 @@ public class ValidationReportController {
       } else {
         throw new ValidationReportException("Unsupported report format " + format);
       }
+      title = title.replaceAll(" ", "-");
       response.setHeader("Content-disposition", "attachment;filename=" + title
           + "-ValidationReport." + ext);
       FileCopyUtils.copy(io, response.getOutputStream());
