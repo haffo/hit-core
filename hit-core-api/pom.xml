@@ -169,7 +169,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.4.187</version>    
+			<version>1.4.187</version>
 		</dependency>
 
 		<dependency>
@@ -184,20 +184,37 @@
 			<artifactId>icu4j</artifactId>
 			<version>3.4.4</version>
 		</dependency>
+		<!-- <dependency> <groupId>com.mangofactory</groupId> <artifactId>swagger-springmvc</artifactId> 
+			<version>1.0.2</version> </dependency> -->
+		<!-- <dependency> <groupId>org.ajar</groupId> <artifactId>swagger-spring-mvc-ui</artifactId> 
+			<version>0.3</version> </dependency> -->
 
 		<dependency>
-			<groupId>com.mangofactory</groupId>
-			<artifactId>swagger-springmvc</artifactId>
-			<version>1.0.2</version>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.4.0</version>
 		</dependency>
-<!-- 
-		<dependency>
-			<groupId>org.ajar</groupId>
-			<artifactId>swagger-spring-mvc-ui</artifactId>
-			<version>0.3</version>
-		</dependency> -->
 		
-	</dependencies>
+		<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-bean-validators</artifactId>
+    <version>2.4.0</version>
+</dependency> 
 
+<dependency>
+    <groupId>io.springfox</groupId>
+    <artifactId>springfox-swagger-ui</artifactId>
+    <version>2.4.0</version>
+</dependency>
+
+
+	</dependencies>
+	<repositories>
+		<repository>
+      <id>jcenter-snapshots</id>
+      <name>jcenter</name>
+      <url>https://jcenter.bintray.com/</url>
+    </repository>
+	</repositories>
 
 </project>

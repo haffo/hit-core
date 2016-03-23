@@ -14,6 +14,7 @@ package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.TestCaseException;
+import io.swagger.annotations.Api;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/artifact")
 @RestController
+@Api(value = "Artifacts", position = 1, description = "Artifacts API")
 public class TestArtifactController {
 
   static final Logger logger = LoggerFactory.getLogger(TestArtifactController.class);

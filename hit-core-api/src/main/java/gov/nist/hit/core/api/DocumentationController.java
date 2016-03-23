@@ -14,53 +14,28 @@ package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.DocumentType;
-import gov.nist.hit.core.domain.Message;
-import gov.nist.hit.core.domain.TestingStage;
-import gov.nist.hit.core.domain.TestArtifact;
-import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseDocumentation;
-import gov.nist.hit.core.domain.TestCaseGroup;
-import gov.nist.hit.core.domain.CFTestInstance;
-import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.DocumentRepository;
-import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
-import gov.nist.hit.core.repo.TestContextRepository;
-import gov.nist.hit.core.repo.CFTestInstanceRepository;
-import gov.nist.hit.core.repo.TestPlanRepository;
-import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.service.TestCaseDocumentationService;
-import gov.nist.hit.core.service.TestPlanService;
 import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
-import gov.nist.hit.core.service.exception.MessageException;
-import gov.nist.hit.core.service.exception.TestCaseException;
-import gov.nist.hit.core.service.exception.ValidationReportException;
-import gov.nist.hit.core.service.util.ResourcebundleHelper;
+import io.swagger.annotations.Api;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.io.Resource;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -72,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/documentation")
 @RestController
+@Api(value = "Documentation", position = 1, description = "Documentation API")
 public class DocumentationController {
 
   static final Logger logger = LoggerFactory.getLogger(DocumentationController.class);
@@ -122,7 +98,7 @@ public class DocumentationController {
     logger.info("Fetching all resources docs of type=" + type);
     return documentRepository.findAllResourceDocs(type);
   }
- 
+
   @Cacheable(value = "HitCache", key = "'deliverables-documentation'")
   @RequestMapping(value = "/deliverables", method = RequestMethod.GET)
   public List<Document> toolDownloads() {
@@ -137,7 +113,7 @@ public class DocumentationController {
     Document d = documentRepository.findInstallationDoc();
     return d;
   }
-  
+
   @RequestMapping(value = "/downloadDocument", method = RequestMethod.POST)
   public void downloadDocument(@RequestParam("path") String path, HttpServletRequest request,
       HttpServletResponse response) throws DownloadDocumentException {
@@ -187,7 +163,7 @@ public class DocumentationController {
       Document d = documentRepository.findOneByName(name);
       if (d != null) {
         downloadDocument(d.getPath(), request, response);
-      }else{
+      } else {
         throw new DownloadDocumentException("Unknown document");
       }
     }

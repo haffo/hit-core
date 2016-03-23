@@ -16,6 +16,7 @@ import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.repo.TestCaseGroupRepository;
 import gov.nist.hit.core.service.exception.TestCaseGroupException;
+import io.swagger.annotations.Api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/testcasegroups")
+@Api(value = "TestCaseGroups", position = 1, description = "TestCase Groups API")
 public class TestCaseGroupController {
 
   static final Logger logger = LoggerFactory.getLogger(TestCaseGroupController.class);

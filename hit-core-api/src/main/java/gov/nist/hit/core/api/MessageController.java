@@ -15,6 +15,7 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.service.exception.MessageDownloadException;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.MessageUploadException;
+import io.swagger.annotations.Api;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -41,6 +42,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RequestMapping("/message")
 @RestController
+@Api(value = "Messages", position = 1, description = "Messages API")
 public class MessageController {
   static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 

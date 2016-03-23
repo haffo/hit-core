@@ -16,6 +16,7 @@ import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.service.exception.TestPlanException;
+import io.swagger.annotations.Api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/testplans")
+@Api(value = "TestPlans", position = 1, description = "TestPlans API")
 public class TestPlanController {
 
   static final Logger logger = LoggerFactory.getLogger(TestPlanController.class);

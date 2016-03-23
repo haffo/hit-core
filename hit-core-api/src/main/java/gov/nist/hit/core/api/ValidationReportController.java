@@ -22,6 +22,7 @@ import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
+import io.swagger.annotations.Api;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/report")
+@Api(value = "AutoValidationReport", position = 1, description = "Automatic Validation Report API")
 public class ValidationReportController {
 
   static final Logger logger = LoggerFactory.getLogger(ValidationReportController.class);

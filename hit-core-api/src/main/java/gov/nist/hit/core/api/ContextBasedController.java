@@ -12,16 +12,14 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.repo.TestCaseRepository;
-import gov.nist.hit.core.repo.TestPlanRepository;
-import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestPlanService;
 import gov.nist.hit.core.service.TestStepService;
+import io.swagger.annotations.Api;
 
 import java.util.List;
 
@@ -39,19 +37,20 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/cb")
 @RestController
+@Api(value = "CB TestCases", position = 1, description = "Context-based test cases API")
 public class ContextBasedController {
 
   static final Logger logger = LoggerFactory.getLogger(ContextBasedController.class);
 
   @Autowired
   private TestPlanService testPlanService;
-  
+
   @Autowired
   private TestCaseService testCaseService;
-  
+
   @Autowired
   private TestStepService testStepService;
-  
+
 
 
   @Cacheable(value = "HitCache", key = "'cb-testcases'")

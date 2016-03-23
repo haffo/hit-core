@@ -25,6 +25,7 @@ import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
+import io.swagger.annotations.Api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/teststeps")
 @RestController
+@Api(value = "TestSteps", position = 1, description = "TestSteps API")
 public class TestStepController {
 
   Logger logger = LoggerFactory.getLogger(TestStepController.class);

@@ -40,6 +40,8 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 @Import(DbConfig.class)
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
+
+
   @Override
   public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
     configurer.enable();
@@ -94,6 +96,20 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
     return multipartResolver;
   }
+
+  // @Override
+  // public void addResourceHandlers(ResourceHandlerRegistry registry) {
+  // registry.addResourceHandler("/docs/**").addResourceLocations("classpath*:/docs/");
+  // }
+  //
+  // @Bean
+  // public InternalResourceViewResolver getInternalResourceViewResolver() {
+  // InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+  // resolver.setPrefix("classpath*:/docs/");
+  // resolver.setSuffix("*.html");
+  // return resolver;
+  // }
+
 
 
 }

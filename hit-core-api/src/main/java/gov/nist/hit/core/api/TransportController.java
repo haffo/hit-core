@@ -21,6 +21,7 @@ import gov.nist.hit.core.domain.TransportForms;
 import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.service.TransactionService;
+import io.swagger.annotations.Api;
 
 import java.util.List;
 
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/transport")
 @RestController
+@Api(value = "Transport", position = 1, description = "Transport API")
 public class TransportController {
 
   static final Logger logger = LoggerFactory.getLogger(DocumentationController.class);

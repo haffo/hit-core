@@ -39,10 +39,18 @@ public class WebAppInitializer implements WebApplicationInitializer
     apiServlet.addMapping("/api/*");
     apiServlet.setAsyncSupported(true);
 
-    // Dynamic apiDocsServlet = servletContext.addServlet("hit-api-docs", new
+    // Dynamic apiDocsServlet = servletContext.addServlet("swagger-api", new
     // DispatcherServlet(root));
     // apiDocsServlet.setLoadOnStartup(2);
     // apiDocsServlet.addMapping("/api-docs/*");
+    // apiDocsServlet.setAsyncSupported(true);
+
+    // Dynamic apiUiServlet = servletContext.addServlet("swagger-api-ui", new
+    // DispatcherServlet(root));
+    // apiUiServlet.setLoadOnStartup(3);
+    // apiUiServlet.addMapping("/docs/*");
+
+
     try {
       servletContext.setInitParameter("rsbVersion", ResourcebundleLoader.getRsbleVersion());
     } catch (Exception e) {

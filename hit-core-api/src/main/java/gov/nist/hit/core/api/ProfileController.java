@@ -15,6 +15,7 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.Json;
 import gov.nist.hit.core.repo.ConformanceProfileRepository;
 import gov.nist.hit.core.service.exception.TestCaseException;
+import io.swagger.annotations.Api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/profile")
 @RestController
+@Api(value = "Profiles", position = 1, description = "Profiles API")
 public class ProfileController {
 
   Logger logger = LoggerFactory.getLogger(ProfileController.class);

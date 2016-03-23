@@ -13,8 +13,8 @@
 package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.CFTestInstance;
-import gov.nist.hit.core.repo.CFTestInstanceRepository;
 import gov.nist.hit.core.service.TestObjectService;
+import io.swagger.annotations.Api;
 
 import java.util.List;
 
@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/cf")
 @RestController
+@Api(value = "CF TestCases", position = 1, description = "Context-free test cases API")
 public class ContextFreeController {
 
   static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
