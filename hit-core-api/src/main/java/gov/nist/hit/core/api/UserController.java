@@ -12,41 +12,18 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.AppInfo;
-import gov.nist.hit.core.domain.KeyValuePair;
-import gov.nist.hit.core.domain.Transaction;
-import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.User;
-import gov.nist.hit.core.repo.AppInfoRepository;
-import gov.nist.hit.core.repo.TransactionRepository;
-import gov.nist.hit.core.repo.TransportConfigRepository;
-import gov.nist.hit.core.repo.UserRepository;
-import gov.nist.hit.core.service.TransactionService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.UserNotFoundException;
+import io.swagger.annotations.Api;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.annotations.Where;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.http.HttpRequest;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.springframework.data.jpa.domain.Specifications.where;
 
 /**
  * @author Harold Affo (NIST)
@@ -54,6 +31,7 @@ import static org.springframework.data.jpa.domain.Specifications.where;
  */
 @RestController
 @RequestMapping("/user")
+@Api(hidden = true)
 public class UserController {
 
   @Autowired
@@ -81,14 +59,14 @@ public class UserController {
       SessionContext.setCurrentUserId(session, user.getId());
     }
     return user;
-  } 
-  
+  }
+
   @Transactional()
   @RequestMapping(value = "/delete", method = RequestMethod.POST)
   public boolean delete(HttpSession session) throws UserNotFoundException {
     Long id = SessionContext.getCurrentUserId(session);
     if (id != null) {
-       userService.delete(id);
+      userService.delete(id);
     }
     SessionContext.setCurrentUserId(session, null);
     return true;

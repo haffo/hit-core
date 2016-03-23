@@ -14,6 +14,8 @@ import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageParserException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,9 +54,11 @@ public abstract class TestContextController {
   public abstract ValidationReportConverter getValidatioReportConverter();
 
 
-
-  @RequestMapping(value = "/{testContextId}")
-  public TestContext testContext(@PathVariable final Long testContextId) {
+  @ApiOperation(value = "Get a test context by its id", nickname = "getTestContextById")
+  @RequestMapping(value = "/{testContextId}", produces = "application/json",
+      consumes = "application/json")
+  public TestContext getTestContextById(@ApiParam(value = "the id of the test context",
+      required = true) @PathVariable final Long testContextId) {
     logger.info("Fetching testContext with id=" + testContextId);
     TestContext testContext = getTestContext(testContextId);
     if (testContext == null) {
@@ -63,17 +67,28 @@ public abstract class TestContextController {
     return testContext;
   }
 
-  @RequestMapping(value = "/{testContextId}/parseMessage", method = RequestMethod.POST)
-  public MessageModel parse(@PathVariable final Long testContextId,
-      @RequestBody final MessageParserCommand command) throws MessageParserException {
+  @ApiOperation(value = "Parse a message with a test context",
+      nickname = "parseMessageWithTestContextId")
+  @RequestMapping(value = "/{testContextId}/parseMessage", method = RequestMethod.POST,
+      produces = "application/json", consumes = "application/json")
+  public MessageModel parseMessageWithTestContextId(
+      @ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
+      @ApiParam(value = "the content  to be parsed", required = true) @RequestBody final MessageParserCommand command)
+      throws MessageParserException {
     logger.info("Parsing message");
     return getMessageParser().parse(getTestContext(testContextId), command);
   }
 
-  @RequestMapping(value = "/{testContextId}/validateMessage", method = RequestMethod.POST)
-  public MessageValidationResult validate(@PathVariable final Long testContextId,
-      @RequestBody final MessageValidationCommand command, HttpServletRequest request,
-      HttpServletResponse response, HttpSession session) throws MessageValidationException {
+
+  @ApiOperation(value = "Validate a message with a test context",
+      nickname = "validateMessageWithTestContextId")
+  @RequestMapping(value = "/{testContextId}/validateMessage", method = RequestMethod.POST,
+      produces = "application/json", consumes = "application/json")
+  public MessageValidationResult validateMessageWithTestContextId(
+      @ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
+      @ApiParam(value = "the content  to be validated", required = true) @RequestBody final MessageValidationCommand command,
+      HttpServletRequest request, HttpServletResponse response, HttpSession session)
+      throws MessageValidationException {
     try {
       logger.info("Validating a message");
       MessageValidationResult result =

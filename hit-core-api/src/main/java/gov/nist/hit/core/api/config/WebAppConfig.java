@@ -18,7 +18,6 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -27,6 +26,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -37,7 +37,6 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 @Configuration
 @EnableWebMvc
 @ComponentScan("gov.nist.hit")
-@Import(DbConfig.class)
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
 
@@ -109,6 +108,15 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
   // resolver.setSuffix("*.html");
   // return resolver;
   // }
+
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("swagger-ui.html").addResourceLocations(
+        "classpath:/META-INF/resources/");
+
+    registry.addResourceHandler("/webjars/**").addResourceLocations(
+        "classpath:/META-INF/resources/webjars/");
+  }
 
 
 

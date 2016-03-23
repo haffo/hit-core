@@ -15,6 +15,7 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.AppInfo;
 import gov.nist.hit.core.repo.AppInfoRepository;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 import java.util.List;
 
@@ -31,14 +32,15 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/appInfo")
-@Api(value = "appInfo", position = 1, description = "Application Information API")
+@Api(value = "App Info")
 public class AppInfoController {
 
 
   @Autowired
   private AppInfoRepository appInfoRepository;
 
-  @RequestMapping(method = RequestMethod.GET)
+  @ApiOperation(value = "Get Application Information", nickname = "getAppInfo")
+  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public AppInfo info(HttpServletRequest request) {
     List<AppInfo> infos = appInfoRepository.findAll();
     if (infos != null && !infos.isEmpty()) {

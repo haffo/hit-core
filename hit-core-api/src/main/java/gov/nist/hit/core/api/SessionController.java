@@ -12,6 +12,8 @@
 
 package gov.nist.hit.core.api;
 
+import io.swagger.annotations.Api;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/session")
+@Api(hidden = true)
 public class SessionController {
 
   @RequestMapping(value = "/delete", method = RequestMethod.POST)

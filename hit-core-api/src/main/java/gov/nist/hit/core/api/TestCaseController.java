@@ -25,6 +25,8 @@ import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -49,7 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/testcases")
 @RestController
-@Api(value = "testcases", position = 1, description = "TestCases API")
+@Api(value = "testcases")
 public class TestCaseController {
 
   Logger logger = LoggerFactory.getLogger(TestCaseController.class);
@@ -75,7 +77,10 @@ public class TestCaseController {
    * @param testCaseId
    * @return
    */
-  @RequestMapping(value = "/{testCaseId}")
+  @ApiOperation(value = "Get a test case (context-free or context-based) by its id",
+      nickname = "getTestCaseById")
+  @RequestMapping(value = "/{testCaseId}", method = RequestMethod.GET,
+      consumes = "application/json", produces = "application/json")
   public TestCase testCase(@PathVariable final Long testCaseId) {
     logger.info("Fetching testCase with id=" + testCaseId);
     TestCase testCase = testCaseService.findOne(testCaseId);
@@ -93,6 +98,7 @@ public class TestCaseController {
    * @return
    * @throws MessageValidationException
    */
+  @ApiOperation(value = "", hidden = true)
   @RequestMapping(value = "/{testCaseId}/clearRecords", method = RequestMethod.POST)
   public boolean clearRecords(@PathVariable("testCaseId") final Long testCaseId,
       HttpServletRequest request) throws MessageValidationException {
@@ -113,8 +119,12 @@ public class TestCaseController {
    * @param testCaseId
    * @return
    */
-  @RequestMapping(value = "/{testCaseId}/details", method = RequestMethod.GET)
-  public Map<String, TestArtifact> details(@PathVariable("testCaseId") final Long testCaseId) {
+  @ApiOperation(value = "Get a test case (context-free or context-based) details by its id",
+      nickname = "getTestCaseDetailsById")
+  @RequestMapping(value = "/{testCaseId}/details", method = RequestMethod.GET,
+      consumes = "application/json", produces = "application/json")
+  public Map<String, TestArtifact> getTestCaseDetailsById(
+      @PathVariable("testCaseId") final Long testCaseId) {
     Map<String, TestArtifact> result = new HashMap<String, TestArtifact>();
     logger.info("Fetching testcase " + testCaseId + " artifacts ");
     TestCase testCase = testCase(testCaseId);
@@ -128,15 +138,19 @@ public class TestCaseController {
    * @param testCaseId
    * @return
    */
+  @ApiOperation(value = "", hidden = true)
   @RequestMapping(value = "/{testCaseId}/teststory", method = RequestMethod.GET)
   public TestArtifact tcTestStory(@PathVariable("testCaseId") Long testCaseId) {
     logger.info("Fetching teststory of testcase/teststep with id=" + testCaseId);
     return testCaseService.testStory(testCaseId);
   }
 
+  @ApiOperation(value = "Download the validation reports of a test case by the test case's id",
+      nickname = "getTestCaseReports")
   @RequestMapping(value = "/{testCaseId}/reports/download", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public boolean zipReports(@PathVariable("testCaseId") final Long testCaseId,
+      consumes = "application/x-www-form-urlencoded; charset=UTF-8", produces = "application/zip")
+  public boolean getTestCaseReports(
+      @ApiParam(value = "the id of the test case", required = true) @PathVariable("testCaseId") final Long testCaseId,
       HttpServletRequest request, HttpServletResponse response) throws ValidationReportException {
     try {
       logger.info("Clearing user records for testcase " + testCaseId);

@@ -3,7 +3,8 @@ package gov.nist.hit.core.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+ 
+@ApiModel(value="MessageModel", description="Sample model for the documentation")
 public class MessageModel {
 
   private Map<String, String> delimeters;

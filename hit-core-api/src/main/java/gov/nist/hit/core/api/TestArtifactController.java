@@ -15,6 +15,8 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,16 +39,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/artifact")
 @RestController
-@Api(value = "Artifacts", position = 1, description = "Artifacts API")
+@Api(value = "Artifacts")
 public class TestArtifactController {
 
   static final Logger logger = LoggerFactory.getLogger(TestArtifactController.class);
 
+  @ApiOperation(
+      value = "Download a test artifact by its path",
+      nickname = "getProfileJsonById",
+      produces = "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document")
   @RequestMapping(value = "/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public String download(@RequestParam("path") String path, @RequestParam(value = "title",
-      required = false) String title, HttpServletRequest request, HttpServletResponse response)
-      throws MessageException {
+  public String download(
+      @ApiParam(value = "the path of the artifact", required = true) @RequestParam("path") String path,
+      @ApiParam(value = "the title to give to the document", required = true) @RequestParam(
+          value = "title", required = false) String title, HttpServletRequest request,
+      HttpServletResponse response) throws MessageException {
     try {
 
       if (path != null && (path.endsWith("pdf") || path.endsWith("docx"))) {

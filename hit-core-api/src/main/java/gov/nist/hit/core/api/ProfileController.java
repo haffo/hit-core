@@ -16,12 +16,15 @@ import gov.nist.hit.core.domain.Json;
 import gov.nist.hit.core.repo.ConformanceProfileRepository;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/profile")
 @RestController
-@Api(value = "Profiles", position = 1, description = "Profiles API")
+@Api(value = "Profiles")
 public class ProfileController {
 
   Logger logger = LoggerFactory.getLogger(ProfileController.class);
@@ -39,9 +42,12 @@ public class ProfileController {
   @Autowired
   private ConformanceProfileRepository conformanceProfileRepository;
 
-
-  @RequestMapping(value = "/{profileId}")
-  public Json profile(@PathVariable final Long profileId) {
+  @ApiOperation(value = "Get the json representation of a conformance profile by its id",
+      nickname = "getProfileJsonById")
+  @RequestMapping(value = "/{profileId}", method = RequestMethod.GET,
+      consumes = "application/json", produces = "application/json")
+  public Json getProfileJsonById(@ApiParam(value = "the id of the conformance profile",
+      required = true) @PathVariable final Long profileId) {
     if (profileId == null) {
       throw new TestCaseException("No profile id provided");
     }

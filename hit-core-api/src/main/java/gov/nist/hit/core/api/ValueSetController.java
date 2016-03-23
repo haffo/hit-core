@@ -16,12 +16,15 @@ import gov.nist.hit.core.domain.Json;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/valueSetLibrary")
 @RestController
-@Api(value = "ValueSetLibrary", position = 1, description = "Value Set Library API")
+@Api(value = "ValueSetLibrary")
 public class ValueSetController {
 
   Logger logger = LoggerFactory.getLogger(ValueSetController.class);
@@ -39,12 +42,15 @@ public class ValueSetController {
   @Autowired
   private VocabularyLibraryRepository vocabularyLibraryRepository;
 
-  @RequestMapping(value = "/{valueSetLibraryId}")
-  public Json profile(@PathVariable final Long valueSetLibraryId) {
+  @ApiOperation(value = "Get the value set library by its id", nickname = "getValueSetLibraryById")
+  @RequestMapping(value = "/{valueSetLibraryId}", produces = "application/json",
+      consumes = "application/json", method = RequestMethod.POST)
+  public Json getValueSetLibraryById(@ApiParam(value = "the id of the value set library",
+      required = true) @PathVariable final Long valueSetLibraryId) {
     if (valueSetLibraryId == null) {
-      throw new TestCaseException("No profile id provided");
+      throw new TestCaseException("No value set library id provided");
     }
-    logger.info("Fetching conformance profile (json) with id=" + valueSetLibraryId);
+    logger.info("Fetching value set library (json) with id=" + valueSetLibraryId);
     String value = vocabularyLibraryRepository.getJson(valueSetLibraryId);
     return new Json(value);
   }

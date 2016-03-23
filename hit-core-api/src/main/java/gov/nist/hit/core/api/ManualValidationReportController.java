@@ -21,6 +21,8 @@ import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,11 +65,14 @@ public class ManualValidationReportController {
   private UserService userService;
 
 
+  @ApiOperation(value = "Download a manual test step validation report by id",
+      nickname = "downloadManualTestStepValidationReportById")
   @RequestMapping(value = "/teststep/{testStepId}/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public void downloadManualReport(@RequestParam("format") String format,
-      @PathVariable("testStepId") Long testStepId, HttpServletRequest request,
-      HttpServletResponse response) {
+  public void downloadManualTestStepValidationReportById(
+      @ApiParam(value = "the targeted format", required = true) @RequestParam("format") String format,
+      @ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") Long testStepId,
+      HttpServletRequest request, HttpServletResponse response) {
     try {
       logger.info("Downloading validation report  in " + format);
       Long userId = SessionContext.getCurrentUserId(request.getSession(false));
@@ -126,6 +131,7 @@ public class ManualValidationReportController {
     }
   }
 
+  @ApiOperation(hidden = true, value = "")
   @RequestMapping(value = "/save", method = RequestMethod.POST)
   public ValidationReport saveManualReport(@RequestBody ManualValidationResult validationResult,
       HttpServletRequest request, HttpServletResponse response) {
@@ -166,10 +172,11 @@ public class ManualValidationReportController {
     }
   }
 
-
+  @ApiOperation(value = "Get the html format of an xml validation report", nickname = "toHtml")
   @RequestMapping(value = "/html", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public Map<String, String> toManualHTML(@RequestParam("xmlReport") String content,
+      consumes = "application/x-www-form-urlencoded; charset=UTF-8", produces = "application/json")
+  public Map<String, String> toManualHTML(
+      @ApiParam(value = "the xml report", required = true) @RequestParam("xmlReport") String content,
       HttpServletRequest request, HttpServletResponse response) {
     try {
       String html = validationReportService.toManualHTML(content);

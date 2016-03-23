@@ -20,6 +20,8 @@ import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestPlanService;
 import gov.nist.hit.core.service.TestStepService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.util.List;
 
@@ -37,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/cb")
 @RestController
-@Api(value = "CB TestCases", position = 1, description = "Context-based test cases API")
+@Api(value = "Context based test cases api")
 public class ContextBasedController {
 
   static final Logger logger = LoggerFactory.getLogger(ContextBasedController.class);
@@ -52,24 +54,33 @@ public class ContextBasedController {
   private TestStepService testStepService;
 
 
-
+  @ApiOperation(value = "Get all context-based test cases list",
+      nickname = "getAllContextBasedTestCases")
   @Cacheable(value = "HitCache", key = "'cb-testcases'")
-  @RequestMapping(value = "/testcases", method = RequestMethod.GET)
+  @RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
   public List<TestPlan> testCases() {
     logger.info("Fetching all testCases...");
     List<TestPlan> testPlans = testPlanService.findAllByStage(TestingStage.CB);
     return testPlans;
   }
 
-  @RequestMapping(value = "/testcases/{testCaseId}", method = RequestMethod.GET)
-  public TestCase testCase(@PathVariable final Long testCaseId) {
+  @ApiOperation(value = "Get a context-based test case by id",
+      nickname = "getOneContextBasedTestCaseById")
+  @RequestMapping(value = "/testcases/{testCaseId}", method = RequestMethod.GET,
+      produces = "application/json")
+  public TestCase testCase(
+      @ApiParam(value = "the id of the test case", required = true) @PathVariable final Long testCaseId) {
     logger.info("Fetching  test case...");
     TestCase testCase = testCaseService.findOne(testCaseId);
     return testCase;
   }
 
-  @RequestMapping(value = "/teststeps/{testStepId}", method = RequestMethod.GET)
-  public TestStep testStep(@PathVariable final Long testStepId) {
+  @ApiOperation(value = "Get a context-based test step by id",
+      nickname = "getOneContextBasedTestStepById", hidden = true)
+  @RequestMapping(value = "/teststeps/{testStepId}", method = RequestMethod.GET,
+      produces = "application/json")
+  public TestStep testStep(
+      @ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
     logger.info("Fetching  test step...");
     TestStep testStep = testStepService.findOne(testStepId);
     return testStep;

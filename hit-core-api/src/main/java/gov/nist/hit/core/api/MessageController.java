@@ -16,6 +16,7 @@ import gov.nist.hit.core.service.exception.MessageDownloadException;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.MessageUploadException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -42,7 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RequestMapping("/message")
 @RestController
-@Api(value = "Messages", position = 1, description = "Messages API")
+@Api(value = "Messages", hidden = true)
 public class MessageController {
   static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
@@ -58,9 +59,11 @@ public class MessageController {
    */
   @RequestMapping(value = "/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public String download(@RequestParam("content") String content, @RequestParam(value = "content",
-      required = false) String title, HttpServletRequest request, HttpServletResponse response)
-      throws MessageDownloadException {
+  public String download(
+      @ApiParam(value = "the content of the message", required = true) @RequestParam("content") String content,
+      @ApiParam(value = "the title of the message", required = false) @RequestParam(
+          value = "title", required = false) String title, HttpServletRequest request,
+      HttpServletResponse response) throws MessageDownloadException {
     try {
       logger.info("Downloading message");
       InputStream io = IOUtils.toInputStream(content, "UTF-8");

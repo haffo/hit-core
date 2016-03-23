@@ -17,6 +17,8 @@ import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.repo.TestCaseGroupRepository;
 import gov.nist.hit.core.service.exception.TestCaseGroupException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/testcasegroups")
-@Api(value = "TestCaseGroups", position = 1, description = "TestCase Groups API")
+@Api(value = "TestCaseGroups")
 public class TestCaseGroupController {
 
   static final Logger logger = LoggerFactory.getLogger(TestCaseGroupController.class);
@@ -44,9 +46,10 @@ public class TestCaseGroupController {
   @Autowired
   protected TestCaseGroupRepository testCaseGroupRepository;
 
-
+  @ApiOperation(value = "Get a test case group by its id", nickname = "getTestCaseGroupById")
   @RequestMapping(value = "/{testCaseGroupId}")
-  public TestCaseGroup testCaseGroup(@PathVariable final Long testCaseGroupId) {
+  public TestCaseGroup getTestCaseGroupById(@ApiParam(value = "the id of the test case group",
+      required = true) @PathVariable final Long testCaseGroupId) {
     logger.info("Fetching test case group with id=" + testCaseGroupId);
     TestCaseGroup testCaseGroup = testCaseGroupRepository.findOne(testCaseGroupId);
     if (testCaseGroup == null) {
@@ -55,10 +58,14 @@ public class TestCaseGroupController {
     return testCaseGroup;
   }
 
-  @RequestMapping(value = "/{testCaseGroupId}/details", method = RequestMethod.GET)
-  public Map<String, TestArtifact> details(@PathVariable final Long testCaseGroupId) {
+  @ApiOperation(value = "Get a test case group details by its id",
+      nickname = "getTestCaseGroupDetailsById")
+  @RequestMapping(value = "/{testCaseGroupId}/details", method = RequestMethod.GET,
+      produces = "application/json", consumes = "application/json")
+  public Map<String, TestArtifact> details(@ApiParam(value = "the id of the test case group",
+      required = true) @PathVariable final Long testCaseGroupId) {
     logger.info("Fetching artifacts of test case group with id=" + testCaseGroupId);
-    TestCaseGroup testCaseGroup = testCaseGroup(testCaseGroupId);
+    TestCaseGroup testCaseGroup = getTestCaseGroupById(testCaseGroupId);
     Map<String, TestArtifact> result = new HashMap<String, TestArtifact>();
     result.put("testStory", testCaseGroup.getTestStory());
     return result;

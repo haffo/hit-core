@@ -17,6 +17,8 @@ import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.service.exception.TestPlanException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/testplans")
-@Api(value = "TestPlans", position = 1, description = "TestPlans API")
+@Api(value = "TestPlans")
 public class TestPlanController {
 
   static final Logger logger = LoggerFactory.getLogger(TestPlanController.class);
@@ -44,8 +46,11 @@ public class TestPlanController {
   @Autowired
   protected TestPlanRepository testPlanRepository;
 
-  @RequestMapping(value = "/{testPlanId}")
-  public TestPlan testPlan(@PathVariable final Long testPlanId) {
+  @ApiOperation(value = "Get a test plan by its id", nickname = "getTestPlanById")
+  @RequestMapping(value = "/{testPlanId}", method = RequestMethod.GET,
+      produces = "application/json", consumes = "application/json")
+  public TestPlan getTestPlanById(
+      @ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId) {
     logger.info("Fetching test plan with id=" + testPlanId);
     TestPlan testPlan = testPlanRepository.findOne(testPlanId);
     if (testPlan == null) {
@@ -54,10 +59,13 @@ public class TestPlanController {
     return testPlan;
   }
 
-  @RequestMapping(value = "/{testPlanId}/details", method = RequestMethod.GET)
-  public Map<String, TestArtifact> details(@PathVariable final Long testPlanId) {
+  @ApiOperation(value = "Get a test plan details by its id", nickname = "getTestPlanDetailsById")
+  @RequestMapping(value = "/{testPlanId}/details", method = RequestMethod.GET,
+      produces = "application/json", consumes = "application/json")
+  public Map<String, TestArtifact> getTestPlanDetailsById(@ApiParam(
+      value = "the id of the test plan", required = true) @PathVariable final Long testPlanId) {
     logger.info("Fetching artifacts of testplan with id=" + testPlanId);
-    TestPlan testPlan = testPlan(testPlanId);
+    TestPlan testPlan = getTestPlanById(testPlanId);
     Map<String, TestArtifact> result = new HashMap<String, TestArtifact>();
     result.put("testStory", testPlan.getTestStory());
     return result;

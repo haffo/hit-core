@@ -22,6 +22,8 @@ import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.service.TransactionService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.util.List;
 
@@ -42,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/transport")
 @RestController
-@Api(value = "Transport", position = 1, description = "Transport API")
+@Api(value = "Transport")
 public class TransportController {
 
   static final Logger logger = LoggerFactory.getLogger(DocumentationController.class);
@@ -56,9 +58,12 @@ public class TransportController {
   @Autowired
   private TransactionService transactionService;
 
+  @ApiOperation(value = "Get a configuration form", nickname = "getConfigurationForm")
   @RequestMapping(value = "/config/form", method = RequestMethod.GET)
-  public TransportFormContent form(@RequestParam("type") TestingType type,
-      @RequestParam("protocol") String protocol, @RequestParam("domain") String domain) {
+  public TransportFormContent getConfigurationForm(@RequestParam("type") TestingType type,
+      @RequestParam("protocol") @ApiParam(value = "the targeted protocol (rest,soap etc...)",
+          required = true) String protocol, @RequestParam("domain") @ApiParam(
+          value = "the targeted domain (iz,erx etc...)", required = true) String domain) {
     String content = null;
     if (TestingType.SUT_INITIATOR.equals(type)) {
       content = transportFormsRepository.getSutInitiatorFormByProtocolAndDomain(protocol, domain);
@@ -70,6 +75,7 @@ public class TransportController {
     return new TransportFormContent(content);
   }
 
+  @ApiOperation(value = "", nickname = "", hidden = true)
   @RequestMapping(value = "/config/save", method = RequestMethod.POST)
   public boolean saveConfig(@RequestBody SaveConfigRequest request) {
     TransportConfig config =
@@ -86,17 +92,20 @@ public class TransportController {
     return true;
   }
 
+  @ApiOperation(value = "", nickname = "", hidden = true)
   @RequestMapping(value = "/transaction/{transactionId}/delete", method = RequestMethod.POST)
   public boolean deleteTransaction(@PathVariable Long transactionId) {
     transactionService.delete(transactionId);
     return true;
   }
 
+  @ApiOperation(value = "", nickname = "", hidden = true)
   @RequestMapping(value = "/transaction/{transactionId}", method = RequestMethod.GET)
   public Transaction getTransaction(@PathVariable Long transactionId) {
     return transactionService.findOne(transactionId);
   }
 
+  @ApiOperation(value = "", nickname = "", hidden = true)
   @Cacheable(value = "HitCache", key = "'transport-forms'")
   @RequestMapping(value = "/config/forms", method = RequestMethod.GET)
   public List<TransportForms> forms() {

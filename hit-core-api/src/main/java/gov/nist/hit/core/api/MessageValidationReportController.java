@@ -23,6 +23,8 @@ import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,10 +50,10 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/report")
-@Api(value = "AutoValidationReport", position = 1, description = "Automatic Validation Report API")
-public class ValidationReportController {
+@Api(value = "MessageValidationReport")
+public class MessageValidationReportController {
 
-  static final Logger logger = LoggerFactory.getLogger(ValidationReportController.class);
+  static final Logger logger = LoggerFactory.getLogger(MessageValidationReportController.class);
 
   @Autowired
   private ValidationReportService validationReportService;
@@ -65,12 +67,13 @@ public class ValidationReportController {
   @Autowired
   private UserService userService;
 
-
+  @ApiOperation(value = "", hidden = true)
   @RequestMapping(value = "/save", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public ValidationReport save(@RequestParam("xmlReport") String content,
-      @RequestParam("testStepId") Long testStepId, HttpServletRequest request,
-      HttpServletResponse response) {
+  public ValidationReport save(
+      @ApiParam(value = "the xml validation report", required = true) @RequestParam("xmlReport") String content,
+      @ApiParam(value = "the id of the test step", required = true) @RequestParam("testStepId") Long testStepId,
+      HttpServletRequest request, HttpServletResponse response) {
     try {
       logger.info("Saving validation report");
       Long userId = SessionContext.getCurrentUserId(request.getSession(false));
@@ -106,11 +109,14 @@ public class ValidationReportController {
     }
   }
 
+  @ApiOperation(value = "Download the message validation report of a test step by its id",
+      produces = "text/html,application/msword,application/xml,application/pdf")
   @RequestMapping(value = "/teststep/{testStepId}/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public void download(@RequestParam("format") String format,
-      @PathVariable("testStepId") Long testStepId, HttpServletRequest request,
-      HttpServletResponse response) {
+  public void download(
+      @ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
+      @ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") Long testStepId,
+      HttpServletRequest request, HttpServletResponse response) {
     try {
       logger.info("Downloading validation report  in " + format);
       Long userId = SessionContext.getCurrentUserId(request.getSession(false));

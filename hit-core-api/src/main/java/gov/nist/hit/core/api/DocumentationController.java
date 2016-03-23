@@ -21,6 +21,8 @@ import gov.nist.hit.core.service.TestCaseDocumentationService;
 import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,61 +64,76 @@ public class DocumentationController {
   private ZipGenerator zipGenerator;
 
 
+  @ApiOperation(value = "Get all context-based test cases documentation info",
+      nickname = "getContextbasedTestCaseDocumentationInfo")
   @Cacheable(value = "HitCache", key = "#stage.name() + 'testcases-documentation'")
-  @RequestMapping(value = "/testcases", method = RequestMethod.GET)
-  public TestCaseDocumentation testCases(@RequestParam("stage") TestingStage stage) {
-    logger.info("Fetching " + stage + " test case documentation");
-    TestCaseDocumentation doc = testCaseDocumentationService.findOneByStage(stage);
+  @RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
+  public TestCaseDocumentation testCases() {
+    logger.info("Fetching test case documentation");
+    TestCaseDocumentation doc = testCaseDocumentationService.findOneByStage(TestingStage.CB);
     return doc;
   }
 
+
+  @ApiOperation(value = "Get all release notes", nickname = "getAllReleaseNotes")
   @Cacheable(value = "HitCache", key = "'releasenotes'")
-  @RequestMapping(value = "/releasenotes", method = RequestMethod.GET)
+  @RequestMapping(value = "/releasenotes", method = RequestMethod.GET,
+      produces = "application/json")
   public List<Document> releaseNotes() {
     logger.info("Fetching  all release notes");
     return documentRepository.findAllReleaseNotes();
   }
 
+  @ApiOperation(value = "Get all user docs", nickname = "getAllUserDocs")
   @Cacheable(value = "HitCache", key = "'userdocs'")
-  @RequestMapping(value = "/userdocs", method = RequestMethod.GET)
+  @RequestMapping(value = "/userdocs", method = RequestMethod.GET, produces = "application/json")
   public List<Document> userDocs() {
     logger.info("Fetching  all release notes");
     return documentRepository.findAllUserDocs();
   }
 
+  @ApiOperation(value = "Get all known issues", nickname = "getAllKnownIssues")
   @Cacheable(value = "HitCache", key = "'knownissues'")
-  @RequestMapping(value = "/knownissues", method = RequestMethod.GET)
+  @RequestMapping(value = "/knownissues", method = RequestMethod.GET, produces = "application/json")
   public List<Document> knownIssues() {
     logger.info("Fetching  all known issues");
     return documentRepository.findAllKnownIssues();
   }
 
-
+  @ApiOperation(value = "Get all resources docs", nickname = "getAllResourceDocs")
   @Cacheable(value = "HitCache", key = "#type.name() + 'resource-documentation'")
-  @RequestMapping(value = "/resourcedocs", method = RequestMethod.GET)
+  @RequestMapping(value = "/resourcedocs", method = RequestMethod.GET,
+      produces = "application/json")
   public List<Document> resourcedocs(@RequestParam("type") DocumentType type) {
     logger.info("Fetching all resources docs of type=" + type);
     return documentRepository.findAllResourceDocs(type);
   }
 
+  @ApiOperation(value = "Get all deliverables", nickname = "getAllDeliverables")
   @Cacheable(value = "HitCache", key = "'deliverables-documentation'")
-  @RequestMapping(value = "/deliverables", method = RequestMethod.GET)
+  @RequestMapping(value = "/deliverables", method = RequestMethod.GET,
+      produces = "application/json")
   public List<Document> toolDownloads() {
     logger.info("Fetching all tooldownloads");
     return documentRepository.findAllDeliverableDocs();
   }
 
+  @ApiOperation(value = "Get the installation guide info", nickname = "getInstallationGuide")
   @Cacheable(value = "HitCache", key = "'installationguide-documentation'")
-  @RequestMapping(value = "/installationguide", method = RequestMethod.GET)
+  @RequestMapping(value = "/installationguide", method = RequestMethod.GET,
+      produces = "application/json")
   public Document installationGuide() {
     logger.info("Fetching installation guide");
     Document d = documentRepository.findInstallationDoc();
     return d;
   }
 
+  @ApiOperation(value = "Download a document by its path", nickname = "downloadDocumentByPath",
+      hidden = true)
   @RequestMapping(value = "/downloadDocument", method = RequestMethod.POST)
-  public void downloadDocument(@RequestParam("path") String path, HttpServletRequest request,
-      HttpServletResponse response) throws DownloadDocumentException {
+  public void downloadDocumentByPath(
+      @ApiParam(value = "the path of the document", required = true) @RequestParam("path") String path,
+      HttpServletRequest request, HttpServletResponse response) throws DownloadDocumentException {
     try {
       if (path != null) {
         String fileName = null;
@@ -136,10 +153,15 @@ public class DocumentationController {
     }
   }
 
-
-  @RequestMapping(value = "/downloadResourceDocs", method = RequestMethod.POST)
-  public void downloadResourceDocs(@RequestParam("type") DocumentType type,
-      HttpServletRequest request, HttpServletResponse response) throws DownloadDocumentException {
+  @ApiOperation(
+      value = "Download a collection of resource documents by a specific type (example messages, test packages etc...)",
+      nickname = "downloadResourceDocs", hidden = true)
+  @RequestMapping(value = "/downloadResourceDocs", method = RequestMethod.POST,
+      produces = "application/zip")
+  public void downloadResourceDocs(
+      @ApiParam(value = "the type of the document, example messages, test packages etc...",
+          required = true) @RequestParam("type") DocumentType type, HttpServletRequest request,
+      HttpServletResponse response) throws DownloadDocumentException {
     try {
       InputStream stream = zipResourceDocs(type);
       response.setContentType("application/zip");
@@ -156,28 +178,31 @@ public class DocumentationController {
     }
   }
 
+  @ApiOperation(value = "Download a document by its file name", nickname = "downloadDocByName")
   @RequestMapping(value = "/doc", method = RequestMethod.GET)
-  public void doc(@RequestParam("name") String name, HttpServletRequest request,
-      HttpServletResponse response) throws DownloadDocumentException {
+  public void downloadDocByName(
+      @ApiParam(value = "the name of the document", required = true) @RequestParam("name") String name,
+      HttpServletRequest request, HttpServletResponse response) throws DownloadDocumentException {
     if (name != null) {
       Document d = documentRepository.findOneByName(name);
       if (d != null) {
-        downloadDocument(d.getPath(), request, response);
+        downloadDocumentByPath(d.getPath(), request, response);
       } else {
         throw new DownloadDocumentException("Unknown document");
       }
     }
   }
 
-
-  @RequestMapping(value = "/testPackages", method = RequestMethod.POST)
-  public void testPackages(@RequestParam("stage") TestingStage stage, HttpServletRequest request,
-      HttpServletResponse response) throws DownloadDocumentException {
+  @ApiOperation(value = "Download all context-based test packages",
+      nickname = "downloadTestPackages")
+  @RequestMapping(value = "/testPackages", method = RequestMethod.POST,
+      produces = "application/zip")
+  public void downloadTestPackages(HttpServletRequest request, HttpServletResponse response)
+      throws DownloadDocumentException {
     try {
-      InputStream stream = zipTestPackages(stage);
+      InputStream stream = zipTestPackages(TestingStage.CB);
       response.setContentType("application/zip");
-      response
-          .setHeader("Content-disposition", "attachment;filename=" + stage + "TestPackages.zip");
+      response.setHeader("Content-disposition", "attachment;filename=ContextBasedTestPackages.zip");
       FileCopyUtils.copy(stream, response.getOutputStream());
 
     } catch (IOException e) {
@@ -189,14 +214,17 @@ public class DocumentationController {
     }
   }
 
-  @RequestMapping(value = "/exampleMessages", method = RequestMethod.POST)
-  public void exampleMessages(@RequestParam("stage") TestingStage stage,
-      HttpServletRequest request, HttpServletResponse response) throws DownloadDocumentException {
+  @ApiOperation(value = "Download all context-based example messages",
+      nickname = "downloadAllExampleMessages")
+  @RequestMapping(value = "/exampleMessages", method = RequestMethod.POST,
+      produces = "application/zip")
+  public void downloadAllExampleMessages(HttpServletRequest request, HttpServletResponse response)
+      throws DownloadDocumentException {
     try {
-      InputStream stream = zipExampleMessages(stage);
+      InputStream stream = zipExampleMessages(TestingStage.CB);
       response.setContentType("application/zip");
-      response.setHeader("Content-disposition", "attachment;filename=" + stage
-          + "ExampleMessages.zip");
+      response.setHeader("Content-disposition", "attachment;filename="
+          + "ContextBasedExampleMessages.zip");
       FileCopyUtils.copy(stream, response.getOutputStream());
     } catch (IOException e) {
       logger.debug("Failed to download the example messages ");
@@ -207,9 +235,13 @@ public class DocumentationController {
     }
   }
 
+  @ApiOperation(value = "Download an artifact by its path", nickname = "downloadArtifactByPath",
+      hidden = true)
   @RequestMapping(value = "/artifact", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public void download(@RequestParam("title") String title, @RequestParam("path") String path,
+  public void downloadArtifactByPath(@ApiParam(value = "the title of the document",
+      required = false) @RequestParam("title") String title, @ApiParam(
+      value = "the path of the document", required = true) @RequestParam("path") String path,
       HttpServletRequest request, HttpServletResponse response) throws DownloadDocumentException {
     try {
       InputStream content = getContent(path);

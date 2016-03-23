@@ -25,6 +25,7 @@ import gov.nist.hit.core.service.exception.UserNotFoundException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import gov.nist.hit.core.service.exception.XmlFormatterException;
 import gov.nist.hit.core.service.exception.XmlParserException;
+import io.swagger.annotations.Api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Harold Affo (NIST)
  * 
  */
+@Api(hidden = true)
 @ControllerAdvice
 public class MainExceptionHandler {
   static final Logger logger = LoggerFactory.getLogger(MainExceptionHandler.class);
@@ -81,8 +83,8 @@ public class MainExceptionHandler {
   public String messageValidationException(MessageValidationException ex) {
     logger.error(ex.getMessage(), ex);
     return "Sorry, cannot validate the message provided.\n" + ex.getMessage();
-  } 
-  
+  }
+
   @ResponseBody
   @ExceptionHandler(TransportException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -90,7 +92,7 @@ public class MainExceptionHandler {
     logger.error(ex.getMessage(), ex);
     return ex.getMessage();
   }
-  
+
 
   @ResponseBody
   @ExceptionHandler(MessageParserException.class)
@@ -163,7 +165,7 @@ public class MainExceptionHandler {
     logger.error(ex.getMessage(), ex);
     return "Invalid input.\n";
   }
-  
+
   @ResponseBody
   @ExceptionHandler(IllegalArgumentException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -171,33 +173,31 @@ public class MainExceptionHandler {
     logger.error(ex.getMessage(), ex);
     return "Invalid input.\n";
   }
-  
+
   @ResponseBody
   @ExceptionHandler(TypeMismatchException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String illegalArgumentException(TypeMismatchException ex) {
     logger.error(ex.getMessage(), ex);
     return "Invalid input.\n";
-  } 
-  
+  }
+
   @ResponseBody
   @ExceptionHandler(SpelEvaluationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String spelEvaluationException(SpelEvaluationException ex) {
     logger.error(ex.getMessage(), ex);
     return "Invalid input.\n";
-  } 
-  
+  }
+
   @ResponseBody
   @ExceptionHandler(UserNotFoundException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String userNotFoundException(UserNotFoundException ex) {
     logger.error(ex.getMessage(), ex);
     return "User could not be found.\n";
-  } 
-  
-  
-  
-  
+  }
+
+
 
 }

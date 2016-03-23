@@ -15,6 +15,7 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.CFTestInstance;
 import gov.nist.hit.core.service.TestObjectService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/cf")
 @RestController
-@Api(value = "CF TestCases", position = 1, description = "Context-free test cases API")
+@Api(value = "Context-free test cases api")
 public class ContextFreeController {
 
   static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
@@ -39,8 +41,10 @@ public class ContextFreeController {
   @Autowired
   private TestObjectService testObjectService;
 
+  @ApiOperation(value = "Get all context-free test cases list",
+      nickname = "getAllContextFreeTestCases")
   @Cacheable(value = "HitCache", key = "'cf-testcases'")
-  @RequestMapping(value = "/testcases")
+  @RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
   public List<CFTestInstance> testCases() {
     logger.info("Fetching all testCases...");
     return testObjectService.findAllAsRoot();
