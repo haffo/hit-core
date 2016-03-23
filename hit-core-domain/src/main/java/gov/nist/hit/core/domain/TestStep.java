@@ -2,8 +2,11 @@ package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -56,11 +59,17 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testDataSpecification; 
   
-  @ElementCollection(fetch=FetchType.EAGER)
-  @CollectionTable(name = "protocol")
-  @Column(name = "protocols")
-  protected Set<String> protocols = new LinkedHashSet<String>();
-    
+//  @ElementCollection(fetch=FetchType.EAGER)
+//  @CollectionTable(name = "protocol")
+//  @Column(name = "protocols")
+//  
+//  
+ 
+  @ElementCollection(fetch = FetchType.EAGER)
+  @JoinTable(name = "TestStepProtocols", joinColumns = @JoinColumn(name = "TestStep"))
+  Set<Protocol> protocols = new HashSet<Protocol>(); 
+
+      
   public TestStep() {
     super();
     this.type = ObjectType.TestStep;
@@ -137,13 +146,15 @@ public class TestStep extends AbstractTestCase implements Serializable {
     this.testDataSpecification = testDataSpecification;
   }
 
-  public Set<String> getProtocols() {
+  public Set<Protocol> getProtocols() {
     return protocols;
   }
 
-  public void setProtocols(Set<String> protocols) {
+  public void setProtocols(Set<Protocol> protocols) {
     this.protocols = protocols;
   }
+
+ 
 
   
   
