@@ -13,6 +13,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -65,9 +66,13 @@ public class TestStep extends AbstractTestCase implements Serializable {
 //  
 //  
  
+  @Embedded
   @ElementCollection(fetch = FetchType.EAGER)
-  @JoinTable(name = "TestStepProtocols", joinColumns = @JoinColumn(name = "TestStep"))
-  Set<Protocol> protocols = new HashSet<Protocol>(); 
+  @CollectionTable(
+        name="TestStepProtocols",
+        joinColumns=@JoinColumn(name="TestStep")
+  )
+  private Set<Protocol> protocols = new HashSet<Protocol>(); 
 
       
   public TestStep() {
