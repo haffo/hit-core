@@ -11,6 +11,8 @@
  */
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -20,6 +22,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Harold Affo (NIST)
  */
+@ApiModel(value="ValidationResult", description="Data Model representing the result of a message validation")
 public class ValidationResult {
 
   protected List<ValidationResultItem> errors;

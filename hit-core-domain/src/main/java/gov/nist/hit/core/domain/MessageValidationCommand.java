@@ -12,6 +12,9 @@
 
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,19 +23,22 @@ import java.util.Map;
  * @author Harold Affo(NIST)
  * 
  */
+@ApiModel(value="MessageValidationCommand", description="Data Model representing a request to validate a message")
 public class MessageValidationCommand extends TestCaseCommand {
 
+  @ApiModelProperty(required=true, value="content to parse")
   private String content;
 
-  private Map<String, String> nav;;
+   private Map<String, String> nav;;
 
-  private String facilityId; 
+   private String facilityId; 
   
-  private String contextType; 
+   private String contextType; 
   
-  private String name;
-    
-  private ArrayList<String> dqaCodes; 
+   private String name;
+   
+   @ApiModelProperty(required=false, value="data quality codes to validate")
+   private ArrayList<String> dqaCodes; 
 
   public String getContent() {
     return content;

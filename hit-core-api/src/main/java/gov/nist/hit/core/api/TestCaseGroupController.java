@@ -61,7 +61,7 @@ public class TestCaseGroupController {
   @ApiOperation(value = "Get a test case group details by its id",
       nickname = "getTestCaseGroupDetailsById")
   @RequestMapping(value = "/{testCaseGroupId}/details", method = RequestMethod.GET,
-      produces = "application/json", consumes = "application/json")
+      produces = "application/json")
   public Map<String, TestArtifact> details(@ApiParam(value = "the id of the test case group",
       required = true) @PathVariable final Long testCaseGroupId) {
     logger.info("Fetching artifacts of test case group with id=" + testCaseGroupId);

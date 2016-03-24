@@ -1,15 +1,19 @@
 /**
- * This software was developed at the National Institute of Standards and Technology by employees
- * of the Federal Government in the course of their official duties. Pursuant to title 17 Section 105 of the
- * United States Code this software is not subject to copyright protection and is in the public domain.
- * This is an experimental system. NIST assumes no responsibility whatsoever for its use by other parties,
- * and makes no guarantees, expressed or implied, about its quality, reliability, or any other characteristic.
- * We would appreciate acknowledgement if the software is used. This software can be redistributed and/or
- * modified freely provided that any derivative works bear some notice that they are derived from it, and any
- * modified versions bear some notice that they have been modified.
+ * This software was developed at the National Institute of Standards and Technology by employees of
+ * the Federal Government in the course of their official duties. Pursuant to title 17 Section 105
+ * of the United States Code this software is not subject to copyright protection and is in the
+ * public domain. This is an experimental system. NIST assumes no responsibility whatsoever for its
+ * use by other parties, and makes no guarantees, expressed or implied, about its quality,
+ * reliability, or any other characteristic. We would appreciate acknowledgement if the software is
+ * used. This software can be redistributed and/or modified freely provided that any derivative
+ * works bear some notice that they are derived from it, and any modified versions bear some notice
+ * that they have been modified.
  */
 
 package gov.nist.hit.core.domain;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Map;
 
@@ -18,19 +22,22 @@ import java.util.Map;
  * @author Harold Affo (NIST)
  * 
  */
+@ApiModel(value = "TransportResponse",
+    description = "Data Model containing the response of a transaction")
 public class TransportResponse {
 
-	private static final long serialVersionUID = 1L; 
-	
-	private Long testStepId; 
-	private String outgoingMessage;
-	private String incomingMessage;
+  @ApiModelProperty(required = true, value = "id of the test step")
+  private Long testStepId;
+  @ApiModelProperty(required = true, value = "message sent")
+  private String outgoingMessage;
+  @ApiModelProperty(required = true, value = "message received")
+  private String incomingMessage;
 
- 
 
-	public TransportResponse() {
-		super();
-	}
+
+  public TransportResponse() {
+    super();
+  }
 
 
 
@@ -78,8 +85,5 @@ public class TransportResponse {
   }
 
 
-   
-
-	 
 
 }

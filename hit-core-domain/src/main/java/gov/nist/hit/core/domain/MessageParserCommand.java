@@ -12,13 +12,18 @@
 
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
  
 /**
  * @author Harold Affo (NIST)
  * 
  */
+@ApiModel(value="MessageParserCommand", description="Data Model representing a request to parse a message")
 public class MessageParserCommand extends TestCaseCommand {
 
+  @ApiModelProperty(required=true, value="content to parse")
   private String content;
 
   private String name;

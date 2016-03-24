@@ -79,7 +79,7 @@ public class TestStepController {
    */
   @ApiOperation(value = "Get a test step by its id", nickname = "getTestStepById")
   @RequestMapping(value = "/{teststepId}", method = RequestMethod.GET,
-      produces = "application/json", consumes = "application/json")
+      produces = "application/json")
   public TestStep testStep(
       @ApiParam(value = "the id of the test step", required = true) @PathVariable final Long teststepId) {
     logger.info("Fetching test step with id=" + teststepId);
@@ -99,7 +99,7 @@ public class TestStepController {
   @ApiOperation(value = "Get a test ste's test context by the test step's id",
       nickname = "getTestStepTestContextByTestStepId")
   @RequestMapping(value = "/{testStepId}/testcontext", method = RequestMethod.GET,
-      produces = "application/json", consumes = "application/json")
+      produces = "application/json")
   public TestContext getTestStepTestContextByTestStepId(@ApiParam(
       value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
     logger.info("Fetching testContext from testStepId=" + testStepId);

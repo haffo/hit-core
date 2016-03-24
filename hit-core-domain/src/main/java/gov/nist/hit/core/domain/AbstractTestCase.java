@@ -1,5 +1,7 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -29,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @MappedSuperclass
 public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
 
+  @ApiModelProperty(required=true, value="name of the test case")
   @Column(columnDefinition = "TEXT")
   protected String name;
 
@@ -48,22 +51,24 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
 //  @Column
 //  private String testStepName;
 
-
+  @ApiModelProperty(required=false, value="description of the test case")
   @Column(columnDefinition = "TEXT")
   protected String description;
 
-
+  @ApiModelProperty(required=true, value="type of the test case")
   @NotNull
   @Enumerated(EnumType.STRING)
   protected ObjectType type;
 
-
+  @ApiModelProperty(required=false, value="stage of the test case")
   @Enumerated(EnumType.STRING)
   protected TestingStage stage;
 
+  @ApiModelProperty(required=true, value="position of the test case")
   @Min(1)
   protected int position;
 
+  @ApiModelProperty(required=true, value="test story of the test case")
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testStory;

@@ -1,5 +1,8 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +35,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@ApiModel(value = "TestStep", description = "Data Model representing a test step")
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class TestStep extends AbstractTestCase implements Serializable {
@@ -42,19 +46,22 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
  
+  @ApiModelProperty(required = true, value = "domain of the test step")
   @NotNull
   @Enumerated(EnumType.STRING)
   protected TestingType testingType;  
   
-  
+  @ApiModelProperty(required = false, value = "juror document of the test step")
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact jurorDocument;
 
+  @ApiModelProperty(required = false, value = "message content of the test step")
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact messageContent;
 
+  @ApiModelProperty(required = false, value = "test data specification of the test step")
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testDataSpecification; 
@@ -64,7 +71,7 @@ public class TestStep extends AbstractTestCase implements Serializable {
 //  @Column(name = "protocols")
 //  
 //  
- 
+  @ApiModelProperty(required = false, value = "supported protocols of the test step")
   @ElementCollection(fetch = FetchType.EAGER)
   @JoinTable(name = "TestStepProtocols", joinColumns = @JoinColumn(name = "TestStep"))
   Set<Protocol> protocols = new HashSet<Protocol>(); 
@@ -75,10 +82,12 @@ public class TestStep extends AbstractTestCase implements Serializable {
     this.type = ObjectType.TestStep;
   }
 
+  @ApiModelProperty(required = false, value = "test context of the test step")
   @OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER,
       orphanRemoval = true)
   protected TestContext testContext;
 
+  @ApiModelProperty(required = false, value = "parent test case of the test step")
   @JsonIgnore
   @ManyToOne(optional=true,fetch = FetchType.LAZY)
   protected TestCase testCase;

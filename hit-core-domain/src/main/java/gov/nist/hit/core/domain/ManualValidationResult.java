@@ -1,8 +1,11 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+
 import java.util.Date;
 import java.util.Map;
 
+@ApiModel(value="ManualValidationResult", description="Data Model containing a message validation result")
 public class ManualValidationResult {
   
   private Long testStepId;

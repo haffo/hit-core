@@ -1,5 +1,8 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -22,7 +25,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-
+@ApiModel(value = "TestCase", description = "Data Model representing a test case")
 @Entity
 public class TestCase extends AbstractTestCase implements Serializable {
 
@@ -30,22 +33,23 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id; 
- 
+  private Long id;
+
   public TestCase() {
     super();
     this.type = ObjectType.TestCase;
-    }
+  }
 
-  @OneToMany(mappedBy = "testCase", orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @ApiModelProperty(required = true, value = "test steps of the test case")
+  @OneToMany(mappedBy = "testCase", orphanRemoval = true, fetch = FetchType.EAGER,
+      cascade = {CascadeType.ALL})
   private List<TestStep> testSteps = new ArrayList<TestStep>();
 
-  @OneToMany(mappedBy = "testCase", orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @ApiModelProperty(required = false, value = "mapping of data of the test case")
+  @OneToMany(mappedBy = "testCase", orphanRemoval = true, fetch = FetchType.EAGER,
+      cascade = {CascadeType.ALL})
   protected Collection<DataMapping> dataMappings;
 
-
-  private String protocol;
-  
   public Long getId() {
     return id;
   }
@@ -55,25 +59,19 @@ public class TestCase extends AbstractTestCase implements Serializable {
   }
 
   public List<TestStep> getTestSteps() {
-      return testSteps;
+    return testSteps;
   }
 
   public void setTestSteps(List<TestStep> testSteps) {
     this.testSteps = testSteps;
   }
 
-  public String getProtocol() {
-    return protocol;
-  }
 
-  public void setProtocol(String protocol) {
-    this.protocol = protocol;
-  }
 
-  public void addTestStep(TestStep testStep){
-    if(testStep.getTestCase() != null){
+  public void addTestStep(TestStep testStep) {
+    if (testStep.getTestCase() != null) {
       throw new RuntimeException("Test step belongs to a different test case");
-    } 
+    }
     getTestSteps().add(testStep);
     testStep.setTestCase(this);
   }
@@ -86,8 +84,6 @@ public class TestCase extends AbstractTestCase implements Serializable {
     this.dataMappings = dataMappings;
   }
 
- 
- 
 
-  
+
 }

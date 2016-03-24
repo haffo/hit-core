@@ -7,6 +7,8 @@
  */
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -25,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Harold Affo (NIST)
  */
 @Entity
+@ApiModel(value="ConfoDocumentrmanceProfile", description="Data Model representing a document")
 public class Document implements Serializable {
 
   @Id

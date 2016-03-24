@@ -37,12 +37,17 @@ public class WebAppInitializer implements WebApplicationInitializer
     Dynamic apiServlet = servletContext.addServlet("hit-api", new DispatcherServlet(root));
     apiServlet.setLoadOnStartup(1);
     apiServlet.addMapping("/api/*");
+    // apiServlet.addMapping("/");
     apiServlet.setAsyncSupported(true);
 
-    Dynamic apiDocsServlet = servletContext.addServlet("swagger-api", new DispatcherServlet(root));
-    apiDocsServlet.setLoadOnStartup(2);
-    apiDocsServlet.addMapping("/*");
-    apiDocsServlet.setAsyncSupported(true);
+    // Dynamic apiDocsServlet = servletContext.addServlet("swagger-api", new
+    // DispatcherServlet(root));
+    // apiDocsServlet.setLoadOnStartup(2);
+    // apiServlet.addMapping("*.html");
+    // // apiDocsServlet.addMapping("/swagger-ui.html");
+    // // apiDocsServlet.addMapping("/configuration/ui");
+    // // apiDocsServlet.addMapping("/swagger-*");
+    // apiDocsServlet.setAsyncSupported(true);
 
     // Dynamic apiUiServlet = servletContext.addServlet("swagger-api-ui", new
     // DispatcherServlet(root));

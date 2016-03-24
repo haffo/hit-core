@@ -1,5 +1,8 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,27 +22,33 @@ import javax.persistence.MapKeyColumn;
 
 
 @Entity
+@ApiModel(value = "TransportConfig", description = "Data Model representing the configuration information of a transaction")
 public class TransportConfig {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
-
+  
+  @ApiModelProperty(required = true, value = "protocol of the transaction", example="soap, rest, etc...")
   @Column(name = "PROTOCOL")
   private String protocol; 
   
+  @ApiModelProperty(required = true, value = "domain of the transaction", example="iz, erx, etc...")
   @Column(name = "DOMAIN")
   private String domain;
   
+  @ApiModelProperty(required = true, value = "id of the user executing the transaction", example="soap, rest, etc...")
   @Column(name = "USERID")
   private Long userId;
  
+  @ApiModelProperty(required = true, value = "configuration information  provided by the sut")
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "sut_initiator_config", joinColumns=@JoinColumn(name="transport_config_id"))
   @MapKeyColumn(name = "property_key")
   @Column(name = "property_value")
   protected Map<String, String> sutInitiator = new HashMap<String, String>();;
 
+  @ApiModelProperty(required = true, value = "configuration information provided to the sut")
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "ta_initiator_config", joinColumns=@JoinColumn(name="transport_config_id"))
   @MapKeyColumn(name = "property_key")

@@ -11,11 +11,14 @@
 
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+
 
 /**
  * @author Harold Affo (NIST)
  * 
  */
+@ApiModel(value="TransactionCommand", description="Data Model representing the request of a transaction")
 public class TransactionCommand extends Command {
 
 	private static final long serialVersionUID = 1L; 

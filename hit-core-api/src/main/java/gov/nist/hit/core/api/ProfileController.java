@@ -44,8 +44,7 @@ public class ProfileController {
 
   @ApiOperation(value = "Get the json representation of a conformance profile by its id",
       nickname = "getProfileJsonById")
-  @RequestMapping(value = "/{profileId}", method = RequestMethod.GET,
-      consumes = "application/json", produces = "application/json")
+  @RequestMapping(value = "/{profileId}", method = RequestMethod.GET, produces = "application/json")
   public Json getProfileJsonById(@ApiParam(value = "the id of the conformance profile",
       required = true) @PathVariable final Long profileId) {
     if (profileId == null) {

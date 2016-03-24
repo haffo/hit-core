@@ -12,12 +12,17 @@
 
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Harold Affo(NIST)
  * 
  */
+@ApiModel(value="MessageValidationReportCommand", description="Data Model representing a request to parse an xml validation report")
 public class MessageValidationReportCommand {
 
+  @ApiModelProperty(required=true, value="xml validation report")
   private String xmlReport;
 
   public String getXmlReport() {

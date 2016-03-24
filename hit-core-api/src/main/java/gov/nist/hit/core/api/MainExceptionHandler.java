@@ -58,7 +58,7 @@ public class MainExceptionHandler {
   @ResponseBody
   public String exception(RuntimeException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, something went wrong.\n";
+    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
   }
 
   @ResponseBody
@@ -66,7 +66,7 @@ public class MainExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String exception(Exception ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, something went wrong.\n";
+    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
   }
 
   @ResponseBody
@@ -82,7 +82,7 @@ public class MainExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String messageValidationException(MessageValidationException ex) {
     logger.error(ex.getMessage(), ex);
-    return "Sorry, cannot validate the message provided.\n" + ex.getMessage();
+    return "Sorry, cannot validate the message provided.\n" + "DEBUG:\n" + ex.getMessage();
   }
 
   @ResponseBody

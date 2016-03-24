@@ -1,5 +1,8 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +30,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@ApiModel(value = "TestPlan", description = "Data Model representing a test plan")
 @Entity
 public class TestPlan extends AbstractTestCase  implements Serializable {
 
@@ -36,10 +40,12 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id; 
   
+  @ApiModelProperty(required = false, value = "summary of the test plan")
   @JsonIgnoreProperties(value = {"html","json"})
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testPlanSummary; 
 
+  @ApiModelProperty(required = false, value = "test package of the test plan")
   @JsonIgnoreProperties(value = {"html","json"})
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact testPackage;
@@ -49,18 +55,22 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
     this.type = ObjectType.TestPlan;
   }
   
+  @ApiModelProperty(required = false, value = "list of test cases of the test plan")
   @OneToMany(orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JoinTable(name = "tp_tc", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcase_id")})
   private List<TestCase> testCases = new ArrayList<TestCase>();
 
+  @ApiModelProperty(required = false, value = "list of test case groups of the test plan")
   @OneToMany(orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tp_tcg", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcasegroup_id")})
     private List<TestCaseGroup> testCaseGroups = new ArrayList<TestCaseGroup>();
 
+  @ApiModelProperty(required = true, value = "transport support of the test plan")
   private boolean transport;
   
+  @ApiModelProperty(required = true, value = "domain of the test plan", example="iz, erx, etc...")
   @Column(nullable = true)
   private String domain;
    

@@ -1,5 +1,8 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 
 import javax.persistence.CascadeType;
@@ -21,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@ApiModel(value="TestContext", description="Data Model representing the context of a test")
 public class TestContext implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -29,13 +33,15 @@ public class TestContext implements Serializable {
   @GeneratedValue(strategy = GenerationType.TABLE)
   protected Long id;
 
+  @ApiModelProperty(required = true, value = "format of the test context", example="hl7v2,edi,etc...")
   protected String format;
 
+  @ApiModelProperty(required = false, value = "example message of the test context")
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(unique = true, nullable = true, insertable = true, updatable = true)
   protected Message message;
 
-
+  @ApiModelProperty(required = false, value = "stage of the test context", example="CB,CF, etc...")
   @JsonIgnore
   @Enumerated(EnumType.STRING)
   protected TestingStage stage;

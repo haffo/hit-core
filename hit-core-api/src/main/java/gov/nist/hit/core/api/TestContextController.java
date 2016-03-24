@@ -56,7 +56,7 @@ public abstract class TestContextController {
 
   @ApiOperation(value = "Get a test context by its id", nickname = "getTestContextById")
   @RequestMapping(value = "/{testContextId}", produces = "application/json",
-      consumes = "application/json")
+      method = RequestMethod.GET)
   public TestContext getTestContextById(@ApiParam(value = "the id of the test context",
       required = true) @PathVariable final Long testContextId) {
     logger.info("Fetching testContext with id=" + testContextId);
@@ -67,26 +67,26 @@ public abstract class TestContextController {
     return testContext;
   }
 
-  @ApiOperation(value = "Parse a message with a test context",
-      nickname = "parseMessageWithTestContextId")
+  @ApiOperation(value = "Parse a message in a test context",
+      nickname = "parseMessageWithTestContext")
   @RequestMapping(value = "/{testContextId}/parseMessage", method = RequestMethod.POST,
-      produces = "application/json", consumes = "application/json")
-  public MessageModel parseMessageWithTestContextId(
+      produces = "application/json")
+  public MessageModel parseMessageWithTestContext(
       @ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
-      @ApiParam(value = "the content  to be parsed", required = true) @RequestBody final MessageParserCommand command)
+      @ApiParam(value = "the request to be parsed", required = true) @RequestBody final MessageParserCommand command)
       throws MessageParserException {
     logger.info("Parsing message");
     return getMessageParser().parse(getTestContext(testContextId), command);
   }
 
 
-  @ApiOperation(value = "Validate a message with a test context",
-      nickname = "validateMessageWithTestContextId")
+  @ApiOperation(value = "Validate a message in a test context",
+      nickname = "validateMessageWithTestContex")
   @RequestMapping(value = "/{testContextId}/validateMessage", method = RequestMethod.POST,
-      produces = "application/json", consumes = "application/json")
-  public MessageValidationResult validateMessageWithTestContextId(
+      produces = "application/json")
+  public MessageValidationResult validateMessageWithTestContex(
       @ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
-      @ApiParam(value = "the content  to be validated", required = true) @RequestBody final MessageValidationCommand command,
+      @ApiParam(value = "the request to be validated", required = true) @RequestBody final MessageValidationCommand command,
       HttpServletRequest request, HttpServletResponse response, HttpSession session)
       throws MessageValidationException {
     try {

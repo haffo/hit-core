@@ -1,5 +1,7 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import javax.persistence.OrderBy;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
+@ApiModel(value="CFTestInstance", description="Data Model representing context-free test case")
 public class CFTestInstance extends TestStep implements Serializable {
 
   private static final long serialVersionUID = 8805967508478985159L;

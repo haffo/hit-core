@@ -11,6 +11,9 @@
  */
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +36,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+@ApiModel(value = "TestCaseGroup", description = "Data Model representing a group of test cases")
 @Entity
 public class TestCaseGroup extends AbstractTestCase implements Serializable {
 
@@ -47,12 +51,13 @@ public class TestCaseGroup extends AbstractTestCase implements Serializable {
     this.type = ObjectType.TestCaseGroup;
    }
     
+  @ApiModelProperty(required = false, value = "children test case groups of the test case group")
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tcg_tcg", joinColumns = {@JoinColumn(name = "parent_id")},
       inverseJoinColumns = {@JoinColumn(name = "child_id")})
    private List<TestCaseGroup> testCaseGroups = new ArrayList<TestCaseGroup>();
   
-
+  @ApiModelProperty(required = false, value = "children test cases of the test case group")
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tcg_tc", joinColumns = {@JoinColumn(name = "testcasegroup_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcase_id")})

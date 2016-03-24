@@ -12,6 +12,8 @@
 
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+
 import java.io.Serializable;
 
 /**

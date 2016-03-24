@@ -1,10 +1,12 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
  
-@ApiModel(value="MessageModel", description="Sample model for the documentation")
+@ApiModel(value="MessageModel", description="Data Model representing the parsed message")
 public class MessageModel {
 
   private Map<String, String> delimeters;

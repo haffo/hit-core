@@ -44,7 +44,7 @@ public class ValueSetController {
 
   @ApiOperation(value = "Get the value set library by its id", nickname = "getValueSetLibraryById")
   @RequestMapping(value = "/{valueSetLibraryId}", produces = "application/json",
-      consumes = "application/json", method = RequestMethod.POST)
+      method = RequestMethod.POST)
   public Json getValueSetLibraryById(@ApiParam(value = "the id of the value set library",
       required = true) @PathVariable final Long valueSetLibraryId) {
     if (valueSetLibraryId == null) {

@@ -11,11 +11,14 @@
  */
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+
 /**
  * Represents the data associated to a message validation.
  * 
  * @author Harold Affo (NIST)
  */
+@ApiModel(value="ValidationResultItem", description="Data Model representing the failure/success of a message validation")
 public class ValidationResultItem {
 
   protected String description;

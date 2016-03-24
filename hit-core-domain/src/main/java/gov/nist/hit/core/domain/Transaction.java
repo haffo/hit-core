@@ -12,6 +12,9 @@
 
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +38,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @(#) UserTransaction.java
  */
 @Entity
+@ApiModel(value = "Transaction", description = "Data Model representing a transaction")
 public class Transaction implements java.io.Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -42,21 +46,25 @@ public class Transaction implements java.io.Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
  
-
+  @ApiModelProperty(required = true, value = "message sent by the sut (system under test)")
   @NotNull
   @Column(nullable = false, columnDefinition = "LONGTEXT")
   protected String incoming;
 
+  @ApiModelProperty(required = true, value = "message sent to the sut (system under test)")
   @NotNull
   @Column(nullable = false, columnDefinition = "LONGTEXT")
   protected String outgoing;
  
+  @ApiModelProperty(required = true, value = "id of the test step")
   protected Long testStepId;
   
+  @ApiModelProperty(required = true, value = "user executing the transaction")
   @JsonIgnore
   @OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
   protected User user; 
   
+  @ApiModelProperty(required = true, value = "list of properties of the transaction")
   @JsonIgnore
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name="transaction_config", joinColumns=@JoinColumn(name="transaction_id"))
@@ -64,6 +72,7 @@ public class Transaction implements java.io.Serializable {
   @Column(name = "property_value")
   protected Map<String, String> properties = new HashMap<String, String>();
   
+  @ApiModelProperty(required = false, value = "id of the response message id of the transaction")
   @JsonIgnore
   @Column(nullable = true)
   protected Long responseMessageId;

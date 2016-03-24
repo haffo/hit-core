@@ -1,5 +1,8 @@
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 
 import javax.persistence.Basic;
@@ -14,14 +17,18 @@ import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@ApiModel(value="MessageValidationResult", description="Data Model representing the result of a message validation")
 public class MessageValidationResult implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  @ApiModelProperty(required=true, value="json validation report")
   private String json;
 
+  @ApiModelProperty(required=false, value="html validation report")
   private String html;
 
+  @ApiModelProperty(required=false, value="xml validation report")
   private String xml;
 
   public MessageValidationResult(String json, String html) {

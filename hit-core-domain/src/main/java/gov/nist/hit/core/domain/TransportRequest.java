@@ -11,6 +11,9 @@
 
 package gov.nist.hit.core.domain;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Map;
 
 
@@ -18,15 +21,25 @@ import java.util.Map;
  * @author Harold Affo (NIST)
  * 
  */
+@ApiModel(value = "TransportRequest", description = "Data Model representing the request information of a transaction")
 public class TransportRequest {
 
 	private static final long serialVersionUID = 1L; 
 	
+	@ApiModelProperty(required = true, value = "configuration information of the sut")
 	private Map<String, String> config; // required
-	private Long testStepId; 
-	private String message;
-	private Long userId; // required
-    private Long responseMessageId; // required
+	
+	@ApiModelProperty(required = true, value = "id of the test step")
+	private Long testStepId;
+	
+	@ApiModelProperty(required = true, value = "content of the message to be sent")
+	private String message; 
+	
+	@ApiModelProperty(required = true, value = "id of the user executing the transaction")
+	private Long userId;  
+    
+	@ApiModelProperty(required = true, value = "id of the message to respond with")
+	private Long responseMessageId;  
 
 	public TransportRequest() {
 		super();

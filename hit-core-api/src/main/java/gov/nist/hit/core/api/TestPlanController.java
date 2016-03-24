@@ -48,7 +48,7 @@ public class TestPlanController {
 
   @ApiOperation(value = "Get a test plan by its id", nickname = "getTestPlanById")
   @RequestMapping(value = "/{testPlanId}", method = RequestMethod.GET,
-      produces = "application/json", consumes = "application/json")
+      produces = "application/json")
   public TestPlan getTestPlanById(
       @ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId) {
     logger.info("Fetching test plan with id=" + testPlanId);
@@ -61,7 +61,7 @@ public class TestPlanController {
 
   @ApiOperation(value = "Get a test plan details by its id", nickname = "getTestPlanDetailsById")
   @RequestMapping(value = "/{testPlanId}/details", method = RequestMethod.GET,
-      produces = "application/json", consumes = "application/json")
+      produces = "application/json")
   public Map<String, TestArtifact> getTestPlanDetailsById(@ApiParam(
       value = "the id of the test plan", required = true) @PathVariable final Long testPlanId) {
     logger.info("Fetching artifacts of testplan with id=" + testPlanId);
