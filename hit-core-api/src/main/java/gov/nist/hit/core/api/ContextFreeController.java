@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/cf")
 @RestController
-@Api(value = "Context-free test cases api")
+@Api(value = "Context-free test cases api", tags = "Context-free test cases")
 public class ContextFreeController {
 
   static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);

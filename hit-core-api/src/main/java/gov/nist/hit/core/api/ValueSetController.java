@@ -14,7 +14,6 @@ package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.Json;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
-import gov.nist.hit.core.service.exception.TestCaseException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/valueSetLibrary")
 @RestController
-@Api(value = "ValueSetLibrary")
+@Api(value = "ValueSetLibrary", tags = "ValueSet Library")
 public class ValueSetController {
 
   Logger logger = LoggerFactory.getLogger(ValueSetController.class);
@@ -44,12 +43,9 @@ public class ValueSetController {
 
   @ApiOperation(value = "Get the value set library by its id", nickname = "getValueSetLibraryById")
   @RequestMapping(value = "/{valueSetLibraryId}", produces = "application/json",
-      method = RequestMethod.POST)
+      method = RequestMethod.GET)
   public Json getValueSetLibraryById(@ApiParam(value = "the id of the value set library",
-      required = true) @PathVariable final Long valueSetLibraryId) {
-    if (valueSetLibraryId == null) {
-      throw new TestCaseException("No value set library id provided");
-    }
+      required = true) @PathVariable final long valueSetLibraryId) {
     logger.info("Fetching value set library (json) with id=" + valueSetLibraryId);
     String value = vocabularyLibraryRepository.getJson(valueSetLibraryId);
     return new Json(value);

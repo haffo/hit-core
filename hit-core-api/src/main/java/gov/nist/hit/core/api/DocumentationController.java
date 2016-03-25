@@ -49,7 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/documentation")
 @RestController
-@Api(value = "Documentation", position = 1, description = "Documentation API")
+@Api(value = "Documentation", tags = "Documentation")
 public class DocumentationController {
 
   static final Logger logger = LoggerFactory.getLogger(DocumentationController.class);

@@ -21,6 +21,7 @@ import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
@@ -51,6 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/manual/report")
+@Api(value = "Manual validation report api", tags = "Manual Validation Report")
 public class ManualValidationReportController {
 
   static final Logger logger = LoggerFactory.getLogger(ManualValidationReportController.class);

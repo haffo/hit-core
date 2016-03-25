@@ -330,9 +330,8 @@ public abstract class ResourcebundleLoader {
     if (resource != null) {
       appInfo.setMessageContentInfo(FileUtil.getContent(resource));
     }
-
+    appInfo.setApiDocsPath("/apidocs");
     appInfoRepository.save(appInfo);
-
     logger.info("loading app info...DONE");
   }
 

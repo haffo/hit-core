@@ -12,8 +12,6 @@
 
 package gov.nist.hit.core.api;
 
-import io.swagger.annotations.Api;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Harold Affo (NIST)
  * 
  */
-@Api(hidden = true)
 @RestController
 public class ErrorController {
 

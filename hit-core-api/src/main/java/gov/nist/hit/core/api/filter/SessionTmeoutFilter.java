@@ -52,6 +52,7 @@ public class SessionTmeoutFilter implements Filter {
     if (session == null
         && ((Pattern.compile("\\/api\\/(\\w+)\\/clearRecords").matcher(path).find()) || ((!Pattern
             .compile("\\/api\\/appInfo").matcher(path).find()
+            && !Pattern.compile("\\/api\\/session\\/keepAlive").matcher(path).find()
             && !Pattern.compile("\\/api\\/session\\/create").matcher(path).find()
             && !Pattern.compile("\\/api\\/ws\\/").matcher(path).find()
             && !Pattern.compile("\\/api\\/transport\\/config\\/forms").matcher(path).find()

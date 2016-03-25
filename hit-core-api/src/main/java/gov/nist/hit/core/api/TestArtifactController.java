@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/artifact")
 @RestController
-@Api(value = "Artifacts")
+@Api(value = "Artifacts", tags = "Artifacts")
 public class TestArtifactController {
 
   static final Logger logger = LoggerFactory.getLogger(TestArtifactController.class);

@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/appInfo")
-@Api(value = "App Info")
+@Api(value = "App Info", tags = "Application Information")
 public class AppInfoController {
 
 

@@ -29,25 +29,30 @@ public class WebAppInitializer implements WebApplicationInitializer
   @Override
   public void onStartup(final ServletContext servletContext) throws ServletException {
 
-    final AnnotationConfigWebApplicationContext root = new AnnotationConfigWebApplicationContext();
-    root.setServletContext(servletContext);
-    root.scan("gov.nist.hit.core");
+    final AnnotationConfigWebApplicationContext context1 =
+        new AnnotationConfigWebApplicationContext();
+    context1.setServletContext(servletContext);
+    context1.scan("gov.nist.hit.core");
     // web app servlet
-    servletContext.addListener(new ContextLoaderListener(root));
-    Dynamic apiServlet = servletContext.addServlet("hit-api", new DispatcherServlet(root));
+    servletContext.addListener(new ContextLoaderListener(context1));
+    Dynamic apiServlet = servletContext.addServlet("hit-api", new DispatcherServlet(context1));
     apiServlet.setLoadOnStartup(1);
     apiServlet.addMapping("/api/*");
-    // apiServlet.addMapping("/");
     apiServlet.setAsyncSupported(true);
 
-    // Dynamic apiDocsServlet = servletContext.addServlet("swagger-api", new
-    // DispatcherServlet(root));
-    // apiDocsServlet.setLoadOnStartup(2);
-    // apiServlet.addMapping("*.html");
-    // // apiDocsServlet.addMapping("/swagger-ui.html");
-    // // apiDocsServlet.addMapping("/configuration/ui");
-    // // apiDocsServlet.addMapping("/swagger-*");
-    // apiDocsServlet.setAsyncSupported(true);
+    Dynamic apiDocsServlet =
+        servletContext.addServlet("hit-api-docs", new DispatcherServlet(context1));
+    apiDocsServlet.setLoadOnStartup(1);
+    apiDocsServlet.addMapping("/apidocs/*");
+
+
+    // final AnnotationConfigWebApplicationContext context2 =
+    // new AnnotationConfigWebApplicationContext();
+    // context2.setServletContext(servletContext);
+    // Dynamic apiDocsServlet =
+    // servletContext.addServlet("hit-api-docs", new DispatcherServlet(context2));
+    // apiDocsServlet.setLoadOnStartup(1);
+    // apiDocsServlet.addMapping("/docs/*");
 
     // Dynamic apiUiServlet = servletContext.addServlet("swagger-api-ui", new
     // DispatcherServlet(root));

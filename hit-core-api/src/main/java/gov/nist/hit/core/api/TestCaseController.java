@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/testcases")
 @RestController
-@Api(value = "testcases")
+@Api(value = "testcases", tags = "Test Cases")
 public class TestCaseController {
 
   Logger logger = LoggerFactory.getLogger(TestCaseController.class);
@@ -79,7 +79,8 @@ public class TestCaseController {
    */
   @ApiOperation(value = "Get a test case (context-free or context-based) by its id",
       nickname = "getTestCaseById")
-  @RequestMapping(value = "/{testCaseId}", method = RequestMethod.GET, produces = "application/json")
+  @RequestMapping(value = "/{testCaseId}", method = RequestMethod.GET,
+      produces = "application/json")
   public TestCase testCase(@PathVariable final Long testCaseId) {
     logger.info("Fetching testCase with id=" + testCaseId);
     TestCase testCase = testCaseService.findOne(testCaseId);
@@ -120,7 +121,8 @@ public class TestCaseController {
    */
   @ApiOperation(value = "Get a test case (context-free or context-based) details by its id",
       nickname = "getTestCaseDetailsById")
-  @RequestMapping(value = "/{testCaseId}/details", method = RequestMethod.GET, produces = "application/json")
+  @RequestMapping(value = "/{testCaseId}/details", method = RequestMethod.GET,
+      produces = "application/json")
   public Map<String, TestArtifact> getTestCaseDetailsById(
       @PathVariable("testCaseId") final Long testCaseId) {
     Map<String, TestArtifact> result = new HashMap<String, TestArtifact>();

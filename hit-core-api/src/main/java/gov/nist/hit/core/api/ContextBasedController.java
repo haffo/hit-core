@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/cb")
 @RestController
-@Api(value = "Context based test cases api")
+@Api(value = "Context based test cases api", tags = "Context-based Test cases")
 public class ContextBasedController {
 
   static final Logger logger = LoggerFactory.getLogger(ContextBasedController.class);

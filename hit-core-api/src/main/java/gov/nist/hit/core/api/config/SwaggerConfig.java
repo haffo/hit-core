@@ -1,5 +1,7 @@
 package gov.nist.hit.core.api.config;
 
+import io.swagger.annotations.Api;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +20,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig {
   @Bean
   public Docket api() {
-    return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any())
-        .paths(PathSelectors.any()).build();
+    return new Docket(DocumentationType.SWAGGER_2).select()
+        .apis(RequestHandlerSelectors.withClassAnnotation(Api.class)).paths(PathSelectors.any())
+        .build().pathMapping("/api/");
   }
 
   private ApiInfo apiInfo() {

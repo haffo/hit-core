@@ -14,7 +14,6 @@ package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.Json;
 import gov.nist.hit.core.repo.ConformanceProfileRepository;
-import gov.nist.hit.core.service.exception.TestCaseException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/profile")
 @RestController
-@Api(value = "Profiles")
+@Api(value = "Conformance profiles api", tags = "Conformance Profiles")
 public class ProfileController {
 
   Logger logger = LoggerFactory.getLogger(ProfileController.class);
@@ -46,10 +45,7 @@ public class ProfileController {
       nickname = "getProfileJsonById")
   @RequestMapping(value = "/{profileId}", method = RequestMethod.GET, produces = "application/json")
   public Json getProfileJsonById(@ApiParam(value = "the id of the conformance profile",
-      required = true) @PathVariable final Long profileId) {
-    if (profileId == null) {
-      throw new TestCaseException("No profile id provided");
-    }
+      required = true) @PathVariable final long profileId) {
     logger.info("Fetching conformance profile (json) with id=" + profileId);
     String value = conformanceProfileRepository.getJson(profileId);
     return new Json(value);

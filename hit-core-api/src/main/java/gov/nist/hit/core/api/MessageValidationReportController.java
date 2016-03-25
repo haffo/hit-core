@@ -50,7 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/report")
-@Api(value = "MessageValidationReport")
+@Api(value = "Message validation report api", tags = "Message Validation Report")
 public class MessageValidationReportController {
 
   static final Logger logger = LoggerFactory.getLogger(MessageValidationReportController.class);

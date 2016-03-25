@@ -15,7 +15,6 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.User;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.UserNotFoundException;
-import io.swagger.annotations.Api;
 
 import javax.servlet.http.HttpSession;
 
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/user")
-@Api(hidden = true)
 public class UserController {
 
   @Autowired

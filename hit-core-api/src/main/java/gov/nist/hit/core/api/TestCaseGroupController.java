@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/testcasegroups")
-@Api(value = "TestCaseGroups")
+@Api(value = "TestCaseGroups", tags = "Test cases groups")
 public class TestCaseGroupController {
 
   static final Logger logger = LoggerFactory.getLogger(TestCaseGroupController.class);

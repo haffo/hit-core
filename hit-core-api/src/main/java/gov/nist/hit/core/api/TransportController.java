@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/transport")
 @RestController
-@Api(value = "Transport")
+@Api(value = "Transport", tags = "Transport")
 public class TransportController {
 
   static final Logger logger = LoggerFactory.getLogger(DocumentationController.class);

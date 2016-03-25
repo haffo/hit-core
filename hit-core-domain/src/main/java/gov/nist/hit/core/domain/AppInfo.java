@@ -81,6 +81,8 @@ public class AppInfo  implements Serializable {
   
   private String rsbVersion;
   
+  private String apiDocsPath;
+  
   public String getUrl() {
     return url;
   }
@@ -244,6 +246,17 @@ public class AppInfo  implements Serializable {
 
   public void setRsbVersion(String rsbVersion) {
     this.rsbVersion = rsbVersion;
+  }
+  
+  
+  
+
+  public String getApiDocsPath() {
+    return apiDocsPath;
+  }
+
+  public void setApiDocsPath(String apiDocsPath) {
+    this.apiDocsPath = apiDocsPath;
   }
 
   @Override

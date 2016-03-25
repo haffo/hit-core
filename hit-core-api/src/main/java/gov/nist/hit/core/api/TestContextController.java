@@ -14,6 +14,7 @@ import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageParserException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 
-
+@Api(value = "TestContexts", tags = "Test contexts")
 public abstract class TestContextController {
 
   Logger logger = LoggerFactory.getLogger(TestContextController.class);

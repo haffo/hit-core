@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/teststeps")
 @RestController
-@Api(value = "TestSteps")
+@Api(value = "TestSteps", tags = "Test Steps")
 public class TestStepController {
 
   Logger logger = LoggerFactory.getLogger(TestStepController.class);
