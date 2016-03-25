@@ -16,6 +16,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -45,7 +46,6 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
- 
   @ApiModelProperty(required = true, value = "domain of the test step")
   @NotNull
   @Enumerated(EnumType.STRING)
@@ -55,12 +55,12 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact jurorDocument;
-
+  
   @ApiModelProperty(required = false, value = "message content of the test step")
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
   protected TestArtifact messageContent;
-
+  
   @ApiModelProperty(required = false, value = "test data specification of the test step")
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
@@ -72,21 +72,25 @@ public class TestStep extends AbstractTestCase implements Serializable {
 //  
 //  
   @ApiModelProperty(required = false, value = "supported protocols of the test step")
+  @Embedded
   @ElementCollection(fetch = FetchType.EAGER)
-  @JoinTable(name = "TestStepProtocols", joinColumns = @JoinColumn(name = "TestStep"))
-  Set<Protocol> protocols = new HashSet<Protocol>(); 
+  @CollectionTable(
+        name="TestStepProtocols",
+        joinColumns=@JoinColumn(name="TestStep")
+  )
+  private Set<Protocol> protocols = new HashSet<Protocol>(); 
 
       
   public TestStep() {
     super();
     this.type = ObjectType.TestStep;
   }
-
+  
   @ApiModelProperty(required = false, value = "test context of the test step")
   @OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER,
       orphanRemoval = true)
   protected TestContext testContext;
-
+  
   @ApiModelProperty(required = false, value = "parent test case of the test step")
   @JsonIgnore
   @ManyToOne(optional=true,fetch = FetchType.LAZY)
