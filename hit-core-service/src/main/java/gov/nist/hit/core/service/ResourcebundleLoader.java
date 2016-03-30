@@ -53,7 +53,7 @@ import gov.nist.hit.core.repo.TransactionRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.repo.TransportMessageRepository;
 import gov.nist.hit.core.repo.UserRepository;
-import gov.nist.hit.core.repo.ValidationReportRepository;
+import gov.nist.hit.core.repo.TestStepValidationReportRepository;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
@@ -183,7 +183,7 @@ public abstract class ResourcebundleLoader {
   protected TransactionRepository transactionRepository;
 
   @Autowired
-  protected ValidationReportRepository validationResultRepository;
+  protected TestStepValidationReportRepository validationResultRepository;
 
   @Autowired
   protected DataMappingRepository dataMappingRepository;
@@ -1483,11 +1483,11 @@ public abstract class ResourcebundleLoader {
     this.transactionRepository = transactionRepository;
   }
 
-  public ValidationReportRepository getValidationResultRepository() {
+  public TestStepValidationReportRepository getValidationResultRepository() {
     return validationResultRepository;
   }
 
-  public void setValidationResultRepository(ValidationReportRepository validationResultRepository) {
+  public void setValidationResultRepository(TestStepValidationReportRepository validationResultRepository) {
     this.validationResultRepository = validationResultRepository;
   }
 

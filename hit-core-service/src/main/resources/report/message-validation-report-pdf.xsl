@@ -5,23 +5,31 @@
 	xmlns:context="http://www.nist.gov/healthcare/validation/message/hl7/v2/context"
 	xmlns:profile="http://www.nist.gov/healthcare/profile">
 	<xsl:output method="html" />
+	<xsl:param name="withHeader">
+		<xsl:value-of select="true()"/>
+	</xsl:param>
+	
 	<xsl:key name="categs"
 		match="/report:HL7V2MessageValidationReport/report:SpecificReport/report:AssertionList/report:Assertion"
 		use="concat(@Type,'+',@Result)" />
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+ 	
 	<xsl:template match="/report:HL7V2MessageValidationReport">
-		<xsl:apply-templates select="report:HeaderReport" />
-		<xsl:apply-templates select="report:SpecificReport" />
+ 		<xsl:apply-templates select="report:HeaderReport" />
+ 	    <xsl:apply-templates select="report:SpecificReport" />
 	</xsl:template>
+	
 	<xsl:template match="report:HeaderReport">
+		<xsl:if test="$withHeader = boolean('true')">
 		<div class="report-section">
+ 		
 			<table class="forumline title-background" width="100%"
 				cellspacing="1" cellpadding="10">
 				<tbody class="cf-tbody">
 					<tr>
 						<td class="row1 border_right">
-							<span class="maintitle">Message Validation Report</span>
+							<span class="submaintitle2">Message Validation Report</span>
 						</td>
 						<td class="row2" style="font-weight:bold">
 							<center>
@@ -30,6 +38,7 @@
 									<xsl:with-param name="myTime" select="message:TimeOfTest" />
 								</xsl:call-template>
 							</center>
+							
 						</td>
 					</tr>
 				</tbody>
@@ -71,6 +80,7 @@
 			</table>
 		</div>
 		<xsl:apply-templates select="message:TestCaseReference" />
+		</xsl:if>
 	</xsl:template>
 	<xsl:template match="report:SpecificReport">
 		<xsl:apply-templates select="report:MetaData/report:Profile" />

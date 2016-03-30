@@ -16,7 +16,7 @@ public class ManualValidationResult {
   
   private Date date;
   
-  private Map<String, String> nav;;
+  private Map<String, String> nav;
 
   public ManualValidationResult() {
     super();

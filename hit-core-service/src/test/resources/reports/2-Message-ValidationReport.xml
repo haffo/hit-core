@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:HL7V2MessageValidationReport xmlns:ns2="http://www.nist.gov/healthcare/profile" xmlns:ns3="http://www.nist.gov/healthcare/validation/message/hl7/v2/report" xmlns:ns4="http://www.nist.gov/healthcare/validation/message/hl7/v2/context" xmlns:ns5="http://www.nist.gov/healthcare/message" xmlns:ns6="http://www.nist.gov/healthcare/validation" xmlns:ns7="http://www.nist.gov/healthcare/validation/message">
+    <ns3:HeaderReport>
+        <ns7:ServiceName>NIST Validation Tool</ns7:ServiceName>
+        <ns7:ServiceProvider>NIST</ns7:ServiceProvider>
+        <ns7:ServiceVersion>1.0.2</ns7:ServiceVersion>
+        <ns7:StandardType>HL7 V2</ns7:StandardType>
+        <ns7:ValidationType>Automated</ns7:ValidationType>
+        <ns7:Type>Context-Based</ns7:Type>
+        <ns7:DateOfTest>2016-03-28-04:00</ns7:DateOfTest>
+        <ns7:TimeOfTest>16:02:25.707-04:00</ns7:TimeOfTest>
+        <ns7:PositiveAssertionIndicator>false</ns7:PositiveAssertionIndicator>
+        <ns7:AffirmCount>45</ns7:AffirmCount>
+        <ns7:ErrorCount>1</ns7:ErrorCount>
+        <ns7:WarningCount>3</ns7:WarningCount>
+        <ns7:InfoCount>0</ns7:InfoCount>
+        <ns7:AlertCount>9</ns7:AlertCount>
+        <ns7:TestCaseReference>
+            <ns3:TestCase>Juana Mariana Gonzales Transmit Immunization Report</ns3:TestCase>
+            <ns3:TestGroup>Transmit Immunization Report </ns3:TestGroup>
+            <ns3:TestPlan>Pilot Isolated Test Plan-2</ns3:TestPlan>
+            <ns3:TestStep>Receive Acknowledgement</ns3:TestStep>
+        </ns7:TestCaseReference>
+    </ns3:HeaderReport>
+    <ns3:SpecificReport>
+        <ns3:MetaData>
+            <ns3:Profile Organization="NIST" Name="Return an Acknowledgement" Type="Constrainable" Version="1.0.0" HL7Version="2.5.1" Date="20160219" MessageType="ACK^ACK^ACK" Identifier="Z23" Specification="Implementation Guide for Immunization Messaging, Release 1.5 October 1 2014"/>
+            <ns3:Message Encoding="ER7" Transformed="false">
+                <ns3:Er7Message>MSH|^~\&amp;|NIST APP|NIST Test Iz Reg|Test EHR Application|X68|200906040000-0500||ACK^V04^ACK|NIST-IZ-ACK-001.01|T|2.5.1|||NE|NE|||||Z23^CDCPHINVS
+MSA|AA|NIST-IZ-001.01</ns3:Er7Message>
+            </ns3:Message>
+            <ns3:Context>
+                <ns4:FailureInterpretation>
+                    <ns4:MessageFailure Result="WARNING" Type="RE_USAGE"/>
+                    <ns4:MessageFailure Result="ERROR" Type="CONSTRAINT_FAILURE"/>
+                    <ns4:MessageFailure Result="ERROR" Type="CODED_ELEMENT"/>
+                    <ns4:MessageFailure Result="AFFIRMATIVE" Type="CONTENT_SPEC_ERROR"/>
+                    <ns4:MessageFailure Result="ERROR" Type="INVALID_CONTENT"/>
+                    <ns4:MessageFailure Result="AFFIRMATIVE" Type="CONTENT_SUCCESS"/>
+                    <ns4:MessageFailure Result="AFFIRMATIVE" Type="BINDING_LOCATION"/>
+                    <ns4:MessageFailure Result="ERROR" Type="X_USAGE"/>
+                    <ns4:MessageFailure Result="ERROR" Type="W_USAGE"/>
+                    <ns4:MessageFailure Result="AFFIRMATIVE" Type="CONSTRAINT_SUCCESS"/>
+                    <ns4:MessageFailure Result="AFFIRMATIVE" Type="CONSTRAINT_SPEC_ERROR"/>
+                    <ns4:MessageFailure Result="AFFIRMATIVE" Type="PREDICATE_SPEC_ERROR"/>
+                    <ns4:MessageFailure Result="ERROR" Type="VALUE_SET"/>
+                    <ns4:MessageFailure Result="ALERT" Type="VALUE_SET"/>
+                    <ns4:MessageFailure Result="WARNING" Type="VALUE_SET"/>
+                    <ns4:MessageFailure Result="ERROR" Type="EXTRA"/>
+                    <ns4:MessageFailure Result="ERROR" Type="LENGTH"/>
+                    <ns4:MessageFailure Result="AFFIRMATIVE" Type="PREDICATE_SUCCESS"/>
+                    <ns4:MessageFailure Result="ERROR" Type="PREDICATE"/>
+                    <ns4:MessageFailure Result="ERROR" Type="R_USAGE"/>
+                    <ns4:MessageFailure Result="ERROR" Type="UNEXPECTED"/>
+                    <ns4:MessageFailure Result="ERROR" Type="FORMAT"/>
+                    <ns4:MessageFailure Result="ERROR" Type="CONTENT_FAILURE"/>
+                    <ns4:MessageFailure Result="ERROR" Type="UNESCAPED_SEPARATOR"/>
+                    <ns4:MessageFailure Result="ERROR" Type="CONFORMANCE_STATEMENT"/>
+                    <ns4:MessageFailure Result="ERROR" Type="CARDINALITY"/>
+                </ns4:FailureInterpretation>
+            </ns3:Context>
+        </ns3:MetaData>
+        <ns3:AssertionList>
+            <ns3:Assertion Type="RE_USAGE" Result="warning">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ERR[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Segment ERR (Error) is missing. Depending on the use case and data availability it may be appropriate to value this element.(Usage is RE, Required, but may be Empty)</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="RE_USAGE" Result="warning">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>MSH[1]-23[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Field MSH-23 (Receiving Responsible Organization) is missing. Depending on the use case and data availability it may be appropriate to value this element.(Usage is RE, Required, but may be Empty)</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="RE_USAGE" Result="warning">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>MSH[1]-22[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Field MSH-22 (Sending Responsible Organization) is missing. Depending on the use case and data availability it may be appropriate to value this element.(Usage is RE, Required, but may be Empty)</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>10</ns3:Column>
+                    <ns3:Path>MSH[1]-3[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/X) target: 3[1] description: If HD.2 (Universal ID) is valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>10</ns3:Column>
+                    <ns3:Path>MSH[1]-3[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 2[1] description: If HD.1 (Namespace ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>10</ns3:Column>
+                    <ns3:Path>MSH[1]-3[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 1[1] description: If HD.2 (Universal ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>19</ns3:Column>
+                    <ns3:Path>MSH[1]-4[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/X) target: 3[1] description: If HD.2 (Universal ID) is valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>19</ns3:Column>
+                    <ns3:Path>MSH[1]-4[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 2[1] description: If HD.1 (Namespace ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>19</ns3:Column>
+                    <ns3:Path>MSH[1]-4[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 1[1] description: If HD.2 (Universal ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>36</ns3:Column>
+                    <ns3:Path>MSH[1]-5[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/X) target: 3[1] description: If HD.2 (Universal ID) is valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>36</ns3:Column>
+                    <ns3:Path>MSH[1]-5[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 2[1] description: If HD.1 (Namespace ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>36</ns3:Column>
+                    <ns3:Path>MSH[1]-5[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 1[1] description: If HD.2 (Universal ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>57</ns3:Column>
+                    <ns3:Path>MSH[1]-6[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/X) target: 3[1] description: If HD.2 (Universal ID) is valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>57</ns3:Column>
+                    <ns3:Path>MSH[1]-6[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 2[1] description: If HD.1 (Namespace ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>57</ns3:Column>
+                    <ns3:Path>MSH[1]-6[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 1[1] description: If HD.2 (Universal ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>131</ns3:Column>
+                    <ns3:Path>MSH[1]-21[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/X) target: 4[1] description: If EI.3 (Universal ID) is valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>131</ns3:Column>
+                    <ns3:Path>MSH[1]-21[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 3[1] description: If EI.2 (Namespace ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="PREDICATE_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>131</ns3:Column>
+                    <ns3:Path>MSH[1]-21[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Predicate C(R/O) target: 2[1] description: If EI.3 (Universal ID) is not valued.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Invalid content (based on test case fixed data). The value at MSA-1(Acknowledgment Code) does not match the expected value: 'AA'.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSA[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Expected content is missing. The empty value at MSH-21.2(Namespace ID) is expected to be present.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].21[1].2[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Profile Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Invalid content (based on test case fixed data). The value at MSH-11.1(Processing ID) does not match the expected value: 'T'.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].11[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Invalid content (based on test case fixed data). The value at MSA-2(Message Control ID) does not match the expected value: 'NIST-IZ-001.01'.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSA[1].2[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Expected content is missing. The empty value at MSH-3.1(Namespace ID) is expected to be present.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].3[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Invalid content (based on test case fixed data). The value at MSH-3.1(Namespace ID) does not match the expected value: 'NIST APP'.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].3[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Invalid content (based on test case fixed data). The value at MSH-10(Message Control ID) does not match the expected value: 'NIST-IZ-ACK-001.01'.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].10[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Expected content is missing. The empty value at MSH-4.1(Namespace ID) is expected to be present.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].4[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Invalid content (based on test case fixed data). The value at MSH-4.1(Namespace ID) does not match the expected value: 'NIST Test Iz Reg'.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].4[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Expected content is missing. The empty value at MSH-6.1(Namespace ID) is expected to be present.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].6[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Invalid content (based on test case fixed data). The value at MSH-6.1(Namespace ID) does not match the expected value: 'X68'.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].6[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Expected content is missing. The empty value at MSH-5.1(Namespace ID) is expected to be present.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].5[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONTENT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>ACK[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>Content - Invalid content (based on test case fixed data). The value at MSH-5.1(Namespace ID) does not match the expected value: 'Test EHR Application'.</ns3:Description>
+                <ns3:MetaData>
+                    <Reference>
+                        <GeneratedBy>Test Case Authoring &amp; Management Tool(TCAMT)</GeneratedBy>
+                        <ReferencePath>MSH[1].5[1].1[1]</ReferencePath>
+                        <Source>Message</Source>
+                        <TestDataCategorization>Value-Test Case Fixed</TestDataCategorization>
+                    </Reference>
+                </ns3:MetaData>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>MSH[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-12 - The value of MSH-1 (Field Separator) SHALL be '|'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>MSH[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-13 - The value of MSH-2 (Encoding Characters) SHALL be '^~\&amp;'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>MSH[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-51 - The value of MSH-9 (Message Type) SHALL be 'ACK^V04^ACK' or "ACK^Q11^ACK".</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>MSH[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-15 - The value of MSH-12.1 (Version ID) SHALL be '2.5.1'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>MSH[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-53 - The value of MSH-15 (Accept Acknowledgment Type) SHALL be 'NE'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>MSH[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-52 - The value of MSH-16 (Application Acknowledgment Type) SHALL be 'NE'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>1</ns3:Column>
+                    <ns3:Path>MSH[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-54 - The value of MSH-21 (Message Profile Identifier) SHALL be 'Z23^CDCPHINVS'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>10</ns3:Column>
+                    <ns3:Path>MSH[1]-3[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-5 - The value of HD.2 (Universal ID) SHALL be formatted with ISO-compliant OID.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>10</ns3:Column>
+                    <ns3:Path>MSH[1]-3[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-6 - If HD.2 (Universal ID) is valued, then the value of HD.3 (Universal ID Type) SHALL be 'ISO'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>19</ns3:Column>
+                    <ns3:Path>MSH[1]-4[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-5 - The value of HD.2 (Universal ID) SHALL be formatted with ISO-compliant OID.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>19</ns3:Column>
+                    <ns3:Path>MSH[1]-4[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-6 - If HD.2 (Universal ID) is valued, then the value of HD.3 (Universal ID Type) SHALL be 'ISO'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>36</ns3:Column>
+                    <ns3:Path>MSH[1]-5[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-5 - The value of HD.2 (Universal ID) SHALL be formatted with ISO-compliant OID.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>36</ns3:Column>
+                    <ns3:Path>MSH[1]-5[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-6 - If HD.2 (Universal ID) is valued, then the value of HD.3 (Universal ID Type) SHALL be 'ISO'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>57</ns3:Column>
+                    <ns3:Path>MSH[1]-6[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-5 - The value of HD.2 (Universal ID) SHALL be formatted with ISO-compliant OID.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>57</ns3:Column>
+                    <ns3:Path>MSH[1]-6[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-6 - If HD.2 (Universal ID) is valued, then the value of HD.3 (Universal ID Type) SHALL be 'ISO'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>131</ns3:Column>
+                    <ns3:Path>MSH[1]-21[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-3 - The value of EI.3 (Universal ID) SHALL be formatted with ISO-compliant OID.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_SUCCESS" Result="affirmative">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>131</ns3:Column>
+                    <ns3:Path>MSH[1]-21[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-4 - The value of EI.5.4 (Universal ID Type) SHALL be 'ISO'.</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="CONSTRAINT_FAILURE" Result="error">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>61</ns3:Column>
+                    <ns3:Path>MSH[1]-7[1].1</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>IZ-TS_Z - The value of MSH-7.1 (Time) SHALL be formatted with YYYYMMDDHHMMSS+-ZZZZ.</ns3:Description>
+                <ns3:StackTrace>
+                    <ns3:Trace>
+                        <ns3:Assertion>()MSH.7[1].1[1] SHALL match '([0-9]{4})((0[1-9])|(1[0-2]))((0[1-9])|([1-2][0-9])|(3[0-1]))(([0-1][0-9])|(2[0-3]))([0-5][0-9])([0-5][0-9]).*((\+|\-)[0-9]{4})' regular expression</ns3:Assertion>
+                        <ns3:FailureReasons/>
+                    </ns3:Trace>
+                </ns3:StackTrace>
+            </ns3:Assertion>
+            <ns3:Assertion Type="VALUE_SET" Result="alert">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>10</ns3:Column>
+                    <ns3:Path>MSH[1]-3[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>The value set HL70363_IZ has been excluded from the validation</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="VALUE_SET" Result="alert">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>10</ns3:Column>
+                    <ns3:Path>MSH[1]-3[1].1</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>The value set HL70363_IZ has been excluded from the validation</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="VALUE_SET" Result="alert">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>19</ns3:Column>
+                    <ns3:Path>MSH[1]-4[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>The value set HL70362_IZ has been excluded from the validation</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="VALUE_SET" Result="alert">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>19</ns3:Column>
+                    <ns3:Path>MSH[1]-4[1].1</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>The value set HL70363_IZ has been excluded from the validation</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="VALUE_SET" Result="alert">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>36</ns3:Column>
+                    <ns3:Path>MSH[1]-5[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>The value set HL70361_IZ has been excluded from the validation</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="VALUE_SET" Result="alert">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>36</ns3:Column>
+                    <ns3:Path>MSH[1]-5[1].1</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>The value set HL70363_IZ has been excluded from the validation</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="VALUE_SET" Result="alert">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>57</ns3:Column>
+                    <ns3:Path>MSH[1]-6[1]</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>The value set HL70362_IZ has been excluded from the validation</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="VALUE_SET" Result="alert">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>57</ns3:Column>
+                    <ns3:Path>MSH[1]-6[1].1</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>The value set HL70363_IZ has been excluded from the validation</ns3:Description>
+            </ns3:Assertion>
+            <ns3:Assertion Type="VALUE_SET" Result="alert">
+                <ns3:Location>
+                    <ns3:Line>1</ns3:Line>
+                    <ns3:Column>135</ns3:Column>
+                    <ns3:Path>MSH[1]-21[1].2</ns3:Path>
+                </ns3:Location>
+                <ns3:Description>The value set HL70363_IZ has been excluded from the validation</ns3:Description>
+            </ns3:Assertion>
+        </ns3:AssertionList>
+    </ns3:SpecificReport>
+</ns3:HL7V2MessageValidationReport>

@@ -15,13 +15,13 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.ValidationReport;
+import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.repo.TestCaseRepository;
 import gov.nist.hit.core.repo.TestContextRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.service.TestStepService;
+import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.UserService;
-import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
@@ -69,7 +69,7 @@ public class TestStepController {
   private UserService userService;
 
   @Autowired
-  private ValidationReportService validationReportService;
+  private TestStepValidationReportService validationReportService;
 
   /**
    * find a test step by its id
@@ -126,12 +126,15 @@ public class TestStepController {
     Long userId = SessionContext.getCurrentUserId(request.getSession(false));
     if (userId == null || userService.findOne(userId) == null)
       throw new ValidationReportException("Invalid user credentials");
-    ValidationReport result = validationReportService.findOneByTestStepAndUser(testStepId, userId);
+    TestStepValidationReport result =
+        validationReportService.findOneByTestStepAndUser(testStepId, userId);
     if (result != null) {
       validationReportService.delete(result);
     }
     return true;
   }
+
+
 
   @ApiOperation(
       value = "Get a test step's details (juror document, test story etc...) by the test step's id",

@@ -1,14 +1,15 @@
 <xsl:stylesheet exclude-result-prefixes="map" version="2.0"
+	xmlns:manualvalidationreport="http://www.nist.gov/healthcare/validation/manual/report"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:map="urn:internal">
 	<xsl:output method="html" />
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
-	<xsl:template match="/ManualValidationReport">
-		<xsl:apply-templates select="HeaderReport" />
-		<xsl:apply-templates select="TestCaseReference" />
-		<xsl:apply-templates select="SpecificReport" />
+	<xsl:template match="/manualvalidationreport:ManualValidationReport">
+		<xsl:apply-templates select="manualvalidationreport:HeaderReport" />
+		<xsl:apply-templates select="manualvalidationreport:TestCaseReference" />
+		<xsl:apply-templates select="manualvalidationreport:SpecificReport" />
 	</xsl:template>
-	<xsl:template match="HeaderReport">
+	<xsl:template match="manualvalidationreport:HeaderReport">
 		<div class="report-section">
 			<table class="forumline title-background" width="100%"
 				cellspacing="1" cellpadding="10">
@@ -19,7 +20,7 @@
 						</td>
 						<td class="row2" style="font-weight:bold">
 							<center>
-								<xsl:value-of select="/ManualValidationReport/HeaderReport/DateOfTest" />
+								<xsl:value-of select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:HeaderReport/manualvalidationreport:DateOfTest" />
 							</center>
 						</td>
 					</tr>
@@ -35,7 +36,7 @@
 						<td class="row2">
 							<center>
 								<xsl:value-of
-									select="/ManualValidationReport/HeaderReport/ValidationType" />
+									select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:HeaderReport/manualvalidationreport:ValidationType" />
 							</center>
 						</td>
 					</tr>
@@ -51,7 +52,7 @@
 						<td class="row1 border_right">Testing Type</td>
 						<td class="row2">
 							<center>
-								<xsl:value-of select="/ManualValidationReport/HeaderReport/Type" />
+								<xsl:value-of select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:HeaderReport/manualvalidationreport:Type" />
 							</center>
 						</td>
 					</tr>
@@ -72,28 +73,28 @@
 						<td class="row2 border_right dark-gray">TestPlan</td>
 						<td class="row3 ">
 							<xsl:value-of
-								select="/ManualValidationReport/TestCaseReference/TestPlan" />
+								select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:TestCaseReference/manualvalidationreport:TestPlan" />
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row2 border_right dark-gray">Test Case Group</td>
 						<td class="row3 ">
 							<xsl:value-of
-								select="/ManualValidationReport/TestCaseReference/TestGroup" />
+								select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:TestCaseReference/manualvalidationreport:TestGroup" />
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row2 border_right dark-gray">Test Case</td>
 						<td class="row3">
 							<xsl:value-of
-								select="/ManualValidationReport/TestCaseReference/TestCase" />
+								select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:TestCaseReference/manualvalidationreport:TestCase" />
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row2 border_right dark-gray">Test Step</td>
 						<td class="row3 ">
 							<xsl:value-of
-								select="/ManualValidationReport/TestCaseReference/TestStep" />
+								select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:TestCaseReference/manualvalidationreport:TestStep" />
 						</td>
 					</tr>
 				</tbody>
@@ -110,7 +111,7 @@
 					<tr class="border_bottom">
 						<td class="row1 border_right" valign="top" rowspan="6">Result</td>
 						<td class="row2 border_right dark-gray">
-							<xsl:value-of select="/ManualValidationReport/SpecificReport/@Result" />
+							<xsl:value-of select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:SpecificReport/@Result" />
 						</td>
 					</tr>
 				</tbody>
@@ -129,7 +130,7 @@
 							<div style="width:100%;">
 								<textarea readonly="true" style="width:100%" rows="10"
 									wrap="off">
-									<xsl:value-of select="/ManualValidationReport/SpecificReport/Comments" />
+									<xsl:value-of select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:SpecificReport/manualvalidationreport:Comments" />
 								</textarea>
 							</div>
 						</td>

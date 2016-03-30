@@ -1,3 +1,5 @@
+package gov.nist.hit.core.api;
+
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
  * the Federal Government in the course of their official duties. Pursuant to title 17 Section 105
@@ -10,16 +12,14 @@
  * that they have been modified.
  */
 
-package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestingType;
+import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.domain.User;
-import gov.nist.hit.core.domain.ValidationReport;
+import gov.nist.hit.core.service.MessageValidationReportService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.UserService;
-import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
@@ -49,14 +49,14 @@ import org.springframework.web.bind.annotation.RestController;
  * 
  */
 @RestController
-@RequestMapping("/report")
+@RequestMapping("/messageValidationReport")
 @Api(value = "Message validation report api", tags = "Message Validation Report")
 public class MessageValidationReportController {
 
   static final Logger logger = LoggerFactory.getLogger(MessageValidationReportController.class);
 
   @Autowired
-  private ValidationReportService validationReportService;
+  private MessageValidationReportService validationReportService;
 
   @Autowired
   private TestStepService testStepService;
@@ -68,10 +68,10 @@ public class MessageValidationReportController {
   private UserService userService;
 
   @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/save", method = RequestMethod.POST,
+  @RequestMapping(value = "/create", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public ValidationReport save(
-      @ApiParam(value = "the xml validation report", required = true) @RequestParam("xmlReport") String content,
+  public TestStepValidationReport save(
+      @ApiParam(value = "the xml validation report", required = true) @RequestParam("xmlMessageValidationReport") String xmlMessageValidationReport,
       @ApiParam(value = "the id of the test step", required = true) @RequestParam("testStepId") Long testStepId,
       HttpServletRequest request, HttpServletResponse response) {
     try {
@@ -84,22 +84,22 @@ public class MessageValidationReportController {
       if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
         throw new ValidationReportException("No test step or unknown test step specified");
 
-      ValidationReport report = null;
-      List<ValidationReport> reports =
+      TestStepValidationReport report = null;
+      List<TestStepValidationReport> reports =
           validationReportService.findAllByTestStepAndUser(testStepId, userId);
       if (reports != null && !reports.isEmpty()) {
         if (reports.size() == 1) {
           report = reports.get(0);
         } else {
           validationReportService.delete(reports);
-          report = new ValidationReport();
+          report = new TestStepValidationReport();
         }
       } else {
-        report = new ValidationReport();
+        report = new TestStepValidationReport();
       }
       report.setTestStep(testStep);
       report.setUser(user);
-      report.setXml(content);
+      report.setXml(xmlMessageValidationReport);
       validationReportService.save(report);
       return report;
     } catch (ValidationReportException e) {
@@ -110,27 +110,30 @@ public class MessageValidationReportController {
   }
 
   @ApiOperation(value = "Download the message validation report of a test step by its id",
+      nickname = "download",
       produces = "text/html,application/msword,application/xml,application/pdf")
-  @RequestMapping(value = "/teststep/{testStepId}/download", method = RequestMethod.POST,
+  @RequestMapping(value = "/{messageValidationReportId}/download", method = RequestMethod.POST,
       consumes = "application/x-www-form-urlencoded; charset=UTF-8")
   public void download(
       @ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
-      @ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") Long testStepId,
+      @ApiParam(value = "the id of the validation report", required = true) @PathVariable("messageValidationReportId") Long testStepValidationReportId,
       HttpServletRequest request, HttpServletResponse response) {
     try {
       logger.info("Downloading validation report  in " + format);
       Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      User user = null;
-      if (userId == null || ((user = userService.findOne(userId)) == null))
+      if (userId == null || (userService.findOne(userId) == null))
         throw new MessageValidationException("Invalid user credentials");
       if (format == null)
         throw new ValidationReportException("No format specified");
-      ValidationReport report =
-          validationReportService.findOneByTestStepAndUser(testStepId, userId);
+      TestStepValidationReport report = validationReportService.findOne(testStepValidationReportId);
       String xmlReport = null;
       if (report == null || ((xmlReport = report.getXml()) == null)) {
         throw new ValidationReportException("No validation report available for this test step");
       }
+      if (report.getUser() == null || !report.getUser().getId().equals(userId)) {
+        throw new MessageValidationException("Forbidden access");
+      }
+
       TestStep testStep = report.getTestStep();
       if (testStep == null)
         throw new ValidationReportException("No associated test step found");
@@ -138,16 +141,13 @@ public class MessageValidationReportController {
       String ext = format.toLowerCase();
       InputStream io = null;
       if ("HTML".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(autoHtml(xmlReport), "UTF-8");
+        io = IOUtils.toInputStream(generateHtml(xmlReport), "UTF-8");
         response.setContentType("text/html");
-      } else if ("DOC".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(autoHtml(xmlReport), "UTF-8");
-        response.setContentType("application/msword");
       } else if ("XML".equalsIgnoreCase(format)) {
         io = IOUtils.toInputStream(xmlReport, "UTF-8");
         response.setContentType("application/xml");
       } else if ("PDF".equalsIgnoreCase(format)) {
-        io = validationReportService.toAutoPDF(xmlReport);
+        io = validationReportService.generatePdf(xmlReport);
         response.setContentType("application/pdf");
       } else {
         throw new ValidationReportException("Unsupported report format " + format);
@@ -163,29 +163,9 @@ public class MessageValidationReportController {
     }
   }
 
-  public InputStream pdf(ValidationReport report) {
-    try {
-      InputStream io = null;
-      String xmlReport = report.getXml();
-      TestStep testStep = report.getTestStep();
-      if (testStep.getTestingType().equals(TestingType.SUT_MANUAL)
-          || testStep.getTestingType().equals(TestingType.SUT_MANUAL)) {
-        io = validationReportService.toManualPDF(xmlReport);
-      } else {
-        io = validationReportService.toAutoPDF(xmlReport);
-      }
-      return io;
-    } catch (ValidationReportException e) {
-      throw new ValidationReportException("Failed to generate the report pdf");
-    } catch (Exception e) {
-      throw new ValidationReportException("Failed to generate the report pdf");
-    }
-  }
 
-
-
-  private String autoHtml(String xmlReport) {
-    return validationReportService.toAutoHTML(xmlReport);
+  private String generateHtml(String xmlReport) {
+    return validationReportService.generateHtml(xmlReport);
   }
 
 

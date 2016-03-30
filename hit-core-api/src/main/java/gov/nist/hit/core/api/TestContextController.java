@@ -8,9 +8,9 @@ import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.service.MessageParser;
 import gov.nist.hit.core.service.MessageValidator;
 import gov.nist.hit.core.service.TestStepService;
+import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationReportConverter;
-import gov.nist.hit.core.service.ValidationReportService;
 import gov.nist.hit.core.service.exception.MessageParserException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
@@ -37,7 +37,7 @@ public abstract class TestContextController {
   Logger logger = LoggerFactory.getLogger(TestContextController.class);
 
   @Autowired
-  private ValidationReportService validationResultService;
+  private TestStepValidationReportService validationReportService;
 
   @Autowired
   private TestStepService testStepService;

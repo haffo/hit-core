@@ -1,21 +1,26 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class ValidationReport implements Serializable {
+public class TestStepValidationReport implements Serializable {
   
   private static final long serialVersionUID = 1L;
 
@@ -31,11 +36,21 @@ public class ValidationReport implements Serializable {
   @ManyToOne(optional=false)
   private User user; 
   
+  @JsonIgnore
   @Column(columnDefinition = "TEXT")
-  private String xml; 
+  private String xml;   
+ 
+  @Transient
+  private String html;  
   
   
-  public ValidationReport(String content,TestStep testStep, User user) {
+  @Enumerated(EnumType.STRING)
+  private TestResult result = null;
+  
+  @Column(columnDefinition = "TEXT")
+  private String comments;
+  
+  public TestStepValidationReport(String content,TestStep testStep, User user) {
     super();
     this.xml = content;
     this.testStep  =testStep;
@@ -43,7 +58,7 @@ public class ValidationReport implements Serializable {
   }
 
  
-  public ValidationReport() {
+  public TestStepValidationReport() {
    }
 
    
@@ -84,14 +99,37 @@ public class ValidationReport implements Serializable {
     this.user = user;
   }
 
-//  public byte[] getPdf() {
-//    return pdf;
-//  }
-//
-//  public void setPdf(byte[] pdf) {
-//    this.pdf = pdf;
-//  }
-//  
+
+  public TestResult getResult() {
+    return result;
+  }
+
+
+  public void setResult(TestResult result) {
+    this.result = result;
+  }
+
+
+  public String getComments() {
+    return comments;
+  }
+
+
+  public void setComments(String comments) {
+    this.comments = comments;
+  }
+
+
+  public String getHtml() {
+    return html;
+  }
+
+
+  public void setHtml(String html) {
+    this.html = html;
+  }
+
+  
   
   
 }

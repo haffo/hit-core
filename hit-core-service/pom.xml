@@ -40,6 +40,10 @@
 					<groupId>com.ibm.icu</groupId>
 					<artifactId>icu4j</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>xalan</groupId>
+	<artifactId>xalan</artifactId>
+				</exclusion>
 			</exclusions>
 
 		</dependency>
@@ -77,17 +81,26 @@
 		</dependency>
 
 
+<!-- 	<dependency>
+	<groupId>net.sf.saxon</groupId>
+	<artifactId>saxon-HE</artifactId>
+	<version>9.7.0-4</version>
+</dependency> -->
+
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon</artifactId>
 			<version>8.7</version>
 		</dependency>
 
+ 
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon-dom</artifactId>
 			<version>8.7</version>
-		</dependency>
+					</dependency>
+
+
 
 	</dependencies>
 
