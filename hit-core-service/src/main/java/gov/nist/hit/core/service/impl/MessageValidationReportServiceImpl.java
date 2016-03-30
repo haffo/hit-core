@@ -32,9 +32,14 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 public class MessageValidationReportServiceImpl implements MessageValidationReportService {
 
   private final static Logger logger = Logger.getLogger(MessageValidationReportServiceImpl.class);
-  private static final String XSL = "/report/message-validation-report-pdf.xsl";
+  private static final String HTML_XSL = "/report/message-validation-report-html.xsl";
+  private static final String PDF_XSL = "/report/message-validation-report-pdf.xsl";
+
   protected static final String CSS = "/report/report.css";
+  protected static final String JS = "/report/report.js";
+
   protected String css = "";
+  protected String javascript = "";
 
   @Autowired
   protected TestStepValidationReportRepository validationReportRepository;
@@ -44,6 +49,8 @@ public class MessageValidationReportServiceImpl implements MessageValidationRepo
   public MessageValidationReportServiceImpl() {
     try {
       css = IOUtils.toString(MessageValidationReportServiceImpl.class.getResourceAsStream(CSS));
+      javascript =
+          IOUtils.toString(TestStepValidationReportServiceImpl.class.getResourceAsStream(JS));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -105,7 +112,7 @@ public class MessageValidationReportServiceImpl implements MessageValidationRepo
   public String generateHtml(String xml) throws ValidationReportException {
     try {
       String xslt =
-          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(XSL));
+          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(HTML_XSL));
       TransformerFactory transFact = TransformerFactory.newInstance();
       transFact.setURIResolver(new XsltURIResolver());
       Transformer transformer = transFact.newTransformer(new StreamSource(new StringReader(xslt)));
@@ -115,7 +122,7 @@ public class MessageValidationReportServiceImpl implements MessageValidationRepo
       transformer.transform(source, result);
       String htmlReport = HtmlUtil.repairStyle(new String(resultStream.toByteArray()));
       logger.info("HTML validation report generated");
-      return addCss(htmlReport);
+      return addCssAndJs(htmlReport);
     } catch (Exception e) {
       throw new ValidationReportException(e);
     } catch (TransformerFactoryConfigurationError e) {
@@ -128,7 +135,7 @@ public class MessageValidationReportServiceImpl implements MessageValidationRepo
   public String generateXhtml(String xml) throws ValidationReportException {
     try {
       String xslt =
-          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(XSL));
+          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(PDF_XSL));
       TransformerFactory transFact = TransformerFactory.newInstance();
       transFact.setURIResolver(new XsltURIResolver());
       Transformer transformer = transFact.newTransformer(new StreamSource(new StringReader(xslt)));
@@ -153,7 +160,7 @@ public class MessageValidationReportServiceImpl implements MessageValidationRepo
       ITextRenderer renderer = new ITextRenderer();
       renderer.setDocumentFromString(xhtml);
       renderer.layout();
-      File temp = File.createTempFile("TestStepValidationReport", ".pdf");
+      File temp = File.createTempFile("MessageValidationReport", ".pdf");
       temp.deleteOnExit();
       OutputStream os;
       os = new FileOutputStream(temp);
@@ -167,19 +174,40 @@ public class MessageValidationReportServiceImpl implements MessageValidationRepo
     }
   }
 
-  private String addCss(String htmlReport) throws IOException {
+
+  public String addCssAndJs(String htmlReport) throws IOException {
     StringBuffer sb = new StringBuffer();
     sb.append("<html xmlns='http://www.w3.org/1999/xhtml'>");
     sb.append("<head>");
-    sb.append("<title>Test Step Validation Report</title>");
+    sb.append("<title>Message Validation Report</title>");
     sb.append("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
-    sb.append("<style>");
+    sb.append("<style type='text/css'>");
     sb.append(css);
-    sb.append("</style></head><body>");
+    sb.append("</style>");
+    sb.append("<style type='text/javascript'>");
+    sb.append(javascript);
+    sb.append("</style>");
+    sb.append("</head><body>");
     sb.append(htmlReport);
     sb.append("</body></html>");
     return sb.toString();
   }
+
+  public String addCss(String htmlReport) throws IOException {
+    StringBuffer sb = new StringBuffer();
+    sb.append("<html xmlns='http://www.w3.org/1999/xhtml'>");
+    sb.append("<head>");
+    sb.append("<title>Message Validation Report</title>");
+    sb.append("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
+    sb.append("<style type='text/css'>");
+    sb.append(css);
+    sb.append("</style>");
+    sb.append("</head><body>");
+    sb.append(htmlReport);
+    sb.append("</body></html>");
+    return sb.toString();
+  }
+
 
 
   @Override

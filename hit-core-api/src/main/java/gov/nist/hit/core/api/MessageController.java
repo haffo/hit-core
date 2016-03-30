@@ -68,7 +68,7 @@ public class MessageController {
       logger.info("Downloading message");
       InputStream io = IOUtils.toInputStream(content, "UTF-8");
       response.setContentType("text/plain");
-      String fileName = title == null ? "Message-" + new Date().getTime() + ".txt" : title + ".txt";
+      String fileName = "Message-" + new Date().getTime() + ".txt";
       response.setHeader("Content-disposition", "attachment;filename=" + fileName);
       FileCopyUtils.copy(io, response.getOutputStream());
     } catch (RuntimeException e) {

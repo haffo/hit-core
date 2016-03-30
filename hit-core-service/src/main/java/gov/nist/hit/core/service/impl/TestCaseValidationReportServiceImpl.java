@@ -43,7 +43,7 @@ import com.ibm.icu.util.Calendar;
 public class TestCaseValidationReportServiceImpl implements TestCaseValidationReportService {
 
   private final static Logger logger = Logger.getLogger(TestCaseValidationReportServiceImpl.class);
-  private static final String HTML_XSL = "/report/testcase-validation-report-pdf.xsl";
+  private static final String HTML_XSL = "/report/testcase-validation-report-html.xsl";
   private static final String PDF_XSL = "/report/testcase-validation-report-pdf.xsl";
   protected static final String CSS = "/report/report.css";
   protected String css = "";

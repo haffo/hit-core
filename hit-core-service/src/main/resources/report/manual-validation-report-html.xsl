@@ -2,143 +2,157 @@
 	xmlns:manualvalidationreport="http://www.nist.gov/healthcare/validation/manual/report"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:map="urn:internal">
 	<xsl:output method="html" />
-	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
-	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+	<xsl:param name="withHeader">
+		<xsl:value-of select="true()" />
+	</xsl:param>
+
+	<xsl:param name="withManualBody">
+		<xsl:value-of select="true()" />
+	</xsl:param>
+
+
 	<xsl:template match="/manualvalidationreport:ManualValidationReport">
 		<xsl:apply-templates select="manualvalidationreport:HeaderReport" />
 		<xsl:apply-templates select="manualvalidationreport:TestCaseReference" />
 		<xsl:apply-templates select="manualvalidationreport:SpecificReport" />
 	</xsl:template>
 	<xsl:template match="manualvalidationreport:HeaderReport">
-		<div class="report-section">
-			<table class="forumline title-background" width="100%"
-				cellspacing="1" cellpadding="10">
-				<tbody class="cf-tbody">
-					<tr>
-						<td class="row1 border_right">
-							<span class="maintitle">Manual Validation Report</span>
-						</td>
-						<td class="row2" style="font-weight:bold">
-							<center>
-								<xsl:value-of select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:HeaderReport/manualvalidationreport:DateOfTest" />
-							</center>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<div class="report-section">
-			<table class="forumline" width="100%" cellspacing="1"
-				cellpadding="2">
-				<tbody class="cf-tbody">
-					<tr>
-						<td class="row1 border_right">Validation Type</td>
-						<td class="row2">
-							<center>
-								<xsl:value-of
-									select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:HeaderReport/manualvalidationreport:ValidationType" />
-							</center>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<xsl:if test="$withHeader = boolean('true')">
+			<div class="report-section">
+				<table class="forumline title-background" width="100%"
+					cellspacing="1" cellpadding="10">
+					<tbody class="cf-tbody">
+						<tr>
+							<td class="row1 border_right">
+								<span class="submaintitle2">Manual Validation Report</span>
+							</td>
+							<td class="row2" style="font-weight:bold">
+								<center>
+									<xsl:value-of select="manualvalidationreport:DateOfTest" />
+								</center>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="report-section">
+				<table class="forumline" width="100%" cellspacing="1"
+					cellpadding="2">
+					<tbody class="cf-tbody">
+						<tr>
+							<td class="row1 border_right">Validation Type</td>
+							<td class="row2">
+								<center>
+									<xsl:value-of select="manualvalidationreport:ValidationType" />
+								</center>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-		<div class="report-section">
-			<table class="forumline" width="100%" cellspacing="1"
-				cellpadding="2">
-				<tbody class="cf-tbody">
-					<tr>
-						<td class="row1 border_right">Testing Type</td>
-						<td class="row2">
-							<center>
-								<xsl:value-of select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:HeaderReport/manualvalidationreport:Type" />
-							</center>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+			<div class="report-section">
+				<table class="forumline" width="100%" cellspacing="1"
+					cellpadding="2">
+					<tbody class="cf-tbody">
+						<tr>
+							<td class="row1 border_right">Testing Type</td>
+							<td class="row2">
+								<center>
+									<xsl:value-of select="manualvalidationreport:Type" />
+								</center>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-		<!-- <xsl:apply-templates select="message:TestCaseReference" /> -->
-	</xsl:template>
+			<!-- <xsl:apply-templates select="message:TestCaseReference" /> -->
 
-	<xsl:template match="TestCaseReference">
-		<div class="report-section">
-			<table class="forumline" width="100%" cellspacing="1"
-				cellpadding="2">
-				<tbody>
-					<tr class="border_bottom">
-						<td class="row1 border_right" valign="top" rowspan="6">Test Case</td>
-						<td class="row2 border_right dark-gray">TestPlan</td>
-						<td class="row3 ">
-							<xsl:value-of
-								select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:TestCaseReference/manualvalidationreport:TestPlan" />
-						</td>
-					</tr>
-					<tr class="border_bottom">
-						<td class="row2 border_right dark-gray">Test Case Group</td>
-						<td class="row3 ">
-							<xsl:value-of
-								select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:TestCaseReference/manualvalidationreport:TestGroup" />
-						</td>
-					</tr>
-					<tr class="border_bottom">
-						<td class="row2 border_right dark-gray">Test Case</td>
-						<td class="row3">
-							<xsl:value-of
-								select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:TestCaseReference/manualvalidationreport:TestCase" />
-						</td>
-					</tr>
-					<tr class="border_bottom">
-						<td class="row2 border_right dark-gray">Test Step</td>
-						<td class="row3 ">
-							<xsl:value-of
-								select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:TestCaseReference/manualvalidationreport:TestStep" />
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</xsl:template>
-
-
-	<xsl:template match="SpecificReport">
-		<div class="report-section">
-			<table class="forumline" width="100%" cellspacing="1"
-				cellpadding="2">
-				<tbody>
-					<tr class="border_bottom">
-						<td class="row1 border_right" valign="top" rowspan="6">Result</td>
-						<td class="row2 border_right dark-gray">
-							<xsl:value-of select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:SpecificReport/@Result" />
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-
-		<div class="report-section">
-			<table class="forumline" width="100%" cellspacing="1"
-				cellpadding="2">
-				<tbody>
-					<tr class="row1">
-						<th style="border-bottom:2pt #005C99 solid" align="left">Comments</th>
-					</tr>
-					<tr class="border_bottom">
-						<td class="row2 border_right dark-gray ">
-							<div style="width:100%;">
-								<textarea readonly="true" style="width:100%" rows="10"
-									wrap="off">
-									<xsl:value-of select="/manualvalidationreport:ManualValidationReport/manualvalidationreport:SpecificReport/manualvalidationreport:Comments" />
-								</textarea>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		</xsl:if>
 
 	</xsl:template>
 
+	<xsl:template match="manualvalidationreport:TestCaseReference">
+		<xsl:if test="$withHeader = boolean('true')">
+			<div class="report-section">
+
+
+				<table class="forumline" width="100%" cellspacing="1"
+					cellpadding="2">
+					<tbody>
+						<tr class="border_bottom">
+							<td class="row1 border_right" valign="top" rowspan="4">Test Case</td>
+							<td class="row2 border_right dark-gray">Test Plan</td>
+							<td class="row3 ">
+								<xsl:value-of select="manualvalidationreport:TestPlan" />
+							</td>
+						</tr>
+						<tr class="border_bottom">
+							<td class="row2 border_right dark-gray">Test Group</td>
+							<td class="row3 ">
+								<xsl:value-of select="manualvalidationreport:TestGroup" />
+							</td>
+						</tr>
+						<tr class="border_bottom">
+							<td class="row2 border_right dark-gray">Test Case</td>
+							<td class="row3">
+								<xsl:value-of select="manualvalidationreport:TestCase" />
+							</td>
+						</tr>
+						<tr class="border_bottom">
+							<td class="row2 border_right dark-gray">Test Step</td>
+							<td class="row3">
+								<xsl:value-of select="manualvalidationreport:TestStep" />
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</xsl:if>
+	</xsl:template>
+
+
+	<xsl:template match="manualvalidationreport:SpecificReport">
+		<xsl:if test="$withManualBody = boolean('true')">
+			<div class="report-section">
+				<table class="forumline" width="100%" cellspacing="1"
+					cellpadding="2">
+					<tbody class="cf-tbody">
+						<tr>
+							<td class="row1 border_right">Result</td>
+							<td class="row2">
+								<center>
+									<xsl:value-of select="@Result" />
+								</center>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="report-section">
+				<table class="forumline" width="100%" cellspacing="1"
+					cellpadding="2">
+					<tbody>
+						<tr class="row1">
+							<th style="border-bottom:2pt #005C99 solid" align="left">Comments</th>
+						</tr>
+						<tr class="border_bottom">
+							<td class="row2 border_right dark-gray ">
+								<div style="width:100%;">
+									<textarea readonly="true" style="width:100%" rows="10"
+										wrap="off">
+										<xsl:value-of select="manualvalidationreport:Comments" />
+									</textarea>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+		</xsl:if>
+
+	</xsl:template>
 </xsl:stylesheet>

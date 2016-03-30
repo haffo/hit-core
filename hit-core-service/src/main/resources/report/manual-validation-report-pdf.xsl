@@ -2,8 +2,6 @@
 	xmlns:manualvalidationreport="http://www.nist.gov/healthcare/validation/manual/report"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:map="urn:internal">
 	<xsl:output method="html" />
-	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
-	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 	<xsl:param name="withHeader">
 		<xsl:value-of select="true()" />
 	</xsl:param>

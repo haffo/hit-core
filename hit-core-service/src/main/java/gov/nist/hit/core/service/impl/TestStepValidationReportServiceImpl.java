@@ -40,9 +40,13 @@ import com.ibm.icu.util.Calendar;
 public class TestStepValidationReportServiceImpl implements TestStepValidationReportService {
 
   private final static Logger logger = Logger.getLogger(TestStepValidationReportServiceImpl.class);
-  private static final String XSL = "/report/teststep-validation-report-pdf.xsl";
+  private static final String PDF_XSL = "/report/teststep-validation-report-pdf.xsl";
+  private static final String HTML_XSL = "/report/teststep-validation-report-html.xsl";
   protected static final String CSS = "/report/report.css";
+  protected static final String JS = "/report/report.js";
+
   protected String css = "";
+  protected String javascript = "";
 
   @Autowired
   protected TestStepValidationReportRepository validationReportRepository;
@@ -52,6 +56,8 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   public TestStepValidationReportServiceImpl() {
     try {
       css = IOUtils.toString(TestStepValidationReportServiceImpl.class.getResourceAsStream(CSS));
+      javascript =
+          IOUtils.toString(TestStepValidationReportServiceImpl.class.getResourceAsStream(JS));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -115,7 +121,7 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   public String generateHtml(String xml) throws ValidationReportException {
     try {
       String xslt =
-          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(XSL));
+          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(HTML_XSL));
       TransformerFactory transFact = TransformerFactory.newInstance();
       transFact.setURIResolver(new XsltURIResolver());
       Transformer transformer = transFact.newTransformer(new StreamSource(new StringReader(xslt)));
@@ -138,7 +144,7 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   public String generateXhtml(String xml) throws ValidationReportException {
     try {
       String xslt =
-          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(XSL));
+          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(PDF_XSL));
       TransformerFactory transFact = TransformerFactory.newInstance();
       transFact.setURIResolver(new XsltURIResolver());
       Transformer transformer = transFact.newTransformer(new StreamSource(new StringReader(xslt)));
@@ -256,12 +262,15 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
     sb.append("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
     sb.append("<style>");
     sb.append(css);
-    sb.append("</style></head><body>");
+    sb.append("</style>");
+    sb.append("<style type='text/javascript'>");
+    sb.append(javascript);
+    sb.append("</style>");
+    sb.append("</head><body>");
     sb.append(htmlReport);
     sb.append("</body></html>");
     return sb.toString();
   }
-
 
   @Override
   public List<TestStepValidationReport> findAllByTestStepAndUser(Long testStepId, Long userId) {
@@ -356,20 +365,6 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
     } catch (TransformerFactoryConfigurationError e) {
       throw new ValidationReportException(e.getMessage());
     }
-  }
-
-  public String addManualCss(String htmlReport) throws IOException {
-    StringBuffer sb = new StringBuffer();
-    sb.append("<html xmlns='http://www.w3.org/1999/xhtml'>");
-    sb.append("<head>");
-    sb.append("<title>Manual Validation Report</title>");
-    sb.append("<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />");
-    sb.append("<style>");
-    sb.append(css);
-    sb.append("</style></head><body>");
-    sb.append(htmlReport);
-    sb.append("</body></html>");
-    return sb.toString();
   }
 
 

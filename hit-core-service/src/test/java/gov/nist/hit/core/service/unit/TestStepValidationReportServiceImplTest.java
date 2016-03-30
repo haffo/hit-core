@@ -22,7 +22,40 @@ public class TestStepValidationReportServiceImplTest {
   TestStepValidationReportService service = new TestStepValidationReportServiceImpl();
 
   @Test
-  public void testGenerateMessageValidationPdf() throws Exception {
+  public void testGenerateTestStepValidationHtml() throws Exception {
+    String xmlMessageValidationReport =
+        IOUtils.toString(TestStepValidationReportServiceImplTest.class
+            .getResourceAsStream("/reports/1-Message-ValidationReport.xml"));
+    assertNotNull(xmlMessageValidationReport);
+
+    TestStepValidationReport report = new TestStepValidationReport();
+    TestStep ts = new TestStep();
+    ts.setName("Record an adverse reaction");
+    ts.setTestingType(TestingType.SUT_INITIATOR);
+    ts.setPosition(3);
+    report.setTestStep(ts);
+    report.setComments("TestStep1 comments");
+    report.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
+
+    String xml = service.generateXmlTestStepValidationReport(xmlMessageValidationReport, report);
+    assertNotNull(xml);
+    File f = new File("src/test/resources/1-TestStepMessageValidationReport.xml");
+    OutputStream os;
+    os = new FileOutputStream(f);
+    FileCopyUtils.copy(IOUtils.toInputStream(xml), os);
+    os.close();
+
+    InputStream io = IOUtils.toInputStream(service.generateHtml(xml));
+    assertNotNull(io);
+    f = new File("src/test/resources/5-TestStepMessageValidationReport.html");
+    os = new FileOutputStream(f);
+    FileCopyUtils.copy(io, os);
+    os.close();
+  }
+
+
+  @Test
+  public void testGenerateTestStepValidationPdf() throws Exception {
     String xmlMessageValidationReport =
         IOUtils.toString(TestStepValidationReportServiceImplTest.class
             .getResourceAsStream("/reports/1-Message-ValidationReport.xml"));
