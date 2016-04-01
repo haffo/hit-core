@@ -66,7 +66,7 @@ public class DocumentationController {
 
   @ApiOperation(value = "Get all context-based test cases documentation info",
       nickname = "getContextbasedTestCaseDocumentationInfo")
-  @Cacheable(value = "HitCache", key = "#stage.name() + 'testcases-documentation'")
+  @Cacheable(value = "HitCache", key = "'testcases-documentation'")
   @RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
   public TestCaseDocumentation testCases() {
     logger.info("Fetching test case documentation");

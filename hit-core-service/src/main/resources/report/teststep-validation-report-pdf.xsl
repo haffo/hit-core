@@ -21,7 +21,7 @@
 	</xsl:param>
 
 
-	<xsl:template match="/teststepvalidationreport:TestStepValidationReport">
+	<xsl:template match="teststepvalidationreport:TestStepValidationReport">
 		<xsl:apply-templates
 			select="teststepvalidationreport:TestStepValidationReportHeader" />
 		<xsl:apply-templates
@@ -30,7 +30,9 @@
 
 	<xsl:template match="teststepvalidationreport:TestStepValidationReportHeader">
 <!-- 		<xsl:if test="$withHeader = boolean('true')">
- -->			<div class="report-section">
+ -->			
+  
+ <div class="report-section">
 				<table class="forumline title-background" width="100%"
 					cellspacing="1" cellpadding="10">
 					<tbody class="cf-tbody">

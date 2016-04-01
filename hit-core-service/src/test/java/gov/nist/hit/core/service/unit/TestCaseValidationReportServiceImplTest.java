@@ -8,8 +8,9 @@ import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
+import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.impl.TestCaseValidationReportServiceImpl;
-import gov.nist.hit.core.service.util.ReportUtil;
+import gov.nist.hit.core.service.impl.TestStepValidationReportServiceImpl;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +27,7 @@ import org.springframework.util.FileCopyUtils;
 public class TestCaseValidationReportServiceImplTest {
 
   TestCaseValidationReportService service = new TestCaseValidationReportServiceImpl();
+  TestStepValidationReportService testStepService = new TestStepValidationReportServiceImpl();
 
 
 
@@ -43,7 +45,7 @@ public class TestCaseValidationReportServiceImplTest {
     TestStepValidationReport r1 = new TestStepValidationReport();
     String xmlMessageValidationReport =
         IOUtils.toString(TestCaseValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/1-Message-ValidationReport.xml"));
+            .getResourceAsStream("/reports/3-Manual-ValidationReport.xml"));
 
     TestStep t1 = new TestStep();
     t1.setName("Transmit the immunization report to the Immunization Registry");
@@ -52,7 +54,8 @@ public class TestCaseValidationReportServiceImplTest {
     t1.setTestingType(TestingType.SUT_INITIATOR);
     r1.setComments("TestStep1 comments");
     r1.setResult(TestResult.FAILED);
-    String xml = ReportUtil.generateXmlTestStepValidationReport(xmlMessageValidationReport, r1);
+    String xml =
+        testStepService.generateXmlTestStepValidationReport(xmlMessageValidationReport, r1);
     r1.setXml(xml);
 
     testStepReports.add(r1);
@@ -69,7 +72,7 @@ public class TestCaseValidationReportServiceImplTest {
     r2.setComments("TestStep2 comments");
     r2.setResult(TestResult.FAILED_NOT_SUPPORTED);
 
-    xml = ReportUtil.generateXmlTestStepValidationReport(xmlMessageValidationReport, r2);
+    xml = testStepService.generateXmlTestStepValidationReport(xmlMessageValidationReport, r2);
     r2.setXml(xml);
 
     testStepReports.add(r2);
@@ -77,15 +80,15 @@ public class TestCaseValidationReportServiceImplTest {
     TestStepValidationReport r3 = new TestStepValidationReport();
     xmlMessageValidationReport =
         IOUtils.toString(TestCaseValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/3-Manual-ValidationReport.xml"));
+            .getResourceAsStream("/reports/2-Message-ValidationReport.xml"));
     TestStep t3 = new TestStep();
     t3.setName("Record an adverse reaction");
-    t3.setTestingType(TestingType.SUT_MANUAL);
+    t3.setTestingType(TestingType.TA_RESPONDER);
     t3.setPosition(3);
     r3.setTestStep(t3);
     r3.setComments("TestStep3 comments");
     r3.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
-    xml = ReportUtil.generateXmlTestStepValidationReport(xmlMessageValidationReport, r3);
+    xml = testStepService.generateXmlTestStepValidationReport(xmlMessageValidationReport, r3);
     r3.setXml(xml);
 
     testStepReports.add(r3);

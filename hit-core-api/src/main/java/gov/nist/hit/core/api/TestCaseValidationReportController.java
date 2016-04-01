@@ -16,6 +16,7 @@ import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
 import gov.nist.hit.core.service.UserService;
+import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,9 +68,11 @@ public class TestCaseValidationReportController {
   public boolean downloadTestCaseValidationReport(
       @ApiParam(value = "the id of the test case", required = true) @RequestParam("testCaseId") final Long testCaseId,
       @ApiParam(value = "the format of the report", required = true) @RequestParam("format") final String format,
-      @ApiParam(value = "the result of the validation", required = true) @RequestParam("result") final String result,
-      @ApiParam(value = "the user's comments", required = true) @RequestParam("comments") final String comments,
-      HttpServletRequest request, HttpServletResponse response) throws ValidationReportException {
+      @ApiParam(value = "the result of the test case", required = true) @RequestParam(
+          value = "result", required = true) String result, @ApiParam(
+          value = "the comments of the test case", required = false) @RequestParam(
+          value = "comments", required = false) String comments, HttpServletRequest request,
+      HttpServletResponse response) throws ValidationReportException {
     try {
       logger.info("Clearing user records for testcase " + testCaseId);
       Long userId = SessionContext.getCurrentUserId(request.getSession(false));
@@ -106,5 +110,25 @@ public class TestCaseValidationReportController {
     return true;
   }
 
+
+  /**
+   * Clear a user records related to a test case
+   * 
+   * @param testCaseId
+   * @param request
+   * @return
+   * @throws MessageValidationException
+   */
+  @ApiOperation(value = "", hidden = true)
+  @RequestMapping(value = "/{testCaseId}/clearRecords", method = RequestMethod.POST)
+  public boolean clearRecords(@PathVariable("testCaseId") final Long testCaseId,
+      HttpServletRequest request) throws MessageValidationException {
+    logger.info("Clearing user records for testcase " + testCaseId);
+    Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+    if (userId == null || userService.findOne(userId) == null)
+      throw new ValidationReportException("Invalid user credentials");
+    testCaseValidationReportService.deleteByTestCaseAndUser(userId, testCaseId);
+    return true;
+  }
 
 }

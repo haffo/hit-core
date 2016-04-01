@@ -30,6 +30,20 @@ public class MessageValidationReportServiceImplTest {
     os.close();
   }
 
+  @Test
+  public void testGenerateMessageValidationPdf() throws Exception {
+    String xmlMessageValidationReport =
+        IOUtils.toString(MessageValidationReportServiceImplTest.class
+            .getResourceAsStream("/reports/1-Message-ValidationReport.xml"));
+    assertNotNull(xmlMessageValidationReport);
+    InputStream io = service.generatePdf(xmlMessageValidationReport);
+    assertNotNull(io);
+    File f = new File("src/test/resources/6-MessageValidationReport.pdf");
+    FileOutputStream os = new FileOutputStream(f);
+    FileCopyUtils.copy(io, os);
+    os.close();
+  }
+
 
 
 }

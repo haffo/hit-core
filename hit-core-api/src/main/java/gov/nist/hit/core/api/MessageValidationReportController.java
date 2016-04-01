@@ -130,7 +130,7 @@ public class MessageValidationReportController {
       if (report == null || ((xmlReport = report.getXml()) == null)) {
         throw new ValidationReportException("No validation report available for this test step");
       }
-      if (report.getUser() == null || !report.getUser().getId().equals(userId)) {
+      if (report.getUser() == null || !userId.equals(report.getUser().getId())) {
         throw new MessageValidationException("Forbidden access");
       }
 

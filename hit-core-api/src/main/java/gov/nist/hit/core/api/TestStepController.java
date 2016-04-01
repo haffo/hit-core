@@ -15,24 +15,19 @@ package gov.nist.hit.core.api;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.repo.TestCaseRepository;
 import gov.nist.hit.core.repo.TestContextRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.UserService;
-import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
-import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,31 +102,6 @@ public class TestStepController {
     if (testContext == null)
       throw new TestCaseException("No testcontext available for teststep id=" + testStepId);
     return testContext;
-  }
-
-  /**
-   * Clear the user records related to a test step
-   * 
-   * @param testStepId
-   * @param request
-   * @return
-   * @throws MessageValidationException
-   */
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/{testStepId}/clearRecords", method = RequestMethod.POST)
-  public boolean clearRecords(
-      @ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") final Long testStepId,
-      HttpServletRequest request) throws MessageValidationException {
-    logger.info("Generating html validation report");
-    Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-    if (userId == null || userService.findOne(userId) == null)
-      throw new ValidationReportException("Invalid user credentials");
-    TestStepValidationReport result =
-        validationReportService.findOneByTestStepAndUser(testStepId, userId);
-    if (result != null) {
-      validationReportService.delete(result);
-    }
-    return true;
   }
 
 

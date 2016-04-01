@@ -22,7 +22,7 @@
 	
 
 
-	<xsl:template match="/testcasevalidationreport:TestCaseValidationReport">
+	<xsl:template match="testcasevalidationreport:TestCaseValidationReport">
 		<xsl:apply-templates
 			select="testcasevalidationreport:TestCaseValidationReportHeader" />
 		<xsl:apply-templates

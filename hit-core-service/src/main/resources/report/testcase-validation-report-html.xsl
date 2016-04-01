@@ -22,7 +22,7 @@
 	
 
 
-	<xsl:template match="/testcasevalidationreport:TestCaseValidationReport">
+	<xsl:template match="testcasevalidationreport:TestCaseValidationReport">
 		<xsl:apply-templates
 			select="testcasevalidationreport:TestCaseValidationReportHeader" />
 		<xsl:apply-templates
@@ -88,16 +88,10 @@
 					</tr>
 					<tr class="border_bottom">
 						<td class="row2 border_right dark-gray ">
-							<div style="width:95%;">
-								<xsl:for-each select="tokenize(testcasevalidationreport:Comments,'\r')">
-									<p>
-										<xsl:call-template name="commentsBreaker">
-											<xsl:with-param name="commentLine">
-												<xsl:value-of select="." />
-											</xsl:with-param>
-										</xsl:call-template>
-									</p>
-								</xsl:for-each>
+							<div style="width:100%;">
+								<textarea style="width:100%;height:100%" readonly="true" wrap="off">
+									<xsl:value-of select="testcasevalidationreport:Comments" />
+								</textarea>
 							</div>
 						</td>
 					</tr>

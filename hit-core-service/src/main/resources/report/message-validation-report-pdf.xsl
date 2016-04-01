@@ -7,20 +7,29 @@
 	<xsl:output method="html" />
 	<xsl:param name="withHeader">
 		<xsl:value-of select="true()"/>
-	</xsl:param>
-	
+	</xsl:param> 
+<!-- 
+	<xsl:param name="testStepVariable">
+		<xsl:value-of select="current-dateTime()"/>
+	</xsl:param> 
+	 -->
+	<xsl:param name="testStepVariable">
+		<xsl:value-of select="report:HL7V2MessageValidationReport/report:HeaderReport/message:DateOfTest"/>
+ 	</xsl:param>
+ 	
 	<xsl:key name="categs"
-		match="/report:HL7V2MessageValidationReport/report:SpecificReport/report:AssertionList/report:Assertion"
+		match="report:HL7V2MessageValidationReport/report:SpecificReport/report:AssertionList/report:Assertion"
 		use="concat(@Type,'+',@Result)" />
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
  	
-	<xsl:template match="/report:HL7V2MessageValidationReport">
+	<xsl:template match="report:HL7V2MessageValidationReport">
  		<xsl:apply-templates select="report:HeaderReport" />
  	    <xsl:apply-templates select="report:SpecificReport" />
 	</xsl:template>
 	
 	<xsl:template match="report:HeaderReport">
+	
 		<xsl:if test="$withHeader = boolean('true')">
 		<div class="report-section">
  		

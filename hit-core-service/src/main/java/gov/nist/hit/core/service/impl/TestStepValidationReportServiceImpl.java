@@ -29,6 +29,7 @@ import nu.xom.Attribute;
 import nu.xom.Document;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -120,18 +121,23 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   @Override
   public String generateHtml(String xml) throws ValidationReportException {
     try {
-      String xslt =
-          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(HTML_XSL));
-      TransformerFactory transFact = TransformerFactory.newInstance();
-      transFact.setURIResolver(new XsltURIResolver());
-      Transformer transformer = transFact.newTransformer(new StreamSource(new StringReader(xslt)));
-      StreamSource source = new StreamSource(new StringReader(xml));
-      ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-      StreamResult result = new StreamResult(resultStream);
-      transformer.transform(source, result);
-      String htmlReport = HtmlUtil.repairStyle(new String(resultStream.toByteArray()));
-      logger.info("HTML validation report generated");
-      return addCss(htmlReport);
+      if (StringUtils.isNotEmpty(xml)) {
+        String xslt =
+            IOUtils.toString(TestCaseValidationReportServiceImpl.class
+                .getResourceAsStream(HTML_XSL));
+        TransformerFactory transFact = TransformerFactory.newInstance();
+        transFact.setURIResolver(new XsltURIResolver());
+        Transformer transformer =
+            transFact.newTransformer(new StreamSource(new StringReader(xslt)));
+        StreamSource source = new StreamSource(new StringReader(xml));
+        ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
+        StreamResult result = new StreamResult(resultStream);
+        transformer.transform(source, result);
+        String htmlReport = HtmlUtil.repairStyle(new String(resultStream.toByteArray()));
+        logger.info("HTML validation report generated");
+        return addCss(htmlReport);
+      }
+      return null;
     } catch (Exception e) {
       throw new ValidationReportException(e);
     } catch (TransformerFactoryConfigurationError e) {
@@ -143,18 +149,23 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   @Override
   public String generateXhtml(String xml) throws ValidationReportException {
     try {
-      String xslt =
-          IOUtils.toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(PDF_XSL));
-      TransformerFactory transFact = TransformerFactory.newInstance();
-      transFact.setURIResolver(new XsltURIResolver());
-      Transformer transformer = transFact.newTransformer(new StreamSource(new StringReader(xslt)));
-      StreamSource source = new StreamSource(new StringReader(xml));
-      ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-      StreamResult result = new StreamResult(resultStream);
-      transformer.transform(source, result);
-      String html = HtmlUtil.repairStyle(new String(resultStream.toByteArray()));
-      logger.info("XHTML validation report generated");
-      return addCss(html);
+      if (StringUtils.isNotEmpty(xml)) {
+        String xslt =
+            IOUtils
+                .toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(PDF_XSL));
+        TransformerFactory transFact = TransformerFactory.newInstance();
+        transFact.setURIResolver(new XsltURIResolver());
+        Transformer transformer =
+            transFact.newTransformer(new StreamSource(new StringReader(xslt)));
+        StreamSource source = new StreamSource(new StringReader(xml));
+        ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
+        StreamResult result = new StreamResult(resultStream);
+        transformer.transform(source, result);
+        String html = HtmlUtil.repairStyle(new String(resultStream.toByteArray()));
+        logger.info("XHTML validation report generated");
+        return addCss(html);
+      }
+      return null;
     } catch (Exception e) {
       throw new ValidationReportException(e);
     } catch (TransformerFactoryConfigurationError e) {
@@ -165,17 +176,20 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   @Override
   public InputStream generatePdf(String xml) throws ValidationReportException {
     try {
-      String xhtml = generateXhtml(xml).replaceAll("<br>", "<br/>");
-      ITextRenderer renderer = new ITextRenderer();
-      renderer.setDocumentFromString(xhtml);
-      renderer.layout();
-      File temp = File.createTempFile("TestStepValidationReport", ".pdf");
-      temp.deleteOnExit();
-      OutputStream os;
-      os = new FileOutputStream(temp);
-      renderer.createPDF(os);
-      os.close();
-      return new FileInputStream(temp);
+      if (StringUtils.isNotEmpty(xml)) {
+        String xhtml = generateXhtml(xml).replaceAll("<br>", "<br/>");
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocumentFromString(xhtml);
+        renderer.layout();
+        File temp = File.createTempFile("TestStepValidationReport", ".pdf");
+        temp.deleteOnExit();
+        OutputStream os;
+        os = new FileOutputStream(temp);
+        renderer.createPDF(os);
+        os.close();
+        return new FileInputStream(temp);
+      }
+      return null;
     } catch (Exception e) {
       throw new ValidationReportException(e);
     } catch (TransformerFactoryConfigurationError e) {
@@ -373,9 +387,9 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   public String generateXmlTestStepValidationReport(String xmlMessageValidationReport,
       TestStepValidationReport report) throws ValidationReportException {
     try {
-      nu.xom.Element element =
-          ReportUtil.generateTestStepValidationReportElement(xmlMessageValidationReport, report);
-      return element.toXML();
+      String xml =
+          ReportUtil.generateXmlTestStepValidationReport(xmlMessageValidationReport, report);
+      return xml;
     } catch (RuntimeException e) {
       throw new ValidationReportException(e);
     } catch (Exception e) {

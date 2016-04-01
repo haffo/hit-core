@@ -166,7 +166,14 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
         testCaseReportContent.appendChild(ReportUtil.getXmlElement(tesStepReport.getXml()));
       }
 
-      return report.toXML();
+      String xml = report.toXML();
+      // File f = new File("src/main/resources/TestCaseValidationReport.xml");
+      // System.out.println(f.getAbsolutePath());
+      // PrintWriter pw = new PrintWriter(f);
+      // pw.print(xml);
+      // pw.close();
+
+      return xml;
     } catch (Exception e) {
       throw new ValidationReportException(e);
     } catch (TransformerFactoryConfigurationError e) {

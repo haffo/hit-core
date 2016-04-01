@@ -21,7 +21,7 @@
 	</xsl:param>
 
 
-	<xsl:template match="/teststepvalidationreport:TestStepValidationReport">
+	<xsl:template match="teststepvalidationreport:TestStepValidationReport">
 		<xsl:apply-templates
 			select="teststepvalidationreport:TestStepValidationReportHeader" />
 		<xsl:apply-templates
@@ -122,8 +122,8 @@
 					</tr>
 					<tr class="border_bottom">
 						<td class="row2 border_right dark-gray ">
-							<div style="width:95%;">							
-								<textarea cols="80" readonly="true" rows="10" wrap="off">
+							<div style="width:100%;height:100%">							
+								<textarea style="width:100%;height:100%" readonly="true" wrap="off">
 									<xsl:value-of select="teststepvalidationreport:Comments" />
 								</textarea>
 								

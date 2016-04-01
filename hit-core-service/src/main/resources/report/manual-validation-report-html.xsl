@@ -11,7 +11,7 @@
 	</xsl:param>
 
 
-	<xsl:template match="/manualvalidationreport:ManualValidationReport">
+	<xsl:template match="manualvalidationreport:ManualValidationReport">
 		<xsl:apply-templates select="manualvalidationreport:HeaderReport" />
 		<xsl:apply-templates select="manualvalidationreport:TestCaseReference" />
 		<xsl:apply-templates select="manualvalidationreport:SpecificReport" />

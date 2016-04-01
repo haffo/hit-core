@@ -17,16 +17,12 @@ import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
 import gov.nist.hit.core.service.UserService;
-import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
-import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,25 +72,6 @@ public class TestCaseController {
     return testCase;
   }
 
-  /**
-   * Clear a user records related to a test case
-   * 
-   * @param testCaseId
-   * @param request
-   * @return
-   * @throws MessageValidationException
-   */
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/{testCaseId}/clearRecords", method = RequestMethod.POST)
-  public boolean clearRecords(@PathVariable("testCaseId") final Long testCaseId,
-      HttpServletRequest request) throws MessageValidationException {
-    logger.info("Clearing user records for testcase " + testCaseId);
-    Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-    if (userId == null || userService.findOne(userId) == null)
-      throw new ValidationReportException("Invalid user credentials");
-    testCaseValidationReportService.deleteByTestCaseAndUser(userId, testCaseId);
-    return true;
-  }
 
   /**
    * 

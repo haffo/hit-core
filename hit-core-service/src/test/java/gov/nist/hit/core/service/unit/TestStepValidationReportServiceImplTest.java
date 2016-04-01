@@ -39,7 +39,7 @@ public class TestStepValidationReportServiceImplTest {
 
     String xml = service.generateXmlTestStepValidationReport(xmlMessageValidationReport, report);
     assertNotNull(xml);
-    File f = new File("src/test/resources/1-TestStepMessageValidationReport.xml");
+    File f = new File("src/test/resources/5-TestStepMessageValidationReport.xml");
     OutputStream os;
     os = new FileOutputStream(f);
     FileCopyUtils.copy(IOUtils.toInputStream(xml), os);

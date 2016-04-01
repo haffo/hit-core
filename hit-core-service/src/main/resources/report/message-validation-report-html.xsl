@@ -10,13 +10,13 @@
 	</xsl:param>
 
 	<xsl:key name="categs"
-		match="/report:HL7V2MessageValidationReport/report:SpecificReport/report:AssertionList/report:Assertion"
+		match="report:HL7V2MessageValidationReport/report:SpecificReport/report:AssertionList/report:Assertion"
 		use="concat(@Type,'+',@Result)" />
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
 
-	<xsl:template match="/report:HL7V2MessageValidationReport">
+	<xsl:template match="report:HL7V2MessageValidationReport">
 		<xsl:apply-templates select="report:HeaderReport" />
 		<xsl:apply-templates select="report:SpecificReport" />
 	</xsl:template>
@@ -318,7 +318,7 @@
 						<!-- <td class="row2 border_right dark-gray">Content</td> -->
 						<td class="row2 border_right dark-gray ">
 							<div style="text-align: center">
-								<textarea cols="80" readonly="true" rows="10" wrap="off">
+								<textarea style="width:100%;height:100%" readonly="true" wrap="off">
 									<xsl:value-of select="report:Er7Message" />
 								</textarea>
 							</div>
