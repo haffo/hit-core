@@ -12,17 +12,12 @@ import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.impl.TestCaseValidationReportServiceImpl;
 import gov.nist.hit.core.service.impl.TestStepValidationReportServiceImpl;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.springframework.util.FileCopyUtils;
 
 public class TestCaseValidationReportServiceImplTest {
 
@@ -101,22 +96,12 @@ public class TestCaseValidationReportServiceImplTest {
   public void testGenerateXml() throws Exception {
     String xml = service.generateXml(get());
     assertNotNull(xml);
-    File f = new File("src/test/resources/TestCaseValidationReport.xml");
-    System.out.println(f.getAbsolutePath());
-    PrintWriter pw = new PrintWriter(f);
-    pw.print(xml);
-    pw.close();
   }
 
   @Test
   public void testGenerateHtml() throws Exception {
     String html = service.generateHtml(get());
     assertNotNull(html);
-    File f = new File("src/test/resources/TestCaseValidationReport.html");
-    System.out.println(f.getAbsolutePath());
-    PrintWriter pw = new PrintWriter(f);
-    pw.print(html);
-    pw.close();
   }
 
 
@@ -124,10 +109,6 @@ public class TestCaseValidationReportServiceImplTest {
   public void testGeneratePdf() throws Exception {
     InputStream io = service.generatePdf(get());
     assertNotNull(io);
-    File f = new File("src/test/resources/TestCaseValidationReport.pdf");
-    OutputStream os = new FileOutputStream(f);
-    FileCopyUtils.copy(io, os);
-    os.close();
   }
 
 }
