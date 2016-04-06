@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hit-core-service</artifactId>
 	<packaging>jar</packaging>
@@ -9,6 +10,8 @@
 		<artifactId>hit-core</artifactId>
 		<version>1.0.6-SNAPSHOT</version>
 	</parent>
+
+
 
 	<dependencies>
 
@@ -42,7 +45,7 @@
 				</exclusion>
 				<exclusion>
 					<groupId>xalan</groupId>
-	<artifactId>xalan</artifactId>
+					<artifactId>xalan</artifactId>
 				</exclusion>
 			</exclusions>
 
@@ -81,11 +84,8 @@
 		</dependency>
 
 
-<!-- 	<dependency>
-	<groupId>net.sf.saxon</groupId>
-	<artifactId>saxon-HE</artifactId>
-	<version>9.7.0-4</version>
-</dependency> -->
+		<!-- <dependency> <groupId>net.sf.saxon</groupId> <artifactId>saxon-HE</artifactId> 
+			<version>9.7.0-4</version> </dependency> -->
 
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
@@ -93,14 +93,19 @@
 			<version>8.7</version>
 		</dependency>
 
- 
+
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon-dom</artifactId>
 			<version>8.7</version>
-					</dependency>
+		</dependency>
 
-
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring-security.version}</version>
+		</dependency>
+		
 
 	</dependencies>
 

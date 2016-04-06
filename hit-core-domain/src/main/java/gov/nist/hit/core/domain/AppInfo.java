@@ -81,8 +81,10 @@ public class AppInfo  implements Serializable {
   
   private String rsbVersion;
   
-  private String apiDocsPath;
+  private String apiDocsPath; 
   
+  private String mailFrom = "hit-testing@nist.gov"; 
+    
   public String getUrl() {
     return url;
   }
@@ -265,6 +267,14 @@ public class AppInfo  implements Serializable {
         + ", name=" + name + ", domain=" + domain + ", header=" + header + ", adminEmail="
         + adminEmail + ", homeContent=" + homeContent
         + ", profileInfo=" + profileInfo + "]";
+  }
+
+  public String getMailFrom() {
+    return mailFrom;
+  }
+
+  public void setMailFrom(String mailFrom) {
+    this.mailFrom = mailFrom;
   }
 
   

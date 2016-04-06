@@ -43,7 +43,7 @@ public class User implements java.io.Serializable {
     super();
   }
 
-  
+   
   public void addConfig(TransportConfig config){
     if(config.getUserId() != null)
       throw new RuntimeException("The configuration provided belongs already to another user");
