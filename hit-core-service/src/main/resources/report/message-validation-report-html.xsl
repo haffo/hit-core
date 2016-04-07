@@ -383,22 +383,34 @@
 						<th style="border-bottom:2pt #005C99 solid" align="left">Summary</th>
 					</tr>
 					<tr class="border_bottom">
-						<td class="row6 " style="color: red; font-weight: bold">
-							<input type="checkbox" onclick="toggle_visibility('error',this)" />
+						<td class="row6 " style="color: red; font-weight: bold">							
+							<input type="checkbox">
+								<xsl:attribute name="onclick">toggle_visibility('<xsl:value-of
+									select="generate-id()" />error',this)</xsl:attribute>
+ 								<xsl:attribute name="checked">true</xsl:attribute>
+ 							</input>
+							
 							<xsl:value-of select="../report:HeaderReport/message:ErrorCount" />
 							Errors
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: maroon; font-weight: bold">
-							<input type="checkbox" onclick="toggle_visibility('alert',this)" />
+ 							<input type="checkbox">
+								<xsl:attribute name="onclick">toggle_visibility('<xsl:value-of
+									select="generate-id()" />alert',this)</xsl:attribute>
+  							</input>
+ 							
 							<xsl:value-of select="../report:HeaderReport/message:AlertCount" />
 							Alerts
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: gold; font-weight: bold">
-							<input type="checkbox" onclick="toggle_visibility('warning',this)" />
+ 							<input type="checkbox">
+								<xsl:attribute name="onclick">toggle_visibility('<xsl:value-of
+									select="generate-id()" />warning',this)</xsl:attribute>
+  							</input>
 							<xsl:value-of select="../report:HeaderReport/message:WarningCount" />
 							Warnings
 						</td>
