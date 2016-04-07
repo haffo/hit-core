@@ -9,9 +9,11 @@ import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.impl.TestStepValidationReportServiceImpl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.PrintWriter;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -21,11 +23,13 @@ public class TestStepValidationReportServiceImplTest {
 
   TestStepValidationReportService service = new TestStepValidationReportServiceImpl();
 
+  static final String outputsFolder = "src/test/resources/outputs";
+
   @Test
   public void testGenerateTestStepValidationHtml() throws Exception {
     String xmlMessageValidationReport =
         IOUtils.toString(TestStepValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/1-Message-ValidationReport.xml"));
+            .getResourceAsStream("/inputs/1-Message-ValidationReport.xml"));
     assertNotNull(xmlMessageValidationReport);
 
     TestStepValidationReport report = new TestStepValidationReport();
@@ -39,18 +43,12 @@ public class TestStepValidationReportServiceImplTest {
 
     String xml = service.generateXmlTestStepValidationReport(xmlMessageValidationReport, report);
     assertNotNull(xml);
-    File f = new File("src/test/resources/5-TestStepMessageValidationReport.xml");
-    OutputStream os;
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(IOUtils.toInputStream(xml), os);
-    os.close();
+    saveToFile(new File(outputsFolder + "/5-TestStepMessageValidationReport.xml"), xml);
 
     InputStream io = IOUtils.toInputStream(service.generateHtml(xml));
     assertNotNull(io);
-    f = new File("src/test/resources/5-TestStepMessageValidationReport.html");
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(io, os);
-    os.close();
+    saveToFile(new File(outputsFolder + "/5-TestStepMessageValidationReport.html"), io);
+
   }
 
 
@@ -58,7 +56,7 @@ public class TestStepValidationReportServiceImplTest {
   public void testGenerateTestStepValidationPdf() throws Exception {
     String xmlMessageValidationReport =
         IOUtils.toString(TestStepValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/1-Message-ValidationReport.xml"));
+            .getResourceAsStream("/inputs/1-Message-ValidationReport.xml"));
     assertNotNull(xmlMessageValidationReport);
 
     TestStepValidationReport report = new TestStepValidationReport();
@@ -72,18 +70,13 @@ public class TestStepValidationReportServiceImplTest {
 
     String xml = service.generateXmlTestStepValidationReport(xmlMessageValidationReport, report);
     assertNotNull(xml);
-    File f = new File("src/test/resources/1-TestStepMessageValidationReport.xml");
-    OutputStream os;
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(IOUtils.toInputStream(xml), os);
-    os.close();
+    saveToFile(new File(outputsFolder + "/1-TestStepMessageValidationReport.xml"), xml);
+
 
     InputStream io = service.generatePdf(xml);
     assertNotNull(io);
-    f = new File("src/test/resources/1-TestStepMessageValidationReport.pdf");
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(io, os);
-    os.close();
+    saveToFile(new File(outputsFolder + "/1-TestStepMessageValidationReport.pdf"), io);
+
   }
 
   @Test
@@ -99,18 +92,13 @@ public class TestStepValidationReportServiceImplTest {
     String xml = service.generateXmlTestStepValidationReport(null, r3);
 
     assertNotNull(xml);
-    File f = new File("src/test/resources/2-TestStepManualValidationReport.xml");
-    OutputStream os;
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(IOUtils.toInputStream(xml), os);
-    os.close();
+    saveToFile(new File(outputsFolder + "/2-TestStepManualValidationReport.xml"), xml);
+
 
     InputStream io = service.generatePdf(xml);
     assertNotNull(io);
-    f = new File("src/test/resources/2-TestStepManualValidationReport.pdf");
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(io, os);
-    os.close();
+    saveToFile(new File(outputsFolder + "/2-TestStepManualValidationReport.pdf"), io);
+
   }
 
   @Test
@@ -125,11 +113,7 @@ public class TestStepValidationReportServiceImplTest {
     r3.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
     String xml = service.generateXmlTestStepValidationReport(null, r3);
     assertNotNull(xml);
-    File f = new File("src/test/resources/3-TestStepManualValidationReport.xml");
-    OutputStream os;
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(IOUtils.toInputStream(xml), os);
-    os.close();
+    saveToFile(new File(outputsFolder + "/3-TestStepMesssageValidationReport.xml"), xml);
     r3.setXml(xml);
     r3.setComments("Updated TestStep3 comments");
     r3.setResult(TestResult.FAILED_NOT_SUPPORTED);
@@ -139,18 +123,14 @@ public class TestStepValidationReportServiceImplTest {
 
     InputStream io = service.generatePdf(xml);
     assertNotNull(io);
-
-    f = new File("src/test/resources/3-TestStepManualValidationReport.pdf");
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(io, os);
-    os.close();
+    saveToFile(new File(outputsFolder + "/3-TestStepMesssageValidationReport.pdf"), io);
   }
 
   @Test
   public void testUpdateMessageValidationPdf() throws Exception {
     String xmlMessageValidationReport =
         IOUtils.toString(TestStepValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/1-Message-ValidationReport.xml"));
+            .getResourceAsStream("/inputs/1-Message-ValidationReport.xml"));
     assertNotNull(xmlMessageValidationReport);
     TestStepValidationReport r3 = new TestStepValidationReport();
     TestStep t3 = new TestStep();
@@ -162,11 +142,7 @@ public class TestStepValidationReportServiceImplTest {
     r3.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
     String xml = service.generateXmlTestStepValidationReport(xmlMessageValidationReport, r3);
     assertNotNull(xml);
-    File f = new File("src/test/resources/4-TestStepManualValidationReport.xml");
-    OutputStream os;
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(IOUtils.toInputStream(xml), os);
-    os.close();
+    saveToFile(new File(outputsFolder + "/4-TestStepMesssageValidationReport.xml"), xml);
     r3.setXml(xml);
     r3.setComments("Updated TestStep4 comments");
     r3.setResult(TestResult.FAILED_NOT_SUPPORTED);
@@ -176,11 +152,20 @@ public class TestStepValidationReportServiceImplTest {
 
     InputStream io = service.generatePdf(xml);
     assertNotNull(io);
+    saveToFile(new File(outputsFolder + "/4-TestStepMesssageValidationReport.pdf"), io);
+  }
 
-    f = new File("src/test/resources/4-TestStepMesssageValidationReport.pdf");
-    os = new FileOutputStream(f);
-    FileCopyUtils.copy(io, os);
-    os.close();
+
+  private void saveToFile(File f, String content) throws FileNotFoundException {
+    PrintWriter pw = new PrintWriter(f);
+    pw.append(content);
+    pw.close();
+  }
+
+  private void saveToFile(File f, InputStream content) throws IOException {
+    FileOutputStream out = new FileOutputStream(f);
+    FileCopyUtils.copy(content, out);
+    out.close();
   }
 
 

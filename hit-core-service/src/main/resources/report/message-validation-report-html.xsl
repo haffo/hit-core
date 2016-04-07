@@ -9,9 +9,6 @@
 		<xsl:value-of select="true()" />
 	</xsl:param>
 
-	<xsl:key name="categs"
-		match="report:HL7V2MessageValidationReport/report:SpecificReport/report:AssertionList/report:Assertion"
-		use="concat(@Type,'+',@Result)" />
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
@@ -22,9 +19,43 @@
 	</xsl:template>
 
 	<xsl:template match="report:HeaderReport">
+		<script type="text/javascript">
+					function toggle_visibility(id, elm) {
+					var e =
+					document.getElementById(id);
+					if (elm.checked == true)
+					e.style.display = '';
+					else
+					e.style.display = 'none';
+					};
+					function
+					toggle_visibilityC(cls, elm) {
+					var e =
+					document.getElementsByClassName(cls);
+					for(var i = e.length - 1; i >=
+					0; i--) {
+					if (elm.checked == true)
+					e[i].style.display = '';
+					else
+					e[i].style.display = 'none';
+					}
+					};
+
+					function fi(id) {
+					var div =
+					document.getElementById(id);
+					if (div.style.display !== 'none') {
+					document.getElementById("btn").childNodes[0].nodeValue = "View";
+					div.style.display = 'none';
+					}
+					else {
+					document.getElementById("btn").childNodes[0].nodeValue = "Hide";
+					div.style.display = '';
+					}
+					};
+		</script>
 		<xsl:if test="$withHeader = boolean('true')">
 			<div class="report-section">
-
 				<table class="forumline title-background" width="100%"
 					cellspacing="1" cellpadding="10">
 					<tbody class="cf-tbody">
@@ -145,7 +176,11 @@
 							<xsl:value-of select="$count" />
 							<input type="checkbox">
 								<xsl:attribute name="onclick">toggle_visibility('<xsl:value-of
+									select="generate-id()" /><xsl:value-of
 									select="$classification" />',this)</xsl:attribute>
+								<xsl:if test="$classification='error'">
+									<xsl:attribute name="checked">true</xsl:attribute>
+								</xsl:if>
 							</input>
 						</td>
 					</tr>
@@ -153,13 +188,24 @@
 			</table>
 			<table class="forumline cf-report-category" width="100%"
 				cellspacing="1" cellpadding="2">
-				<xsl:attribute name="id"><xsl:value-of select='$classification' /></xsl:attribute>
-				<xsl:apply-templates
-					select="./report:AssertionList/report:Assertion[@Result = $classification][generate-id(.)=generate-id(key('categs',concat(@Type,'+',@Result))[1])]" />
+				<xsl:if test="$classification!='error'">
+						<xsl:attribute name="style">display : none;</xsl:attribute>
+				</xsl:if>
+					
+				<xsl:attribute name="id">
+					<xsl:value-of select='generate-id()' /><xsl:value-of select="$classification" />
+				</xsl:attribute>
+				
+				<xsl:for-each-group select="./report:AssertionList/report:Assertion[@Result = $classification]" group-by="@Type">
+					<xsl:call-template name="TmPT">
+						<xsl:with-param name="id" select="generate-id(current-group()[1])"></xsl:with-param>
+					</xsl:call-template>
+				</xsl:for-each-group>						
 			</table>
 		</div>
 	</xsl:template>
-	<xsl:template match="report:AssertionList/report:Assertion">
+	<xsl:template name="TmPT">
+		<xsl:param name="id"></xsl:param>
 		<tbody>
 			<tr>
 				<td class="row5 border_bottom" colspan="3" style="width:30%">
@@ -167,19 +213,19 @@
 				</td>
 				<td class="row5 border_bottom" align="right" style="width:70%">
 					Count :
-					<xsl:value-of select="count(key('categs',concat(@Type,'+',@Result)))" />
+					<xsl:value-of select="count(current-group())" />
 					<input type="checkbox" checked="true">
 						<xsl:attribute name="onclick">toggle_visibilityC('<xsl:value-of
-							select="@Result" /><xsl:value-of select="@Type" />',this)</xsl:attribute>
+							select="$id" />',this)</xsl:attribute>
 					</input>
 				</td>
 			</tr>
 		</tbody>
-		<xsl:for-each select="key('categs', concat(@Type,'+',@Result))">
+		<xsl:for-each select="current-group()">
 			<tbody class="border_bottom">
 				<xsl:attribute name="class">alternate<xsl:value-of
 					select="position() mod 2" /> border_bottom <xsl:value-of
-					select="@Result" /><xsl:value-of select="@Type" /></xsl:attribute>
+							select="$id" /></xsl:attribute>
 				<tr class="border_bottom">
 					<td class="row3 border_right border_bottom" rowspan="5"
 						style="width:20px;">
@@ -374,10 +420,15 @@
 					<th style="border-bottom:2pt #005C99 solid" align="left">Failures
 						interpretation</th>
 					<td align="right" style="border-bottom:2pt #005C99 solid">
-						<input type="checkbox" onclick="toggle_visibility('mfi',this)" />
+						<button id="btn" onclick="fi('mfi')"> 
+						<xsl:attribute name="onclick">
+							fi('mfi<xsl:value-of select="generate-id()" />')
+						</xsl:attribute>
+						View </button>
 					</td>
 				</tr>
-				<tbody id="mfi">
+				<tbody style="display : none;">
+					<xsl:attribute name="id">mfi<xsl:value-of select="generate-id()" /></xsl:attribute>
 					<tr>
 						<td class="row5 border_bottom border_right" style="width:50%">Category</td>
 						<td class="row5 border_bottom" style="width:50%">Classification</td>
