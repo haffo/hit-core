@@ -18,14 +18,17 @@ import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.TransportFormContent;
 import gov.nist.hit.core.domain.TransportForms;
+import gov.nist.hit.core.domain.TransportMessage;
 import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.service.TransactionService;
+import gov.nist.hit.core.service.TransportMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +60,10 @@ public class TransportController {
 
   @Autowired
   private TransactionService transactionService;
+
+  @Autowired
+  private TransportMessageService transportMessageService;
+
 
   @ApiOperation(value = "Get a configuration form", nickname = "getConfigurationForm")
   @RequestMapping(value = "/config/form", method = RequestMethod.GET)
@@ -95,7 +102,16 @@ public class TransportController {
   @ApiOperation(value = "", nickname = "", hidden = true)
   @RequestMapping(value = "/transaction/{transactionId}/delete", method = RequestMethod.POST)
   public boolean deleteTransaction(@PathVariable Long transactionId) {
-    transactionService.delete(transactionId);
+    Transaction transaction = transactionService.findOne(transactionId);
+    if (transaction != null) {
+      Map<String, String> criteria = transaction.getProperties();
+      List<TransportMessage> transportMessages =
+          transportMessageService.findAllByProperties(criteria);
+      if (transportMessages != null) {
+        transportMessageService.delete(transportMessages);
+      }
+      transactionService.delete(transaction);
+    }
     return true;
   }
 
