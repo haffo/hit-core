@@ -1,12 +1,16 @@
 package gov.nist.hit.core.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 
 @Embeddable
-public class Protocol {
-  
+public class Protocol implements Serializable {
+ 
+  private static final long serialVersionUID = 1L;
+
   @NotNull  
   @Column(nullable = false) 
   private String value;

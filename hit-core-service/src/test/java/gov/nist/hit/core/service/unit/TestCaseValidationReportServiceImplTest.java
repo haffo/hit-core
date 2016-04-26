@@ -12,19 +12,25 @@ import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.impl.TestCaseValidationReportServiceImpl;
 import gov.nist.hit.core.service.impl.TestStepValidationReportServiceImpl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.springframework.util.FileCopyUtils;
 
 public class TestCaseValidationReportServiceImplTest {
 
   TestCaseValidationReportService service = new TestCaseValidationReportServiceImpl();
   TestStepValidationReportService testStepService = new TestStepValidationReportServiceImpl();
 
-
+  static final String outputsFolder = "src/test/resources/outputs";
 
   private TestCaseValidationResult get() throws Exception {
     TestCaseValidationResult result = new TestCaseValidationResult();
@@ -96,12 +102,14 @@ public class TestCaseValidationReportServiceImplTest {
   public void testGenerateXml() throws Exception {
     String xml = service.generateXml(get());
     assertNotNull(xml);
+    saveToFile(new File(outputsFolder + "/TestCaseValidationReport.xml"), xml);
   }
 
   @Test
   public void testGenerateHtml() throws Exception {
     String html = service.generateHtml(get());
     assertNotNull(html);
+    saveToFile(new File(outputsFolder + "/TestCaseValidationReport.html"), html);
   }
 
 
@@ -109,6 +117,21 @@ public class TestCaseValidationReportServiceImplTest {
   public void testGeneratePdf() throws Exception {
     InputStream io = service.generatePdf(get());
     assertNotNull(io);
+    saveToFile(new File(outputsFolder + "/TestCaseValidationReport.pdf"), io);
   }
+
+
+  private void saveToFile(File f, String content) throws FileNotFoundException {
+    PrintWriter pw = new PrintWriter(f);
+    pw.append(content);
+    pw.close();
+  }
+
+  private void saveToFile(File f, InputStream content) throws IOException {
+    FileOutputStream out = new FileOutputStream(f);
+    FileCopyUtils.copy(content, out);
+    out.close();
+  }
+
 
 }

@@ -4,80 +4,91 @@
 	xmlns:map="urn:internal"
 	xmlns:context="http://www.nist.gov/healthcare/validation/message/hl7/v2/context"
 	xmlns:profile="http://www.nist.gov/healthcare/profile">
-	<xsl:output method="html" omit-xml-declaration="yes" />
+	<xsl:output method="html" />
 	<xsl:param name="withHeader">
-		<xsl:value-of select="true()" />
-	</xsl:param>
-
+		<xsl:value-of select="true()"/>
+	</xsl:param> 
+<!-- 
+	<xsl:param name="testStepVariable">
+		<xsl:value-of select="current-dateTime()"/>
+	</xsl:param> 
+	 -->
+	<xsl:param name="testStepVariable">
+		<xsl:value-of select="report:HL7V2MessageValidationReport/report:HeaderReport/message:DateOfTest"/>
+ 	</xsl:param>
+ 	
+	<xsl:key name="categs"
+		match="report:HL7V2MessageValidationReport/report:SpecificReport/report:AssertionList/report:Assertion"
+		use="concat(@Type,'+',@Result)" />
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
-
-
+ 	
 	<xsl:template match="report:HL7V2MessageValidationReport">
-		<xsl:apply-templates select="report:HeaderReport" />
-		<xsl:apply-templates select="report:SpecificReport" />
+ 		<xsl:apply-templates select="report:HeaderReport" />
+ 	    <xsl:apply-templates select="report:SpecificReport" />
 	</xsl:template>
-
+	
 	<xsl:template match="report:HeaderReport">
+	
 		<xsl:if test="$withHeader = boolean('true')">
-			<div class="report-section">
-				<table class="forumline title-background" width="100%"
-					cellspacing="1" cellpadding="10">
-					<tbody class="cf-tbody">
-						<tr>
-							<td class="row1 border_right">
-								<span class="submaintitle2">Message Validation Report</span>
-							</td>
-							<td class="row2" style="font-weight:bold">
-								<center>
-									<xsl:call-template name="dateTransformer">
-										<xsl:with-param name="myDate" select="message:DateOfTest" />
-										<xsl:with-param name="myTime" select="message:TimeOfTest" />
-									</xsl:call-template>
-								</center>
-
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="report-section">
-				<table class="forumline" width="100%" cellspacing="1"
-					cellpadding="2">
-					<tbody class="cf-tbody">
-						<tr>
-							<td class="row1 border_right">Validation Type</td>
-							<td class="row2">
-								<center>
-									<xsl:value-of select="message:Type" />
-								</center>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="report-section">
-				<table class="forumline" width="100%" cellspacing="1"
-					cellpadding="2">
-					<tbody class="cf-tbody border_right">
-						<tr class="border_bottom">
-							<td class="row1 border_right" valign="top" rowspan="2">Testing
-								Tool</td>
-							<td class="row2 border_right ">Name</td>
-							<td class="row3 ">
-								<xsl:value-of select="message:ServiceName" />
-							</td>
-						</tr>
-						<tr class="border_bottom">
-							<td class="row2 border_right ">Validation Version</td>
-							<td class="row3 ">
-								<xsl:value-of select="message:ServiceVersion" />
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<xsl:apply-templates select="message:TestCaseReference" />
+		<div class="report-section">
+ 		
+			<table class="forumline title-background" width="100%"
+				cellspacing="1" cellpadding="10">
+				<tbody class="cf-tbody">
+					<tr>
+						<td class="row1 border_right">
+							<span class="submaintitle2">Message Validation Report</span>
+						</td>
+						<td class="row2" style="font-weight:bold">
+							<center>
+								<xsl:call-template name="dateTransformer">
+									<xsl:with-param name="myDate" select="message:DateOfTest" />
+									<xsl:with-param name="myTime" select="message:TimeOfTest" />
+								</xsl:call-template>
+							</center>
+							
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="report-section">
+			<table class="forumline" width="100%" cellspacing="1"
+				cellpadding="2">
+				<tbody class="cf-tbody">
+					<tr>
+						<td class="row1 border_right">Validation Type</td>
+						<td class="row2">
+							<center>
+								<xsl:value-of select="message:Type" />
+							</center>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="report-section">
+			<table class="forumline" width="100%" cellspacing="1"
+				cellpadding="2">
+				<tbody class="cf-tbody border_right">
+					<tr class="border_bottom">
+						<td class="row1 border_right" valign="top" rowspan="2">Testing Tool</td>
+						<td class="row2 border_right ">Name</td>
+						<td class="row3 ">
+							<xsl:value-of select="message:ServiceName" />
+						</td>
+					</tr>
+					<tr class="border_bottom">
+						<td class="row2 border_right ">Validation Version</td>
+						<td class="row3 ">
+							<xsl:value-of select="message:ServiceVersion" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<xsl:apply-templates select="message:TestCaseReference" />
 		</xsl:if>
 	</xsl:template>
 	<xsl:template match="report:SpecificReport">
@@ -107,10 +118,13 @@
 			<xsl:with-param name="color" select="'gold'" />
 			<xsl:with-param name="msg" select="'Warnings'" />
 		</xsl:call-template>
-		<!-- <xsl:call-template name="Assertions"> <xsl:with-param name="classification" 
-			select="'affirmative'" /> <xsl:with-param name="count" select="../report:HeaderReport/message:AffirmCount" 
-			/> <xsl:with-param name="color" select="'green'" /> <xsl:with-param name="msg" 
-			select="'Affirmatives'" /> </xsl:call-template> -->
+<!-- 		<xsl:call-template name="Assertions">
+			<xsl:with-param name="classification" select="'affirmative'" />
+			<xsl:with-param name="count"
+				select="../report:HeaderReport/message:AffirmCount" />
+			<xsl:with-param name="color" select="'green'" />
+			<xsl:with-param name="msg" select="'Affirmatives'" />
+		</xsl:call-template> -->
 		<!-- <xsl:call-template name="Assertions"> -->
 		<!-- <xsl:with-param name="classification" select="'informational'"/> -->
 		<!-- <xsl:with-param name="count" select="../report:HeaderReport/message:InfoCount"/> -->
@@ -139,30 +153,21 @@
 							</xsl:attribute>
 							Count :
 							<xsl:value-of select="$count" />
+							<!-- <input type="checkbox"> <xsl:attribute name="onclick">toggle_visibility('<xsl:value-of 
+								select="$classification" />',this)</xsl:attribute> </input> -->
 						</td>
 					</tr>
 				</tbody>
 			</table>
 			<table class="forumline cf-report-category" width="100%"
 				cellspacing="1" cellpadding="2">
-<!-- 				<xsl:if test="$classification!='error'">
-						<xsl:attribute name="style">display : none;</xsl:attribute>
-				</xsl:if> -->
-					
-				<xsl:attribute name="id">
-					<xsl:value-of select='generate-id()' /><xsl:value-of select="$classification" />
-				</xsl:attribute>
-				
-				<xsl:for-each-group select="./report:AssertionList/report:Assertion[@Result = $classification]" group-by="@Type">
-					<xsl:call-template name="TmPT">
-						<xsl:with-param name="id" select="generate-id(current-group()[1])"></xsl:with-param>
-					</xsl:call-template>
-				</xsl:for-each-group>						
+				<xsl:attribute name="id"><xsl:value-of select='$classification' /></xsl:attribute>
+				<xsl:apply-templates
+					select="./report:AssertionList/report:Assertion[@Result = $classification][generate-id(.)=generate-id(key('categs',concat(@Type,'+',@Result))[1])]" />
 			</table>
 		</div>
 	</xsl:template>
-	<xsl:template name="TmPT">
-		<xsl:param name="id"></xsl:param>
+	<xsl:template match="report:AssertionList/report:Assertion">
 		<tbody>
 			<tr>
 				<td class="row5 border_bottom" colspan="3" style="width:30%">
@@ -170,15 +175,18 @@
 				</td>
 				<td class="row5 border_bottom" align="right" style="width:70%">
 					Count :
-					<xsl:value-of select="count(current-group())" />
+					<xsl:value-of select="count(key('categs',concat(@Type,'+',@Result)))" />
+					<!-- <input type="checkbox" checked="true"> <xsl:attribute name="onclick">toggle_visibilityC('<xsl:value-of 
+						select="@Result" /><xsl:value-of select="@Type" />',this)</xsl:attribute> 
+						</input> -->
 				</td>
 			</tr>
 		</tbody>
-		<xsl:for-each select="current-group()">
+		<xsl:for-each select="key('categs', concat(@Type,'+',@Result))">
 			<tbody class="border_bottom">
 				<xsl:attribute name="class">alternate<xsl:value-of
 					select="position() mod 2" /> border_bottom <xsl:value-of
-							select="$id" /></xsl:attribute>
+					select="@Result" /><xsl:value-of select="@Type" /></xsl:attribute>
 				<tr class="border_bottom">
 					<td class="row3 border_right border_bottom" rowspan="5"
 						style="width:20px;">
@@ -314,10 +322,15 @@
 						<th style="border-bottom:2pt #005C99 solid" align="left">Message</th>
 					</tr>
 					<tr class="border_bottom">
-						<!-- <td class="row2 border_right dark-gray">Content</td> -->
-						<td class="row2 border_right dark-gray ">
-							<div style="text-align: center">								
-								<xsl:for-each
+<!-- 						<td class="row2 border_right dark-gray">Content</td>
+ -->						<td class="row2 border_right dark-gray ">
+<!-- 							<div style="text-align: center">
+								<textarea cols="80" readonly="true" rows="10" wrap="off">
+									<xsl:value-of select="report:Er7Message" />
+								</textarea>
+							</div> -->
+							<div style="width:90%;font-size:80%;">
+							<xsl:for-each
 								select="tokenize(report:Er7Message,'\n')">
 								<p>
 									<xsl:call-template name="segmentBreaker">
@@ -329,9 +342,9 @@
 
 
 							</xsl:for-each>
+						</div>
 							
-								
-							</div>
+							
 						</td>
 					</tr>
 				</tbody>
@@ -348,26 +361,36 @@
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: red; font-weight: bold">
- 							<xsl:value-of select="../report:HeaderReport/message:ErrorCount" />
+							<!-- <input type="checkbox" onclick="toggle_visibility('error',this)" 
+								/> -->
+							<xsl:value-of select="../report:HeaderReport/message:ErrorCount" />
 							Errors
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: maroon; font-weight: bold">
- 							<xsl:value-of select="../report:HeaderReport/message:AlertCount" />
+							<!-- <input type="checkbox" onclick="toggle_visibility('alert',this)" 
+								/> -->
+							<xsl:value-of select="../report:HeaderReport/message:AlertCount" />
 							Alerts
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: gold; font-weight: bold">
- 							<xsl:value-of select="../report:HeaderReport/message:WarningCount" />
+							<!-- <input type="checkbox" onclick="toggle_visibility('warning',this)" 
+								/> -->
+							<xsl:value-of select="../report:HeaderReport/message:WarningCount" />
 							Warnings
 						</td>
 					</tr>
-					<!-- <tr class="border_bottom"> <td class="row6" style="color: green; 
-						font-weight: bold"> <input type="checkbox" onclick="toggle_visibility('affirmative',this)" 
-						/> <xsl:value-of select="../report:HeaderReport/message:AffirmCount" /> Affirmatives 
-						</td> </tr> -->
+					<!-- <tr class="border_bottom">
+						<td class="row6" style="color: green; font-weight: bold">
+							<input type="checkbox" onclick="toggle_visibility('affirmative',this)" 
+								/>
+							<xsl:value-of select="../report:HeaderReport/message:AffirmCount" />
+							Affirmatives
+						</td>
+					</tr> -->
 				</tbody>
 			</table>
 		</div>
@@ -381,15 +404,11 @@
 					<th style="border-bottom:2pt #005C99 solid" align="left">Failures
 						interpretation</th>
 					<td align="right" style="border-bottom:2pt #005C99 solid">
-						<button id="btn" onclick="fi('mfi')"> 
-						<xsl:attribute name="onclick">
-							fi('mfi<xsl:value-of select="generate-id()" />')
-						</xsl:attribute>
-						View </button>
+						<!-- <input type="checkbox" onclick="toggle_visibility('mfi',this)" 
+							/> -->
 					</td>
 				</tr>
-				<tbody style="display : none;">
-					<xsl:attribute name="id">mfi<xsl:value-of select="generate-id()" /></xsl:attribute>
+				<tbody id="mfi">
 					<tr>
 						<td class="row5 border_bottom border_right" style="width:50%">Category</td>
 						<td class="row5 border_bottom" style="width:50%">Classification</td>
@@ -427,7 +446,7 @@
 		<xsl:text>, </xsl:text>
 		<xsl:value-of select="$myTime" />
 	</xsl:template>
-
+	
 	<xsl:template name="segmentBreaker">
 		<xsl:param name="segment" />
 		<xsl:if test="string-length($segment) > 0">
@@ -441,5 +460,5 @@
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>
-
+	
 </xsl:stylesheet>
