@@ -32,22 +32,17 @@
 	<sec:http pattern="/lib/**" security="none" />
 
 	<sec:http pattern="/api/**" security="none" />
-	<!-- <sec:http pattern="/api/cf/*" security="none" />
-	<sec:http pattern="/api/message/*" security="none" />
-	<sec:http pattern="/api/messageValidationReport/*" security="none" />
-	<sec:http pattern="/api/profile/*" security="none" />
-	<sec:http pattern="/api/session/*" security="none" />
-	<sec:http pattern="/api/artifact/*" security="none" />
-	<sec:http pattern="/api/testcases/*" security="none" />
-	<sec:http pattern="/api/teststeps/*" security="none" />
-	<sec:http pattern="/api/testcasegroups/*" security="none" />
-	<sec:http pattern="/api/testCaseValidationReport/*" security="none" />
-	<sec:http pattern="/api/testcontexts/*" security="none" />
-	<sec:http pattern="/api/testplans/*" security="none" />
-	<sec:http pattern="/api/transport/*" security="none" />
-	<sec:http pattern="/api/user/*" security="none" />
-	<sec:http pattern="/api/valueSetLibrary/*" security="none" />
- -->
+	<!-- <sec:http pattern="/api/cf/*" security="none" /> <sec:http pattern="/api/message/*" 
+		security="none" /> <sec:http pattern="/api/messageValidationReport/*" security="none" 
+		/> <sec:http pattern="/api/profile/*" security="none" /> <sec:http pattern="/api/session/*" 
+		security="none" /> <sec:http pattern="/api/artifact/*" security="none" /> 
+		<sec:http pattern="/api/testcases/*" security="none" /> <sec:http pattern="/api/teststeps/*" 
+		security="none" /> <sec:http pattern="/api/testcasegroups/*" security="none" 
+		/> <sec:http pattern="/api/testCaseValidationReport/*" security="none" /> 
+		<sec:http pattern="/api/testcontexts/*" security="none" /> <sec:http pattern="/api/testplans/*" 
+		security="none" /> <sec:http pattern="/api/transport/*" security="none" /> 
+		<sec:http pattern="/api/user/*" security="none" /> <sec:http pattern="/api/valueSetLibrary/*" 
+		security="none" /> -->
 
 	<sec:http create-session="ifRequired" use-expressions="true">
 		<sec:http-basic entry-point-ref="restAuthenticationEntryPoint" />
@@ -64,9 +59,8 @@
 			access="isAnonymous() or isFullyAuthenticated()" />
 
 		<sec:intercept-url pattern="/api/**" access="isAnonymous()" />
-		<!-- <sec:intercept-url pattern="/api/session/keepAlive"
-			access="isAnonymous()" />
- -->
+		<!-- <sec:intercept-url pattern="/api/session/keepAlive" access="isAnonymous()" 
+			/> -->
 		<sec:intercept-url pattern="/j_spring_security_logout"
 			access="isFullyAuthenticated()" />
 
@@ -105,7 +99,11 @@
 		<property name="authenticationManager" ref="authenticationManager" />
 	</bean>
 
-	<jee:jndi-lookup id="authDataSource" jndi-name="${auth.jndi}" />
+	<bean id="authDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		p:driverClassName="${auth.jdbc.driverClassName}" p:url="${auth.jdbc.url}"
+		p:username="${auth.jdbc.username}" p:password="${auth.jdbc.password}"
+		p:testWhileIdle="${auth.jdbc.testWhileIdle}" p:testOnBorrow="${auth.jdbc.testOnBorrow}"
+		p:validationQuery="${auth.jdbc.validationQuery}" destroy-method="close" />
 
 
 	<bean id="expressionHandler"

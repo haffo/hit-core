@@ -12,7 +12,7 @@
 package gov.nist.hit.core.service;
 
 import gov.nist.hit.core.domain.account.Account;
-import gov.nist.hit.core.repo.account.AccountRepository;
+import gov.nist.hit.core.repo.AccountRepository;
 
 import java.io.Serializable;
 

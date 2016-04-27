@@ -1,14 +1,17 @@
 /**
- * This software was developed at the National Institute of Standards and Technology by employees
- * of the Federal Government in the course of their official duties. Pursuant to title 17 Section 105 of the
- * United States Code this software is not subject to copyright protection and is in the public domain.
- * This is an experimental system. NIST assumes no responsibility whatsoever for its use by other parties,
- * and makes no guarantees, expressed or implied, about its quality, reliability, or any other characteristic.
- * We would appreciate acknowledgement if the software is used. This software can be redistributed and/or
- * modified freely provided that any derivative works bear some notice that they are derived from it, and any
- * modified versions bear some notice that they have been modified.
+ * This software was developed at the National Institute of Standards and Technology by employees of
+ * the Federal Government in the course of their official duties. Pursuant to title 17 Section 105
+ * of the United States Code this software is not subject to copyright protection and is in the
+ * public domain. This is an experimental system. NIST assumes no responsibility whatsoever for its
+ * use by other parties, and makes no guarantees, expressed or implied, about its quality,
+ * reliability, or any other characteristic. We would appreciate acknowledgement if the software is
+ * used. This software can be redistributed and/or modified freely provided that any derivative
+ * works bear some notice that they are derived from it, and any modified versions bear some notice
+ * that they have been modified.
  */
 package gov.nist.hit.core.domain.account;
+
+import gov.nist.hit.core.domain.TransportConfig;
 
 import java.io.Serializable;
 
@@ -18,244 +21,252 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
- 
+
 /**
  * @author fdevaulx
  * 
- */  
+ */
 @Entity
 @JsonIgnoreProperties(value = "new", ignoreUnknown = true)
-public class Account  implements Serializable {
+public class Account implements Serializable {
 
-	private static final long serialVersionUID = 20130625L;
+  private static final long serialVersionUID = 20130625L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
-	
-	@Transient
-	private String registrationPassword;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  protected Long id;
 
-	@JsonIgnore
-	private boolean entityDisabled = false;
+  @Transient
+  private String registrationPassword;
 
-	@JsonIgnore
-	// TODO remove it and check it doesn't affect REST API security
-	private boolean pending = false;
+  @JsonIgnore
+  private boolean entityDisabled = false;
 
-	@Length(max = 100)
-	private String accountType;
+  @JsonIgnore
+  // TODO remove it and check it doesn't affect REST API security
+  private boolean pending = false;
 
-	@Length(max = 100)
-	@Column(unique = true)
-	private String username;
+  @Length(max = 100)
+  private String accountType;
 
-	@Email
-	@Length(max = 100)
-	@Column(unique = true)
-	private String email;
+  @Length(max = 100)
+  @Column(unique = true)
+  private String username;
 
-	@Length(max = 100)
-	@Column(unique = true)
-	private String fullName;
+  @Email
+  @Length(max = 100)
+  @Column(unique = true)
+  private String email;
 
-	@Length(max = 100)
-	private String phone;
+  @Length(max = 100)
+  @Column(unique = true)
+  private String fullName;
 
-	@Length(max = 100)
-	private String employer;
-	
- 	@Length(max = 100)
-	private String title;
-	
- 	@Length(max = 100)
-	private String juridiction;
-	
+  @Length(max = 100)
+  private String phone;
 
-	private Boolean signedConfidentialityAgreement = false;
+  @Length(max = 100)
+  private String employer;
 
-	public Account() {
-		this(null);
-	}
+  @Length(max = 100)
+  private String title;
 
-	/**
-	 * Creates a new account instance.
-	 */
-	public Account(Long id) {
-		this.setId(id);
-	}
+  @Length(max = 100)
+  private String juridiction;
 
-	/**
-	 * @return the username
-	 */
-	public String getUsername() {
-		return username;
-	}
 
-	/**
-	 * @param username
-	 *            the username to set
-	 */
-	public void setUsername(String username) {
-		this.username = username;
-	}
 
-	/**
-	 * @return the email
-	 */
-	public String getEmail() {
-		return email;
-	}
+  // @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  // @JoinTable(name = "user_configs", joinColumns = {@JoinColumn(name = "user_id")},
+  // inverseJoinColumns = {@JoinColumn(name = "confi_id")})
+  //
+  // @OneToMany(mappedBy = "user")
+  // private Set<TransportConfig> configs = new HashSet<TransportConfig>();
 
-	/**
-	 * @param email
-	 *            the email to set
-	 */
-	public void setEmail(String email) {
-		this.email = email;
-	}
 
-	/**
-	 * @return the phone
-	 */
-	public String getPhone() {
-		return phone;
-	}
 
-	/**
-	 * @param phone
-	 *            the phone to set
-	 */
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
+  public void addConfig(TransportConfig config) {
+    if (config.getUserId() != null)
+      throw new RuntimeException("The configuration provided belongs already to another user");
+    // this.getConfigs().add(config);
+    config.setUserId(this.getId());
+  }
 
-	/**
-	 * @return the entityDisabled
-	 */
-	public boolean isEntityDisabled() {
-		return entityDisabled;
-	}
 
-	/**
-	 * @param entityDisabled
-	 *            the entityDisabled to set
-	 */
-	public void setEntityDisabled(boolean entityDisabled) {
-		this.entityDisabled = entityDisabled;
-	}
+  private Boolean signedConfidentialityAgreement = false;
 
-	// Only used for registration
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return registrationPassword;
-	}
+  public Account() {
+    this(null);
+  }
 
-	/**
-	 * @param password
-	 *            the password to set
-	 */
-	public void setPassword(String registrationPassword) {
-		this.registrationPassword = registrationPassword;
-	}
+  /**
+   * Creates a new account instance.
+   */
+  public Account(Long id) {
+    this.setId(id);
+  }
 
-	/**
-	 * @return the accountType
-	 */
-	public String getAccountType() {
-		return accountType;
-	}
+  /**
+   * @return the username
+   */
+  public String getUsername() {
+    return username;
+  }
 
-	/**
-	 * @param accountType
-	 *            the accountType to set
-	 */
-	public void setAccountType(String accountType) {
-		this.accountType = accountType;
-	}
+  /**
+   * @param username the username to set
+   */
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-	 
+  /**
+   * @return the email
+   */
+  public String getEmail() {
+    return email;
+  }
 
-	/**
-	 * @return the signedConfidentialityAgreement
-	 */
-	public Boolean getSignedConfidentialityAgreement() {
-		return signedConfidentialityAgreement;
-	}
+  /**
+   * @param email the email to set
+   */
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-	/**
-	 * @param signedConfidentialityAgreement
-	 *            the signedConfidentialityAgreement to set
-	 */
-	public void setSignedConfidentialityAgreement(
-			Boolean signedConfidentialityAgreement) {
-		this.signedConfidentialityAgreement = signedConfidentialityAgreement;
-	}
+  /**
+   * @return the phone
+   */
+  public String getPhone() {
+    return phone;
+  }
 
-	/**
-	 * @return the pending
-	 */
-	public boolean isPending() {
-		return pending;
-	}
+  /**
+   * @param phone the phone to set
+   */
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
 
-	/**
-	 * @param pending
-	 *            the pending to set
-	 */
-	public void setPending(boolean pending) {
-		this.pending = pending;
-	}
+  /**
+   * @return the entityDisabled
+   */
+  public boolean isEntityDisabled() {
+    return entityDisabled;
+  }
 
-	public Long getId() {
-		return id;
-	}
+  /**
+   * @param entityDisabled the entityDisabled to set
+   */
+  public void setEntityDisabled(boolean entityDisabled) {
+    this.entityDisabled = entityDisabled;
+  }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  // Only used for registration
+  /**
+   * @return the password
+   */
+  public String getPassword() {
+    return registrationPassword;
+  }
 
-	public String getFullName() {
-		return fullName;
-	}
+  /**
+   * @param password the password to set
+   */
+  public void setPassword(String registrationPassword) {
+    this.registrationPassword = registrationPassword;
+  }
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+  /**
+   * @return the accountType
+   */
+  public String getAccountType() {
+    return accountType;
+  }
 
-	public String getEmployer() {
-		return employer;
-	}
+  /**
+   * @param accountType the accountType to set
+   */
+  public void setAccountType(String accountType) {
+    this.accountType = accountType;
+  }
 
-	public void setEmployer(String employer) {
-		this.employer = employer;
-	}
 
-	public String getTitle() {
-		return title;
-	}
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+  /**
+   * @return the signedConfidentialityAgreement
+   */
+  public Boolean getSignedConfidentialityAgreement() {
+    return signedConfidentialityAgreement;
+  }
 
-	public String getJuridiction() {
-		return juridiction;
-	}
+  /**
+   * @param signedConfidentialityAgreement the signedConfidentialityAgreement to set
+   */
+  public void setSignedConfidentialityAgreement(Boolean signedConfidentialityAgreement) {
+    this.signedConfidentialityAgreement = signedConfidentialityAgreement;
+  }
 
-	public void setJuridiction(String juridiction) {
-		this.juridiction = juridiction;
-	}
+  /**
+   * @return the pending
+   */
+  public boolean isPending() {
+    return pending;
+  }
 
-	
-	
+  /**
+   * @param pending the pending to set
+   */
+  public void setPending(boolean pending) {
+    this.pending = pending;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getFullName() {
+    return fullName;
+  }
+
+  public void setFullName(String fullName) {
+    this.fullName = fullName;
+  }
+
+  public String getEmployer() {
+    return employer;
+  }
+
+  public void setEmployer(String employer) {
+    this.employer = employer;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public String getJuridiction() {
+    return juridiction;
+  }
+
+  public void setJuridiction(String juridiction) {
+    this.juridiction = juridiction;
+  }
+
+
+
 }

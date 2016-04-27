@@ -52,7 +52,7 @@ import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.repo.TransactionRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.repo.TransportMessageRepository;
-import gov.nist.hit.core.repo.UserRepository;
+import gov.nist.hit.core.repo.AccountRepository;
 import gov.nist.hit.core.repo.TestStepValidationReportRepository;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.exception.ProfileParserException;
@@ -174,7 +174,7 @@ public abstract class ResourcebundleLoader {
   protected DBService dbService;
 
   @Autowired
-  protected UserRepository userRepository;
+  protected AccountRepository userRepository;
 
   @Autowired
   protected TransportMessageRepository transportMessageRepository;
@@ -1459,11 +1459,11 @@ public abstract class ResourcebundleLoader {
     this.dbService = dbService;
   }
 
-  public UserRepository getUserRepository() {
+  public AccountRepository getUserRepository() {
     return userRepository;
   }
 
-  public void setUserRepository(UserRepository userRepository) {
+  public void setUserRepository(AccountRepository userRepository) {
     this.userRepository = userRepository;
   }
 

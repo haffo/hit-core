@@ -13,9 +13,9 @@
 package gov.nist.hit.core.api;
 
 import gov.nist.hit.core.domain.TestCase;
+import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
-import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
@@ -58,7 +58,7 @@ public class TestCaseValidationReportController {
   private TestCaseService testCaseService;
 
   @Autowired
-  private UserService userService;
+  private AccountService userService;
 
   @ApiOperation(value = "Download a test case validation report by the test case's id",
       nickname = "downloadTestCaseValidationReport",

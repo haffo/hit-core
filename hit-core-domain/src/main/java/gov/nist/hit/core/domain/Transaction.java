@@ -12,6 +12,7 @@
 
 package gov.nist.hit.core.domain;
 
+import gov.nist.hit.core.domain.account.Account;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -45,7 +46,7 @@ public class Transaction implements java.io.Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
- 
+
   @ApiModelProperty(required = true, value = "message sent by the sut (system under test)")
   @NotNull
   @Column(nullable = false, columnDefinition = "LONGTEXT")
@@ -55,32 +56,32 @@ public class Transaction implements java.io.Serializable {
   @NotNull
   @Column(nullable = false, columnDefinition = "LONGTEXT")
   protected String outgoing;
- 
+
   @ApiModelProperty(required = true, value = "id of the test step")
   protected Long testStepId;
-  
+
   @ApiModelProperty(required = true, value = "user executing the transaction")
   @JsonIgnore
   @OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
-  protected User user; 
-  
+  protected Account user;
+
   @ApiModelProperty(required = true, value = "list of properties of the transaction")
   @JsonIgnore
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name="transaction_config", joinColumns=@JoinColumn(name="transaction_id"))
+  @CollectionTable(name = "transaction_config", joinColumns = @JoinColumn(name = "transaction_id"))
   @MapKeyColumn(name = "property_key")
   @Column(name = "property_value")
   protected Map<String, String> properties = new HashMap<String, String>();
-  
+
   @ApiModelProperty(required = false, value = "id of the response message id of the transaction")
   @JsonIgnore
   @Column(nullable = true)
   protected Long responseMessageId;
-  
- 
+
+
   public Transaction() {
     super();
-   }
+  }
 
   public Long getId() {
     return id;
@@ -120,15 +121,15 @@ public class Transaction implements java.io.Serializable {
     this.testStepId = testStepId;
   }
 
-  public User getUser() {
+  public Account getUser() {
     return user;
   }
 
-  public void setUser(User user) {
+  public void setUser(Account user) {
     this.user = user;
   }
 
- 
+
   public Map<String, String> getProperties() {
     return properties;
   }
@@ -148,13 +149,11 @@ public class Transaction implements java.io.Serializable {
 
   @Override
   public String toString() {
-    return "Transaction [id=" + id + ", incoming=" + incoming
-        + ", outgoing=" + outgoing + ", testStepId=" + testStepId + ", user=" + user + ", properties="
-        + properties + ", responseMessageId=" + responseMessageId + "]";
+    return "Transaction [id=" + id + ", incoming=" + incoming + ", outgoing=" + outgoing
+        + ", testStepId=" + testStepId + ", user=" + user + ", properties=" + properties
+        + ", responseMessageId=" + responseMessageId + "]";
   }
 
-  
-  
-  
+
 
 }

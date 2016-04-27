@@ -9,30 +9,26 @@
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  */
-package gov.nist.hit.core.repo.account;
+package gov.nist.hit.core.domain.util;
 
-import gov.nist.hit.core.domain.account.Account;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.jpa.domain.Specification;
+import java.util.Calendar;
+import java.util.Random;
 
 /**
- * @author fdevaulx
+ * @author Harold Affo
  * 
  */
-public class AccountSpecsHelper extends SpecsHelper<Account> {
+public class UserUtil {
 
-  static final Logger logger = LoggerFactory.getLogger(AccountSpecsHelper.class);
+  public static final String[] AUTHORITY_LIST = {"user", "author", "supervisor", "admin"};
+  public static final String[] ACCOUNT_TYPE_LIST = {"author", "supervisor", "admin"};
 
-  @Override
-  public Specification<Account> getSpecificationFromString(String filterKey, String filterValue) {
-    if ("accountType".equals(filterKey)) {
-      return AccountSpecs.hasAccountType(filterValue);
-    } else if ("company".equals(filterKey)) {
-      return AccountSpecs.companyIsLike(filterValue);
-    }
-    return null;
+  public static String generateRandom() {
+    int mon = Calendar.getInstance().get(Calendar.MONTH);
+    int yea = Calendar.getInstance().get(Calendar.YEAR);
+    int secs = Calendar.getInstance().get(Calendar.SECOND);
+    Random rmd = new Random(System.currentTimeMillis());
+    int rmdFile = rmd.nextInt(1000);
+    return "" + yea + mon + rmdFile + secs;
   }
-
 }
