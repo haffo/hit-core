@@ -32,4 +32,6 @@ public interface TestCaseValidationReportService {
   public String generateXhtml(TestCaseValidationResult result) throws ValidationReportException;
 
   void deleteByTestCaseAndUser(Long userId, Long testCaseId);
+
+
 }

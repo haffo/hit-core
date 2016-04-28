@@ -20,4 +20,6 @@ public interface AccountService {
 
   List<Account> findAll();
 
+  void reconcileAccounts(Long oldAccountId, Long newAccountId);
+
 }

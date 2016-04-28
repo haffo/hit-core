@@ -27,4 +27,7 @@ public interface TestCaseValidationReportRepository extends
   List<TestStepValidationReport> findAllByTestCaseAndUser(@Param("userId") Long userId,
       @Param("testCaseId") Long testCaseId);
 
+  @Query("select report from TestStepValidationReport report where report.user.id = :userId")
+  List<TestStepValidationReport> findAllByUser(@Param("userId") Long userId);
+
 }

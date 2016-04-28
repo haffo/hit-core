@@ -6,6 +6,7 @@ import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransportConfig;
 import gov.nist.hit.core.domain.account.Account;
 import gov.nist.hit.core.repo.AccountRepository;
+import gov.nist.hit.core.repo.TestCaseValidationReportRepository;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.TransactionService;
@@ -27,6 +28,9 @@ public class AccountServiceImpl implements AccountService {
 
   @Autowired
   private TransactionService transactionService;
+
+  @Autowired
+  private TestCaseValidationReportRepository testCaseValidationReportRepository;
 
   //
   @Autowired
@@ -86,6 +90,30 @@ public class AccountServiceImpl implements AccountService {
   public List<Account> findAll() {
     // TODO Auto-generated method stub
     return accountRepository.findAll();
+  }
+
+  @Override
+  public void reconcileAccounts(Long oldAccountId, Long newAccountId) {
+
+    List<TransportConfig> configs = transportConfigService.findAllByUser(oldAccountId);
+    if (configs != null) {
+      transportConfigService.delete(configs);
+    }
+    List<Transaction> transactions = transactionService.findAllByUser(oldAccountId);
+    if (transactions != null) {
+      transactionService.delete(transactions);
+    }
+
+    List<TestStepValidationReport> reports =
+        testCaseValidationReportRepository.findAllByUser(oldAccountId);
+    if (reports != null && !reports.isEmpty()) {
+      Account newAccount = this.findOne(newAccountId);
+      for (TestStepValidationReport report : reports) {
+        report.setUser(newAccount);
+      }
+      testCaseValidationReportRepository.save(reports);
+    }
+
   }
 
 

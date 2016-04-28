@@ -21,8 +21,10 @@ import gov.nist.hit.core.domain.account.ShortAccount;
 import gov.nist.hit.core.repo.AccountPasswordResetRepository;
 import gov.nist.hit.core.repo.AccountRepository;
 import gov.nist.hit.core.repo.util.AccountSpecsHelper;
+import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.CustomSortHandler;
 import gov.nist.hit.core.service.RandomPasswordGenerator;
+import gov.nist.hit.core.service.TestCaseValidationReportService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.UserNotFoundException;
 import gov.nist.hit.core.service.util.UserUtil;
@@ -79,6 +81,9 @@ public class AccountController {
   AccountRepository accountRepository;
 
   @Autowired
+  AccountService accountService;
+
+  @Autowired
   UserService userService;
 
   @Autowired
@@ -96,6 +101,8 @@ public class AccountController {
   @Value("${admin.email}")
   private String ADMIN_EMAIL;
 
+  @Autowired
+  TestCaseValidationReportService testCaseValidationService;
 
 
   @Autowired
@@ -140,10 +147,6 @@ public class AccountController {
           sacc.setId(acc.getId());
           sacc.setEmail(acc.getEmail());
           sacc.setFullName(acc.getFullName());
-          sacc.setEmployer(acc.getEmployer());
-          sacc.setJuridiction(acc.getJuridiction());
-          sacc.setPhone(acc.getPhone());
-          sacc.setTitle(acc.getTitle());
           sacc.setUsername(acc.getUsername());
           saccs.add(sacc);
         }
@@ -225,12 +228,8 @@ public class AccountController {
           sacc.setId(acc.getId());
           sacc.setEmail(acc.getEmail());
           sacc.setFullName(acc.getFullName());
-          sacc.setEmployer(acc.getEmployer());
-          sacc.setJuridiction(acc.getJuridiction());
-          sacc.setPhone(acc.getPhone());
           sacc.setAccountType(acc.getAccountType());
           sacc.setUsername(acc.getUsername());
-          sacc.setTitle(acc.getTitle());
 
           saccs.add(sacc);
         }
@@ -272,10 +271,6 @@ public class AccountController {
           sacc.setId(acc.getId());
           sacc.setEmail(acc.getEmail());
           sacc.setFullName(acc.getFullName());
-          sacc.setEmployer(acc.getEmployer());
-          sacc.setJuridiction(acc.getJuridiction());
-          sacc.setPhone(acc.getPhone());
-          sacc.setTitle(acc.getTitle());
           sacc.setPending(acc.isPending());
           sacc.setEntityDisabled(acc.isEntityDisabled());
           sacc.setUsername(acc.getUsername());
@@ -319,12 +314,8 @@ public class AccountController {
             account.getEmail());
       }
 
-      acc.setEmployer(account.getEmployer());
       acc.setFullName(account.getFullName());
       acc.setEmail(account.getEmail());
-      acc.setJuridiction(account.getJuridiction());
-      acc.setPhone(account.getPhone());
-      acc.setTitle(account.getTitle());
 
       accountRepository.save(acc);
 
@@ -602,12 +593,8 @@ public class AccountController {
       registeredAccount.setPending(true);
       registeredAccount.setUsername(account.getUsername());
       registeredAccount.setAccountType(account.getAccountType());
-      registeredAccount.setEmployer(account.getEmployer());
       registeredAccount.setFullName(account.getFullName());
-      registeredAccount.setPhone(account.getPhone());
       registeredAccount.setEmail(account.getEmail());
-      registeredAccount.setTitle(account.getTitle());
-      registeredAccount.setJuridiction(account.getJuridiction());
       registeredAccount.setSignedConfidentialityAgreement(account
           .getSignedConfidentialityAgreement());
 
@@ -947,7 +934,17 @@ public class AccountController {
    * User wants to log in
    * */
   @RequestMapping(value = "/accounts/login", method = RequestMethod.GET)
-  public ResponseMessage doNothing() {
+  public ResponseMessage doNothing(HttpSession session) {
+    User u = userService.getCurrentUser();
+    CurrentUser cu = null;
+    if (u != null && u.isEnabled()) {
+      Account a = accountRepository.findByTheAccountsUsername(u.getUsername());
+      if (!a.isPending()) {
+        Long guestId = SessionContext.getCurrentUserId(session);
+        accountService.reconcileAccounts(guestId, a.getId());
+        SessionContext.setCurrentUserId(session, a.getId());
+      }
+    }
     return new ResponseMessage(ResponseMessage.Type.success, "loginSuccess", "succes");
   }
 
@@ -968,6 +965,7 @@ public class AccountController {
         cu.setAuthorities(u.getAuthorities());
         cu.setPending(a.isPending());
         cu.setFullName(a.getFullName());
+        cu.setGuestAccount(false);
       }
     }
     return cu;
@@ -975,7 +973,7 @@ public class AccountController {
 
   private void sendApplicationConfirmationNotification(Account acc) {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-    msg.setSubject("NIST IGAMT Application Received");
+    msg.setSubject("NIST  Application Received");
     msg.setTo(acc.getEmail());
     msg.setText("Dear "
         + acc.getUsername()
@@ -1022,22 +1020,11 @@ public class AccountController {
         + "Username: "
         + acc.getUsername()
         + "\n"
-        + "Title/Position: "
-        + acc.getTitle()
-        + "\n"
-        + "Employer: "
-        + acc.getEmployer()
-        + "\n"
-        + "Juridiction: "
-        + acc.getJuridiction()
-        + "\n"
-        + "Phone Number: "
-        + acc.getPhone()
-        + "\n"
         + " \n\n"
         + "Sincerely, "
         + "\n\n"
-        + "The NIST IGAMT Team" + "\n\n");
+        + "The NIST IGAMT Team"
+        + "\n\n");
     try {
       this.mailSender.send(msg);
     } catch (MailException ex) {
@@ -1222,7 +1209,7 @@ public class AccountController {
 
 
   @Transactional()
-  @RequestMapping(value = "/user/current", method = RequestMethod.POST)
+  @RequestMapping(value = "/accounts/guest", method = RequestMethod.POST)
   public Account create(HttpSession session) throws UserNotFoundException {
     Account user = null;
     Long id = SessionContext.getCurrentUserId(session);

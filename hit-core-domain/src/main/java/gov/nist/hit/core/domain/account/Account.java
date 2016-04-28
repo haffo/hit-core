@@ -68,18 +68,9 @@ public class Account implements Serializable {
   @Column(unique = true)
   private String fullName;
 
-  @Length(max = 100)
-  private String phone;
 
-  @Length(max = 100)
-  private String employer;
-
-  @Length(max = 100)
-  private String title;
-
-  @Length(max = 100)
-  private String juridiction;
-
+  @JsonIgnore
+  private boolean guestAccount = true;
 
 
   // @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
@@ -140,19 +131,7 @@ public class Account implements Serializable {
     this.email = email;
   }
 
-  /**
-   * @return the phone
-   */
-  public String getPhone() {
-    return phone;
-  }
 
-  /**
-   * @param phone the phone to set
-   */
-  public void setPhone(String phone) {
-    this.phone = phone;
-  }
 
   /**
    * @return the entityDisabled
@@ -243,28 +222,20 @@ public class Account implements Serializable {
     this.fullName = fullName;
   }
 
-  public String getEmployer() {
-    return employer;
+  public String getRegistrationPassword() {
+    return registrationPassword;
   }
 
-  public void setEmployer(String employer) {
-    this.employer = employer;
+  public void setRegistrationPassword(String registrationPassword) {
+    this.registrationPassword = registrationPassword;
   }
 
-  public String getTitle() {
-    return title;
+  public boolean isGuestAccount() {
+    return guestAccount;
   }
 
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public String getJuridiction() {
-    return juridiction;
-  }
-
-  public void setJuridiction(String juridiction) {
-    this.juridiction = juridiction;
+  public void setGuestAccount(boolean guestAccount) {
+    this.guestAccount = guestAccount;
   }
 
 
