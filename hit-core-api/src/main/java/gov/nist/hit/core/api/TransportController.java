@@ -90,7 +90,11 @@ public class TransportController {
             request.getProtocol(), request.getDomain());
     if (config != null) {
       if (TestingType.SUT_INITIATOR.equals(request.getType())) {
-        config.setSutInitiator(request.getConfig());
+        Map<String, String> newValues = request.getConfig();
+        Map<String, String> sutConfig = config.getSutInitiator();
+        for (String key : newValues.keySet()) {
+          sutConfig.put(key, newValues.get(key));
+        }
       } else if (TestingType.TA_INITIATOR.equals(request.getType())) {
         config.setTaInitiator(request.getConfig());
       }
@@ -126,8 +130,8 @@ public class TransportController {
   @RequestMapping(value = "/config/forms", method = RequestMethod.GET)
   public List<TransportForms> forms() {
     logger.info("Fetching  all transports form");
-    return transportFormsRepository.findAll();
+    List<TransportForms> forms = transportFormsRepository.findAll();
+    return forms;
   }
-
 
 }

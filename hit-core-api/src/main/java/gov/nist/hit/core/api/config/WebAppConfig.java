@@ -37,7 +37,7 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan("gov.nist.hit")
+@ComponentScan({"gov.nist.hit", "gov.nist.auth.hit"})
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
 

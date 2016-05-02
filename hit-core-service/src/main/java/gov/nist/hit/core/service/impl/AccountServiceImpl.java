@@ -1,11 +1,11 @@
 package gov.nist.hit.core.service.impl;
 
+import gov.nist.auth.hit.core.domain.Account;
+import gov.nist.auth.hit.core.repo.AccountRepository;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransportConfig;
-import gov.nist.hit.core.domain.account.Account;
-import gov.nist.hit.core.repo.AccountRepository;
 import gov.nist.hit.core.repo.TestCaseValidationReportRepository;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
@@ -15,14 +15,17 @@ import gov.nist.hit.core.service.TransportConfigService;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "accountService")
+@Transactional(value = "authTransactionManager")
 public class AccountServiceImpl implements AccountService {
-
   @Autowired
   protected AccountRepository accountRepository;
 
@@ -32,9 +35,6 @@ public class AccountServiceImpl implements AccountService {
   @Autowired
   private TestCaseValidationReportRepository testCaseValidationReportRepository;
 
-  //
-  @Autowired
-  protected EntityManager entityManager;
 
   @Autowired
   protected TransportConfigService transportConfigService;
@@ -52,11 +52,13 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  @Transactional(value = "authTransactionManager")
   public void delete(Account user) {
     accountRepository.delete(user);
   }
 
   @Override
+  @Transactional(value = "authTransactionManager")
   public void delete(Long id) {
     if (id != null) {
       List<TransportConfig> configs = transportConfigService.findAllByUser(id);
@@ -77,6 +79,8 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  @Transactional(value = "authTransactionManager")
+  // @Transactional(propagation = Propagation.REQUIRED)
   public Account save(Account user) {
     return accountRepository.saveAndFlush(user);
   }
@@ -93,6 +97,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  @Transactional(value = "transactionManager")
   public void reconcileAccounts(Long oldAccountId, Long newAccountId) {
 
     List<TransportConfig> configs = transportConfigService.findAllByUser(oldAccountId);
@@ -103,17 +108,63 @@ public class AccountServiceImpl implements AccountService {
     if (transactions != null) {
       transactionService.delete(transactions);
     }
-
     List<TestStepValidationReport> reports =
         testCaseValidationReportRepository.findAllByUser(oldAccountId);
     if (reports != null && !reports.isEmpty()) {
       Account newAccount = this.findOne(newAccountId);
       for (TestStepValidationReport report : reports) {
-        report.setUser(newAccount);
+        report.setUserId(newAccount.getId());
       }
       testCaseValidationReportRepository.save(reports);
     }
+  }
 
+  @Override
+  public Account findByTheAccountsUsername(String username) {
+    // TODO Auto-generated method stub
+    return accountRepository.findByTheAccountsUsername(username);
+  }
+
+  @Override
+  public Account findOne(Specification<Account> spec) {
+    // TODO Auto-generated method stub
+    return accountRepository.findOne(spec);
+  }
+
+  @Override
+  public List<Account> findAll(Specification<Account> spec) {
+    // TODO Auto-generated method stub
+    return accountRepository.findAll(spec);
+  }
+
+  @Override
+  public Page<Account> findAll(Specification<Account> spec, Pageable pageable) {
+    // TODO Auto-generated method stub
+    return accountRepository.findAll(spec, pageable);
+  }
+
+  @Override
+  public List<Account> findAll(Specification<Account> spec, Sort sort) {
+    // TODO Auto-generated method stub
+    return accountRepository.findAll(spec, sort);
+  }
+
+  @Override
+  public long count(Specification<Account> spec) {
+    // TODO Auto-generated method stub
+    return accountRepository.count(spec);
+  }
+
+  @Override
+  public Account findByTheAccountsEmail(String email) {
+    // TODO Auto-generated method stub
+    return accountRepository.findByTheAccountsEmail(email);
+  }
+
+  @Override
+  public List<Account> findByTheAccountsAccountType(String accountType) {
+    // TODO Auto-generated method stub
+    return accountRepository.findByTheAccountsAccountType(accountType);
   }
 
 

@@ -9,9 +9,9 @@
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  */
-package gov.nist.hit.core.domain.account;
+package gov.nist.auth.hit.core.domain;
 
-import gov.nist.hit.core.domain.util.UserUtil;
+import gov.nist.auth.hit.core.domain.util.UserUtil;
 
 import java.io.Serializable;
 import java.util.Date;

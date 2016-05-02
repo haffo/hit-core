@@ -13,9 +13,9 @@ package gov.nist.hit.core.api;
  */
 
 
+import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.domain.account.Account;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.MessageValidationReportService;
 import gov.nist.hit.core.service.TestCaseService;
@@ -98,7 +98,7 @@ public class MessageValidationReportController {
         report = new TestStepValidationReport();
       }
       report.setTestStep(testStep);
-      report.setUser(user);
+      report.setUserId(user.getId());
       report.setXml(xmlMessageValidationReport);
       validationReportService.save(report);
       return report;
@@ -130,7 +130,7 @@ public class MessageValidationReportController {
       if (report == null || ((xmlReport = report.getXml()) == null)) {
         throw new ValidationReportException("No validation report available for this test step");
       }
-      if (report.getUser() == null || !userId.equals(report.getUser().getId())) {
+      if (report.getUserId() == null || !userId.equals(report.getUserId())) {
         throw new MessageValidationException("Forbidden access");
       }
 

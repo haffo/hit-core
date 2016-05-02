@@ -12,14 +12,11 @@
          http://www.springframework.org/schema/jee
          http://www.springframework.org/schema/jee/spring-jee.xsd">
 
-	<context:property-placeholder
-		location="classpath:app-mail-config.properties, classpath:app-auth-config.properties" />
+	<context:property-placeholder location="classpath:app-auth-config.properties" />
 
 	<sec:http pattern="/blank.html" security="none" />
 	<sec:http pattern="/Error.html" security="none" />
 	<sec:http pattern="/InvalidAppState.html" security="none" />
-	<sec:http pattern="/InvalidAppState.html" security="none" />
-	<sec:http pattern="/InvalidRequest.html" security="none" />
 	<sec:http pattern="/NotFound.html" security="none" />
 	<sec:http pattern="/SessionTimeout.html" security="none" />
 	<sec:http pattern="/index.html" security="none" />
@@ -31,48 +28,72 @@
 	<sec:http pattern="/fonts/**" security="none" />
 	<sec:http pattern="/lib/**" security="none" />
 
-	<sec:http pattern="/api/**" security="none" />
-	<!-- <sec:http pattern="/api/cf/*" security="none" /> <sec:http pattern="/api/message/*" 
-		security="none" /> <sec:http pattern="/api/messageValidationReport/*" security="none" 
-		/> <sec:http pattern="/api/profile/*" security="none" /> <sec:http pattern="/api/session/*" 
-		security="none" /> <sec:http pattern="/api/artifact/*" security="none" /> 
-		<sec:http pattern="/api/testcases/*" security="none" /> <sec:http pattern="/api/teststeps/*" 
-		security="none" /> <sec:http pattern="/api/testcasegroups/*" security="none" 
-		/> <sec:http pattern="/api/testCaseValidationReport/*" security="none" /> 
-		<sec:http pattern="/api/testcontexts/*" security="none" /> <sec:http pattern="/api/testplans/*" 
-		security="none" /> <sec:http pattern="/api/transport/*" security="none" /> 
-		<sec:http pattern="/api/user/*" security="none" /> <sec:http pattern="/api/valueSetLibrary/*" 
-		security="none" /> -->
+	<sec:http pattern="/api/ws/*" security="none" />
+	<sec:http pattern="/api/appInfo" security="none" />
+	<sec:http pattern="/api/*/clearRecords" security="none" />
+	<sec:http pattern="/api/*/testcases" security="none" />
+	<!-- <sec:http pattern="/api/session/create" security="none" /> -->
+	<sec:http pattern="/api/transport/config/forms" security="none" />
+	<sec:http pattern="/api/testcases/*" security="none" />
+	<sec:http pattern="/api/teststeps/*" security="none" />
+	<sec:http pattern="/api/testcasegroups/*" security="none" />
+	<sec:http pattern="/api/testplans/*" security="none" />
+	<sec:http pattern="/api/transport/*" security="none" />
+	<sec:http pattern="/api/user/*" security="none" />
+	<sec:http pattern="/api/documentation/*" security="none" />
 
 	<sec:http create-session="ifRequired" use-expressions="true">
+
+		<sec:session-management>
+			<sec:concurrency-control max-sessions="1" />
+		</sec:session-management>
+
 		<sec:http-basic entry-point-ref="restAuthenticationEntryPoint" />
+		<sec:intercept-url pattern="/api/**" access="isAnonymous() or isFullyAuthenticated()" />
 
 		<sec:intercept-url pattern="/api/sooa/accounts/**"
 			access="isAnonymous()" />
 		<sec:intercept-url pattern="/api/sooa/usernames/**"
 			access="isAnonymous()" />
-
 		<sec:intercept-url pattern="/api/sooa/emails/**"
 			access="isAnonymous()" />
-
-		<sec:intercept-url pattern="/api/accounts/cuser"
-			access="isAnonymous() or isFullyAuthenticated()" />
-
-		<sec:intercept-url pattern="/api/**" access="isAnonymous()" />
-		<!-- <sec:intercept-url pattern="/api/session/keepAlive" access="isAnonymous()" 
+		<sec:intercept-url pattern="/api/session/keepAlive"
+			access="isAnonymous()" />
+		<!-- <sec:intercept-url pattern="/api/session/create" access="isAnonymous() 
+			or isFullyAuthenticated()" /> -->
+		<!-- <sec:intercept-url pattern="/api/accounts/login" access="isFullyAuthenticated()" 
 			/> -->
+<!-- 			
+		<sec:intercept-url pattern="/api/accounts/cuser"
+			access="isAnonymous() or isFullyAuthenticated()" /> -->
+			
+		<sec:intercept-url pattern="/api/accounts/guest"
+			access="isAnonymous()" />
+		<sec:intercept-url pattern="/api/accounts/guest/*"
+			access="isAnonymous()" />
+<!-- 	<sec:intercept-url pattern="/api/transport/**"
+			access="isAnonymous() or isFullyAuthenticated()" /> -->
+			
+		<!-- <sec:intercept-url pattern="/api/messageValidationReport/**"
+			access="isAnonymous() or isFullyAuthenticated()" />
+			<sec:intercept-url pattern="/api/testCaseValidationReport/**"
+			access="isAnonymous() or isFullyAuthenticated()" />
+				<sec:intercept-url pattern="/api/testStepValidationReport/**"
+			access="isAnonymous() or isFullyAuthenticated()" />
+				<sec:intercept-url pattern="/api/session/keepAlive" access="isAnonymous() or isFullyAuthenticated()" 
+			/> -->
+		
+	
 		<sec:intercept-url pattern="/j_spring_security_logout"
 			access="isFullyAuthenticated()" />
-
-		<sec:intercept-url pattern="/**"
-			access="isFullyAuthenticated() and hasRole('admin')" />
+<!-- 		<sec:intercept-url pattern="/**"
+			access="isFullyAuthenticated() and hasRole('admin')" /> -->
 
 		<sec:logout logout-success-url="/index.html" />
 
 	</sec:http>
 
-	<bean id="restAuthenticationEntryPoint"
-		class="gov.nist.healthcare.nht.acmgt.web.RestAuthenticationEntryPoint" />
+	<bean id="restAuthenticationEntryPoint" class="gov.nist.hit.core.api.util.RestAuthenticationEntryPoint" />
 
 	<sec:global-method-security
 		pre-post-annotations="enabled">
@@ -93,8 +114,7 @@
 		<constructor-arg value="256" />
 	</bean>
 
-	<bean id="userDetailsService"
-		class="gov.nist.healthcare.nht.acmgt.general.CustomJdbcUserDetailsManager">
+	<bean id="userDetailsService" class="gov.nist.hit.core.service.CustomJdbcUserDetailsManager">
 		<property name="dataSource" ref="authDataSource" />
 		<property name="authenticationManager" ref="authenticationManager" />
 	</bean>

@@ -18,6 +18,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -39,9 +40,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author Harold Affo (NIST)
  * 
  */
- 
+
 @Configuration
-@EnableJpaRepositories("gov.nist.hit")
+@EnableJpaRepositories(value = "gov.nist.hit")
 @PropertySource(value = "classpath:app-db.properties")
 @EnableTransactionManagement(proxyTargetClass = true)
 public class DbConfig {
@@ -49,7 +50,7 @@ public class DbConfig {
   @Autowired
   private Environment env;
 
-  @Bean
+  @Bean 
   public DataSource dataSource() {
     DriverManagerDataSource dataSource = new DriverManagerDataSource();
     dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
@@ -59,9 +60,10 @@ public class DbConfig {
     return dataSource;
   }
 
-  @Bean
-  public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource,
-      JpaVendorAdapter jpaVendorAdapter) {
+  @Bean 
+  public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+       DataSource dataSource,
+       JpaVendorAdapter jpaVendorAdapter) {
     LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
     lef.setDataSource(dataSource);
     lef.setJpaVendorAdapter(jpaVendorAdapter);
@@ -73,7 +75,7 @@ public class DbConfig {
     return lef;
   }
 
-  @Bean
+  @Bean 
   public JpaVendorAdapter jpaVendorAdapter() {
     HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
     jpaVendorAdapter.setShowSql(Boolean.getBoolean(env.getProperty("jpa.showSql")));
@@ -101,7 +103,8 @@ public class DbConfig {
   }
 
   @Bean
-  public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+  public PlatformTransactionManager transactionManager(
+     EntityManagerFactory entityManagerFactory) {
     JpaTransactionManager transactionManager = new JpaTransactionManager();
     transactionManager.setEntityManagerFactory(entityManagerFactory);
     transactionManager.setJpaDialect(new HibernateJpaDialect());

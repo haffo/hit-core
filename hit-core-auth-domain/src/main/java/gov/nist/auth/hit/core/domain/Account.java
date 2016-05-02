@@ -9,9 +9,7 @@
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  */
-package gov.nist.hit.core.domain.account;
-
-import gov.nist.hit.core.domain.TransportConfig;
+package gov.nist.auth.hit.core.domain;
 
 import java.io.Serializable;
 
@@ -80,14 +78,6 @@ public class Account implements Serializable {
   // @OneToMany(mappedBy = "user")
   // private Set<TransportConfig> configs = new HashSet<TransportConfig>();
 
-
-
-  public void addConfig(TransportConfig config) {
-    if (config.getUserId() != null)
-      throw new RuntimeException("The configuration provided belongs already to another user");
-    // this.getConfigs().add(config);
-    config.setUserId(this.getId());
-  }
 
 
   private Boolean signedConfidentialityAgreement = false;

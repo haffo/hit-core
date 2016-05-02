@@ -1,7 +1,5 @@
 package gov.nist.hit.core.domain;
 
-import gov.nist.hit.core.domain.account.Account;
-
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -30,8 +28,7 @@ public class TestStepValidationReport implements Serializable {
   private TestStep testStep;
 
   @JsonIgnore
-  @ManyToOne(optional = false)
-  private Account user;
+  private Long userId;
 
   @JsonIgnore
   @Column(columnDefinition = "TEXT")
@@ -47,11 +44,11 @@ public class TestStepValidationReport implements Serializable {
   @Column(columnDefinition = "TEXT")
   private String comments;
 
-  public TestStepValidationReport(String content, TestStep testStep, Account user) {
+  public TestStepValidationReport(String content, TestStep testStep, Long accountId) {
     super();
     this.xml = content;
     this.testStep = testStep;
-    this.user = user;
+    this.userId = accountId;
   }
 
 
@@ -85,12 +82,15 @@ public class TestStepValidationReport implements Serializable {
     this.testStep = testStep;
   }
 
-  public Account getUser() {
-    return user;
+
+
+  public Long getUserId() {
+    return userId;
   }
 
-  public void setUser(Account user) {
-    this.user = user;
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
   }
 
 

@@ -9,9 +9,9 @@
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  */
-package gov.nist.hit.core.repo.util;
+package gov.nist.auth.hit.core.repo.util;
 
-import gov.nist.hit.core.domain.account.Account;
+import gov.nist.auth.hit.core.domain.Account;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;

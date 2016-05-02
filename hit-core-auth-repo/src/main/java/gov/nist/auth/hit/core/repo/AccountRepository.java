@@ -1,6 +1,6 @@
-package gov.nist.hit.core.repo;
+package gov.nist.auth.hit.core.repo;
 
-import gov.nist.hit.core.domain.account.Account;
+import gov.nist.auth.hit.core.domain.Account;
 
 import java.util.List;
 

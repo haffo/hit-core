@@ -12,29 +12,26 @@
 package gov.nist.hit.core.api;
 
 import static org.springframework.data.jpa.domain.Specifications.where;
+import gov.nist.auth.hit.core.domain.Account;
+import gov.nist.auth.hit.core.domain.AccountChangeCredentials;
+import gov.nist.auth.hit.core.domain.AccountPasswordReset;
+import gov.nist.auth.hit.core.domain.CurrentUser;
+import gov.nist.auth.hit.core.domain.ShortAccount;
+import gov.nist.auth.hit.core.domain.util.UserUtil;
+import gov.nist.auth.hit.core.repo.util.AccountSpecsHelper;
 import gov.nist.hit.core.domain.ResponseMessage;
-import gov.nist.hit.core.domain.account.Account;
-import gov.nist.hit.core.domain.account.AccountChangeCredentials;
-import gov.nist.hit.core.domain.account.AccountPasswordReset;
-import gov.nist.hit.core.domain.account.CurrentUser;
-import gov.nist.hit.core.domain.account.ShortAccount;
-import gov.nist.hit.core.repo.AccountPasswordResetRepository;
-import gov.nist.hit.core.repo.AccountRepository;
-import gov.nist.hit.core.repo.util.AccountSpecsHelper;
+import gov.nist.hit.core.service.AccountPasswordResetService;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.CustomSortHandler;
 import gov.nist.hit.core.service.RandomPasswordGenerator;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
 import gov.nist.hit.core.service.UserService;
-import gov.nist.hit.core.service.exception.UserNotFoundException;
-import gov.nist.hit.core.service.util.UserUtil;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -53,7 +50,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -77,8 +73,6 @@ public class AccountController {
 
   public AccountController() {}
 
-  @Inject
-  AccountRepository accountRepository;
 
   @Autowired
   AccountService accountService;
@@ -92,8 +86,7 @@ public class AccountController {
   @Autowired
   private SimpleMailMessage templateMessage;
 
-  @Value("${unauthenticated.registration.authorized.accountType}")
-  private String AUTHORIZED_ACCOUNT_TYPE_UNAUTH_REG;
+  private final String AUTHORIZED_ACCOUNT_TYPE_UNAUTH_REG = "tester";
 
   @Value("${server.email}")
   private String SERVER_EMAIL;
@@ -106,7 +99,7 @@ public class AccountController {
 
 
   @Autowired
-  AccountPasswordResetRepository accountResetPasswordRepository;
+  AccountPasswordResetService accountPasswordResetService;
 
 
   @PreAuthorize("hasRole('supervisor') or hasRole('admin')")
@@ -115,7 +108,7 @@ public class AccountController {
 
     List<Account> accs = new LinkedList<Account>();
 
-    for (Account acc : accountRepository.findAll()) {
+    for (Account acc : accountService.findAll()) {
       if (!acc.isEntityDisabled()) {
         accs.add(acc);
       }
@@ -135,7 +128,7 @@ public class AccountController {
     AccountSpecsHelper accH = new AccountSpecsHelper();
 
     Page<Account> pa =
-        accountRepository.findAll((where(accH.getSpecificationFromString("accountType", "author"))
+        accountService.findAll((where(accH.getSpecificationFromString("accountType", "tester"))
             .and(accH.getSpecification(filter))), new PageRequest(value, size,
             (new CustomSortHandler(sort)).getSort()));
 
@@ -173,7 +166,7 @@ public class AccountController {
   //
   // AccountSpecsHelper accH = new AccountSpecsHelper();
   //
-  // Page<Account> pa = accountRepository.findAll((where(accH
+  // Page<Account> pa = accountService.findAll((where(accH
   // .getSpecificationFromString("accountType", "authorizedVendor"))
   // .and(accH.getSpecification(filter))), new PageRequest(value,
   // size, (new CustomSortHandler(sort)).getSort()));
@@ -217,7 +210,7 @@ public class AccountController {
     }
 
     Page<Account> pa =
-        accountRepository.findAll((new AccountSpecsHelper()).getSpecification(filter),
+        accountService.findAll((new AccountSpecsHelper()).getSpecification(filter),
             new PageRequest(value, size, (new CustomSortHandler(sort)).getSort()));
 
     if (pa.getContent() != null && !pa.getContent().isEmpty()) {
@@ -250,7 +243,7 @@ public class AccountController {
 
     User authU = userService.getCurrentUser();
     if (authU != null && authU.isEnabled()) {
-      if (authU.getAuthorities().contains(new SimpleGrantedAuthority("author"))) {
+      if (authU.getAuthorities().contains(new SimpleGrantedAuthority("tester"))) {
         filter.clear();
       } else if (authU.getAuthorities().contains(new SimpleGrantedAuthority("supervisor"))
           || authU.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) {
@@ -263,7 +256,7 @@ public class AccountController {
     }
 
     List<Account> accs =
-        accountRepository.findAll((new AccountSpecsHelper()).getSpecification(filter));
+        accountService.findAll((new AccountSpecsHelper()).getSpecification(filter));
     if (accs != null && !accs.isEmpty()) {
       for (Account acc : accs) {
         if (!acc.isEntityDisabled()) {
@@ -286,7 +279,7 @@ public class AccountController {
   @RequestMapping(value = "/accounts/{id}", method = RequestMethod.GET)
   public Account getAccountById(@PathVariable Long id) {
 
-    Account acc = accountRepository.findOne(id);
+    Account acc = accountService.findOne(id);
 
     if (acc == null || acc.isEntityDisabled()) {
       return null;
@@ -300,7 +293,7 @@ public class AccountController {
   public ResponseMessage updateAccountById(@PathVariable Long id,
       @Valid @RequestBody Account account) {
 
-    Account acc = accountRepository.findOne(id);
+    Account acc = accountService.findOne(id);
     if (acc == null || acc.isEntityDisabled()) {
       return new ResponseMessage(ResponseMessage.Type.danger, "badAccount", id.toString());
     } else {
@@ -309,7 +302,7 @@ public class AccountController {
         return new ResponseMessage(ResponseMessage.Type.danger, "emptyEmail", account.getEmail());
       }
       if (!acc.getEmail().equalsIgnoreCase(account.getEmail())
-          && accountRepository.findByTheAccountsEmail(account.getEmail()) != null) {
+          && accountService.findByTheAccountsEmail(account.getEmail()) != null) {
         return new ResponseMessage(ResponseMessage.Type.danger, "duplicateEmail",
             account.getEmail());
       }
@@ -317,7 +310,7 @@ public class AccountController {
       acc.setFullName(account.getFullName());
       acc.setEmail(account.getEmail());
 
-      accountRepository.save(acc);
+      accountService.save(acc);
 
       return new ResponseMessage(ResponseMessage.Type.success, "accountUpdated", acc.getId()
           .toString());
@@ -330,7 +323,7 @@ public class AccountController {
   public ResponseMessage accountEmailExist(@PathVariable String email, @RequestParam(
       required = false) String email1) {
 
-    if (accountRepository.findByTheAccountsEmail(email) != null) {
+    if (accountService.findByTheAccountsEmail(email) != null) {
       return new ResponseMessage(ResponseMessage.Type.success, "emailFound", email);
     } else {
       return new ResponseMessage(ResponseMessage.Type.success, "emailNotFound", email);
@@ -340,7 +333,7 @@ public class AccountController {
   @RequestMapping(value = "/sooa/usernames/{username}", method = RequestMethod.GET)
   public ResponseMessage accountUsernameExist(@PathVariable String username) {
 
-    if (accountRepository.findByTheAccountsUsername(username) != null) {
+    if (accountService.findByTheAccountsUsername(username) != null) {
       return new ResponseMessage(ResponseMessage.Type.success, "usernameFound", username);
     } else {
       return new ResponseMessage(ResponseMessage.Type.success, "usernameNotFound", username);
@@ -365,10 +358,10 @@ public class AccountController {
     // validEntry = userService.userExists(account.getUsername()) == true ?
     // validEntry = false : validEntry;
     validEntry =
-        accountRepository.findByTheAccountsEmail(account.getEmail()) != null ? validEntry = false
+        accountService.findByTheAccountsEmail(account.getEmail()) != null ? validEntry = false
             : validEntry;
     // validEntry =
-    // accountRepository.findByTheAccountsUsername(account.getUsername()) !=
+    // accountService.findByTheAccountsUsername(account.getUsername()) !=
     // null ? validEntry = false : validEntry;
 
     if (!validEntry) {
@@ -412,9 +405,9 @@ public class AccountController {
       registeredAccount.setUsername(generatedUsername);
       registeredAccount.setAccountType(account.getAccountType());
       registeredAccount.setEmail(account.getEmail());
-      registeredAccount.setPending(true);
-
-      accountRepository.save(registeredAccount);
+      registeredAccount.setPending(false);
+      registeredAccount.setGuestAccount(false);
+      accountService.save(registeredAccount);
     } catch (Exception e) {
       return new ResponseMessage(ResponseMessage.Type.danger, "errorWithAccount", null);
     }
@@ -423,7 +416,7 @@ public class AccountController {
     // Create reset token. First get accountPasswordReset element from the
     // repository. If null create it.
     AccountPasswordReset arp =
-        accountResetPasswordRepository.findByTheAccountsUsername(account.getUsername());
+        accountPasswordResetService.findByTheAccountsUsername(account.getUsername());
     if (arp == null) {
       arp = new AccountPasswordReset();
       arp.setUsername(account.getUsername());
@@ -433,7 +426,7 @@ public class AccountController {
     arp.setTimestamp(new Date());
     arp.setNumberOfReset(arp.getNumberOfReset() + 1);
 
-    accountResetPasswordRepository.save(arp);
+    accountPasswordResetService.save(arp);
 
     // String port = "";
     // if (SERVER_PORT != null && !SERVER_PORT.isEmpty()) {
@@ -461,7 +454,7 @@ public class AccountController {
       HttpServletRequest request) throws Exception {
 
     // get account
-    Account acc = accountRepository.findOne(accountId);
+    Account acc = accountService.findOne(accountId);
 
     if (acc == null || acc.isEntityDisabled()) {
       return new ResponseMessage(ResponseMessage.Type.danger, "badAccount", accountId.toString());
@@ -475,7 +468,7 @@ public class AccountController {
 
     // generate a new token
     AccountPasswordReset arp =
-        accountResetPasswordRepository.findByTheAccountsUsername(acc.getUsername());
+        accountPasswordResetService.findByTheAccountsUsername(acc.getUsername());
     if (arp == null) {
       arp = new AccountPasswordReset();
       arp.setUsername(acc.getUsername());
@@ -485,7 +478,7 @@ public class AccountController {
     arp.setTimestamp(new Date());
     arp.setNumberOfReset(arp.getNumberOfReset() + 1);
 
-    accountResetPasswordRepository.save(arp);
+    accountPasswordResetService.save(arp);
 
     // // generate url
     // String port = "";
@@ -511,7 +504,7 @@ public class AccountController {
       throws Exception {
 
     // get account
-    Account acc = accountRepository.findOne(accountId);
+    Account acc = accountService.findOne(accountId);
 
     if (acc == null || acc.isEntityDisabled()) {
       return new ResponseMessage(ResponseMessage.Type.danger, "badAccount", accountId.toString(),
@@ -519,7 +512,7 @@ public class AccountController {
     }
 
     acc.setPending(false);
-    accountRepository.save(acc);
+    accountService.save(acc);
 
     // generate and send email
     this.sendAccountApproveNotification(acc);
@@ -533,7 +526,7 @@ public class AccountController {
   public ResponseMessage suspendAccount(@PathVariable Long accountId, HttpServletRequest request)
       throws Exception {
     // get account
-    Account acc = accountRepository.findOne(accountId);
+    Account acc = accountService.findOne(accountId);
 
     if (acc == null || acc.isEntityDisabled()) {
       return new ResponseMessage(ResponseMessage.Type.danger, "badAccount", accountId.toString(),
@@ -541,7 +534,7 @@ public class AccountController {
     }
 
     acc.setPending(true);
-    accountRepository.save(acc);
+    accountService.save(acc);
     // generate and send email
     return new ResponseMessage(ResponseMessage.Type.success, "accountSuspended", acc.getUsername(),
         true);
@@ -561,10 +554,10 @@ public class AccountController {
     validEntry =
         userService.userExists(account.getUsername()) == true ? validEntry = false : validEntry;
     validEntry =
-        accountRepository.findByTheAccountsEmail(account.getEmail()) != null ? validEntry = false
+        accountService.findByTheAccountsEmail(account.getEmail()) != null ? validEntry = false
             : validEntry;
     validEntry =
-        accountRepository.findByTheAccountsUsername(account.getUsername()) != null ? validEntry =
+        accountService.findByTheAccountsUsername(account.getUsername()) != null ? validEntry =
             false : validEntry;
 
     if (!validEntry) {
@@ -590,15 +583,16 @@ public class AccountController {
     Account registeredAccount = new Account();
     try {
       // Make sure only desired data gets persisted
-      registeredAccount.setPending(true);
+      registeredAccount.setPending(false);
       registeredAccount.setUsername(account.getUsername());
       registeredAccount.setAccountType(account.getAccountType());
       registeredAccount.setFullName(account.getFullName());
       registeredAccount.setEmail(account.getEmail());
       registeredAccount.setSignedConfidentialityAgreement(account
           .getSignedConfidentialityAgreement());
+      registeredAccount.setGuestAccount(false);
 
-      accountRepository.save(registeredAccount);
+      accountService.save(registeredAccount);
     } catch (Exception e) {
       userService.deleteUser(account.getUsername());
       logger.error(e.getMessage(), e);
@@ -623,9 +617,9 @@ public class AccountController {
     Account acc = null;
 
     if (username != null) {
-      acc = accountRepository.findByTheAccountsUsername(username);
+      acc = accountService.findByTheAccountsUsername(username);
       if (acc == null) {
-        acc = accountRepository.findByTheAccountsEmail(username);
+        acc = accountService.findByTheAccountsEmail(username);
       }
     } else {
       return new ResponseMessage(ResponseMessage.Type.danger, "noUsernameOrEmail", null);
@@ -641,7 +635,7 @@ public class AccountController {
     // Create reset token. First get accountPasswordReset element from the
     // repository. If null create it.
     AccountPasswordReset arp =
-        accountResetPasswordRepository.findByTheAccountsUsername(acc.getUsername());
+        accountPasswordResetService.findByTheAccountsUsername(acc.getUsername());
     if (arp == null) {
       arp = new AccountPasswordReset();
       arp.setUsername(acc.getUsername());
@@ -651,7 +645,7 @@ public class AccountController {
     arp.setTimestamp(new Date());
     arp.setNumberOfReset(arp.getNumberOfReset() + 1);
 
-    accountResetPasswordRepository.save(arp);
+    accountPasswordResetService.save(arp);
     //
     // String port = "";
     // if (SERVER_PORT != null && !SERVER_PORT.isEmpty()) {
@@ -690,7 +684,7 @@ public class AccountController {
       return new ResponseMessage(ResponseMessage.Type.danger, "invalidPassword", null);
     }
 
-    Account onRecordAccount = accountRepository.findOne(accountId);
+    Account onRecordAccount = accountService.findOne(accountId);
     if (!onRecordAccount.getUsername().equals(acc.getUsername())) {
       return new ResponseMessage(ResponseMessage.Type.danger, "invalidUsername", null);
     }
@@ -721,7 +715,7 @@ public class AccountController {
       return new ResponseMessage(ResponseMessage.Type.danger, "invalidPassword", null);
     }
 
-    Account onRecordAccount = accountRepository.findOne(accountId);
+    Account onRecordAccount = accountService.findOne(accountId);
     if (!onRecordAccount.getUsername().equals(acc.getUsername())) {
       return new ResponseMessage(ResponseMessage.Type.danger, "invalidUsername", null);
     }
@@ -753,7 +747,7 @@ public class AccountController {
     // logger.debug("^^^^^^^^^^^^^^^^^^^^^ -4 ^^^^^^^^^^^^^^^^^^");
 
     AccountPasswordReset apr =
-        accountResetPasswordRepository.findByTheAccountsUsername(acc.getUsername());
+        accountPasswordResetService.findByTheAccountsUsername(acc.getUsername());
 
     // logger.debug("^^^^^^^^^^^^^^^^^^^^^ -3 ^^^^^^^^^^^^^^^^^^");
 
@@ -785,7 +779,7 @@ public class AccountController {
 
     // logger.debug("^^^^^^^^^^^^^^^^^^^^^ 1 ^^^^^^^^^^^^^^^^^^");
 
-    Account onRecordAccount = accountRepository.findByTheAccountsUsername(acc.getUsername());
+    Account onRecordAccount = accountService.findByTheAccountsUsername(acc.getUsername());
 
     // logger.debug("^^^^^^^^^^^^^^^^^^^^^ 2 ^^^^^^^^^^^^^^^^^^");
 
@@ -818,7 +812,7 @@ public class AccountController {
     // logger.debug("^^^^^^^^^^^^^^^^^^^^^ 0 ^^^^^^^^^^^^^^^^^^");
 
     AccountPasswordReset apr =
-        accountResetPasswordRepository.findByTheAccountsUsername(racc.getUsername());
+        accountPasswordResetService.findByTheAccountsUsername(racc.getUsername());
 
     // logger.debug("^^^^^^^^^^^^^^^^^^^^^ 1 ^^^^^^^^^^^^^^^^^^");
 
@@ -849,7 +843,7 @@ public class AccountController {
 
     // logger.debug("^^^^^^^^^^^^^^^^^^^^^ 5 ^^^^^^^^^^^^^^^^^^");
 
-    Account onRecordAccount = accountRepository.findByTheAccountsUsername(racc.getUsername());
+    Account onRecordAccount = accountService.findByTheAccountsUsername(racc.getUsername());
 
     // logger.debug("^^^^^^^^^^^^^^^^^^^^^ 6 ^^^^^^^^^^^^^^^^^^");
 
@@ -863,14 +857,16 @@ public class AccountController {
     // update the agreement
     onRecordAccount.setSignedConfidentialityAgreement(racc.getSignedConfidentialityAgreement());
     onRecordAccount.setPending(false);
-    accountRepository.save(onRecordAccount);
+    onRecordAccount.setGuestAccount(false);
+
+    accountService.save(onRecordAccount);
 
     // logger.debug("^^^^^^^^^^^^^^^^^^^^^ 8 ^^^^^^^^^^^^^^^^^^");
     Long expireTokenTime = (new Date()).getTime() - AccountPasswordReset.tokenValidityTimeInMilis;
     Date expireTokenDate = new Date();
     expireTokenDate.setTime(expireTokenTime);
     apr.setTimestamp(expireTokenDate);
-    accountResetPasswordRepository.save(apr);
+    accountPasswordResetService.save(apr);
 
     // send email notification
     this.sendResetRegistrationAccountPasswordNotification(onRecordAccount);
@@ -889,7 +885,7 @@ public class AccountController {
       return new ResponseMessage(ResponseMessage.Type.danger, "badEmail", email);
     }
 
-    Account acc = accountRepository.findByTheAccountsEmail(email);
+    Account acc = accountService.findByTheAccountsEmail(email);
     if (acc == null) {
       return new ResponseMessage(ResponseMessage.Type.danger, "noEmailRecords", email);
     }
@@ -908,7 +904,7 @@ public class AccountController {
   @RequestMapping(value = "/accounts/{id}", method = RequestMethod.DELETE)
   public ResponseMessage deleteAccountById(@PathVariable Long id) {
 
-    Account acc = accountRepository.findOne(id);
+    Account acc = accountService.findOne(id);
 
     if (acc == null || acc.isEntityDisabled()) {
       return new ResponseMessage(ResponseMessage.Type.danger, "badAccount", id.toString());
@@ -922,7 +918,7 @@ public class AccountController {
         userService.disableUser(acc.getUsername());
         acc.setEntityDisabled(true);
         logger.debug("^^^^^^^^^^^^^^^^ about to save ^^^^^^^^^^^^^^^^^");
-        accountRepository.save(acc);
+        accountService.save(acc);
         logger.debug("^^^^^^^^^^^^^^^^ saved ^^^^^^^^^^^^^^^^^");
         return new ResponseMessage(ResponseMessage.Type.success, "deletedAccount", id.toString(),
             true);
@@ -933,18 +929,16 @@ public class AccountController {
   /**
    * User wants to log in
    * */
+  // @PreAuthorize("hasRole('tester') or hasRole('admin')")
   @RequestMapping(value = "/accounts/login", method = RequestMethod.GET)
   public ResponseMessage doNothing(HttpSession session) {
     User u = userService.getCurrentUser();
-    CurrentUser cu = null;
-    if (u != null && u.isEnabled()) {
-      Account a = accountRepository.findByTheAccountsUsername(u.getUsername());
-      if (!a.isPending()) {
-        Long guestId = SessionContext.getCurrentUserId(session);
-        accountService.reconcileAccounts(guestId, a.getId());
-        SessionContext.setCurrentUserId(session, a.getId());
-      }
+    Account a = accountService.findByTheAccountsUsername(u.getUsername());
+    Long guestId = SessionContext.getCurrentUserId(session);
+    if (guestId != null) {
+      accountService.reconcileAccounts(guestId, a.getId());
     }
+    SessionContext.setCurrentUserId(session, a.getId());
     return new ResponseMessage(ResponseMessage.Type.success, "loginSuccess", "succes");
   }
 
@@ -956,7 +950,7 @@ public class AccountController {
     User u = userService.getCurrentUser();
     CurrentUser cu = null;
     if (u != null && u.isEnabled()) {
-      Account a = accountRepository.findByTheAccountsUsername(u.getUsername());
+      Account a = accountService.findByTheAccountsUsername(u.getUsername());
       if (!a.isPending()) {
         cu = new CurrentUser();
         cu.setUsername(u.getUsername());
@@ -1208,31 +1202,56 @@ public class AccountController {
   }
 
 
-  @Transactional()
   @RequestMapping(value = "/accounts/guest", method = RequestMethod.POST)
-  public Account create(HttpSession session) throws UserNotFoundException {
-    Account user = null;
+  public CurrentUser currentGuest(HttpSession session) {
+    CurrentUser cu = null;
     Long id = SessionContext.getCurrentUserId(session);
     if (id != null) {
-      user = accountRepository.findOne(id);
+      Account account = accountService.findOne(id);
+      if (account != null) {
+        cu = new CurrentUser();
+        cu.setAccountId(account.getId());
+        cu.setAuthenticated(false);
+        cu.setGuestAccount(true);
+      }
     }
-    if (user == null) {
-      user = new Account();
-      accountRepository.save(user);
-      SessionContext.setCurrentUserId(session, user.getId());
-    }
-    return user;
+    return cu;
   }
 
-  @Transactional()
-  @RequestMapping(value = "/user/delete", method = RequestMethod.POST)
-  public boolean delete(HttpSession session) throws UserNotFoundException {
+  @RequestMapping(value = "/accounts/guest/createIfNotExist", method = RequestMethod.POST)
+  public CurrentUser createGuest(HttpSession session) {
+    CurrentUser cu = null;
+    Account account = null;
     Long id = SessionContext.getCurrentUserId(session);
     if (id != null) {
-      accountRepository.delete(id);
+      account = accountService.findOne(id);
+    } else {
+      account = new Account();
+      account.setGuestAccount(true);
+      accountService.save(account);
     }
-    SessionContext.setCurrentUserId(session, null);
-    return true;
+    SessionContext.setCurrentUserId(session, account.getId());
+    if (account != null) {
+      cu = new CurrentUser();
+      cu.setAccountId(account.getId());
+      cu.setAuthenticated(false);
+      cu.setGuestAccount(true);
+    }
+    return cu;
   }
+
+
+  // @RequestMapping(value = "/accounts/guest/delete", method = RequestMethod.POST)
+  // public boolean delete(HttpSession session) {
+  // Long id = SessionContext.getCurrentUserId(session);
+  // if (id != null) {
+  // Account user = accountService.findOne(id);
+  // if (user.isGuestAccount()) {
+  // accountService.delete(user);
+  // }
+  // }
+  // SessionContext.setCurrentUserId(session, null);
+  // return true;
+  // }
 
 }

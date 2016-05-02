@@ -3,12 +3,15 @@ package gov.nist.hit.core.service.impl;
 import gov.nist.hit.core.domain.UserConfig;
 import gov.nist.hit.core.repo.UserConfigRepository;
 import gov.nist.hit.core.service.UserConfigService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +28,7 @@ public class UserConfigServiceImpl implements UserConfigService {
     protected UserConfigRepository userConfigRepository;
 
     @Autowired
+    @PersistenceContext(unitName = "iztool")
     protected EntityManager entityManager;
 
 

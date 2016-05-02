@@ -9,7 +9,7 @@
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  */
-package gov.nist.hit.core.repo.util;
+package gov.nist.auth.hit.core.repo.util;
 
 import static org.springframework.data.jpa.domain.Specifications.where;
 

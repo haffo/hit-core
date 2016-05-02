@@ -23,26 +23,26 @@ import org.springframework.data.repository.query.Param;
 public interface TestStepValidationReportRepository extends
     JpaRepository<TestStepValidationReport, Long> {
 
-  @Query("select report from TestStepValidationReport report where report.user.id = :userId and report.testStep.id = :testStepId")
+  @Query("select report from TestStepValidationReport report where report.userId = :userId and report.testStep.id = :testStepId")
   TestStepValidationReport findOneByTestStepAndUser(@Param("userId") Long userId,
       @Param("testStepId") Long testStepId);
 
-  @Query("select report from TestStepValidationReport report where report.user.id = :userId and report.testStep.id = :testStepId")
+  @Query("select report from TestStepValidationReport report where report.userId = :userId and report.testStep.id = :testStepId")
   List<TestStepValidationReport> findAllByTestStepAndUser(@Param("userId") Long userId,
       @Param("testStepId") Long testStepId);
 
-  @Query("select report from TestStepValidationReport report where report.user.id = :userId and report.testStep.id IN (:testStepIds)")
+  @Query("select report from TestStepValidationReport report where report.userId = :userId and report.testStep.id IN (:testStepIds)")
   List<TestStepValidationReport> findAllByTestSteps(@Param("userId") Long userId,
       @Param("testStepIds") List<Long> testStepIds);
 
-  @Query("select report from TestStepValidationReport report where report.user.id = :userId and report.testStep.testCase.id = :testCaseId")
+  @Query("select report from TestStepValidationReport report where report.userId = :userId and report.testStep.testCase.id = :testCaseId")
   List<TestStepValidationReport> findAllByTestCaseAndUser(@Param("userId") Long userId,
       @Param("testCaseId") Long testCaseId);
 
-  @Query("select report from TestStepValidationReport report where report.user.id = :userId")
+  @Query("select report from TestStepValidationReport report where report.userId = :userId")
   List<TestStepValidationReport> findAllByUser(@Param("userId") Long userId);
 
-  @Query("select report from TestStepValidationReport report where report.id = :reportId and report.user.id = :userId")
+  @Query("select report from TestStepValidationReport report where report.id = :reportId and report.userId = :userId")
   TestStepValidationReport findOneByIdAndUser(@Param("reportId") Long reportId,
       @Param("userId") Long userId);
 

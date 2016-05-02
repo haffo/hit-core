@@ -9,7 +9,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -17,7 +16,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-@WebFilter(urlPatterns = "/api/*")
+// @WebFilter(urlPatterns = "/api/*")
 public class SessionTmeoutFilter implements Filter {
 
   /*
@@ -52,6 +51,7 @@ public class SessionTmeoutFilter implements Filter {
     if (session == null
         && ((Pattern.compile("\\/api\\/(\\w+)\\/clearRecords").matcher(path).find()) || ((!Pattern
             .compile("\\/api\\/appInfo").matcher(path).find()
+            // && !Pattern.compile("\\/api\\/accounts\\/login").matcher(path).find()
             && !Pattern.compile("\\/api\\/session\\/keepAlive").matcher(path).find()
             && !Pattern.compile("\\/api\\/session\\/create").matcher(path).find()
             && !Pattern.compile("\\/api\\/ws\\/").matcher(path).find()

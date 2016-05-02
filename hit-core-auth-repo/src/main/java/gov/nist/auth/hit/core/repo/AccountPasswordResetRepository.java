@@ -9,9 +9,9 @@
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  */
-package gov.nist.hit.core.repo;
+package gov.nist.auth.hit.core.repo;
 
-import gov.nist.hit.core.domain.account.AccountPasswordReset;
+import gov.nist.auth.hit.core.domain.AccountPasswordReset;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,12 +1,14 @@
 package gov.nist.hit.core.service;
 
-import gov.nist.hit.core.domain.account.Account;
+import gov.nist.auth.hit.core.domain.Account;
 
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface AccountService {
+
+public interface AccountService extends JpaSpecificationExecutor<Account> {
 
   boolean exitBySutInitiatorPropertiesAndProtocol(Map<String, String> criteria, String protocol);
 
@@ -21,5 +23,12 @@ public interface AccountService {
   List<Account> findAll();
 
   void reconcileAccounts(Long oldAccountId, Long newAccountId);
+
+  Account findByTheAccountsUsername(String username);
+
+  Account findByTheAccountsEmail(String email);
+
+  List<Account> findByTheAccountsAccountType(String accountType);
+
 
 }

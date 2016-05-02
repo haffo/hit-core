@@ -12,14 +12,12 @@
 
 package gov.nist.hit.core.domain;
 
-import gov.nist.hit.core.domain.account.Account;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -30,7 +28,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -62,8 +59,7 @@ public class Transaction implements java.io.Serializable {
 
   @ApiModelProperty(required = true, value = "user executing the transaction")
   @JsonIgnore
-  @OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
-  protected Account user;
+  protected Long userId;
 
   @ApiModelProperty(required = true, value = "list of properties of the transaction")
   @JsonIgnore
@@ -121,14 +117,14 @@ public class Transaction implements java.io.Serializable {
     this.testStepId = testStepId;
   }
 
-  public Account getUser() {
-    return user;
+
+  public Long getUserId() {
+    return userId;
   }
 
-  public void setUser(Account user) {
-    this.user = user;
+  public void setUserId(Long userId) {
+    this.userId = userId;
   }
-
 
   public Map<String, String> getProperties() {
     return properties;
@@ -150,7 +146,7 @@ public class Transaction implements java.io.Serializable {
   @Override
   public String toString() {
     return "Transaction [id=" + id + ", incoming=" + incoming + ", outgoing=" + outgoing
-        + ", testStepId=" + testStepId + ", user=" + user + ", properties=" + properties
+        + ", testStepId=" + testStepId + ", user=" + userId + ", properties=" + properties
         + ", responseMessageId=" + responseMessageId + "]";
   }
 

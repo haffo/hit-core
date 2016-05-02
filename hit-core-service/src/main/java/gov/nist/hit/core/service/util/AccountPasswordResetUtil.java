@@ -12,7 +12,8 @@
 package gov.nist.hit.core.service.util;
 
 
-import gov.nist.hit.core.domain.account.AccountPasswordReset;
+import gov.nist.auth.hit.core.domain.AccountPasswordReset;
+import gov.nist.auth.hit.core.domain.util.UserUtil;
 
 import java.io.Serializable;
 import java.util.Date;

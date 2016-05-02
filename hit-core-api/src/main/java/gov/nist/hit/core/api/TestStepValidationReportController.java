@@ -12,10 +12,10 @@
 
 package gov.nist.hit.core.api;
 
+import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.TestResult;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.domain.account.Account;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestStepService;
@@ -89,7 +89,7 @@ public class TestStepValidationReportController {
       if (report == null) {
         report = new TestStepValidationReport();
         report.setTestStep(testStep);
-        report.setUser(user);
+        report.setUserId(user.getId());
         validationReportService.save(report);
       }
     } catch (ValidationReportException e) {
@@ -164,7 +164,7 @@ public class TestStepValidationReportController {
         report = new TestStepValidationReport();
       }
       report.setTestStep(testStep);
-      report.setUser(user);
+      report.setUserId(user.getId());
       report.setComments(comments);
       report.setResult(StringUtils.isNotEmpty(result) ? TestResult.valueOf(result) : null);
       String xml = report.getXml();
@@ -207,7 +207,7 @@ public class TestStepValidationReportController {
       if (report == null || ((xmlReport = report.getXml()) == null)) {
         throw new ValidationReportException("No validation report available for this test step");
       }
-      if (report.getUser() == null || !userId.equals(report.getUser().getId())) {
+      if (report.getUserId() == null || !userId.equals(report.getUserId())) {
         throw new MessageValidationException("Forbidden access");
       }
 
@@ -343,7 +343,7 @@ public class TestStepValidationReportController {
           validationReportService.findOneByTestStepAndUser(testStepId, userId);
       if (report != null) {
         report.setTestStep(testStep);
-        report.setUser(user);
+        report.setUserId(user.getId());
         report.setComments(comments);
         report.setResult(StringUtils.isNotEmpty(result) ? TestResult.valueOf(result) : null);
         String xml = report.getXml();

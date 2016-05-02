@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class TransportMessageServiceImpl implements TransportMessageService {
   protected TransportMessageRepository transportMessageRepository;
 
   @Autowired
+  @PersistenceContext(unitName = "iztool")
   protected EntityManager entityManager;
 
 

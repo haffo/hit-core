@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,9 @@ public class TransportConfigServiceImpl implements TransportConfigService {
   protected TransportConfigRepository transportConfigRepository;
 
 
+
   @Autowired
+  @PersistenceContext(unitName = "iztool")
   protected EntityManager entityManager;
 
   @Override
@@ -55,8 +58,7 @@ public class TransportConfigServiceImpl implements TransportConfigService {
    * @return
    */
   @Override
-  public TransportConfig set(List<KeyValuePair> pairs, TestingType type,
-      TransportConfig config) {
+  public TransportConfig set(List<KeyValuePair> pairs, TestingType type, TransportConfig config) {
     if (pairs.isEmpty())
       return config;
     for (KeyValuePair pair : pairs) {
@@ -85,8 +87,7 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
 
 
-  private String toInitiatorQuery(Map<String, String> criteria, TestingType type,
-      String protocol) {
+  private String toInitiatorQuery(Map<String, String> criteria, TestingType type, String protocol) {
     String table =
         type == TestingType.SUT_INITIATOR ? "sut_initiator_config" : "ta_initiator_config";
     String sql = "SELECT * FROM transportconfig tr";

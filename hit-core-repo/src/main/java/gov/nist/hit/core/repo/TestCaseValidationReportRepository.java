@@ -23,11 +23,11 @@ import org.springframework.data.repository.query.Param;
 public interface TestCaseValidationReportRepository extends
     JpaRepository<TestStepValidationReport, Long> {
 
-  @Query("select report from TestStepValidationReport report where report.user.id = :userId and report.testStep.testCase.id = :testCaseId")
+  @Query("select report from TestStepValidationReport report where report.userId = :userId and report.testStep.testCase.id = :testCaseId")
   List<TestStepValidationReport> findAllByTestCaseAndUser(@Param("userId") Long userId,
       @Param("testCaseId") Long testCaseId);
 
-  @Query("select report from TestStepValidationReport report where report.user.id = :userId")
+  @Query("select report from TestStepValidationReport report where report.userId = :userId")
   List<TestStepValidationReport> findAllByUser(@Param("userId") Long userId);
 
 }

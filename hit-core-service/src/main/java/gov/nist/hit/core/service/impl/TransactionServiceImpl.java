@@ -11,21 +11,30 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
+@PropertySource(value = "classpath:app-db.properties")
 public class TransactionServiceImpl implements TransactionService {
 
   private static final long serialVersionUID = 1L;
+
+
+  @Autowired
+  private Environment env;
 
   @Autowired
   protected TransactionRepository transactionRepository;
 
   //
   @Autowired
+  @PersistenceContext(unitName = "iztool")
   protected EntityManager entityManager;
 
 

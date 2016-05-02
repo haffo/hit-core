@@ -11,8 +11,7 @@
  */
 package gov.nist.hit.core.service;
 
-import gov.nist.hit.core.domain.account.Account;
-import gov.nist.hit.core.repo.AccountRepository;
+import gov.nist.auth.hit.core.domain.Account;
 
 import java.io.Serializable;
 
@@ -34,7 +33,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
   static final Logger logger = LoggerFactory.getLogger(CustomPermissionEvaluator.class);
 
   @Autowired
-  AccountRepository accountRepository;
+  AccountService accountService;
 
   /*
    * (non-Javadoc)
@@ -48,7 +47,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     logger.debug("^^^^^^^^^^^^^^^^^ 0 ^^^^^^^^^^^^^^^^^^");
     if ("accessAccountBasedResource".equals(permission)) {
       logger.debug("^^^^^^^^^^^^^^^^^ 1 ^^^^^^^^^^^^^^^^^^");
-      Account acc = accountRepository.findByTheAccountsUsername(authentication.getName());
+      Account acc = accountService.findByTheAccountsUsername(authentication.getName());
       logger.debug("^^^^^^^^^^^^^^^^^ 2 " + acc + " ^^^^^^^^^^^^^^^^^^");
       if (acc == null) {
         return false;
@@ -77,7 +76,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
       String targetType, Object permission) {
 
     if ("accessAccountBasedResource".equals(permission)) {
-      Account acc = accountRepository.findByTheAccountsUsername(authentication.getName());
+      Account acc = accountService.findByTheAccountsUsername(authentication.getName());
       if (acc == null) {
         return false;
       }
