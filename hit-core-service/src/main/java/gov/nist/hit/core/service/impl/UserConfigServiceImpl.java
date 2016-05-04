@@ -28,8 +28,8 @@ public class UserConfigServiceImpl implements UserConfigService {
     protected UserConfigRepository userConfigRepository;
 
     @Autowired
-//    @PersistenceContext(unitName = "iztool")
-    protected EntityManager entityManager;
+    @PersistenceContext(unitName = "base-tool")
+     protected EntityManager entityManager;
 
 
     @Override

@@ -24,8 +24,8 @@ public class TransportMessageServiceImpl implements TransportMessageService {
   protected TransportMessageRepository transportMessageRepository;
 
   @Autowired
-//  @PersistenceContext(unitName = "iztool")
-  protected EntityManager entityManager;
+  @PersistenceContext(unitName = "base-tool")
+   protected EntityManager entityManager;
 
 
   @Override

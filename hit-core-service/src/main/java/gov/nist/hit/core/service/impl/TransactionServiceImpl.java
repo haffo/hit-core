@@ -20,22 +20,18 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
-@PropertySource(value = "classpath:app-db.properties")
-public class TransactionServiceImpl implements TransactionService {
+ public class TransactionServiceImpl implements TransactionService {
 
   private static final long serialVersionUID = 1L;
-
-
-  @Autowired
-  private Environment env;
-
+ 
   @Autowired
   protected TransactionRepository transactionRepository;
 
   //
   @Autowired
-//  @PersistenceContext(unitName = "iztool")
+  @PersistenceContext(unitName = "base-tool")  
   protected EntityManager entityManager;
+  
 
 
   @Override

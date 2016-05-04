@@ -19,7 +19,7 @@ public class DBServiceImpl implements DBService {
   private final static Logger logger = Logger.getLogger(DBServiceImpl.class);
 
   @Autowired
-//  @PersistenceContext(unitName = "iztool")
+  @Qualifier("testingDataEntityManager") 
   protected EntityManager entityManager;
 
   @SuppressWarnings("unchecked")
