@@ -65,6 +65,8 @@ public abstract class ValueSetLibrarySerializer {
             .getBindingIdentifier() == null) ? "" : t.getBindingIdentifier()));
         elmTableDefinition.addAttribute(new Attribute("Name", (t.getName() == null) ? "" : t
             .getName()));
+        elmTableDefinition.addAttribute(new Attribute("NoCodeDisplayText", (t
+            .getNoCodeDisplayText() == null) ? "" : t.getNoCodeDisplayText()));
         elmTableDefinition.addAttribute(new Attribute("Description",
             (t.getDescription() == null) ? "" : t.getDescription()));
         elmTableDefinition.addAttribute(new Attribute("Version", (t.getVersion() == null) ? "" : ""
