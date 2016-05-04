@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -65,11 +66,13 @@ import org.springframework.web.util.UriUtils;
  * 
  */
 @RestController
+@PropertySource(value = {"classpath:app-auth-config.properties"})
 public class AccountController {
 
   static final Logger logger = LoggerFactory.getLogger(AccountController.class);
 
   public final String DEFAULT_PAGE_SIZE = "0";
+
 
   public AccountController() {}
 
@@ -93,6 +96,11 @@ public class AccountController {
 
   @Value("${admin.email}")
   private String ADMIN_EMAIL;
+
+
+  @Value("${mail.tool}")
+  private String TOOL_NAME;
+
 
   @Autowired
   TestCaseValidationReportService testCaseValidationService;
@@ -969,12 +977,11 @@ public class AccountController {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
     msg.setSubject("NIST  Application Received");
     msg.setTo(acc.getEmail());
-    msg.setText("Dear "
-        + acc.getUsername()
-        + " \n\n"
-        + "Thank you for submitting an application for use of the NIST IGAMT. You will be notified via email (using the email address you provided in your application) as to whether your application is approved or not approved."
-        + "\n\n" + "Sincerely, " + "\n\n" + "The NIST IGAMT Team" + "\n\n"
-        + "P.S: If you need help, contact us at '" + ADMIN_EMAIL + "'");
+    msg.setText("Dear " + acc.getUsername() + " \n\n"
+        + "Thank you for submitting an application for use of the " + TOOL_NAME + "\n\n"
+        + "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, "
+        + "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
+        + ADMIN_EMAIL + "'");
     try {
       this.mailSender.send(msg);
     } catch (MailException ex) {
@@ -985,13 +992,13 @@ public class AccountController {
   private void sendAccountRegistrationNotification(Account acc) {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 
-    msg.setSubject("Welcome! You are successfully registered on NIST IGAMT");
+    msg.setSubject("Welcome! You are successfully registered on " + TOOL_NAME + "");
     msg.setTo(acc.getEmail());
-    msg.setText("Dear " + acc.getUsername() + " \n\n"
-        + "You've successfully registered on the NIST IGAMT Site." + " \n" + "Your username is: "
-        + acc.getUsername() + " \n\n" + "Please refer to the user guide for the detailed steps. "
-        + "\n\n" + "Sincerely, " + "\n\n" + "The NIST IGAMT Team" + "\n\n"
-        + "P.S: If you need help, contact us at '" + ADMIN_EMAIL + "'");
+    msg.setText("Dear " + acc.getUsername() + " \n\n" + "You've successfully registered on the "
+        + TOOL_NAME + " Site." + " \n" + "Your username is: " + acc.getUsername() + " \n\n"
+        + "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, "
+        + "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
+        + ADMIN_EMAIL + "'");
 
     try {
       this.mailSender.send(msg);
@@ -1017,8 +1024,9 @@ public class AccountController {
         + " \n\n"
         + "Sincerely, "
         + "\n\n"
-        + "The NIST IGAMT Team"
-        + "\n\n");
+        + "The "
+        + TOOL_NAME
+        + " Team" + "\n\n");
     try {
       this.mailSender.send(msg);
     } catch (MailException ex) {
@@ -1030,11 +1038,11 @@ public class AccountController {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 
     msg.setTo(acc.getEmail());
-    msg.setSubject("NIST IGAMT Account Approval Notification ");
+    msg.setSubject("" + TOOL_NAME + " Account Approval Notification ");
     msg.setText("Dear " + acc.getUsername() + " \n\n"
         + "**** If you have not requested a new account, please disregard this email **** \n\n\n"
         + "Your account has been approved and you can proceed " + "to login .\n" + "\n\n"
-        + "Sincerely, " + "\n\n" + "The NIST IGAMT Team" + "\n\n"
+        + "Sincerely, " + "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n"
         + "P.S: If you need help, contact us at '" + ADMIN_EMAIL + "'");
     try {
       this.mailSender.send(msg);
@@ -1047,14 +1055,14 @@ public class AccountController {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 
     msg.setTo(acc.getEmail());
-    msg.setSubject("NIST IGAMT Registration Notification ");
+    msg.setSubject("" + TOOL_NAME + " Registration Notification ");
     msg.setText("Dear " + acc.getUsername() + " \n\n"
         + "**** If you have not requested a new account, please disregard this email **** \n\n\n"
         + "Your account request has been processed and you can proceed " + "to login .\n"
         + "You need to change your password in order to login.\n"
         + "Copy and paste the following url to your browser to initiate the password change:\n"
         + url + " \n\n" + "Please refer to the user guide for the detailed steps. " + "\n\n"
-        + "Sincerely, " + "\n\n" + "The NIST IGAMT Team" + "\n\n"
+        + "Sincerely, " + "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n"
         + "P.S: If you need help, contact us at '" + ADMIN_EMAIL + "'");
 
     try {
@@ -1068,7 +1076,7 @@ public class AccountController {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 
     msg.setTo(acc.getEmail());
-    msg.setSubject("NIST IGAMT Password Reset Request Notification");
+    msg.setSubject("" + TOOL_NAME + " Password Reset Request Notification");
     msg.setText("Dear "
         + acc.getUsername()
         + " \n\n"
@@ -1089,10 +1097,10 @@ public class AccountController {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 
     msg.setTo(acc.getEmail());
-    msg.setSubject("NIST IGAMT Password Change Notification");
+    msg.setSubject("" + TOOL_NAME + " Password Change Notification");
     msg.setText("Dear " + acc.getUsername() + " \n\n"
-        + "Your password has been successfully changed." + " \n\n" + "Sincerely,\n\n"
-        + "The NIST IGAMT Team");
+        + "Your password has been successfully changed." + " \n\n" + "Sincerely,\n\n" + "The "
+        + TOOL_NAME + " Team");
 
     try {
       this.mailSender.send(msg);
@@ -1104,12 +1112,12 @@ public class AccountController {
   private void sendChangeAccountPasswordNotification(Account acc, String newPassword) {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
     msg.setTo(acc.getEmail());
-    msg.setSubject("NIST IGAMT Password Change Notification");
+    msg.setSubject("" + TOOL_NAME + " Password Change Notification");
     msg.setText("Dear " + acc.getUsername() + " \n\n"
         + "Your password has been successfully changed." + " \n\n"
         + "Your new temporary password is ." + newPassword + " \n\n"
-        + "Please update your password once logged in. \n\n" + "Sincerely,\n\n"
-        + "The NIST IGAMT Team");
+        + "Please update your password once logged in. \n\n" + "Sincerely,\n\n" + "The "
+        + TOOL_NAME + " Team");
 
     try {
       this.mailSender.send(msg);
@@ -1122,10 +1130,10 @@ public class AccountController {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 
     msg.setTo(acc.getEmail());
-    msg.setSubject("NIST IGAMT Password Rest Notification");
+    msg.setSubject("" + TOOL_NAME + " Password Rest Notification");
     msg.setText("Dear " + acc.getUsername() + " \n\n"
         + "Your password has been successfully reset." + " \n" + "Your username is: "
-        + acc.getUsername() + " \n\n" + "Sincerely,\n\n" + "The NIST IGAMT Team");
+        + acc.getUsername() + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
     try {
       this.mailSender.send(msg);
@@ -1138,11 +1146,10 @@ public class AccountController {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 
     msg.setTo(acc.getEmail());
-    msg.setSubject("NIST IGAMT Registration and Password Notification");
+    msg.setSubject("" + TOOL_NAME + " Registration and Password Notification");
     msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully set."
-        + " \n" + "Your username is: " + acc.getUsername() + " \n"
-        + "Your registration with the NIST IGAMT is complete." + " \n\n" + "Sincerely,\n\n"
-        + "The NIST IGAMT Team");
+        + " \n" + "Your username is: " + acc.getUsername() + " \n" + "Your registration with the "
+        + TOOL_NAME + " is complete." + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
     try {
       this.mailSender.send(msg);
@@ -1155,9 +1162,9 @@ public class AccountController {
     SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 
     msg.setTo(acc.getEmail());
-    msg.setSubject("NIST IGAMT Username Notification");
+    msg.setSubject("" + TOOL_NAME + " Username Notification");
     msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your username is: " + acc.getUsername()
-        + " \n\n" + "Sincerely,\n\n" + "The NIST IGAMT Team");
+        + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
     try {
       this.mailSender.send(msg);
@@ -1198,7 +1205,7 @@ public class AccountController {
   private String getUrl(HttpServletRequest request) {
     String scheme = request.getScheme();
     String host = request.getHeader("Host");
-    return scheme + "://" + host + "/igamt";
+    return scheme + "://" + host + "/" + request.getContextPath();
   }
 
 
