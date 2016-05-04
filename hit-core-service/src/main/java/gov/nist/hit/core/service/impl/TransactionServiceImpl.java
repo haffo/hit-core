@@ -34,7 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
 
   //
   @Autowired
-  @PersistenceContext(unitName = "iztool")
+//  @PersistenceContext(unitName = "iztool")
   protected EntityManager entityManager;
 
 

@@ -19,7 +19,7 @@ public class AppInfoServiceImpl implements AppInfoService {
   protected AppInfoRepository appInfoRepository;
 
   @Autowired
-  @PersistenceContext(unitName = "iztool")
+//  @PersistenceContext(unitName = "iztool")
   protected EntityManager entityManager;
 
 

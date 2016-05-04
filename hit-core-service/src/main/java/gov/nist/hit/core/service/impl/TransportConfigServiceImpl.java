@@ -29,7 +29,7 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
 
   @Autowired
-  @PersistenceContext(unitName = "iztool")
+//  @PersistenceContext(unitName = "iztool")
   protected EntityManager entityManager;
 
   @Override
