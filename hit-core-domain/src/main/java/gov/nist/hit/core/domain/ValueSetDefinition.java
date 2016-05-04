@@ -17,12 +17,13 @@ public class ValueSetDefinition implements java.io.Serializable {
   protected StabilityType stability;
   protected ExtensibilityType extensibility;
   protected ContentDefinitionType contentDefinition;
-  
+  protected String noCodeDisplayText;
+
   public Set<ValueSetElement> getValueSetElements() {
     return this.valueSetElements;
   }
 
- 
+
   /**
    * Gets the value of the name property.
    * 
@@ -43,7 +44,7 @@ public class ValueSetDefinition implements java.io.Serializable {
     this.name = value;
   }
 
- 
+
 
   /**
    * Gets the value of the version property.
@@ -65,7 +66,7 @@ public class ValueSetDefinition implements java.io.Serializable {
     this.version = value;
   }
 
- 
+
   /**
    * Gets the value of the oid property.
    * 
@@ -86,7 +87,7 @@ public class ValueSetDefinition implements java.io.Serializable {
     this.oid = value;
   }
 
- 
+
 
   /**
    * Gets the value of the stability property.
@@ -132,7 +133,7 @@ public class ValueSetDefinition implements java.io.Serializable {
     getValueSetElements().add(te);
   }
 
-  
+
 
   public void setValueSetElements(Set<ValueSetElement> valueSetElements) {
     this.valueSetElements = valueSetElements;
@@ -166,9 +167,17 @@ public class ValueSetDefinition implements java.io.Serializable {
   public void setContentDefinition(ContentDefinitionType contentDefinition) {
     this.contentDefinition = contentDefinition;
   }
-  
-  
-  
-  
+
+
+  public String getNoCodeDisplayText() {
+    return noCodeDisplayText;
+  }
+
+
+  public void setNoCodeDisplayText(String noCodeDisplayText) {
+    this.noCodeDisplayText = noCodeDisplayText;
+  }
+
+
 
 }

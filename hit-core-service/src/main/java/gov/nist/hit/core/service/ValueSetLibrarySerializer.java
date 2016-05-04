@@ -151,6 +151,10 @@ public abstract class ValueSetLibrarySerializer {
           tableObj.setBindingIdentifier(elmTable.getAttribute("BindingIdentifier"));
           tableObj.setName(elmTable.getAttribute("Name"));
 
+          if (StringUtils.isNotEmpty(elmTable.getAttribute("NoCodeDisplayText"))) {
+            tableObj.setNoCodeDisplayText(elmTable.getAttribute("NoCodeDisplayText"));
+          }
+
           if (StringUtils.isNotEmpty(elmTable.getAttribute("Description"))) {
             tableObj.setDescription(elmTable.getAttribute("Description"));
           }
