@@ -67,7 +67,7 @@ public class DbConfig {
     lef.setJpaVendorAdapter(jpaVendorAdapter);
     lef.setPackagesToScan("gov.nist.hit");
     lef.setJpaProperties(jpaProperties());
-    lef.setPersistenceUnitName(env.getProperty("jpa.persistenceUnitName"));
+    lef.setPersistenceUnitName("base-tool");
     // lef.setPersistenceUnitManager(persistenceUnitManager);
     lef.setLoadTimeWeaver(new InstrumentationLoadTimeWeaver());
     return lef;
