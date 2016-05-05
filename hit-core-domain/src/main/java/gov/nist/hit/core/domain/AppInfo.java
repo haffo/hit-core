@@ -26,7 +26,7 @@ import javax.persistence.Id;
  * 
  */
 @Entity
-public class AppInfo  implements Serializable {
+public class AppInfo implements Serializable {
 
   private static final long serialVersionUID = 8805967508478985159L;
 
@@ -39,52 +39,68 @@ public class AppInfo  implements Serializable {
   private String version;
 
   private String date;
-  
+
   private String name;
-  
+
   private String domain;
-  
+
   private String header;
-  
+
   private String adminEmail;
-    
-  private String homeTitle; 
-  
+
+  private String homeTitle;
+
   @Column(columnDefinition = "TEXT")
   private String messageContentInfo;
-  
+
   @Column(columnDefinition = "TEXT")
-  private String homeContent; 
-  
+  private String homeContent;
+
   @Column(columnDefinition = "TEXT")
-  private String profileInfo; 
-  
+  private String profileInfo;
+
   @Column(columnDefinition = "TEXT")
   private String valueSetCopyright;
-  
-  
+
+
   @Column(columnDefinition = "TEXT")
   private String disclaimer;
-  
-  
+
+
   @Column(columnDefinition = "TEXT")
   private String confidentiality;
-  
-  
+
+
   @Column(columnDefinition = "TEXT")
   private String validationResultInfo;
-  
+
   @Column(columnDefinition = "TEXT")
   private String acknowledgment;
-  
+
   private String csrfToken;
-  
+
   private String rsbVersion;
-  
-  private String apiDocsPath; 
-  
-  private String mailFrom = "hit-testing@nist.gov"; 
-    
+
+  private String apiDocsPath;
+
+  private String mailFrom = "hit-testing@nist.gov";
+
+  @Column(columnDefinition = "TEXT")
+  private String registrationTitle;
+
+  @Column(columnDefinition = "TEXT")
+  private String registrationAgreement;
+
+  @Column(columnDefinition = "TEXT")
+  private String registrationSubmittedContent;
+
+  @Column(columnDefinition = "TEXT")
+  private String registrationSubmittedTitle;
+
+  @Column(columnDefinition = "TEXT")
+  private String registrationAcceptanceTitle;
+
+
   public String getUrl() {
     return url;
   }
@@ -140,7 +156,7 @@ public class AppInfo  implements Serializable {
   public void setAdminEmail(String adminEmail) {
     this.adminEmail = adminEmail;
   }
- 
+
 
   public String getHomeContent() {
     return homeContent;
@@ -149,7 +165,7 @@ public class AppInfo  implements Serializable {
   public void setHomeContent(String homeContent) {
     this.homeContent = homeContent;
   }
-  
+
   public String getProfileInfo() {
     return profileInfo;
   }
@@ -158,7 +174,7 @@ public class AppInfo  implements Serializable {
     this.profileInfo = profileInfo;
   }
 
-  
+
   public String getValueSetCopyright() {
     return valueSetCopyright;
   }
@@ -174,9 +190,8 @@ public class AppInfo  implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
-  
-  
-  
+
+
 
   public String getDisclaimer() {
     return disclaimer;
@@ -193,7 +208,7 @@ public class AppInfo  implements Serializable {
   public void setConfidentiality(String confidentiality) {
     this.confidentiality = confidentiality;
   }
-  
+
 
   public String getValidationResultInfo() {
     return validationResultInfo;
@@ -202,7 +217,7 @@ public class AppInfo  implements Serializable {
   public void setValidationResultInfo(String validationResultInfo) {
     this.validationResultInfo = validationResultInfo;
   }
-  
+
   public String getAcknowledgment() {
     return acknowledgment;
   }
@@ -210,8 +225,8 @@ public class AppInfo  implements Serializable {
   public void setAcknowledgment(String acknowledgment) {
     this.acknowledgment = acknowledgment;
   }
- 
- 
+
+
   public String getHomeTitle() {
     return homeTitle;
   }
@@ -220,7 +235,7 @@ public class AppInfo  implements Serializable {
     this.homeTitle = homeTitle;
   }
 
-  
+
   public String getCsrfToken() {
     return csrfToken;
   }
@@ -228,8 +243,8 @@ public class AppInfo  implements Serializable {
   public void setCsrfToken(String csrfToken) {
     this.csrfToken = csrfToken;
   }
-  
-  
+
+
 
   public String getMessageContentInfo() {
     return messageContentInfo;
@@ -237,10 +252,9 @@ public class AppInfo  implements Serializable {
 
   public void setMessageContentInfo(String messageContentInfo) {
     this.messageContentInfo = messageContentInfo;
-  } 
-  
-  
-  
+  }
+
+
 
   public String getRsbVersion() {
     return rsbVersion;
@@ -249,9 +263,8 @@ public class AppInfo  implements Serializable {
   public void setRsbVersion(String rsbVersion) {
     this.rsbVersion = rsbVersion;
   }
-  
-  
-  
+
+
 
   public String getApiDocsPath() {
     return apiDocsPath;
@@ -265,8 +278,7 @@ public class AppInfo  implements Serializable {
   public String toString() {
     return "AppInfo [id=" + id + ", url=" + url + ", version=" + version + ", date=" + date
         + ", name=" + name + ", domain=" + domain + ", header=" + header + ", adminEmail="
-        + adminEmail + ", homeContent=" + homeContent
-        + ", profileInfo=" + profileInfo + "]";
+        + adminEmail + ", homeContent=" + homeContent + ", profileInfo=" + profileInfo + "]";
   }
 
   public String getMailFrom() {
@@ -277,10 +289,45 @@ public class AppInfo  implements Serializable {
     this.mailFrom = mailFrom;
   }
 
-  
-  
-  
-  
+  public String getRegistrationAgreement() {
+    return registrationAgreement;
+  }
+
+  public void setRegistrationAgreement(String registrationAgreement) {
+    this.registrationAgreement = registrationAgreement;
+  }
+
+  public String getRegistrationTitle() {
+    return registrationTitle;
+  }
+
+  public void setRegistrationTitle(String registrationTitle) {
+    this.registrationTitle = registrationTitle;
+  }
+
+  public String getRegistrationSubmittedContent() {
+    return registrationSubmittedContent;
+  }
+
+  public void setRegistrationSubmittedContent(String registrationSubmittedContent) {
+    this.registrationSubmittedContent = registrationSubmittedContent;
+  }
+
+  public String getRegistrationSubmittedTitle() {
+    return registrationSubmittedTitle;
+  }
+
+  public void setRegistrationSubmittedTitle(String registrationSubmittedTitle) {
+    this.registrationSubmittedTitle = registrationSubmittedTitle;
+  }
+
+  public String getRegistrationAcceptanceTitle() {
+    return registrationAcceptanceTitle;
+  }
+
+  public void setRegistrationAcceptanceTitle(String registrationAcceptanceTitle) {
+    this.registrationAcceptanceTitle = registrationAcceptanceTitle;
+  }
 
 
 
