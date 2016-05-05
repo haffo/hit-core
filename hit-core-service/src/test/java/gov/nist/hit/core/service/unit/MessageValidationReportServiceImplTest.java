@@ -17,7 +17,7 @@ public class MessageValidationReportServiceImplTest {
   public void testGenerateMessageValidationHtml() throws Exception {
     String xmlMessageValidationReport =
         IOUtils.toString(MessageValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/1-Message-ValidationReport.xml"));
+            .getResourceAsStream("/inputs/1-Message-ValidationReport.xml"));
     assertNotNull(xmlMessageValidationReport);
     InputStream io = IOUtils.toInputStream(service.generateHtml(xmlMessageValidationReport));
     assertNotNull(io);
@@ -27,7 +27,7 @@ public class MessageValidationReportServiceImplTest {
   public void testGenerateMessageValidationPdf() throws Exception {
     String xmlMessageValidationReport =
         IOUtils.toString(MessageValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/1-Message-ValidationReport.xml"));
+            .getResourceAsStream("/inputs/1-Message-ValidationReport.xml"));
     assertNotNull(xmlMessageValidationReport);
     InputStream io = service.generatePdf(xmlMessageValidationReport);
     assertNotNull(io);

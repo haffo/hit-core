@@ -31,6 +31,7 @@ public class TestCaseValidationReportServiceImplTest {
   TestStepValidationReportService testStepService = new TestStepValidationReportServiceImpl();
 
   static final String outputsFolder = "src/test/resources/outputs";
+  static final String inputsRoot = "/inputs";
 
   private TestCaseValidationResult get() throws Exception {
     TestCaseValidationResult result = new TestCaseValidationResult();
@@ -46,7 +47,7 @@ public class TestCaseValidationReportServiceImplTest {
     TestStepValidationReport r1 = new TestStepValidationReport();
     String xmlMessageValidationReport =
         IOUtils.toString(TestCaseValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/3-Manual-ValidationReport.xml"));
+            .getResourceAsStream(inputsRoot + "/3-Manual-ValidationReport.xml"));
 
     TestStep t1 = new TestStep();
     t1.setName("Transmit the immunization report to the Immunization Registry");
@@ -64,7 +65,7 @@ public class TestCaseValidationReportServiceImplTest {
     TestStepValidationReport r2 = new TestStepValidationReport();
     xmlMessageValidationReport =
         IOUtils.toString(TestCaseValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/2-Message-ValidationReport.xml"));
+            .getResourceAsStream(inputsRoot + "/2-Message-ValidationReport.xml"));
     TestStep t2 = new TestStep();
     t2.setName("Receive Acknowledgement");
     t2.setTestingType(TestingType.TA_RESPONDER);
@@ -81,7 +82,7 @@ public class TestCaseValidationReportServiceImplTest {
     TestStepValidationReport r3 = new TestStepValidationReport();
     xmlMessageValidationReport =
         IOUtils.toString(TestCaseValidationReportServiceImplTest.class
-            .getResourceAsStream("/reports/2-Message-ValidationReport.xml"));
+            .getResourceAsStream(inputsRoot + "/2-Message-ValidationReport.xml"));
     TestStep t3 = new TestStep();
     t3.setName("Record an adverse reaction");
     t3.setTestingType(TestingType.TA_RESPONDER);
