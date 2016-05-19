@@ -31,7 +31,6 @@ public class TestCaseExecutionServiceImpl implements TestCaseExecutionService {
     TestCaseExecutionRepository testCaseExecutionRepository;
 
     @Override
-    @Transactional
     public TestCaseExecution save(TestCaseExecution testCaseExecution) {
         TestCaseExecution testCaseExecutionSaved = testCaseExecutionRepository.saveAndFlush(testCaseExecution);
         logger.info("Test case execution saved : "+testCaseExecutionSaved.getId());
