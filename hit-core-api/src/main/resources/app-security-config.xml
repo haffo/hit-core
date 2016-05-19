@@ -29,6 +29,7 @@
 	<sec:http pattern="/lib/**" security="none" />
 
 	<sec:http pattern="/api/ws/*" security="none" />
+	<sec:http pattern="/api/wss/**" security="none" />
 	<sec:http pattern="/api/appInfo" security="none" />
 	<sec:http pattern="/api/*/clearRecords" security="none" />
 	<sec:http pattern="/api/*/testcases" security="none" />
@@ -59,6 +60,8 @@
 			access="isAnonymous()" />
 		<sec:intercept-url pattern="/api/session/keepAlive"
 			access="isAnonymous()" />
+		<!--sec:intercept-url pattern="/api/wss/**"
+			access="isAnonymous()" /-->
 		<!-- <sec:intercept-url pattern="/api/session/create" access="isAnonymous() 
 			or isFullyAuthenticated()" /> -->
 		<!-- <sec:intercept-url pattern="/api/accounts/login" access="isFullyAuthenticated()" 
