@@ -69,6 +69,26 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
   @Override
   public TransportConfig save(TransportConfig config) {
+    List<TransportConfig> configs = transportConfigRepository.findAllByUserAndProtocolAndDomain(config.getUserId(), config.getProtocol(), config.getDomain());
+    List<TransportConfig> toBeDeleted = new ArrayList<>();
+    if(config.getId()==null) {
+      if (configs.size() > 0) {
+        for (TransportConfig transportConfig : configs) {
+          toBeDeleted.add(transportConfig);
+        }
+      }
+    } else {
+      if (configs.size() > 1) {
+        for (TransportConfig transportConfig : configs) {
+          if (transportConfig.getId() != config.getId()) {
+            toBeDeleted.add(transportConfig);
+          }
+        }
+      }
+    }
+    if(toBeDeleted.size()>0){
+      delete(toBeDeleted);
+    }
     return transportConfigRepository.saveAndFlush(config);
   }
 
@@ -82,9 +102,19 @@ public class TransportConfigServiceImpl implements TransportConfigService {
   @Override
   public TransportConfig findOneByUserAndProtocolAndDomain(Long userId, String protocol,
       String domain) {
-    return transportConfigRepository.findOneByUserAndProtocolAndDomain(userId, protocol, domain);
+    List<TransportConfig> configs = transportConfigRepository.findAllByUserAndProtocolAndDomain(userId,protocol,domain);
+    if(configs.size()>1){
+      for(int i=1;i<configs.size();i++){
+        transportConfigRepository.delete(configs.get(i));
+        configs.remove(i);
+      }
+    }
+    List<TransportConfig> configs2Test = transportConfigRepository.findAllByUserAndProtocolAndDomain(userId,protocol,domain);
+    if(configs.size()==1) {
+      return configs.get(0);
+    }
+    return null;
   }
-
 
 
   private String toInitiatorQuery(Map<String, String> criteria, TestingType type, String protocol) {

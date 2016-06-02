@@ -22,6 +22,7 @@ import gov.nist.hit.core.domain.TransportMessage;
 import gov.nist.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.service.TransactionService;
+import gov.nist.hit.core.service.TransportConfigService;
 import gov.nist.hit.core.service.TransportMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -56,7 +57,7 @@ public class TransportController {
   private TransportFormsRepository transportFormsRepository;
 
   @Autowired
-  private TransportConfigRepository transportConfigRepository;
+  private TransportConfigService transportConfigService;
 
   @Autowired
   private TransactionService transactionService;
@@ -86,7 +87,7 @@ public class TransportController {
   @RequestMapping(value = "/config/save", method = RequestMethod.POST)
   public boolean saveConfig(@RequestBody SaveConfigRequest request) {
     TransportConfig config =
-        transportConfigRepository.findOneByUserAndProtocolAndDomain(request.getUserId(),
+        transportConfigService.findOneByUserAndProtocolAndDomain(request.getUserId(),
             request.getProtocol(), request.getDomain());
     if (config != null) {
       if (TestingType.SUT_INITIATOR.equals(request.getType())) {
@@ -98,7 +99,7 @@ public class TransportController {
       } else if (TestingType.TA_INITIATOR.equals(request.getType())) {
         config.setTaInitiator(request.getConfig());
       }
-      transportConfigRepository.save(config);
+      transportConfigService.save(config);
     }
     return true;
   }
