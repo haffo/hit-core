@@ -136,15 +136,18 @@ public class TransportConfigServiceImpl implements TransportConfigService {
       conditions.add(alias + ".property_key is not null");
       i++;
     }
-    sql += " WHERE ";
-    for (int j = 0; j < conditions.size(); j++) {
-      if (j > 0) {
-        sql += " AND ";
+    if(conditions.size()>1) {
+      sql += " WHERE ";
+      for (int j = 0; j < conditions.size(); j++) {
+        if (j > 0) {
+          sql += " AND ";
+        }
+        sql += conditions.get(j);
       }
-      sql += conditions.get(j);
+      sql += " AND tr.protocol = '" + protocol + "'";
+    } else {
+      sql += " WHERE tr.protocol = '" + protocol + "'";
     }
-
-    sql += " and tr.protocol = '" + protocol + "'";
     return sql;
   }
 
