@@ -320,8 +320,7 @@ public class TestStepValidationReportController {
 
 
   @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/update", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+  @RequestMapping(value = "/update", method = RequestMethod.POST)
   public TestStepValidationReport updateValidationReport(
       @ApiParam(value = "The request of the report", required = true) @RequestBody TestStepValidationReport reportRequest,
       HttpServletRequest request, HttpServletResponse response) {
