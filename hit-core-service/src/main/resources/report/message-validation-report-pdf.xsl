@@ -339,11 +339,29 @@
 					<tr class="border_bottom">
 						<!-- <td class="row2 border_right dark-gray">Content</td> -->
 						<td class="row2 border_right dark-gray ">
-							<div style="text-align: center">
+							<!-- <div style="text-align: center">
 								<textarea style="width:100%;height:100%" readonly="true" wrap="off">
 									<xsl:value-of select="report:Er7Message" />
 								</textarea>
 							</div>
+							 -->
+							<div style="text-align: left">								
+								<xsl:for-each
+								select="tokenize(report:Er7Message,'\n')">
+								<p style="text-align: left">
+									<xsl:call-template name="segmentBreaker">
+										<xsl:with-param name="segment">
+											<xsl:value-of select="." />
+										</xsl:with-param>
+									</xsl:call-template>
+								</p>
+
+
+							</xsl:for-each>
+							
+								
+							</div>
+							
 						</td>
 					</tr>
 				</tbody>
@@ -355,7 +373,7 @@
 						<xsl:attribute name="id">msgS<xsl:value-of select="generate-id()"/></xsl:attribute>
 						<tbody>
 							<tr class="row1">
-								<th style="border-bottom:2pt #005C99 solid" align="left">Message With Hexadecimal Characters
+								<th style="border-bottom:2pt #005C99 solid" align="left">Message With Non-Printable Characters
 								<!-- <button>
 								<xsl:attribute name="onclick">HideSep('<xsl:value-of select="generate-id()"/>')</xsl:attribute>
 								Hide Separators
@@ -365,11 +383,27 @@
 							<tr class="border_bottom">
 								<!-- <td class="row2 border_right dark-gray">Content</td> -->
 								<td class="row2 border_right dark-gray ">
-									<div style="text-align: center">
+									<!-- <div style="text-align: center">
 										<textarea style="width:100%;height:100%" readonly="true" wrap="off">
 											<xsl:value-of select="report:Er7MessageHexFormatted" />
 										</textarea>
-									</div>
+									</div>  -->
+									<div style="text-align: left">								
+								<xsl:for-each
+								select="tokenize(report:Er7MessageHexFormatted,'\n')">
+								<p style="text-align: left">
+									<xsl:call-template name="segmentBreaker">
+										<xsl:with-param name="segment">
+											<xsl:value-of select="." />
+										</xsl:with-param>
+									</xsl:call-template>
+								</p>
+
+
+							</xsl:for-each>
+							
+								
+							</div>
 								</td>
 							</tr>
 						</tbody>
