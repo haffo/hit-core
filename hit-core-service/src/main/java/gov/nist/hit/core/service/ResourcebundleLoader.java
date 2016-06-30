@@ -422,6 +422,8 @@ public abstract class ResourcebundleLoader {
             TransportForms tForms = new TransportForms();
             tForms.setProtocol(node.findValue("protocol").textValue());
             tForms.setDomain(node.findValue("domain").textValue());
+            tForms.setDescription(node.findValue("description") != null ? node.findValue(
+                "description").textValue() : null);
             JsonNode forms = node.findValue("forms");
             if (forms.get("TA_INITIATOR") == null || forms.get("SUT_INITIATOR") == null) {
               throw new RuntimeException(
