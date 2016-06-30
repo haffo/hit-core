@@ -140,14 +140,6 @@
 							</xsl:attribute>
 							Count :
 							<xsl:value-of select="$count" />
-							<!-- <input type="checkbox">
-								<xsl:attribute name="onclick">toggle_visibility('<xsl:value-of
-									select="generate-id()" /><xsl:value-of
-									select="$classification" />',this)</xsl:attribute>
-								<xsl:if test="$classification='error'">
-									<xsl:attribute name="checked">true</xsl:attribute>
-								</xsl:if>
-							</input> -->
 						</td>
 					</tr>
 				</tbody>
@@ -155,7 +147,7 @@
 			<table class="forumline cf-report-category" width="100%"
 				cellspacing="1" cellpadding="2">
 				<xsl:if test="$classification!='error'">
-						<xsl:attribute name="style">display : none;</xsl:attribute>
+						<xsl:attribute name="style"></xsl:attribute>
 				</xsl:if>
 					
 				<xsl:attribute name="id">
@@ -180,10 +172,6 @@
 				<td class="row5 border_bottom" align="right" style="width:70%">
 					Count :
 					<xsl:value-of select="count(current-group())" />
-					<!-- <input type="checkbox" checked="true">
-						<xsl:attribute name="onclick">toggle_visibilityC('<xsl:value-of
-							select="$id" />',this)</xsl:attribute>
-					</input> -->
 				</td>
 			</tr>
 		</tbody>
@@ -326,37 +314,20 @@
 				<tbody>
 					<tr class="row1">
 						<th style="border-bottom:2pt #005C99 solid" align="left">Message
-						<!-- <xsl:choose>
-  							<xsl:when test="report:Er7MessageHexFormatted">
-  								<button onclick="ShowSep()">
-									<xsl:attribute name="onclick">ShowSep('<xsl:value-of select="generate-id()"/>')</xsl:attribute>
-										Show Separators
-								</button>
-  							</xsl:when>
-						</xsl:choose> -->
 						</th>
 					</tr>
 					<tr class="border_bottom">
-						<!-- <td class="row2 border_right dark-gray">Content</td> -->
 						<td class="row2 border_right dark-gray ">
-							<!-- <div style="text-align: center">
-								<textarea style="width:100%;height:100%" readonly="true" wrap="off">
-									<xsl:value-of select="report:Er7Message" />
-								</textarea>
-							</div>
-							 -->
-							<div style="text-align: left">								
+							<div style="text-align: left;font-family: monospace">								
 								<xsl:for-each
 								select="tokenize(report:Er7Message,'\n')">
-								<p style="text-align: left">
+								<p style="text-align: left;font-family: monospace">
 									<xsl:call-template name="segmentBreaker">
 										<xsl:with-param name="segment">
 											<xsl:value-of select="." />
 										</xsl:with-param>
 									</xsl:call-template>
 								</p>
-
-
 							</xsl:for-each>
 							
 								
@@ -369,29 +340,19 @@
 			<xsl:choose>
   				<xsl:when test="report:Er7MessageHexFormatted">
 					<table class="forumline" width="100%" cellspacing="1"
-						 cellpadding="2" style="display: none;">
+						 cellpadding="2">
 						<xsl:attribute name="id">msgS<xsl:value-of select="generate-id()"/></xsl:attribute>
 						<tbody>
 							<tr class="row1">
 								<th style="border-bottom:2pt #005C99 solid" align="left">Message With Non-Printable Characters
-								<!-- <button>
-								<xsl:attribute name="onclick">HideSep('<xsl:value-of select="generate-id()"/>')</xsl:attribute>
-								Hide Separators
-								</button> -->
 								</th>
 							</tr>
 							<tr class="border_bottom">
-								<!-- <td class="row2 border_right dark-gray">Content</td> -->
 								<td class="row2 border_right dark-gray ">
-									<!-- <div style="text-align: center">
-										<textarea style="width:100%;height:100%" readonly="true" wrap="off">
-											<xsl:value-of select="report:Er7MessageHexFormatted" />
-										</textarea>
-									</div>  -->
-									<div style="text-align: left">								
+									<div style="text-align: left;font-family: monospace">								
 								<xsl:for-each
 								select="tokenize(report:Er7MessageHexFormatted,'\n')">
-								<p style="text-align: left">
+								<p style="text-align: left;font-family: monospace">
 									<xsl:call-template name="segmentBreaker">
 										<xsl:with-param name="segment">
 											<xsl:value-of select="." />
@@ -422,29 +383,22 @@
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: red; font-weight: bold">
-<!-- 							<input type="checkbox" onclick="toggle_visibility('error',this)" />
- -->							<xsl:value-of select="../report:HeaderReport/message:ErrorCount" />
+							<xsl:value-of select="../report:HeaderReport/message:ErrorCount" />
 							Errors
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: maroon; font-weight: bold">
-<!-- 							<input type="checkbox" onclick="toggle_visibility('alert',this)" />
- -->							<xsl:value-of select="../report:HeaderReport/message:AlertCount" />
+							<xsl:value-of select="../report:HeaderReport/message:AlertCount" />
 							Alerts
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: gold; font-weight: bold">
-<!-- 							<input type="checkbox" onclick="toggle_visibility('warning',this)" />
- -->							<xsl:value-of select="../report:HeaderReport/message:WarningCount" />
+							<xsl:value-of select="../report:HeaderReport/message:WarningCount" />
 							Warnings
 						</td>
 					</tr>
-					<!-- <tr class="border_bottom"> <td class="row6" style="color: green; 
-						font-weight: bold"> <input type="checkbox" onclick="toggle_visibility('affirmative',this)" 
-						/> <xsl:value-of select="../report:HeaderReport/message:AffirmCount" /> Affirmatives 
-						</td> </tr> -->
 				</tbody>
 			</table>
 		</div>
@@ -458,14 +412,9 @@
 					<th style="border-bottom:2pt #005C99 solid" align="left">Failures
 						interpretation</th>
 					<td align="right" style="border-bottom:2pt #005C99 solid">
-<!-- 						<button id="btn" onclick="fi('mfi')"> 
-<!--  						<xsl:attribute name="onclick">
-							fi('mfi<xsl:value-of select="generate-id()" />')
-						</xsl:attribute>
-						View </button> -->
 					</td>
 				</tr>
-				<tbody style="display : none;">
+				<tbody>
 					<xsl:attribute name="id">mfi<xsl:value-of select="generate-id()" /></xsl:attribute>
 					<tr>
 						<td class="row5 border_bottom border_right" style="width:50%">Category</td>
