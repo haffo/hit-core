@@ -12,9 +12,7 @@ package gov.nist.hit.core.domain.test;
  * that they have been modified.
  */
 
- 
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+
 
 /**
  * @author Harold Affo
@@ -22,12 +20,12 @@ import org.junit.Test;
  */
 public class XmlUtilTest {
 
-//  @Test
-//  public void testUpdateContent() throws Exception {
-//    String content =
-//        IOUtils.toString(XmlUtilTest.class.getResourceAsStream("/submitSingleMessageResponse.xml"));
-//    String updated = XmlUtil.prettyPrint(content);
-//    System.out.print(updated);
-//
-//  }
+  // @Test
+  // public void testUpdateContent() throws Exception {
+  // String content =
+  // IOUtils.toString(XmlUtilTest.class.getResourceAsStream("/submitSingleMessageResponse.xml"));
+  // String updated = XmlUtil.prettyPrint(content);
+  // System.out.print(updated);
+  //
+  // }
 }

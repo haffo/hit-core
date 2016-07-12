@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,9 @@ public class TransportConfigServiceImpl implements TransportConfigService {
   protected TransportConfigRepository transportConfigRepository;
 
 
+
   @Autowired
+  @PersistenceContext(unitName = "base-tool")   
   protected EntityManager entityManager;
 
   @Override
@@ -55,8 +58,7 @@ public class TransportConfigServiceImpl implements TransportConfigService {
    * @return
    */
   @Override
-  public TransportConfig set(List<KeyValuePair> pairs, TestingType type,
-      TransportConfig config) {
+  public TransportConfig set(List<KeyValuePair> pairs, TestingType type, TransportConfig config) {
     if (pairs.isEmpty())
       return config;
     for (KeyValuePair pair : pairs) {
@@ -67,6 +69,26 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
   @Override
   public TransportConfig save(TransportConfig config) {
+    List<TransportConfig> configs = transportConfigRepository.findAllByUserAndProtocolAndDomain(config.getUserId(), config.getProtocol(), config.getDomain());
+    List<TransportConfig> toBeDeleted = new ArrayList<>();
+    if(config.getId()==null) {
+      if (configs.size() > 0) {
+        for (TransportConfig transportConfig : configs) {
+          toBeDeleted.add(transportConfig);
+        }
+      }
+    } else {
+      if (configs.size() > 1) {
+        for (TransportConfig transportConfig : configs) {
+          if (transportConfig.getId() != config.getId()) {
+            toBeDeleted.add(transportConfig);
+          }
+        }
+      }
+    }
+    if(toBeDeleted.size()>0){
+      delete(toBeDeleted);
+    }
     return transportConfigRepository.saveAndFlush(config);
   }
 
@@ -80,13 +102,22 @@ public class TransportConfigServiceImpl implements TransportConfigService {
   @Override
   public TransportConfig findOneByUserAndProtocolAndDomain(Long userId, String protocol,
       String domain) {
-    return transportConfigRepository.findOneByUserAndProtocolAndDomain(userId, protocol, domain);
+    List<TransportConfig> configs = transportConfigRepository.findAllByUserAndProtocolAndDomain(userId,protocol,domain);
+    if(configs.size()>1){
+      for(int i=1;i<configs.size();i++){
+        transportConfigRepository.delete(configs.get(i));
+        configs.remove(i);
+      }
+    }
+    List<TransportConfig> configs2Test = transportConfigRepository.findAllByUserAndProtocolAndDomain(userId,protocol,domain);
+    if(configs.size()==1) {
+      return configs.get(0);
+    }
+    return null;
   }
 
 
-
-  private String toInitiatorQuery(Map<String, String> criteria, TestingType type,
-      String protocol) {
+  private String toInitiatorQuery(Map<String, String> criteria, TestingType type, String protocol) {
     String table =
         type == TestingType.SUT_INITIATOR ? "sut_initiator_config" : "ta_initiator_config";
     String sql = "SELECT * FROM transportconfig tr";
@@ -105,15 +136,18 @@ public class TransportConfigServiceImpl implements TransportConfigService {
       conditions.add(alias + ".property_key is not null");
       i++;
     }
-    sql += " WHERE ";
-    for (int j = 0; j < conditions.size(); j++) {
-      if (j > 0) {
-        sql += " AND ";
+    if(conditions.size()>1) {
+      sql += " WHERE ";
+      for (int j = 0; j < conditions.size(); j++) {
+        if (j > 0) {
+          sql += " AND ";
+        }
+        sql += conditions.get(j);
       }
-      sql += conditions.get(j);
+      sql += " AND tr.protocol = '" + protocol + "'";
+    } else {
+      sql += " WHERE tr.protocol = '" + protocol + "'";
     }
-
-    sql += " and tr.protocol = '" + protocol + "'";
     return sql;
   }
 

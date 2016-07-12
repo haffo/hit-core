@@ -93,9 +93,9 @@ public class TestStep extends AbstractTestCase implements Serializable {
   
   @ApiModelProperty(required = false, value = "parent test case of the test step")
   @JsonIgnore
-  @ManyToOne(optional=true,fetch = FetchType.LAZY)
+  @ManyToOne(optional=true,fetch = FetchType.EAGER)
   protected TestCase testCase;
-  
+
  
   public TestStep(String name) {
     super();

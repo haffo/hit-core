@@ -32,13 +32,22 @@ public class WebAppInitializer implements WebApplicationInitializer
     final AnnotationConfigWebApplicationContext context1 =
         new AnnotationConfigWebApplicationContext();
     context1.setServletContext(servletContext);
-    context1.scan("gov.nist.hit.core");
+    context1.scan("gov.nist.hit.core", "gov.nist.auth.hit.core");
     // web app servlet
     servletContext.addListener(new ContextLoaderListener(context1));
     Dynamic apiServlet = servletContext.addServlet("hit-api", new DispatcherServlet(context1));
     apiServlet.setLoadOnStartup(1);
     apiServlet.addMapping("/api/*");
     apiServlet.setAsyncSupported(true);
+
+    //
+    // FilterRegistration.Dynamic securityFilter =
+    // servletContext.addFilter("springSecurityFilterChain", DelegatingFilterProxy.class);
+    // securityFilter.addMappingForUrlPatterns(null, false, "/*");
+    //
+    // servletContext.addListener(new HttpSessionEventPublisher());
+    //
+
 
     Dynamic apiDocsServlet =
         servletContext.addServlet("hit-api-docs", new DispatcherServlet(context1));

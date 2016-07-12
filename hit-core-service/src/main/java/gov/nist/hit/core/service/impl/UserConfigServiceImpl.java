@@ -3,12 +3,15 @@ package gov.nist.hit.core.service.impl;
 import gov.nist.hit.core.domain.UserConfig;
 import gov.nist.hit.core.repo.UserConfigRepository;
 import gov.nist.hit.core.service.UserConfigService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +28,8 @@ public class UserConfigServiceImpl implements UserConfigService {
     protected UserConfigRepository userConfigRepository;
 
     @Autowired
-    protected EntityManager entityManager;
+    @PersistenceContext(unitName = "base-tool")
+     protected EntityManager entityManager;
 
 
     @Override
@@ -87,14 +91,15 @@ public class UserConfigServiceImpl implements UserConfigService {
             conditions.add(alias + ".property_key is not null");
             i++;
         }
-        sql += " WHERE ";
-        for (int j = 0; j < conditions.size(); j++) {
-            if (j > 0) {
-                sql += " AND ";
+        if(conditions.size()>1) {
+            sql += " WHERE ";
+            for (int j = 0; j < conditions.size(); j++) {
+                if (j > 0) {
+                    sql += " AND ";
+                }
+                sql += conditions.get(j);
             }
-            sql += conditions.get(j);
         }
-
         return sql;
     }
 }

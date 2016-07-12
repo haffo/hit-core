@@ -12,6 +12,7 @@
 
 package gov.nist.hit.core.service;
 
+import gov.nist.auth.hit.core.repo.AccountRepository;
 import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.AppInfo;
 import gov.nist.hit.core.domain.CFTestInstance;
@@ -49,11 +50,10 @@ import gov.nist.hit.core.repo.MessageRepository;
 import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.repo.TestStepValidationReportRepository;
 import gov.nist.hit.core.repo.TransactionRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.repo.TransportMessageRepository;
-import gov.nist.hit.core.repo.UserRepository;
-import gov.nist.hit.core.repo.TestStepValidationReportRepository;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
@@ -136,6 +136,7 @@ public abstract class ResourcebundleLoader {
   public static final String TOOL_DOWNLOADS_CONF_PATTERN = "Downloads.json";
   public static final String TRANSPORT_PATTERN = "Global/Transport/";
   public static final String TRANSPORT_CONF_PATTERN = "Transport.json";
+  public static final String REGISTRATION = "Registration.json";
 
   @Autowired
   IntegrationProfileRepository integrationProfileRepository;
@@ -174,7 +175,7 @@ public abstract class ResourcebundleLoader {
   protected DBService dbService;
 
   @Autowired
-  protected UserRepository userRepository;
+  protected AccountRepository userRepository;
 
   @Autowired
   protected TransportMessageRepository transportMessageRepository;
@@ -330,10 +331,35 @@ public abstract class ResourcebundleLoader {
     if (resource != null) {
       appInfo.setMessageContentInfo(FileUtil.getContent(resource));
     }
+
+    loadRegistration(appInfo);
+
     appInfo.setApiDocsPath("/apidocs");
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");
   }
+
+  private void loadRegistration(AppInfo appInfo) throws JsonProcessingException, IOException {
+    Resource resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
+            + ResourcebundleLoader.REGISTRATION);
+    if (resource != null) {
+      String content = FileUtil.getContent(resource);
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode node = mapper.readTree(content);
+      appInfo.setRegistrationTitle(node.findValue("title") != null ? node.findValue("title")
+          .textValue() : null);
+      appInfo.setRegistrationAgreement(node.findValue("agreement") != null ? node.findValue(
+          "agreement").textValue() : null);
+      appInfo.setRegistrationSubmittedContent(node.findValue("submittedContent") != null ? node
+          .findValue("submittedContent").textValue() : null);
+      appInfo.setRegistrationSubmittedTitle(node.findValue("submittedTitle") != null ? node
+          .findValue("submittedTitle").textValue() : null);
+      appInfo.setRegistrationAcceptanceTitle(node.findValue("acceptanceTitle") != null ? node
+          .findValue("acceptanceTitle").textValue() : null);
+    }
+  }
+
 
   private void loadUserDocs() throws IOException {
     logger.info("loading user documents...");
@@ -396,6 +422,8 @@ public abstract class ResourcebundleLoader {
             TransportForms tForms = new TransportForms();
             tForms.setProtocol(node.findValue("protocol").textValue());
             tForms.setDomain(node.findValue("domain").textValue());
+            tForms.setDescription(node.findValue("description") != null ? node.findValue(
+                "description").textValue() : null);
             JsonNode forms = node.findValue("forms");
             if (forms.get("TA_INITIATOR") == null || forms.get("SUT_INITIATOR") == null) {
               throw new RuntimeException(
@@ -1459,11 +1487,11 @@ public abstract class ResourcebundleLoader {
     this.dbService = dbService;
   }
 
-  public UserRepository getUserRepository() {
+  public AccountRepository getUserRepository() {
     return userRepository;
   }
 
-  public void setUserRepository(UserRepository userRepository) {
+  public void setUserRepository(AccountRepository userRepository) {
     this.userRepository = userRepository;
   }
 
@@ -1487,7 +1515,8 @@ public abstract class ResourcebundleLoader {
     return validationResultRepository;
   }
 
-  public void setValidationResultRepository(TestStepValidationReportRepository validationResultRepository) {
+  public void setValidationResultRepository(
+      TestStepValidationReportRepository validationResultRepository) {
     this.validationResultRepository = validationResultRepository;
   }
 

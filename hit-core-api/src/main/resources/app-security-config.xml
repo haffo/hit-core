@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:sec="http://www.springframework.org/schema/security" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans	
+ 		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-3.1.xsd
+         http://www.springframework.org/schema/jee
+         http://www.springframework.org/schema/jee/spring-jee.xsd">
+
+	<context:property-placeholder location="classpath:app-auth-config.properties" />
+
+	<sec:http pattern="/blank.html" security="none" />
+	<sec:http pattern="/Error.html" security="none" />
+	<sec:http pattern="/InvalidAppState.html" security="none" />
+	<sec:http pattern="/NotFound.html" security="none" />
+	<sec:http pattern="/SessionTimeout.html" security="none" />
+	<sec:http pattern="/index.html" security="none" />
+	<sec:http pattern="/images/**" security="none" />
+	<sec:http pattern="/lang/**" security="none" />
+	<sec:http pattern="/scripts/**" security="none" />
+	<sec:http pattern="/styles/**" security="none" />
+	<sec:http pattern="/views/**" security="none" />
+	<sec:http pattern="/fonts/**" security="none" />
+	<sec:http pattern="/lib/**" security="none" />
+
+	<sec:http pattern="/api/ws/*" security="none" />
+	<sec:http pattern="/api/wss/**" security="none" />
+	<sec:http pattern="/api/appInfo" security="none" />
+	<sec:http pattern="/api/*/clearRecords" security="none" />
+	<sec:http pattern="/api/*/testcases" security="none" />
+	<!-- <sec:http pattern="/api/session/create" security="none" /> -->
+	<sec:http pattern="/api/transport/config/forms" security="none" />
+	<sec:http pattern="/api/testcases/*" security="none" />
+	<sec:http pattern="/api/teststeps/*" security="none" />
+	<sec:http pattern="/api/testcasegroups/*" security="none" />
+	<sec:http pattern="/api/testplans/*" security="none" />
+	<sec:http pattern="/api/transport/*" security="none" />
+	<sec:http pattern="/api/user/*" security="none" />
+	<sec:http pattern="/api/documentation/*" security="none" />
+
+	<sec:http create-session="ifRequired" use-expressions="true">
+
+		<sec:session-management>
+			<sec:concurrency-control max-sessions="1" />
+		</sec:session-management>
+
+		<sec:http-basic entry-point-ref="restAuthenticationEntryPoint" />
+		<sec:intercept-url pattern="/api/**" access="isAnonymous() or isFullyAuthenticated()" />
+
+		<sec:intercept-url pattern="/api/sooa/accounts/**"
+			access="isAnonymous()" />
+		<sec:intercept-url pattern="/api/sooa/usernames/**"
+			access="isAnonymous()" />
+		<sec:intercept-url pattern="/api/sooa/emails/**"
+			access="isAnonymous()" />
+		<sec:intercept-url pattern="/api/session/keepAlive"
+			access="isAnonymous()" />
+		<!--sec:intercept-url pattern="/api/wss/**"
+			access="isAnonymous()" /-->
+		<!-- <sec:intercept-url pattern="/api/session/create" access="isAnonymous() 
+			or isFullyAuthenticated()" /> -->
+		<!-- <sec:intercept-url pattern="/api/accounts/login" access="isFullyAuthenticated()" 
+			/> -->
+<!-- 			
+		<sec:intercept-url pattern="/api/accounts/cuser"
+			access="isAnonymous() or isFullyAuthenticated()" /> -->
+			
+		<sec:intercept-url pattern="/api/accounts/guest"
+			access="isAnonymous()" />
+		<sec:intercept-url pattern="/api/accounts/guest/*"
+			access="isAnonymous()" />
+<!-- 	<sec:intercept-url pattern="/api/transport/**"
+			access="isAnonymous() or isFullyAuthenticated()" /> -->
+			
+		<!-- <sec:intercept-url pattern="/api/messageValidationReport/**"
+			access="isAnonymous() or isFullyAuthenticated()" />
+			<sec:intercept-url pattern="/api/testCaseValidationReport/**"
+			access="isAnonymous() or isFullyAuthenticated()" />
+				<sec:intercept-url pattern="/api/testStepValidationReport/**"
+			access="isAnonymous() or isFullyAuthenticated()" />
+				<sec:intercept-url pattern="/api/session/keepAlive" access="isAnonymous() or isFullyAuthenticated()" 
+			/> -->
+		
+	
+		<sec:intercept-url pattern="/j_spring_security_logout"
+			access="isFullyAuthenticated()" />
+<!-- 		<sec:intercept-url pattern="/**"
+			access="isFullyAuthenticated() and hasRole('admin')" /> -->
+
+		<sec:logout logout-success-url="/index.html" />
+
+	</sec:http>
+
+	<bean id="restAuthenticationEntryPoint" class="gov.nist.hit.core.api.util.RestAuthenticationEntryPoint" />
+
+	<sec:global-method-security
+		pre-post-annotations="enabled">
+		<sec:expression-handler ref="expressionHandler" />
+	</sec:global-method-security>
+
+	<sec:authentication-manager alias="authenticationManager">
+		<sec:authentication-provider
+			user-service-ref="userDetailsService">
+			<sec:password-encoder ref="shaPasswordEncoder">
+				<sec:salt-source user-property="username" />
+			</sec:password-encoder>
+		</sec:authentication-provider>
+	</sec:authentication-manager>
+
+	<bean id="shaPasswordEncoder"
+		class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+		<constructor-arg value="256" />
+	</bean>
+
+	<bean id="userDetailsService" class="gov.nist.hit.core.service.CustomJdbcUserDetailsManager">
+		<property name="dataSource" ref="authDataSource" />
+		<property name="authenticationManager" ref="authenticationManager" />
+	</bean>
+
+	<bean id="authDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		p:driverClassName="${auth.jdbc.driverClassName}" p:url="${auth.jdbc.url}"
+		p:username="${auth.jdbc.username}" p:password="${auth.jdbc.password}"
+		p:testWhileIdle="${auth.jdbc.testWhileIdle}" p:testOnBorrow="${auth.jdbc.testOnBorrow}"
+		p:validationQuery="${auth.jdbc.validationQuery}" destroy-method="close" />
+
+
+	<bean id="expressionHandler"
+		class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
+		<property name="permissionEvaluator" ref="permissionEvaluator" />
+	</bean>
+
+	<bean id="permissionEvaluator" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="targetSource">
+			<bean class="org.springframework.aop.target.LazyInitTargetSource">
+				<property name="targetBeanName" value="customPermissionEvaluator" />
+			</bean>
+		</property>
+		<property name="proxyInterfaces"
+			value="org.springframework.security.access.PermissionEvaluator" />
+	</bean>
+
+</beans>

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,8 @@ public class TransportMessageServiceImpl implements TransportMessageService {
   protected TransportMessageRepository transportMessageRepository;
 
   @Autowired
-  protected EntityManager entityManager;
+  @PersistenceContext(unitName = "base-tool")
+   protected EntityManager entityManager;
 
 
   @Override
@@ -51,14 +53,15 @@ public class TransportMessageServiceImpl implements TransportMessageService {
       conditions.add(alias + ".property_key is not null");
       i++;
     }
-    sql += " WHERE ";
-    for (int j = 0; j < conditions.size(); j++) {
-      if (j > 0) {
-        sql += " AND ";
+    if(conditions.size()>1) {
+      sql += " WHERE ";
+      for (int j = 0; j < conditions.size(); j++) {
+        if (j > 0) {
+          sql += " AND ";
+        }
+        sql += conditions.get(j);
       }
-      sql += conditions.get(j);
     }
-
     return sql;
   }
 

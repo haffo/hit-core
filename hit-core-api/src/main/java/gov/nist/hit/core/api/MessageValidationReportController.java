@@ -13,13 +13,13 @@ package gov.nist.hit.core.api;
  */
 
 
+import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.domain.User;
+import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.MessageValidationReportService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestStepService;
-import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
@@ -65,7 +65,7 @@ public class MessageValidationReportController {
   private TestCaseService testCaseService;
 
   @Autowired
-  private UserService userService;
+  private AccountService userService;
 
   @ApiOperation(value = "", hidden = true)
   @RequestMapping(value = "/create", method = RequestMethod.POST,
@@ -77,7 +77,7 @@ public class MessageValidationReportController {
     try {
       logger.info("Saving validation report");
       Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      User user = null;
+      Account user = null;
       if (userId == null || ((user = userService.findOne(userId)) == null))
         throw new MessageValidationException("Invalid user credentials");
       TestStep testStep = null;
@@ -98,7 +98,7 @@ public class MessageValidationReportController {
         report = new TestStepValidationReport();
       }
       report.setTestStep(testStep);
-      report.setUser(user);
+      report.setUserId(user.getId());
       report.setXml(xmlMessageValidationReport);
       validationReportService.save(report);
       return report;
@@ -130,7 +130,7 @@ public class MessageValidationReportController {
       if (report == null || ((xmlReport = report.getXml()) == null)) {
         throw new ValidationReportException("No validation report available for this test step");
       }
-      if (report.getUser() == null || !userId.equals(report.getUser().getId())) {
+      if (report.getUserId() == null || !userId.equals(report.getUserId())) {
         throw new MessageValidationException("Forbidden access");
       }
 

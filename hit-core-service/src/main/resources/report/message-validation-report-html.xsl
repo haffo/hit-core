@@ -12,7 +12,8 @@
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
-
+	<xsl:param name="msgWithSeparators" />
+	
 	<xsl:template match="report:HL7V2MessageValidationReport">
 		<xsl:apply-templates select="report:HeaderReport" />
 		<xsl:apply-templates select="report:SpecificReport" />
@@ -52,6 +53,19 @@
 					document.getElementById("btn").childNodes[0].nodeValue = "Hide";
 					div.style.display = '';
 					}
+					};
+					
+					function ShowSep(id) {
+					var tabC = document.getElementById("msgC"+id);
+					var tabS = document.getElementById("msgS"+id);
+					tabC.style.display = 'none';
+					tabS.style.display = '';
+					};
+					function HideSep(id) {
+					var tabC = document.getElementById("msgC"+id);
+					var tabS = document.getElementById("msgS"+id);
+					tabC.style.display = '';
+					tabS.style.display = 'none';
 					};
 		</script>
 		<xsl:if test="$withHeader = boolean('true')">
@@ -355,10 +369,20 @@
 	<xsl:template match="report:MetaData/report:Message">
 		<div class="report-section">
 			<table class="forumline" width="100%" cellspacing="1"
-				cellpadding="2">
+				 cellpadding="2">
+				<xsl:attribute name="id">msgC<xsl:value-of select="generate-id()"/></xsl:attribute>
 				<tbody>
 					<tr class="row1">
-						<th style="border-bottom:2pt #005C99 solid" align="left">Message</th>
+						<th style="border-bottom:2pt #005C99 solid" align="left">Message
+						<xsl:choose>
+  							<xsl:when test="report:Er7MessageHexFormatted">
+  								<button onclick="ShowSep()">
+									<xsl:attribute name="onclick">ShowSep('<xsl:value-of select="generate-id()"/>')</xsl:attribute>
+										Show Separators
+								</button>
+  							</xsl:when>
+						</xsl:choose>
+						</th>
 					</tr>
 					<tr class="border_bottom">
 						<!-- <td class="row2 border_right dark-gray">Content</td> -->
@@ -372,6 +396,34 @@
 					</tr>
 				</tbody>
 			</table>
+			<xsl:choose>
+  				<xsl:when test="report:Er7MessageHexFormatted">
+					<table class="forumline" width="100%" cellspacing="1"
+						 cellpadding="2" style="display: none;">
+						<xsl:attribute name="id">msgS<xsl:value-of select="generate-id()"/></xsl:attribute>
+						<tbody>
+							<tr class="row1">
+								<th style="border-bottom:2pt #005C99 solid" align="left">Message
+								<button>
+								<xsl:attribute name="onclick">HideSep('<xsl:value-of select="generate-id()"/>')</xsl:attribute>
+								Hide Separators
+								</button>
+								</th>
+							</tr>
+							<tr class="border_bottom">
+								<!-- <td class="row2 border_right dark-gray">Content</td> -->
+								<td class="row2 border_right dark-gray ">
+									<div style="text-align: center">
+										<textarea style="width:100%;height:100%" readonly="true" wrap="off">
+											<xsl:value-of select="report:Er7MessageHexFormatted" />
+										</textarea>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</xsl:when>
+			</xsl:choose>
 		</div>
 	</xsl:template>
 	<xsl:template name="Summary">
@@ -383,34 +435,22 @@
 						<th style="border-bottom:2pt #005C99 solid" align="left">Summary</th>
 					</tr>
 					<tr class="border_bottom">
-						<td class="row6 " style="color: red; font-weight: bold">							
-							<input type="checkbox">
-								<xsl:attribute name="onclick">toggle_visibility('<xsl:value-of
-									select="generate-id()" />error',this)</xsl:attribute>
- 								<xsl:attribute name="checked">true</xsl:attribute>
- 							</input>
-							
+						<td class="row6 " style="color: red; font-weight: bold">
+							<input type="checkbox" onclick="toggle_visibility('error',this)" />
 							<xsl:value-of select="../report:HeaderReport/message:ErrorCount" />
 							Errors
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: maroon; font-weight: bold">
- 							<input type="checkbox">
-								<xsl:attribute name="onclick">toggle_visibility('<xsl:value-of
-									select="generate-id()" />alert',this)</xsl:attribute>
-  							</input>
- 							
+							<input type="checkbox" onclick="toggle_visibility('alert',this)" />
 							<xsl:value-of select="../report:HeaderReport/message:AlertCount" />
 							Alerts
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: gold; font-weight: bold">
- 							<input type="checkbox">
-								<xsl:attribute name="onclick">toggle_visibility('<xsl:value-of
-									select="generate-id()" />warning',this)</xsl:attribute>
-  							</input>
+							<input type="checkbox" onclick="toggle_visibility('warning',this)" />
 							<xsl:value-of select="../report:HeaderReport/message:WarningCount" />
 							Warnings
 						</td>

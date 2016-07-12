@@ -4,14 +4,21 @@ import static org.junit.Assert.assertNotNull;
 import gov.nist.hit.core.service.MessageValidationReportService;
 import gov.nist.hit.core.service.impl.MessageValidationReportServiceImpl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.springframework.util.FileCopyUtils;
 
 public class MessageValidationReportServiceImplTest {
 
   MessageValidationReportService service = new MessageValidationReportServiceImpl();
+  static final String outputsFolder = "src/test/resources/outputs";
 
   @Test
   public void testGenerateMessageValidationHtml() throws Exception {
@@ -31,8 +38,19 @@ public class MessageValidationReportServiceImplTest {
     assertNotNull(xmlMessageValidationReport);
     InputStream io = service.generatePdf(xmlMessageValidationReport);
     assertNotNull(io);
+    saveToFile(new File(outputsFolder + "/1-Message-ValidationReport.pdf"), io);
   }
 
 
+  private void saveToFile(File f, String content) throws FileNotFoundException {
+    PrintWriter pw = new PrintWriter(f);
+    pw.append(content);
+    pw.close();
+  }
 
+  private void saveToFile(File f, InputStream content) throws IOException {
+    FileOutputStream out = new FileOutputStream(f);
+    FileCopyUtils.copy(content, out);
+    out.close();
+  }
 }

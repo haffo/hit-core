@@ -11,22 +11,27 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TransactionServiceImpl implements TransactionService {
+ public class TransactionServiceImpl implements TransactionService {
 
   private static final long serialVersionUID = 1L;
-
+ 
   @Autowired
   protected TransactionRepository transactionRepository;
 
   //
   @Autowired
+  @PersistenceContext(unitName = "base-tool")  
   protected EntityManager entityManager;
+  
 
 
   @Override
@@ -83,14 +88,15 @@ public class TransactionServiceImpl implements TransactionService {
       conditions.add(alias + ".property_key is not null");
       i++;
     }
-    sql += " WHERE ";
-    for (int j = 0; j < conditions.size(); j++) {
-      if (j > 0) {
-        sql += " AND ";
-      }
-      sql += conditions.get(j);
+    if(conditions.size()>1) {
+        sql += " WHERE ";
+        for (int j = 0; j < conditions.size(); j++) {
+            if (j > 0) {
+                sql += " AND ";
+            }
+            sql += conditions.get(j);
+        }
     }
-
     return sql;
   }
 

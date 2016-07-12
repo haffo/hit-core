@@ -13,7 +13,6 @@
 package gov.nist.hit.core.api;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,20 +24,20 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/session")
-public class SessionController {
+public class GuestSessionController {
 
   @RequestMapping(value = "/delete", method = RequestMethod.POST)
   public boolean destroy(HttpServletRequest request) {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.invalidate();
-    }
+    // HttpSession session = request.getSession(false);
+    // if (session != null) {
+    // session.invalidate();
+    // }
     return true;
   }
 
   @RequestMapping(value = "/create", method = RequestMethod.POST)
   public boolean create(HttpServletRequest request) {
-    HttpSession session = request.getSession(true);
+    // HttpSession session = request.getSession(true);
     return true;
   }
 

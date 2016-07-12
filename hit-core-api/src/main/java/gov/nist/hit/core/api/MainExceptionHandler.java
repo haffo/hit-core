@@ -12,6 +12,7 @@
 
 package gov.nist.hit.core.api;
 
+import gov.nist.hit.core.domain.ResponseMessage;
 import gov.nist.hit.core.service.exception.DocumentationException;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
 import gov.nist.hit.core.service.exception.MessageDownloadException;
@@ -33,6 +34,7 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -196,6 +198,14 @@ public class MainExceptionHandler {
   public String userNotFoundException(UserNotFoundException ex) {
     logger.error(ex.getMessage(), ex);
     return "User could not be found.\n";
+  }
+
+  @ResponseBody
+  @ExceptionHandler(AccessDeniedException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseMessage accessDeniedException(AccessDeniedException ex) {
+    logger.error("ERROR: Access Denied", ex);
+    return new ResponseMessage(ResponseMessage.Type.danger, "accessDenied");
   }
 
 

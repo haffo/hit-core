@@ -6,6 +6,7 @@ import gov.nist.hit.core.service.AppInfoService;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ public class AppInfoServiceImpl implements AppInfoService {
   protected AppInfoRepository appInfoRepository;
 
   @Autowired
+  @PersistenceContext(unitName = "base-tool")
   protected EntityManager entityManager;
 
 

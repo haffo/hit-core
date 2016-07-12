@@ -6,6 +6,7 @@ import gov.nist.hit.core.domain.TestResult;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.repo.TestCaseValidationReportRepository;
 import gov.nist.hit.core.repo.TestStepValidationReportRepository;
+import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.exception.ValidationReportException;
@@ -47,6 +48,9 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
   private static final String PDF_XSL = "/report/testcase-validation-report-pdf.xsl";
   protected static final String CSS = "/report/report.css";
   protected String css = "";
+
+  @Autowired
+  private AccountService accountService;
 
   @Autowired
   private TestStepValidationReportService testStepValidationReportService;
@@ -319,6 +323,4 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
       throw new ValidationReportException("Failed to generate the test case report");
     }
   }
-
-
 }
