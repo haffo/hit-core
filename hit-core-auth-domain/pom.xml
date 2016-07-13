@@ -8,6 +8,6 @@
 	<parent>
 		<groupId>gov.nist.hit.core</groupId>
 		<artifactId>hit-core</artifactId>
-		<version>1.0.6-SNAPSHOT</version>
+		<version>1.0.7-SNAPSHOT</version>
 	</parent>
 </project>

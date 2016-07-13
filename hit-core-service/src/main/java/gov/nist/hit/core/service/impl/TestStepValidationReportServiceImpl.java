@@ -66,11 +66,6 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
 
 
   @Override
-  public void delete(TestStepValidationReport report) {
-    validationReportRepository.delete(report);
-  }
-
-  @Override
   public TestStepValidationReport save(TestStepValidationReport report) {
     return validationReportRepository.saveAndFlush(report);
   }
@@ -78,7 +73,13 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
 
   @Override
   public void delete(Long id) {
-    validationReportRepository.delete(id);
+    try {
+      validationReportRepository.delete(id);
+    } catch (RuntimeException e) {
+
+    } catch (Exception e) {
+
+    }
   }
 
   @Override
@@ -88,7 +89,13 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
 
   @Override
   public void delete(List<TestStepValidationReport> reports) {
-    validationReportRepository.delete(reports);
+    try {
+      validationReportRepository.delete(reports);
+    } catch (RuntimeException e) {
+
+    } catch (Exception e) {
+
+    }
   }
 
   @Override
@@ -420,7 +427,9 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
       nu.xom.Element cmtElement = headerElement.getChildElements().get(1);
       cmtElement.removeChildren();
       cmtElement.appendChild(result.getComments());
-      headerElement.removeAttribute(headerElement.getAttribute("Result"));
+      if (headerElement.getAttribute("Result") != null) {
+        headerElement.removeAttribute(headerElement.getAttribute("Result"));
+      }
       headerElement.addAttribute(new Attribute("Result", ReportUtil.getTestCaseResult(result
           .getResult())));
       return report.getDocument().getRootElement();

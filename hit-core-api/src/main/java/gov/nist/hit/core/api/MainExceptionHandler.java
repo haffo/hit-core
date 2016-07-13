@@ -60,6 +60,7 @@ public class MainExceptionHandler {
   @ResponseBody
   public String exception(RuntimeException ex) {
     logger.error(ex.getMessage(), ex);
+    ex.printStackTrace();
     return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
   }
 
@@ -68,6 +69,7 @@ public class MainExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String exception(Exception ex) {
     logger.error(ex.getMessage(), ex);
+    ex.printStackTrace();
     return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
   }
 

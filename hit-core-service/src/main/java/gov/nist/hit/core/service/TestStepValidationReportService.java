@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface TestStepValidationReportService {
 
-  void delete(TestStepValidationReport resutl);
-
   TestStepValidationReport save(TestStepValidationReport report);
 
   void delete(Long id);

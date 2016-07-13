@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -320,10 +319,18 @@ public class TestStepValidationReportController {
 
 
   @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/update", method = RequestMethod.POST)
+  @RequestMapping(value = "/update", method = RequestMethod.POST,
+      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
   public TestStepValidationReport updateValidationReport(
-      @ApiParam(value = "The request of the report", required = true) @RequestBody TestStepValidationReport reportRequest,
-      HttpServletRequest request, HttpServletResponse response) {
+      @ApiParam(value = "the id of the test step", required = true) @RequestParam(
+          value = "testStepId", required = true) Long testStepId,
+      @ApiParam(value = "the xml validation report", required = false) @RequestParam(
+          value = "xmlMessageValidationReport", required = false) String xmlMessageValidationReport,
+      @ApiParam(value = "the result of the validation", required = false) @RequestParam(
+          value = "result", required = false) String result, @ApiParam(
+          value = "the comments of the test step", required = false) @RequestParam(
+          value = "comments", required = false) String comments, HttpServletRequest request,
+      HttpServletResponse response) {
     try {
       logger.info("Saving validation report");
       Long userId = SessionContext.getCurrentUserId(request.getSession(false));
@@ -331,8 +338,6 @@ public class TestStepValidationReportController {
       if (userId == null || ((user = userService.findOne(userId)) == null))
         throw new MessageValidationException("Invalid user credentials");
       TestStep testStep = null;
-      Long testStepId =
-          reportRequest.getTestStep() != null ? reportRequest.getTestStep().getId() : null;
       if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
         throw new ValidationReportException("No test step or unknown test step specified");
       TestStepValidationReport report =
@@ -340,38 +345,31 @@ public class TestStepValidationReportController {
       if (report != null) {
         report.setTestStep(testStep);
         report.setUserId(user.getId());
-        report.setComments(reportRequest.getComments());
-        report.setResult(reportRequest.getResult() != null ? reportRequest.getResult() : null);
-        String xml = report.getXml();
-        if (StringUtils.isNotEmpty(reportRequest.getXml())) {
-          xml =
-              validationReportService.generateXmlTestStepValidationReport(reportRequest.getXml(),
-                  report);
+        report.setComments(comments);
+        report.setResult(StringUtils.isNotEmpty(result) && result != null ? TestResult
+            .valueOf(result) : null);
+        String finalXmlReport = null;
+        if (StringUtils.isNotEmpty(xmlMessageValidationReport)
+            && xmlMessageValidationReport != null) {
+          finalXmlReport =
+              validationReportService.generateXmlTestStepValidationReport(
+                  xmlMessageValidationReport, report);
         } else {
-          if (xml != null) {
-            xml = validationReportService.updateXmlTestValidationReportElement(report);
-          } else if (StringUtils.isNotEmpty(reportRequest.getComments())
-              || report.getResult() != null) {
-            xml = validationReportService.generateXmlTestStepValidationReport(null, report);
+          if (StringUtils.isNotEmpty(report.getXml()) && report.getXml() != null) {
+            finalXmlReport = validationReportService.updateXmlTestValidationReportElement(report);
+          } else if (StringUtils.isNotEmpty(comments) || report.getResult() != null) {
+            finalXmlReport =
+                validationReportService.generateXmlTestStepValidationReport(null, report);
           }
         }
-
-
-        // if (StringUtils.isEmpty(xml)) {
-        // xml = validationReportService.generateXmlTestStepValidationReport(null, report);
-        // } else {
-        // xml = validationReportService.updateXmlTestValidationReportElement(report);
-        // }
-        if (xml != null) {
-          report.setXml(xml);
-          report.setHtml(validationReportService.generateHtml(xml));
+        if (finalXmlReport != null) {
+          report.setXml(finalXmlReport);
+          report.setHtml(validationReportService.generateHtml(finalXmlReport));
           validationReportService.save(report);
         }
       }
 
       return report;
-    } catch (ValidationReportException e) {
-      throw new ValidationReportException("Failed to generate the report");
     } catch (Exception e) {
       throw new ValidationReportException("Failed to generate the report");
     }
@@ -397,7 +395,7 @@ public class TestStepValidationReportController {
     TestStepValidationReport result =
         validationReportService.findOneByTestStepAndUser(testStepId, userId);
     if (result != null) {
-      validationReportService.delete(result);
+      validationReportService.delete(result.getId());
     }
     return true;
   }

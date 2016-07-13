@@ -78,7 +78,7 @@ public class DbConfig {
     HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
     jpaVendorAdapter.setShowSql(Boolean.getBoolean(env.getProperty("jpa.showSql")));
     jpaVendorAdapter.setGenerateDdl(Boolean.getBoolean(env.getProperty("jpa.generateDdl")));
-    jpaVendorAdapter.setDatabase(Database.H2);
+    jpaVendorAdapter.setDatabase(Database.valueOf(env.getProperty("jpa.database")));
     jpaVendorAdapter.setDatabasePlatform(env.getProperty("jpa.databasePlatform"));
     return jpaVendorAdapter;
   }
