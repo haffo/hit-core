@@ -13,7 +13,6 @@ package gov.nist.hit.core.api;
  */
 
 
-import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.service.AccountService;
@@ -28,7 +27,6 @@ import io.swagger.annotations.ApiParam;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,47 +65,7 @@ public class MessageValidationReportController {
   @Autowired
   private AccountService userService;
 
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/create", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public TestStepValidationReport save(
-      @ApiParam(value = "the xml validation report", required = true) @RequestParam("xmlMessageValidationReport") String xmlMessageValidationReport,
-      @ApiParam(value = "the id of the test step", required = true) @RequestParam("testStepId") Long testStepId,
-      HttpServletRequest request, HttpServletResponse response) {
-    try {
-      logger.info("Saving validation report");
-      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      Account user = null;
-      if (userId == null || ((user = userService.findOne(userId)) == null))
-        throw new MessageValidationException("Invalid user credentials");
-      TestStep testStep = null;
-      if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
-        throw new ValidationReportException("No test step or unknown test step specified");
 
-      TestStepValidationReport report = null;
-      List<TestStepValidationReport> reports =
-          validationReportService.findAllByTestStepAndUser(testStepId, userId);
-      if (reports != null && !reports.isEmpty()) {
-        if (reports.size() == 1) {
-          report = reports.get(0);
-        } else {
-          validationReportService.delete(reports);
-          report = new TestStepValidationReport();
-        }
-      } else {
-        report = new TestStepValidationReport();
-      }
-      report.setTestStep(testStep);
-      report.setUserId(user.getId());
-      report.setXml(xmlMessageValidationReport);
-      validationReportService.save(report);
-      return report;
-    } catch (ValidationReportException e) {
-      throw new ValidationReportException("Failed to download the report");
-    } catch (Exception e) {
-      throw new ValidationReportException("Failed to download the report");
-    }
-  }
 
   @ApiOperation(value = "Download the message validation report of a test step by its id",
       nickname = "download",
