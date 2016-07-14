@@ -1,8 +1,0 @@
-target
-.classpath
-.project
-.settings/
-.DS_Store
-.idea
-*.iml
-*hit-core-service/src/test/resources/outputs/
