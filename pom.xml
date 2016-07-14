@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gov.nist.hit.core</groupId>
 	<artifactId>hit-core</artifactId>
-	<version>1.0.7-SNAPSHOT</version>
+	<version>1.0.7</version>
 	<name>hit-core</name>
 	<description>hit-core</description>
 	<packaging>pom</packaging>
@@ -342,7 +342,7 @@
 		<connection>scm:git:https://haffo@github.com/haffo/hit-core.git</connection>
 		<url>scm:git:https://haffo@github.com/haffo/hit-core.git</url>
 		<developerConnection>scm:git:https://haffo@github.com/haffo/hit-core.git</developerConnection>
-	  <tag>HEAD</tag>
+	  <tag>hit-core-1.0.7</tag>
   </scm>  
   
  
