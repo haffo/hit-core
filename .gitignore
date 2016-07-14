@@ -5,13 +5,4 @@ target
 .DS_Store
 .idea
 *.iml
-hit-core-service/src/test/resources/1-TestStepMessageValidationReport.pdf
-hit-core-service/src/test/resources/1-TestStepMessageValidationReport.xml
-hit-core-service/src/test/resources/2-TestStepManualValidationReport.pdf
-hit-core-service/src/test/resources/2-TestStepManualValidationReport.xml
-hit-core-service/src/test/resources/3-TestStepManualValidationReport.pdf
-hit-core-service/src/test/resources/3-TestStepManualValidationReport.xml
-hit-core-service/src/test/resources/4-TestStepManualValidationReport.xml
-hit-core-service/src/test/resources/4-TestStepMesssageValidationReport.pdf
-hit-core-service/src/test/resources/5-TestStepMessageValidationReport.html
-hit-core-service/src/test/resources/5-TestStepMessageValidationReport.xml
+hit-core-service/src/test/resources/outputs/
