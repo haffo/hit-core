@@ -12,7 +12,8 @@
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
-
+	<xsl:param name="msgWithSeparators" />
+	
 	<xsl:template match="report:HL7V2MessageValidationReport">
 		<xsl:apply-templates select="report:HeaderReport" />
 		<xsl:apply-templates select="report:SpecificReport" />
@@ -145,9 +146,9 @@
 			</table>
 			<table class="forumline cf-report-category" width="100%"
 				cellspacing="1" cellpadding="2">
-<!-- 				<xsl:if test="$classification!='error'">
-						<xsl:attribute name="style">display : none;</xsl:attribute>
-				</xsl:if> -->
+				<xsl:if test="$classification!='error'">
+						<xsl:attribute name="style"></xsl:attribute>
+				</xsl:if>
 					
 				<xsl:attribute name="id">
 					<xsl:value-of select='generate-id()' /><xsl:value-of select="$classification" />
@@ -308,18 +309,50 @@
 	<xsl:template match="report:MetaData/report:Message">
 		<div class="report-section">
 			<table class="forumline" width="100%" cellspacing="1"
-				cellpadding="2">
+				 cellpadding="2">
+				<xsl:attribute name="id">msgC<xsl:value-of select="generate-id()"/></xsl:attribute>
 				<tbody>
 					<tr class="row1">
-						<th style="border-bottom:2pt #005C99 solid" align="left">Message</th>
+						<th style="border-bottom:2pt #005C99 solid" align="left">Message
+						</th>
 					</tr>
 					<tr class="border_bottom">
-						<!-- <td class="row2 border_right dark-gray">Content</td> -->
 						<td class="row2 border_right dark-gray ">
-							<div style="text-align: center">								
+							<div style="text-align: left;font-family: monospace">								
 								<xsl:for-each
 								select="tokenize(report:Er7Message,'\n')">
-								<p>
+								<p style="text-align: left;font-family: monospace">
+									<xsl:call-template name="segmentBreaker">
+										<xsl:with-param name="segment">
+											<xsl:value-of select="." />
+										</xsl:with-param>
+									</xsl:call-template>
+								</p>
+							</xsl:for-each>
+							
+								
+							</div>
+							
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<xsl:choose>
+  				<xsl:when test="report:Er7MessageHexFormatted">
+					<table class="forumline" width="100%" cellspacing="1"
+						 cellpadding="2">
+						<xsl:attribute name="id">msgS<xsl:value-of select="generate-id()"/></xsl:attribute>
+						<tbody>
+							<tr class="row1">
+								<th style="border-bottom:2pt #005C99 solid" align="left">Message With Non-Printable Characters
+								</th>
+							</tr>
+							<tr class="border_bottom">
+								<td class="row2 border_right dark-gray ">
+									<div style="text-align: left;font-family: monospace">								
+								<xsl:for-each
+								select="tokenize(report:Er7MessageHexFormatted,'\n')">
+								<p style="text-align: left;font-family: monospace">
 									<xsl:call-template name="segmentBreaker">
 										<xsl:with-param name="segment">
 											<xsl:value-of select="." />
@@ -332,10 +365,12 @@
 							
 								
 							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</xsl:when>
+			</xsl:choose>
 		</div>
 	</xsl:template>
 	<xsl:template name="Summary">
@@ -348,26 +383,22 @@
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: red; font-weight: bold">
- 							<xsl:value-of select="../report:HeaderReport/message:ErrorCount" />
+							<xsl:value-of select="../report:HeaderReport/message:ErrorCount" />
 							Errors
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: maroon; font-weight: bold">
- 							<xsl:value-of select="../report:HeaderReport/message:AlertCount" />
+							<xsl:value-of select="../report:HeaderReport/message:AlertCount" />
 							Alerts
 						</td>
 					</tr>
 					<tr class="border_bottom">
 						<td class="row6 " style="color: gold; font-weight: bold">
- 							<xsl:value-of select="../report:HeaderReport/message:WarningCount" />
+							<xsl:value-of select="../report:HeaderReport/message:WarningCount" />
 							Warnings
 						</td>
 					</tr>
-					<!-- <tr class="border_bottom"> <td class="row6" style="color: green; 
-						font-weight: bold"> <input type="checkbox" onclick="toggle_visibility('affirmative',this)" 
-						/> <xsl:value-of select="../report:HeaderReport/message:AffirmCount" /> Affirmatives 
-						</td> </tr> -->
 				</tbody>
 			</table>
 		</div>
@@ -381,14 +412,9 @@
 					<th style="border-bottom:2pt #005C99 solid" align="left">Failures
 						interpretation</th>
 					<td align="right" style="border-bottom:2pt #005C99 solid">
-						<button id="btn" onclick="fi('mfi')"> 
-						<xsl:attribute name="onclick">
-							fi('mfi<xsl:value-of select="generate-id()" />')
-						</xsl:attribute>
-						View </button>
 					</td>
 				</tr>
-				<tbody style="display : none;">
+				<tbody>
 					<xsl:attribute name="id">mfi<xsl:value-of select="generate-id()" /></xsl:attribute>
 					<tr>
 						<td class="row5 border_bottom border_right" style="width:50%">Category</td>
