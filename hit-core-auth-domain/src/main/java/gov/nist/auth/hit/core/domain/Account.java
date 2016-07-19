@@ -87,7 +87,8 @@ public class Account implements Serializable {
   }
 
   /**
-   * Creates a new account instance.
+   * 
+   * @param id
    */
   public Account(Long id) {
     this.setId(id);
@@ -137,16 +138,16 @@ public class Account implements Serializable {
     this.entityDisabled = entityDisabled;
   }
 
-  // Only used for registration
   /**
-   * @return the password
+   * @return the registrationPassword
    */
   public String getPassword() {
     return registrationPassword;
   }
 
   /**
-   * @param password the password to set
+   * 
+   * @param registrationPassword
    */
   public void setPassword(String registrationPassword) {
     this.registrationPassword = registrationPassword;
