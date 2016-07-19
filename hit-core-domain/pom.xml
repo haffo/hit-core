@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>gov.nist.hit.core</groupId>
 		<artifactId>hit-core</artifactId>
-		<version>1.0.11-SNAPSHOT</version>
+		<version>1.0.10-SNAPSHOT</version>
 	</parent>
 
 
@@ -20,15 +20,5 @@
 		</dependency>
 		
 	</dependencies>
-<profiles>
-		<profile>
-			<id>disable-java8-doclint</id>
-			<activation>
-				<jdk>[1.8,)</jdk>
-			</activation>
-			<properties>
-				<additionalparam>-Xdoclint:none</additionalparam>
-			</properties>
-		</profile>
-	</profiles>
+
 </project>
