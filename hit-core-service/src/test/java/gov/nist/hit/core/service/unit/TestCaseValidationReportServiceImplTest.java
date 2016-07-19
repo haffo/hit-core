@@ -1,6 +1,17 @@
 package gov.nist.hit.core.service.unit;
 
 import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseValidationResult;
 import gov.nist.hit.core.domain.TestResult;
@@ -11,19 +22,6 @@ import gov.nist.hit.core.service.TestCaseValidationReportService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.impl.TestCaseValidationReportServiceImpl;
 import gov.nist.hit.core.service.impl.TestStepValidationReportServiceImpl;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.springframework.util.FileCopyUtils;
 
 public class TestCaseValidationReportServiceImplTest {
 
@@ -63,9 +61,8 @@ public class TestCaseValidationReportServiceImplTest {
     testStepReports.add(r1);
 
     TestStepValidationReport r2 = new TestStepValidationReport();
-    xmlMessageValidationReport =
-        IOUtils.toString(TestCaseValidationReportServiceImplTest.class
-            .getResourceAsStream(inputsRoot + "/2-Message-ValidationReport.xml"));
+    xmlMessageValidationReport = IOUtils.toString(TestCaseValidationReportServiceImplTest.class
+        .getResourceAsStream(inputsRoot + "/2-Message-ValidationReport.xml"));
     TestStep t2 = new TestStep();
     t2.setName("Receive Acknowledgement");
     t2.setTestingType(TestingType.TA_RESPONDER);
@@ -80,9 +77,8 @@ public class TestCaseValidationReportServiceImplTest {
     testStepReports.add(r2);
 
     TestStepValidationReport r3 = new TestStepValidationReport();
-    xmlMessageValidationReport =
-        IOUtils.toString(TestCaseValidationReportServiceImplTest.class
-            .getResourceAsStream(inputsRoot + "/2-Message-ValidationReport.xml"));
+    xmlMessageValidationReport = IOUtils.toString(TestCaseValidationReportServiceImplTest.class
+        .getResourceAsStream(inputsRoot + "/2-Message-ValidationReport.xml"));
     TestStep t3 = new TestStep();
     t3.setName("Record an adverse reaction");
     t3.setTestingType(TestingType.TA_RESPONDER);
@@ -123,15 +119,15 @@ public class TestCaseValidationReportServiceImplTest {
 
 
   private void saveToFile(File f, String content) throws FileNotFoundException {
-    PrintWriter pw = new PrintWriter(f);
-    pw.append(content);
-    pw.close();
+    // PrintWriter pw = new PrintWriter(f);
+    // pw.append(content);
+    // pw.close();
   }
 
   private void saveToFile(File f, InputStream content) throws IOException {
-    FileOutputStream out = new FileOutputStream(f);
-    FileCopyUtils.copy(content, out);
-    out.close();
+    // FileOutputStream out = new FileOutputStream(f);
+    // FileCopyUtils.copy(content, out);
+    // out.close();
   }
 
 

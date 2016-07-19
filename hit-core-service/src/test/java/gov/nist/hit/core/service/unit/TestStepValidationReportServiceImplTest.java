@@ -1,23 +1,21 @@
 package gov.nist.hit.core.service.unit;
 
 import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
 import gov.nist.hit.core.domain.TestResult;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.impl.TestStepValidationReportServiceImpl;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.springframework.util.FileCopyUtils;
 
 public class TestStepValidationReportServiceImplTest {
 
@@ -157,15 +155,15 @@ public class TestStepValidationReportServiceImplTest {
 
 
   private void saveToFile(File f, String content) throws FileNotFoundException {
-    PrintWriter pw = new PrintWriter(f);
-    pw.append(content);
-    pw.close();
+    // PrintWriter pw = new PrintWriter(f);
+    // pw.append(content);
+    // pw.close();
   }
 
   private void saveToFile(File f, InputStream content) throws IOException {
-    FileOutputStream out = new FileOutputStream(f);
-    FileCopyUtils.copy(content, out);
-    out.close();
+    // FileOutputStream out = new FileOutputStream(f);
+    // FileCopyUtils.copy(content, out);
+    // out.close();
   }
 
 
