@@ -6,3 +6,17 @@ target
 .idea
 *.iml
 *test/resources/outputs/*
+hit-core-service/src/test/resources/outputs/1-Message-ValidationReport.pdf
+hit-core-service/src/test/resources/outputs/1-TestStepMessageValidationReport.pdf
+hit-core-service/src/test/resources/outputs/1-TestStepMessageValidationReport.xml
+hit-core-service/src/test/resources/outputs/2-TestStepManualValidationReport.pdf
+hit-core-service/src/test/resources/outputs/2-TestStepManualValidationReport.xml
+hit-core-service/src/test/resources/outputs/3-TestStepMesssageValidationReport.pdf
+hit-core-service/src/test/resources/outputs/3-TestStepMesssageValidationReport.xml
+hit-core-service/src/test/resources/outputs/4-TestStepMesssageValidationReport.pdf
+hit-core-service/src/test/resources/outputs/4-TestStepMesssageValidationReport.xml
+hit-core-service/src/test/resources/outputs/5-TestStepMessageValidationReport.html
+hit-core-service/src/test/resources/outputs/5-TestStepMessageValidationReport.xml
+hit-core-service/src/test/resources/outputs/TestCaseValidationReport.html
+hit-core-service/src/test/resources/outputs/TestCaseValidationReport.pdf
+hit-core-service/src/test/resources/outputs/TestCaseValidationReport.xml
