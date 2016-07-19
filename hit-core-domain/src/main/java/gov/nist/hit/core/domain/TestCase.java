@@ -4,24 +4,18 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -49,6 +43,12 @@ public class TestCase extends AbstractTestCase implements Serializable {
   @OneToMany(mappedBy = "testCase", orphanRemoval = true, fetch = FetchType.EAGER,
       cascade = {CascadeType.ALL})
   protected Collection<DataMapping> dataMappings;
+
+  @ApiModelProperty(required = false, value = "juror document of the test case")
+  @JsonIgnore
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
+  protected TestArtifact jurorDocument;
+
 
   public Long getId() {
     return id;
@@ -82,6 +82,14 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   public void setDataMappings(Collection<DataMapping> dataMappings) {
     this.dataMappings = dataMappings;
+  }
+
+  public TestArtifact getJurorDocument() {
+    return jurorDocument;
+  }
+
+  public void setJurorDocument(TestArtifact jurorDocument) {
+    this.jurorDocument = jurorDocument;
   }
 
 

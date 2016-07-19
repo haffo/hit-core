@@ -88,6 +88,7 @@ public class TestCaseController {
     logger.info("Fetching testcase " + testCaseId + " artifacts ");
     TestCase testCase = testCase(testCaseId);
     result.put("testStory", testCase.getTestStory());
+    result.put("jurorDocument", testCase.getJurorDocument());
     return result;
   }
 
