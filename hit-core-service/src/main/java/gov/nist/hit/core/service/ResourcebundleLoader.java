@@ -931,6 +931,7 @@ public abstract class ResourcebundleLoader {
     tc.setName(testCaseObj.findValue("name").textValue());
     tc.setDescription(testCaseObj.findValue("description").textValue());
     tc.setTestStory(testStory(location));
+    tc.setJurorDocument(jurorDocument(location));
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").intValue());
     }
