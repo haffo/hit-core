@@ -22,6 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>4.1.1.RELEASE</spring.version>
 		<spring-security.version>3.1.4.RELEASE</spring-security.version>
+		<additionalparam>-Xdoclint:none</additionalparam>
 	</properties>
 
 	<dependencies>
@@ -349,6 +350,18 @@
 		<tag>HEAD</tag>
 	</scm>
 
+
+	<profiles>
+		<profile>
+			<id>disable-java8-doclint</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<properties>
+				<additionalparam>-Xdoclint:none</additionalparam>
+			</properties>
+		</profile>
+	</profiles>
 
 
 
