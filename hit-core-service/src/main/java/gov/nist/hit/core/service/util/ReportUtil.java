@@ -91,6 +91,7 @@ public class ReportUtil {
               "http://www.nist.gov/healthcare/validation/teststep/report");
       report.appendChild(reportContent);
       if (StringUtils.isNotEmpty(xmlMessageOrManualValidationReport)) {
+        xmlMessageOrManualValidationReport = removeNonPrintableCharacters(xmlMessageOrManualValidationReport,false);
         reportContent.appendChild(ReportUtil.getXmlElement(xmlMessageOrManualValidationReport));
       }
       return report;
@@ -100,6 +101,28 @@ public class ReportUtil {
       throw new ValidationReportException(e);
     }
   }
+
+    public static String removeNonPrintableCharacters(String message, boolean showHex){
+        StringBuilder cleanedMessage = new StringBuilder();
+        for(char c : message.toCharArray()){
+            if(isPrintable(c))
+                cleanedMessage.append(c);
+            else {
+                if(showHex){
+                    String hex = String.format("%04x", (int) c);
+                    cleanedMessage.append("[x");
+                    cleanedMessage.append(hex);
+                    cleanedMessage.append("]");
+                }
+            }
+        }
+        return cleanedMessage.toString();
+    }
+
+    public static boolean isPrintable(char c){
+        int i = (int) c;
+        return i == 10 || i < 0 || i > 31;
+    }
 
   public static String generateXmlTestStepValidationReport(
       String xmlMessageOrManualValidationReport, TestStepValidationReport report)
@@ -121,6 +144,8 @@ public class ReportUtil {
   public static String getTestCaseResult(TestResult result) throws ValidationReportException {
     return result != null ? result.getTitle() : "";
   }
+
+
 
 
 
