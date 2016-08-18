@@ -1,5 +1,15 @@
 package gov.nist.hit.core.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.auth.hit.core.repo.AccountRepository;
 import gov.nist.hit.core.domain.TestStepValidationReport;
@@ -12,19 +22,8 @@ import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.TransactionService;
 import gov.nist.hit.core.service.TransportConfigService;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 @Service(value = "accountService")
-@Transactional(value = "authTransactionManager")
+@org.springframework.transaction.annotation.Transactional("authTransactionManager")
 public class AccountServiceImpl implements AccountService {
   @Autowired
   protected AccountRepository accountRepository;
@@ -45,20 +44,19 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public boolean exitBySutInitiatorPropertiesAndProtocol(Map<String, String> criteria,
       String protocol) {
-    TransportConfig config =
-        transportConfigService.findOneByPropertiesAndProtocol(criteria, TestingType.SUT_INITIATOR,
-            protocol);
+    TransportConfig config = transportConfigService.findOneByPropertiesAndProtocol(criteria,
+        TestingType.SUT_INITIATOR, protocol);
     return config != null && config.getUserId() != null;
   }
 
   @Override
-  @Transactional(value = "authTransactionManager")
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
   public void delete(Account user) {
     accountRepository.delete(user);
   }
 
   @Override
-  @Transactional(value = "authTransactionManager")
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
   public void delete(Long id) {
     if (id != null) {
       List<TransportConfig> configs = transportConfigService.findAllByUser(id);
@@ -79,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  @Transactional(value = "authTransactionManager")
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
   // @Transactional(propagation = Propagation.REQUIRED)
   public Account save(Account user) {
     return accountRepository.saveAndFlush(user);
@@ -97,7 +95,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  @Transactional(value = "transactionManager")
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public void reconcileAccounts(Long oldAccountId, Long newAccountId) {
 
     List<TransportConfig> configs = transportConfigService.findAllByUser(oldAccountId);
