@@ -37,7 +37,7 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   private static final long serialVersionUID = 8324105895492403037L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+//  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id; 
   
   @ApiModelProperty(required = false, value = "summary of the test plan")

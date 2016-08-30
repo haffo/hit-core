@@ -26,7 +26,7 @@ public class TestCase extends AbstractTestCase implements Serializable {
   private static final long serialVersionUID = 8805967508478985159L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+//  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
   public TestCase() {
