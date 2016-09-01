@@ -166,8 +166,12 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
               "http://www.nist.gov/healthcare/validation/testcase/report");
       report.appendChild(testCaseReportContent);
 
-      for (TestStepValidationReport tesStepReport : result.getTestStepReports()) {
-        testCaseReportContent.appendChild(ReportUtil.getXmlElement(tesStepReport.getXml()));
+      for(int i=1;i<=result.getTestStepReports().size();i++) {
+        for (TestStepValidationReport testStepReport : result.getTestStepReports()) {
+          if(testStepReport.getTestStep().getPosition()==i) {
+            testCaseReportContent.appendChild(ReportUtil.getXmlElement(testStepReport.getXml()));
+          }
+        }
       }
 
       String xml = report.toXML();
