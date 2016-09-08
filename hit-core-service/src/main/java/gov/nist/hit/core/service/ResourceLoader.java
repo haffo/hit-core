@@ -1,5 +1,6 @@
 package gov.nist.hit.core.service;
 
+import gov.nist.hit.core.domain.CFTestInstance;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.domain.TestPlan;
@@ -46,31 +47,29 @@ public interface ResourceLoader {
 
 	public void addOrReplaceIntegrationProfile() throws IOException;
 
-	public void addOrReplaceCFTestCase() throws IOException;
-
-	public void handleTS(Long testCaseId, TestStep ts) throws NotFoundException;
-
-	public void handleTCg(Long testCaseGroup, TestCase tc)
-			throws NotFoundException;
-
-	public void handleTCG(Long testPlan, TestCaseGroup tcg)
-			throws NotFoundException;
+	public void handleCFTC(Long testCaseId, CFTestInstance tc) throws NotFoundException;
 
 	public void handleTP(TestPlan tp);
-
-	public List<TestStep> mergeTS(List<TestStep> newL, List<TestStep> oldL);
-
-	public List<TestStep> createTS() throws IOException;
-
+	
+	public void addTCG(Long parentId, TestCaseGroup tcg, String where) throws NotFoundException;
+	
+	public void updateTCG(TestCaseGroup tcg) throws NotFoundException;
+	
+	public void addTC(Long parentId, TestCase tc, String where) throws NotFoundException;
+	
+	public void updateTC(TestCase tc) throws NotFoundException;
+	
+	public void handleTS(Long testCaseId, TestStep ts) throws NotFoundException;
+	
+	public List<TestPlan> createTP() throws IOException;
+	
+	public List<TestCaseGroup> createTCG() throws IOException;
+	
 	public List<TestCase> createTC() throws IOException;
 
-	public List<TestCaseGroup> createTCG() throws IOException;
+	public List<TestStep> createTS() throws IOException;
+	
+	public List<CFTestInstance> createCFTC() throws IOException;
 
-	public List<TestPlan> createTP() throws IOException;
-
-	public List<TestCase> mergeTC(List<TestCase> newL, List<TestCase> oldL);
-
-	public List<TestCaseGroup> mergeTCG(List<TestCaseGroup> newL,
-			List<TestCaseGroup> oldL);
 
 }

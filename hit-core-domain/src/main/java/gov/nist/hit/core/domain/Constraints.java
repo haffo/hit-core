@@ -21,6 +21,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * 
  * @author Harold Affo
@@ -32,14 +34,17 @@ public class Constraints implements Serializable {
  
   private static final long serialVersionUID = 1L;
 
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  protected Long id; 
+  protected Long id;
   
-  @Column(nullable = true)
+  @JsonIgnore
+  @NotNull
+  @Column(unique = true)
   protected String sourceId;
 
-   @Column(nullable = true)
+  @Column(nullable = true)
   protected String description;
   
 
@@ -70,13 +75,13 @@ public class Constraints implements Serializable {
     this.xml = constraintContent;
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
+//  public Long getId() {
+//    return id;
+//  }
+//
+//  public void setId(Long id) {
+//    this.id = id;
+//  }
 
   public String getSourceId() {
     return sourceId;
@@ -92,7 +97,19 @@ public class Constraints implements Serializable {
 
   public void setDescription(String description) {
     this.description = description;
-  } 
+  }
+
+
+
+public Long getId() {
+	return id;
+}
+
+
+
+public void setId(Long id) {
+	this.id = id;
+} 
   
   
   

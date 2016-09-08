@@ -244,7 +244,7 @@ public abstract class ResourcebundleLoader {
       cachedRepository.getCachedVocabLibraries().clear();
       cachedRepository.getCachedConstraints().clear();
       logger.info("resource bundle loaded successfully...");
-    }
+    }	
   }
 
   public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage)
@@ -714,6 +714,7 @@ public abstract class ResourcebundleLoader {
         String content = FileUtil.getContent(resource);
         Constraints constraints = constraint(content);
         cachedRepository.getCachedConstraints().put(constraints.getSourceId(), constraints);
+        this.constraintsRepository.save(constraints);
       }
     }
   }
@@ -771,9 +772,8 @@ public abstract class ResourcebundleLoader {
     if (resource == null) {
       return null;
     }
-    Constraints constraints = new Constraints();
-    constraints.setXml(FileUtil.getContent(resource));
-    return constraints;
+    return constraint(FileUtil.getContent(resource));
+
   }
 
   protected IntegrationProfile integrationProfile(String content) {
@@ -817,12 +817,14 @@ public abstract class ResourcebundleLoader {
   protected Constraints constraint(String content) {
     Document doc = this.stringToDom(content);
     Constraints constraints = new Constraints();
+    constraints.setXml(content);
     Element constraintsElement = (Element) doc.getElementsByTagName("ConformanceContext").item(0);
     constraints.setSourceId(constraintsElement.getAttribute("UUID"));
+    
     Element metaDataElement = (Element) constraintsElement.getElementsByTagName("MetaData").item(0);
-    constraints.setDescription(metaDataElement.getAttribute("Description"));
-    constraints.setXml(content);
-    constraintsRepository.save(constraints);
+    if(metaDataElement != null)
+    	constraints.setDescription(metaDataElement.getAttribute("Description"));
+    
     return constraints;
   }
 
@@ -936,7 +938,7 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testCaseObj = mapper.readTree(descriptorContent);
     tc.setName(testCaseObj.findValue("name").textValue());
-    tc.setId(testCaseObj.findValue("id").longValue());
+    tc.setPersistentId(testCaseObj.findValue("id").longValue());
     tc.setDescription(testCaseObj.findValue("description").textValue());
     tc.setTestStory(testStory(location));
     tc.setJurorDocument(jurorDocument(location));
@@ -1030,7 +1032,7 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testStepObj = mapper.readTree(descriptorContent);
     testStep.setName(testStepObj.findValue("name").textValue());
-    testStep.setId(testStepObj.findValue("id").longValue());
+    testStep.setPersistentId(testStepObj.findValue("id").longValue());
     testStep.setDescription(testStepObj.findValue("description").textValue());
     JsonNode ttypeObj = testStepObj.findValue("type");
     String tttypeValue = ttypeObj != null ? ttypeObj.textValue() : null;
@@ -1136,7 +1138,7 @@ public abstract class ResourcebundleLoader {
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       TestCaseGroup tcg = new TestCaseGroup();
       tcg.setName(testPlanObj.findValue("name").textValue());
-      tcg.setId(testPlanObj.findValue("id").longValue());
+      tcg.setPersistentId(testPlanObj.findValue("id").longValue());
       tcg.setDescription(testPlanObj.findValue("description").textValue());
       tcg.setTestStory(testStory(location));
       if (testPlanObj.findValue("position") != null) {
@@ -1174,7 +1176,7 @@ public abstract class ResourcebundleLoader {
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       TestPlan tp = new TestPlan();
-      tp.setId(testPlanObj.findValue("id").asLong());
+      tp.setPersistentId(testPlanObj.findValue("id").asLong());
       tp.setName(testPlanObj.findValue("name").textValue());
       tp.setDescription(testPlanObj.findValue("description").textValue());
       tp.setTestStory(testStory(location));
@@ -1230,6 +1232,7 @@ public abstract class ResourcebundleLoader {
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       CFTestInstance parent = new CFTestInstance();
       parent.setName(testPlanObj.findValue("name").textValue());
+      parent.setPersistentId(testPlanObj.findValue("id").asLong());
       if (testPlanObj.findValue("position") != null) {
         parent.setPosition(testPlanObj.findValue("position").intValue());
       }
@@ -1244,7 +1247,6 @@ public abstract class ResourcebundleLoader {
           parent.getChildren().add(testObject);
         }
       }
-
       return parent;
     }
     return null;

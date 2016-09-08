@@ -56,7 +56,7 @@ public class ContextBasedController {
 
   @ApiOperation(value = "Get all context-based test cases list",
       nickname = "getAllContextBasedTestCases")
-//  @Cacheable(value = "HitCache", key = "'cb-testcases'")
+  @Cacheable(value = "HitCache", key = "'cb-testcases'")
   @RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
   public List<TestPlan> testCases() {
     logger.info("Fetching all testCases...");

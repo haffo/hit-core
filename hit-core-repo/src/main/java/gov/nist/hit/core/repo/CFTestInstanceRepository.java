@@ -18,10 +18,14 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface CFTestInstanceRepository extends JpaRepository<CFTestInstance, Long> {
 
   @Query("select to from CFTestInstance to where to.root = true")
   public List<CFTestInstance> findAllAsRoot();
+  
+  @Query("select to from CFTestInstance to where to.persistentId = :id")
+  public CFTestInstance getByPersistentId(@Param("id") Long id);
 
 }

@@ -15,7 +15,12 @@ package gov.nist.hit.core.repo;
 import gov.nist.hit.core.domain.TestCaseGroup;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TestCaseGroupRepository extends JpaRepository<TestCaseGroup, Long> {
 
+	  @Query("select tcg from TestCaseGroup tcg where tcg.persistentId = :id")
+	  public TestCaseGroup getByPersistentId(@Param("id") Long id);
+	  
 }

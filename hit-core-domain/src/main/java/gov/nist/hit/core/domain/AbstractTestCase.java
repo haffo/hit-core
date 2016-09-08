@@ -35,6 +35,9 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
   @Column(columnDefinition = "TEXT")
   protected String name;
 
+  @Column(unique=true)
+  protected Long persistentId;
+
 
 //  @Column
 //  private String parentName;
@@ -182,14 +185,20 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
 		if (getClass() != obj.getClass())
 			return false;
 		AbstractTestCase other = (AbstractTestCase) obj;
-		if (this.getId() != other.getId())
+		if (this.getPersistentId() != other.getPersistentId())
 			return false;
 		return true;
 	}
 
-	public abstract Long getId();
+	public Long getPersistentId() {
+		return persistentId;
+	}
 
-	public abstract void setId(Long id);
+	public void setPersistentId(Long persistentId) {
+		this.persistentId = persistentId;
+	}
+
+
 
 
 }

@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -26,9 +27,9 @@ public class TestCase extends AbstractTestCase implements Serializable {
   private static final long serialVersionUID = 8805967508478985159L;
 
   @Id
-//  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-
+  
   public TestCase() {
     super();
     this.type = ObjectType.TestCase;

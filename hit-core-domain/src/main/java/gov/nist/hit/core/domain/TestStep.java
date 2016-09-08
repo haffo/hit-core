@@ -44,8 +44,10 @@ public class TestStep extends AbstractTestCase implements Serializable {
   private static final long serialVersionUID = 8805967508478985159L;
 
   @Id
-//  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
+  
+  
   @ApiModelProperty(required = true, value = "domain of the test step")
   @NotNull
   @Enumerated(EnumType.STRING)
@@ -166,14 +168,5 @@ public class TestStep extends AbstractTestCase implements Serializable {
   public void setProtocols(Set<Protocol> protocols) {
     this.protocols = protocols;
   }
-
- 
-
-  
-  
- 
-  
- 
-
 
 }

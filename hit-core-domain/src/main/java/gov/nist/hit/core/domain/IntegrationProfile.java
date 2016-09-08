@@ -50,7 +50,9 @@ public class IntegrationProfile implements Serializable {
 	@Column(columnDefinition = "LONGTEXT")
 	protected String xml;
 
-	@Column(nullable = true)
+	@JsonIgnore
+	@NotNull
+	@Column(unique = true)
 	protected String sourceId;
 
 	@Column(nullable = true)
@@ -126,13 +128,13 @@ public class IntegrationProfile implements Serializable {
 		this.key = key;
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+//	public Long getId() {
+//		return id;
+//	}
+//
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
 
 	public String getType() {
 		return type;
