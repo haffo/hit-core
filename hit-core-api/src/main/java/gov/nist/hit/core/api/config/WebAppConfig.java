@@ -86,7 +86,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     stringConverter.setSupportedMediaTypes(Arrays.asList( //
         MediaType.TEXT_PLAIN, //
         MediaType.TEXT_HTML, //
-        MediaType.APPLICATION_JSON, MediaType.TEXT_XML));
+        MediaType.APPLICATION_JSON, MediaType.TEXT_XML,MediaType.APPLICATION_FORM_URLENCODED));
     converters.add(stringConverter);
     super.configureMessageConverters(converters);
   }
