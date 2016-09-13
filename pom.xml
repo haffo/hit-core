@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gov.nist.hit.core</groupId>
 	<artifactId>hit-core</artifactId>
-	<version>1.0.14-SNAPSHOT</version>
+	<version>1.0.15-SNAPSHOT</version>
 	<name>hit-core</name>
 	<description>hit-core</description>
 	<packaging>pom</packaging>
