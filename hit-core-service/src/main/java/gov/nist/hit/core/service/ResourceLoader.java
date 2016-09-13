@@ -71,5 +71,14 @@ public interface ResourceLoader {
 	
 	public List<CFTestInstance> createCFTC() throws IOException;
 
+	public void deleteTS(Long id) throws NotFoundException;
 
+	public void deleteTC(Long id) throws NotFoundException;
+
+	public void deleteTCG(Long id) throws NotFoundException;
+
+	public void deleteTP(Long id) throws NotFoundException;
+
+	public void deleteCFTC(Long id) throws NotFoundException;
+	
 }

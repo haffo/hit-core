@@ -759,6 +759,7 @@ public abstract class ResourcebundleLoader {
         String content = FileUtil.getContent(resource);
         try {
           VocabularyLibrary vocabLibrary = vocabLibrary(content);
+          this.vocabularyLibraryRepository.save(vocabLibrary);
           cachedRepository.getCachedVocabLibraries().put(vocabLibrary.getSourceId(), vocabLibrary);
         } catch (UnsupportedOperationException e) {
         }

@@ -171,6 +171,7 @@ public class ResourcebundleHelper {
 
 	
 	public static String getResourcesFromZip(String URL) throws Exception {
+		System.out.println(URL);
 		URL url = new URL(URL);
 
 		// Read URL
