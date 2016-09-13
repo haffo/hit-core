@@ -1,6 +1,9 @@
 package gov.nist.auth.hit.core.service.impl;
 
+import gov.nist.auth.hit.core.domain.UserTestCaseReport;
+import gov.nist.auth.hit.core.repo.UserTestCaseReportRepository;
 import gov.nist.auth.hit.core.service.UserTestCaseReportService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -16,4 +19,22 @@ import gov.nist.auth.hit.core.service.UserTestCaseReportService;
  * Created by Maxence Lefort on 9/13/16.
  */
 public class UserTestCaseReportServiceImpl implements UserTestCaseReportService {
+
+    @Autowired
+    UserTestCaseReportRepository userTestCaseReportRepository;
+
+    @Override
+    public UserTestCaseReport findOneByAccount(Long accountId) {
+        return userTestCaseReportRepository.findOneByAccountId(accountId);
+    }
+
+    @Override
+    public UserTestCaseReport save(UserTestCaseReport userTestCaseReport) {
+        return userTestCaseReportRepository.saveAndFlush(userTestCaseReport);
+    }
+
+    @Override
+    public void delete(UserTestCaseReport userTestCaseReport) {
+        userTestCaseReportRepository.delete(userTestCaseReport);
+    }
 }

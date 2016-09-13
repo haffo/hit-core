@@ -1,5 +1,6 @@
 package gov.nist.auth.hit.core.service.impl;
 
+import gov.nist.auth.hit.core.domain.UserTestStepReport;
 import gov.nist.auth.hit.core.repo.UserTestStepReportRepository;
 import gov.nist.auth.hit.core.service.UserTestStepReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,5 +23,19 @@ public class UserTestStepReportServiceImpl implements UserTestStepReportService 
     @Autowired
     UserTestStepReportRepository userTestStepReportRepository;
 
+    @Override
+    public UserTestStepReport findOneByAccount(Long accountId) {
+        return userTestStepReportRepository.findOneByAccountId(accountId);
+    }
+
+    @Override
+    public UserTestStepReport save(UserTestStepReport userTestStepReport) {
+        return userTestStepReportRepository.saveAndFlush(userTestStepReport);
+    }
+
+    @Override
+    public void delete(UserTestStepReport userTestStepReport) {
+        userTestStepReportRepository.delete(userTestStepReport);
+    }
 
 }

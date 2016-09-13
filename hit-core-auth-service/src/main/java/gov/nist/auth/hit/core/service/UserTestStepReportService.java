@@ -19,4 +19,8 @@ public interface UserTestStepReportService {
 
     UserTestStepReport findOneByAccount(Long accountId);
 
+    UserTestStepReport save(UserTestStepReport userTestStepReport);
+
+    void delete(UserTestStepReport userTestStepReport);
+
 }

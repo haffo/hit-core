@@ -2,6 +2,7 @@ package gov.nist.auth.hit.core.repo;
 
 import gov.nist.auth.hit.core.domain.UserTestCaseReport;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -18,4 +19,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface UserTestCaseReportRepository extends JpaRepository<UserTestCaseReport, Long> {
 
+    @Query("select utcr from UserTestCaseReport utcr where utcr.account.id = ?1")
+    UserTestCaseReport findOneByAccountId(Long accountId);
 }

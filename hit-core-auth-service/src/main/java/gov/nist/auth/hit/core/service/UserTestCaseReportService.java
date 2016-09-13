@@ -1,5 +1,7 @@
 package gov.nist.auth.hit.core.service;
 
+import gov.nist.auth.hit.core.domain.UserTestCaseReport;
+
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
  * the Federal Government in the course of their official duties. Pursuant to title 17 Section 105
@@ -14,4 +16,11 @@ package gov.nist.auth.hit.core.service;
  * Created by Maxence Lefort on 9/13/16.
  */
 public interface UserTestCaseReportService {
+
+    UserTestCaseReport findOneByAccount(Long accountId);
+
+    UserTestCaseReport save(UserTestCaseReport userTestCaseReport);
+
+    void delete(UserTestCaseReport userTestCaseReport);
+
 }
