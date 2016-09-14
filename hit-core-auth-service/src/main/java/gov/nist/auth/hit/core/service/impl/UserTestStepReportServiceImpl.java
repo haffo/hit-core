@@ -4,6 +4,7 @@ import gov.nist.auth.hit.core.domain.UserTestStepReport;
 import gov.nist.auth.hit.core.repo.UserTestStepReportRepository;
 import gov.nist.auth.hit.core.service.UserTestStepReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * <p/>
  * Created by Maxence Lefort on 9/13/16.
  */
+@Service(value = "userTestStepReportService")
 public class UserTestStepReportServiceImpl implements UserTestStepReportService {
 
     @Autowired

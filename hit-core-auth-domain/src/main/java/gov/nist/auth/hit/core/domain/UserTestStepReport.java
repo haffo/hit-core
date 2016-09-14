@@ -1,5 +1,7 @@
 package gov.nist.auth.hit.core.domain;
 
+import javax.persistence.Entity;
+
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
  * the Federal Government in the course of their official duties. Pursuant to title 17 Section 105
@@ -13,6 +15,7 @@ package gov.nist.auth.hit.core.domain;
  * <p/>
  * Created by Maxence Lefort on 9/13/16.
  */
+@Entity
 public class UserTestStepReport {
 
     private String xml;

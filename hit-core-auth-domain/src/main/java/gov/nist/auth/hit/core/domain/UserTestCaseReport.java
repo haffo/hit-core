@@ -1,5 +1,6 @@
 package gov.nist.auth.hit.core.domain;
 
+import javax.persistence.Entity;
 import java.util.ArrayList;
 
 /**
@@ -15,6 +16,7 @@ import java.util.ArrayList;
  * <p/>
  * Created by Maxence Lefort on 9/13/16.
  */
+@Entity
 public class UserTestCaseReport {
 
     private Double version;
