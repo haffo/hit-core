@@ -14,6 +14,7 @@ package gov.nist.hit.core.repo;
 
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestingStage;
 
 import java.util.List;
@@ -38,7 +39,9 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 
   @Query("select tp.testPackage from TestPlan tp where tp.id = :id")
   public TestArtifact testPackage(@Param("id") Long id);
-
+  
+  @Query("select tp from TestPlan tp where tp.persistentId = :id")
+  public TestPlan getByPersistentId(@Param("id") Long id);
 
 
 }

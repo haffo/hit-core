@@ -15,8 +15,15 @@ package gov.nist.hit.core.repo;
 import gov.nist.hit.core.domain.IntegrationProfile;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface IntegrationProfileRepository extends JpaRepository<IntegrationProfile, Long> {
 
+	  @Query("select p from IntegrationProfile p where :mId member of p.messages")
+	  public IntegrationProfile findByMessageId(@Param("mId") String mId);
+	  
+	  @Query("select p from IntegrationProfile p where p.sourceId = :sourceId")
+	  public IntegrationProfile findBySourceId(@Param("sourceId") String sourceId);
 
 }

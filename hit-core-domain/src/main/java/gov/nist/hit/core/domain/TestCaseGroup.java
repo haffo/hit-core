@@ -46,6 +46,8 @@ public class TestCaseGroup extends AbstractTestCase implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
   
+
+  
   public TestCaseGroup() {
     super();
     this.type = ObjectType.TestCaseGroup;
@@ -86,11 +88,5 @@ public class TestCaseGroup extends AbstractTestCase implements Serializable {
   public void setTestCaseGroups(List<TestCaseGroup> testCaseGroups) {
     this.testCaseGroups = testCaseGroups;
   }
- 
-
-  
-  
-  
- 
 
 }

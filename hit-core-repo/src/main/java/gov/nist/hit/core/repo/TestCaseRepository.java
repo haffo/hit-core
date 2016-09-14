@@ -23,5 +23,8 @@ public interface TestCaseRepository extends JpaRepository<TestCase, Long> {
 
   @Query("select tc.testStory from TestCase tc where tc.id = :id")
   public TestArtifact testStory(@Param("id") Long id);
+  
+  @Query("select tc from TestCase tc where tc.persistentId = :id")
+  public TestCase getByPersistentId(@Param("id") Long id);
 
 }

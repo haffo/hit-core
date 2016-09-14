@@ -18,14 +18,14 @@ public class VocabularyLibrary implements Serializable {
  
  
   private static final long serialVersionUID = 1L;
-
+  
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
   
   @JsonIgnore
   @NotNull
-  @Column(nullable = false)
+  @Column(unique = true)
   protected String sourceId;
   
   @JsonIgnore
@@ -69,14 +69,6 @@ public class VocabularyLibrary implements Serializable {
     super();
     this.xml = valueSetXml;
   }
-  
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
 
   public String getSourceId() {
     return sourceId;
@@ -111,10 +103,15 @@ public class VocabularyLibrary implements Serializable {
   }
   
   
-  
-  
+  public Long getId() {
+	return id;
+  }
 
-  public VocabularyLibrary() {
+  public void setId(Long id) {
+	this.id = id;
+  }
+
+public VocabularyLibrary() {
     super();
     // TODO Auto-generated constructor stub
   }

@@ -12,7 +12,6 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.IntegrationProfile;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,11 +20,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface VocabularyLibraryRepository extends JpaRepository<VocabularyLibrary, Long> {
 
-  @Query("select vocab from VocabularyLibrary vocab where vocab.sourceId = :sourceId")
-  IntegrationProfile findOneBySourceId(@Param("sourceId") String sourceId);
+	  @Query("select vocab from VocabularyLibrary vocab where vocab.sourceId = :sourceId")
+	  VocabularyLibrary findOneBySourceId(@Param("sourceId") String sourceId);
 
-  @Query("select vocab.json from VocabularyLibrary vocab where vocab.id = :valueSetLibraryId")
-  public String getJson(@Param("valueSetLibraryId") Long valueSetLibraryId);
+	  @Query("select vocab.json from VocabularyLibrary vocab where vocab.id = :valueSetLibraryId")
+	  public String getJson(@Param("valueSetLibraryId") Long valueSetLibraryId);
 
 
 }

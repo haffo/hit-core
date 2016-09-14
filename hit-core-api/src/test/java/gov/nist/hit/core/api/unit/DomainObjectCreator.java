@@ -30,7 +30,7 @@ public class DomainObjectCreator {
 
   public VocabularyLibrary getTableLibrary() throws IOException {
     VocabularyLibrary tableLibrary = new VocabularyLibrary();
-    tableLibrary.setId(new Random().nextLong());
+//    tableLibrary.setId(new Random().nextLong());
     tableLibrary.setName("ValueSetLibrary-HW");
     // tableLibrary.setXml(IOUtils.toString(DomainObjectCreator.class
     // .getResourceAsStream("/tables/hw/ValueSetLibrary_HW.xml")));
@@ -39,7 +39,7 @@ public class DomainObjectCreator {
 
   public IntegrationProfile getProfile() throws IOException {
     IntegrationProfile integrationProfile = new IntegrationProfile();
-    integrationProfile.setId(new Random().nextLong());
+//    integrationProfile.setId(new Random().nextLong());
     integrationProfile.setName("IntegrationProfile-ELR");
     integrationProfile.setXml(IOUtils.toString(DomainObjectCreator.class
         .getResourceAsStream("/profiles/ELR.xml")));
