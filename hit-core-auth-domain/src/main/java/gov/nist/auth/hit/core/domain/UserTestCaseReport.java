@@ -34,6 +34,13 @@ public class UserTestCaseReport {
         return userTestStepReports;
     }
 
+    public void addUserTestStepReport(UserTestStepReport userTestStepReport){
+        if(userTestStepReports==null){
+            userTestStepReports = new ArrayList<>();
+        }
+        userTestStepReports.add(userTestStepReport);
+    }
+
     public void setUserTestStepReports(ArrayList<UserTestStepReport> userTestStepReports) {
         this.userTestStepReports = userTestStepReports;
     }

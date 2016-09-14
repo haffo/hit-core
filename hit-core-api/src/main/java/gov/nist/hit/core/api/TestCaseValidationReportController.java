@@ -14,14 +14,17 @@ package gov.nist.hit.core.api;
 
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.auth.hit.core.domain.UserTestCaseReport;
+import gov.nist.auth.hit.core.domain.UserTestStepReport;
 import gov.nist.auth.hit.core.service.UserTestCaseReportService;
 import gov.nist.auth.hit.core.service.UserTestStepReportService;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestStep;
+import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.domain.UserTestCaseReportRequest;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
+import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import gov.nist.hit.core.service.exception.UserNotFoundException;
@@ -57,6 +60,9 @@ public class TestCaseValidationReportController {
   private TestCaseValidationReportService testCaseValidationReportService;
 
 
+    @Autowired
+    private TestStepValidationReportService validationReportService;
+
   @Autowired
   private TestCaseService testCaseService;
 
@@ -85,9 +91,19 @@ public class TestCaseValidationReportController {
             if(testCase==null){
                 throw new TestCaseException(testCaseId);
             }
+            UserTestCaseReport userTestCaseReport = new UserTestCaseReport();
+            userTestCaseReport.setAccount(user);
+            //TODO replace TestCase ID by the persistent one
+            userTestCaseReport.setTestCasePersistentId(testCase.getId());
+            userTestCaseReport.setVersion(testCase.getVersion());
+
             for(TestStep testStep :testCase.getTestSteps()){
                 //TODO replace TestStep ID by the persistent one
-                userTestStepReportService.findOneByAccountAndTestStepId(user.getId(),testStep.getId());
+                UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(user.getId(), testStep.getId());
+                if(userTestStepReport==null){
+                    userTestStepReport = generateUserTestStepReport(user, userId, testStep);
+                }
+                userTestCaseReport.addUserTestStepReport(userTestStepReport);
             }
             /*TestStepValidationReport report =
                     validationReportService.findOneByTestStepAndUser(testStepId, userId);
@@ -98,7 +114,16 @@ public class TestCaseValidationReportController {
         return null;
     }
 
-  @ApiOperation(value = "Download a test case validation report by the test case's id",
+    private UserTestStepReport generateUserTestStepReport(Account user, Long userId, TestStep testStep) {
+        TestStepValidationReport report =
+                validationReportService.findOneByTestStepAndUser(testStep.getId(), userId);
+        //TODO replace TestStep ID by the persistent one
+        UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user,testStep.getId(),report.getComments());
+        userTestStepReport = userTestStepReportService.save(userTestStepReport);
+        return userTestStepReport;
+    }
+
+    @ApiOperation(value = "Download a test case validation report by the test case's id",
       nickname = "downloadTestCaseValidationReport",
       produces = "text/html,application/xml,application/pdf")
   @RequestMapping(value = "/download", method = RequestMethod.POST,
