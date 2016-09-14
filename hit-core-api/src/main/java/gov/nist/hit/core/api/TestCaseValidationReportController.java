@@ -103,11 +103,14 @@ public class TestCaseValidationReportController {
                 if(userTestStepReport==null){
                     userTestStepReport = generateUserTestStepReport(user, userId, testStep);
                 }
-                userTestCaseReport.addUserTestStepReport(userTestStepReport);
+                //if the report fails to generate that means the testStep hasn't been executed
+                if(userTestStepReport!=null) {
+                    userTestCaseReport.addUserTestStepReport(userTestStepReport);
+                } else {
+                    logger.error("Unable to retrieve the report for testStep "+testStep.getId()+" and userId "+userId);
+                }
             }
-            /*TestStepValidationReport report =
-                    validationReportService.findOneByTestStepAndUser(testStepId, userId);
-            UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(),testStep.getVersion(),user,testStepId,);*/
+            userTestCaseReportService.save(userTestCaseReport);
         } catch (UserNotFoundException e) {
             e.printStackTrace();
         }
@@ -117,6 +120,10 @@ public class TestCaseValidationReportController {
     private UserTestStepReport generateUserTestStepReport(Account user, Long userId, TestStep testStep) {
         TestStepValidationReport report =
                 validationReportService.findOneByTestStepAndUser(testStep.getId(), userId);
+        if(report==null){
+            logger.error("No report found for test step "+testStep.getId()+" and userId "+userId);
+            return null;
+        }
         //TODO replace TestStep ID by the persistent one
         UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user,testStep.getId(),report.getComments());
         userTestStepReport = userTestStepReportService.save(userTestStepReport);
