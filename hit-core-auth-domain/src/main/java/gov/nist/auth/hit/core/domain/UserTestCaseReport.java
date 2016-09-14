@@ -1,8 +1,5 @@
 package gov.nist.auth.hit.core.domain;
 
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import java.util.ArrayList;
 
 /**
@@ -20,15 +17,16 @@ import java.util.ArrayList;
  */
 public class UserTestCaseReport {
 
-    private Long version;
+    private Double version;
     private ArrayList<UserTestStepReport> userTestStepReports;
     private Account account;
+    private Long testCasePersistentId;
 
-    public Long getVersion() {
+    public Double getVersion() {
         return version;
     }
 
-    public void setVersion(Long version) {
+    public void setVersion(Double version) {
         this.version = version;
     }
 
@@ -46,5 +44,13 @@ public class UserTestCaseReport {
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    public Long getTestCasePersistentId() {
+        return testCasePersistentId;
+    }
+
+    public void setTestCasePersistentId(Long testCasePersistentId) {
+        this.testCasePersistentId = testCasePersistentId;
     }
 }

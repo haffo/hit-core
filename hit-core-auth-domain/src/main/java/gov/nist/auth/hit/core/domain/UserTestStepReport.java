@@ -1,7 +1,5 @@
 package gov.nist.auth.hit.core.domain;
 
-import gov.nist.auth.hit.core.domain.util.UserUtil;
-
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
  * the Federal Government in the course of their official duties. Pursuant to title 17 Section 105
@@ -18,8 +16,18 @@ import gov.nist.auth.hit.core.domain.util.UserUtil;
 public class UserTestStepReport {
 
     private String xml;
-    private Long version;
+    private Double version;
     private Account account;
+    private Long testStepPersistentId;
+    private String comments;
+
+    public UserTestStepReport(String xml, Double version, Account account, Long testStepPersistentId, String comments) {
+        this.xml = xml;
+        this.version = version;
+        this.account = account;
+        this.testStepPersistentId = testStepPersistentId;
+        this.comments = comments;
+    }
 
     public String getXml() {
         return xml;
@@ -29,11 +37,11 @@ public class UserTestStepReport {
         this.xml = xml;
     }
 
-    public Long getVersion() {
+    public Double getVersion() {
         return version;
     }
 
-    public void setVersion(Long version) {
+    public void setVersion(Double version) {
         this.version = version;
     }
 
@@ -43,5 +51,21 @@ public class UserTestStepReport {
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    public Long getTestStepPersistentId() {
+        return testStepPersistentId;
+    }
+
+    public void setTestStepPersistentId(Long testStepPersistentId) {
+        this.testStepPersistentId = testStepPersistentId;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 }

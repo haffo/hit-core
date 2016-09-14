@@ -13,15 +13,15 @@
 package gov.nist.hit.core.api;
 
 import gov.nist.auth.hit.core.domain.Account;
-import gov.nist.hit.core.domain.TestResult;
-import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.domain.TestStepValidationReportRequest;
+import gov.nist.auth.hit.core.domain.UserTestStepReport;
+import gov.nist.hit.core.domain.*;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
+import gov.nist.hit.core.service.exception.TestStepException;
+import gov.nist.hit.core.service.exception.UserNotFoundException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -356,6 +356,30 @@ public class TestStepValidationReportController {
   // return true;
   // }
 
+  @ApiOperation(value = "", hidden = true)
+  @RequestMapping(value = "/savePersistentUserTestStepReport", method = RequestMethod.POST, produces = "application/json")
+  public UserTestStepReport savePersistentUserTestStepReport(@RequestBody UserTestStepReportRequest command,HttpServletRequest request, HttpServletResponse response) {
+    logger.info("Saving persistent test step report");
+    try {
+      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+      Account user = userService.findOne(command.getAccountId());
+      if(user==null){
+        logger.error("Account "+command.getAccountId()+" not found");
+        throw new UserNotFoundException("Account "+command.getAccountId()+" not found");
+      }
+      Long testStepId = command.getTestStepId();
+      TestStep testStep = testStepService.findOne(testStepId);
+      if(testStep==null){
+        throw new TestStepException(testStepId);
+      }
+      TestStepValidationReport report =
+              validationReportService.findOneByTestStepAndUser(testStepId, userId);
+      UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(),testStep.getVersion(),user,testStepId,);
+    } catch (UserNotFoundException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
 
   @ApiOperation(value = "", hidden = true)
   @RequestMapping(value = "/update", method = RequestMethod.POST, produces = "application/json")

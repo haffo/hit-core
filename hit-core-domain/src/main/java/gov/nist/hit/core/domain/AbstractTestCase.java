@@ -68,6 +68,9 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
   @Min(1)
   protected int position;
 
+  @ApiModelProperty(required=true, value="version of the test case")
+  protected Double version;
+
   @ApiModelProperty(required=true, value="test story of the test case")
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
@@ -115,8 +118,13 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
     this.stage = stage;
   }
 
- 
+  public Double getVersion() {
+    return version;
+  }
 
+  public void setVersion(Double version) {
+    this.version = version;
+  }
 
   public TestArtifact getTestStory() {
     return testStory;
