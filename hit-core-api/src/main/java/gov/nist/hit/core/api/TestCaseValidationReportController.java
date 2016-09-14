@@ -96,7 +96,8 @@ public class TestCaseValidationReportController {
             //TODO replace TestCase ID by the persistent one
             userTestCaseReport.setTestCasePersistentId(testCase.getId());
             userTestCaseReport.setVersion(testCase.getVersion());
-
+            String xml = testCaseValidationReportService.generateXml(testCase,userId,command.getResult(),command.getComments());
+            userTestCaseReport.setXml(xml);
             for(TestStep testStep :testCase.getTestSteps()){
                 //TODO replace TestStep ID by the persistent one
                 UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(user.getId(), testStep.getId());
@@ -129,6 +130,53 @@ public class TestCaseValidationReportController {
         userTestStepReport = userTestStepReportService.save(userTestStepReport);
         return userTestStepReport;
     }
+
+    @ApiOperation(value = "Download a test case validation report by the test case's id",
+            nickname = "downloadPersistentUserTestCaseReport",
+            produces = "text/html,application/xml,application/pdf")
+    @RequestMapping(value = "/downloadPersistentUserTestCaseReport", method = RequestMethod.POST,
+            consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+    public boolean downloadPersistentUserTestCaseReport(@ApiParam(value = "the id of the test case", required = true) @RequestParam("testCaseId") final Long testCaseId, @ApiParam(value = "the format of the report", required = true) @RequestParam("format") final String format, @ApiParam(value = "the account id of the user", required = true) @RequestParam("accountId") final Long accountId, HttpServletRequest request, HttpServletResponse response) throws ValidationReportException {
+        try {
+            logger.info("Downloading HTML for the persistent test case report");
+            Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+            if (userId == null || userService.findOne(userId) == null)
+                throw new ValidationReportException("Invalid user credentials");
+            TestCase testCase = testCaseService.findOne(testCaseId);
+            if (testCase == null)
+                throw new TestCaseException(testCaseId);
+            //TODO replace testcase id by the persistent one
+            UserTestCaseReport userTestCaseReport = userTestCaseReportService.findOneByAccountAndTestCaseId(accountId,testCase.getId());
+            String title = testCase.getName().replaceAll(" ", "-");
+            InputStream io = null;
+            if ("HTML".equalsIgnoreCase(format)) {
+                io =
+                        IOUtils.toInputStream(
+                                testCaseValidationReportService.generateHtml(userTestCaseReport.getXml()),
+                                "UTF-8");
+                response.setContentType("text/html");
+            } else if ("XML".equalsIgnoreCase(format)) {
+                io =
+                        IOUtils.toInputStream(
+                                userTestCaseReport.getXml(),
+                                "UTF-8");
+                response.setContentType("application/xml");
+            } else if ("PDF".equalsIgnoreCase(format)) {
+                io = testCaseValidationReportService.generatePdf(userTestCaseReport.getXml());
+                response.setContentType("application/pdf");
+            } else {
+                throw new ValidationReportException("Unsupported report format " + format);
+            }
+            response.setHeader("Content-disposition", "attachment;filename=" + title
+                    + "-ValidationReport." + format.toLowerCase());
+            FileCopyUtils.copy(io, response.getOutputStream());
+        } catch (Exception e) {
+            throw new ValidationReportException("Failed to download the reports");
+        }
+        return true;
+    }
+
+
 
     @ApiOperation(value = "Download a test case validation report by the test case's id",
       nickname = "downloadTestCaseValidationReport",

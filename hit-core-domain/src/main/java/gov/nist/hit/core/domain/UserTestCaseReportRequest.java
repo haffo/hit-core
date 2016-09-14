@@ -18,9 +18,15 @@ public class UserTestCaseReportRequest {
 
     private Long accountId;
 
-    public UserTestCaseReportRequest(Long testCaseId, Long accountId) {
+    private String result;
+
+    private String comments;
+
+    public UserTestCaseReportRequest(Long testCaseId, Long accountId, String result, String comments) {
         this.testCaseId = testCaseId;
         this.accountId = accountId;
+        this.result = result;
+        this.comments = comments;
     }
 
     public Long getTestCaseId() {
@@ -37,5 +43,21 @@ public class UserTestCaseReportRequest {
 
     public void setAccountId(Long accountId) {
         this.accountId = accountId;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 }

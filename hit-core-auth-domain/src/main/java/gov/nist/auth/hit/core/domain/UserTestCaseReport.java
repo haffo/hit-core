@@ -21,6 +21,7 @@ public class UserTestCaseReport {
     private ArrayList<UserTestStepReport> userTestStepReports;
     private Account account;
     private Long testCasePersistentId;
+    private String xml;
 
     public Double getVersion() {
         return version;
@@ -59,5 +60,13 @@ public class UserTestCaseReport {
 
     public void setTestCasePersistentId(Long testCasePersistentId) {
         this.testCasePersistentId = testCasePersistentId;
+    }
+
+    public String getXml() {
+        return xml;
+    }
+
+    public void setXml(String xml) {
+        this.xml = xml;
     }
 }
