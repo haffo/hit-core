@@ -250,8 +250,7 @@ public class TestStepValidationReportController {
       if(testStep==null){
         throw new TestStepException(testStepId);
       }
-      //TODO replace teststep id by the persistent one
-      UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(accountId,testStep.getId());
+      UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(accountId,testStep.getPersistentId());
       if(userTestStepReport==null){
         logger.error("No testStep Report for account "+accountId+" and testStep "+testStepId);
         throw new ValidationReportException("No testStepReport for account "+accountId+" and testStep "+testStepId);
@@ -432,11 +431,9 @@ public class TestStepValidationReportController {
       if(testStep==null){
         throw new TestStepException(testStepId);
       }
-      //TODO replace TestStep ID by the persistent one
       TestStepValidationReport report =
-              validationReportService.findOneByTestStepAndUser(testStep.getId(), userId);
-      //TODO replace TestStep ID by the persistent one
-      UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user,testStepId,report.getComments());
+              validationReportService.findOneByTestStepAndUser(testStep.getPersistentId(), userId);
+      UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user,testStep.getPersistentId(),report.getComments());
       userTestStepReport = userTestStepReportService.save(userTestStepReport);
       return userTestStepReport;
     } catch (UserNotFoundException e) {

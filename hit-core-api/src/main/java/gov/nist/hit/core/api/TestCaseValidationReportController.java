@@ -93,14 +93,12 @@ public class TestCaseValidationReportController {
             }
             UserTestCaseReport userTestCaseReport = new UserTestCaseReport();
             userTestCaseReport.setAccount(user);
-            //TODO replace TestCase ID by the persistent one
-            userTestCaseReport.setTestCasePersistentId(testCase.getId());
+            userTestCaseReport.setTestCasePersistentId(testCase.getPersistentId());
             userTestCaseReport.setVersion(testCase.getVersion());
             String xml = testCaseValidationReportService.generateXml(testCase,userId,command.getResult(),command.getComments());
             userTestCaseReport.setXml(xml);
             for(TestStep testStep :testCase.getTestSteps()){
-                //TODO replace TestStep ID by the persistent one
-                UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(user.getId(), testStep.getId());
+                UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(user.getId(), testStep.getPersistentId());
                 if(userTestStepReport==null){
                     userTestStepReport = generateUserTestStepReport(user, userId, testStep);
                 }
@@ -125,8 +123,7 @@ public class TestCaseValidationReportController {
             logger.error("No report found for test step "+testStep.getId()+" and userId "+userId);
             return null;
         }
-        //TODO replace TestStep ID by the persistent one
-        UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user,testStep.getId(),report.getComments());
+        UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user,testStep.getPersistentId(),report.getComments());
         userTestStepReport = userTestStepReportService.save(userTestStepReport);
         return userTestStepReport;
     }
@@ -145,8 +142,7 @@ public class TestCaseValidationReportController {
             TestCase testCase = testCaseService.findOne(testCaseId);
             if (testCase == null)
                 throw new TestCaseException(testCaseId);
-            //TODO replace testcase id by the persistent one
-            UserTestCaseReport userTestCaseReport = userTestCaseReportService.findOneByAccountAndTestCaseId(accountId,testCase.getId());
+            UserTestCaseReport userTestCaseReport = userTestCaseReportService.findOneByAccountAndTestCaseId(accountId,testCase.getPersistentId());
             String title = testCase.getName().replaceAll(" ", "-");
             InputStream io = null;
             if ("HTML".equalsIgnoreCase(format)) {
