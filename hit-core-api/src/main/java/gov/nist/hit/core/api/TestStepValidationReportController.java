@@ -229,6 +229,62 @@ public class TestStepValidationReportController {
   // }
   // }
 
+  @ApiOperation(value = "Download the persistent message validation report of a test step by its testStep id and its user's account",
+      nickname = "downloadPersistentUserTestStepReport",
+      produces = "text/html,application/msword,application/xml,application/pdf")
+  @RequestMapping(value = "/downloadPersistentUserTestStepReport", method = RequestMethod.POST,
+      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+  public void downloadPersistentUserTestStepReport(
+      @ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
+      @ApiParam(value = "the account id of the user", required = true) @RequestParam("accountId") final Long accountId,
+      @ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") Long testStepId,
+      HttpServletRequest request, HttpServletResponse response) {
+    try {
+      logger.info("Downloading validation report  in " + format);
+      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+      if (userId == null || (userService.findOne(userId) == null))
+        throw new MessageValidationException("Invalid user credentials");
+      if (format == null)
+        throw new ValidationReportException("No format specified");
+      TestStep testStep = testStepService.findOne(testStepId);
+      if(testStep==null){
+        throw new TestStepException(testStepId);
+      }
+      //TODO replace teststep id by the persistent one
+      UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(accountId,testStep.getId());
+      if(userTestStepReport==null){
+        logger.error("No testStep Report for account "+accountId+" and testStep "+testStepId);
+        throw new ValidationReportException("No testStepReport for account "+accountId+" and testStep "+testStepId);
+      }
+      if (userTestStepReport.getXml()==null) {
+        throw new ValidationReportException("No validation report available for this test step");
+      }
+      String title = testStep.getName();
+      String ext = format.toLowerCase();
+      InputStream io = null;
+      if ("HTML".equalsIgnoreCase(format)) {
+        io = IOUtils.toInputStream(validationReportService.generateHtml(userTestStepReport.getXml()), "UTF-8");
+        response.setContentType("text/html");
+      } else if ("XML".equalsIgnoreCase(format)) {
+        io = IOUtils.toInputStream(userTestStepReport.getXml(), "UTF-8");
+        response.setContentType("application/xml");
+      } else if ("PDF".equalsIgnoreCase(format)) {
+        io = validationReportService.generatePdf(userTestStepReport.getXml());
+        response.setContentType("application/pdf");
+      } else {
+        throw new ValidationReportException("Unsupported report format " + format);
+      }
+      title = title.replaceAll(" ", "-");
+      response.setHeader("Content-disposition", "attachment;filename=" + title
+          + "-ValidationReport." + ext);
+      FileCopyUtils.copy(io, response.getOutputStream());
+    } catch (ValidationReportException | IOException e) {
+      throw new ValidationReportException("Failed to generate the report");
+    } catch (Exception e) {
+      throw new ValidationReportException("Failed to generate the report");
+    }
+  }
+
   @ApiOperation(value = "Download the message validation report of a test step by its id",
       nickname = "download",
       produces = "text/html,application/msword,application/xml,application/pdf")
