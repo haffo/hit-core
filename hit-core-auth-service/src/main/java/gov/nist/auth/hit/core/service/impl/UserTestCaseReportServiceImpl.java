@@ -24,8 +24,8 @@ public class UserTestCaseReportServiceImpl implements UserTestCaseReportService 
     UserTestCaseReportRepository userTestCaseReportRepository;
 
     @Override
-    public UserTestCaseReport findOneByAccount(Long accountId) {
-        return userTestCaseReportRepository.findOneByAccountId(accountId);
+    public UserTestCaseReport findOneByAccountAndTestCaseId(Long accountId,Long testCaseId) {
+        return userTestCaseReportRepository.findOneByAccountIdAndTestCaseId(accountId,testCaseId);
     }
 
     @Override

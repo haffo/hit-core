@@ -24,8 +24,8 @@ public class UserTestStepReportServiceImpl implements UserTestStepReportService 
     UserTestStepReportRepository userTestStepReportRepository;
 
     @Override
-    public UserTestStepReport findOneByAccount(Long accountId) {
-        return userTestStepReportRepository.findOneByAccountId(accountId);
+    public UserTestStepReport findOneByAccountAndTestStepId(Long accountId,Long testStepId) {
+        return userTestStepReportRepository.findOneByAccountIdAndTestStepId(accountId,testStepId);
     }
 
     @Override

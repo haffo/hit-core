@@ -12,12 +12,19 @@
 
 package gov.nist.hit.core.api;
 
+import gov.nist.auth.hit.core.domain.Account;
+import gov.nist.auth.hit.core.domain.UserTestCaseReport;
+import gov.nist.auth.hit.core.service.UserTestCaseReportService;
+import gov.nist.auth.hit.core.service.UserTestStepReportService;
 import gov.nist.hit.core.domain.TestCase;
+import gov.nist.hit.core.domain.TestStep;
+import gov.nist.hit.core.domain.UserTestCaseReportRequest;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
+import gov.nist.hit.core.service.exception.UserNotFoundException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,11 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Harold Affo (NIST)
@@ -59,6 +62,41 @@ public class TestCaseValidationReportController {
 
   @Autowired
   private AccountService userService;
+
+    @Autowired
+    private UserTestStepReportService userTestStepReportService;
+
+    @Autowired
+    private UserTestCaseReportService userTestCaseReportService;
+
+    @ApiOperation(value = "", hidden = true)
+    @RequestMapping(value = "/savePersistentUserTestStepReport", method = RequestMethod.POST, produces = "application/json")
+    public UserTestCaseReport savePersistentUserTestCaseReport(@RequestBody UserTestCaseReportRequest command,HttpServletRequest request, HttpServletResponse response) {
+        logger.info("Saving persistent test step report");
+        try {
+            Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+            Account user = userService.findOne(command.getAccountId());
+            if(user==null){
+                logger.error("Account "+command.getAccountId()+" not found");
+                throw new UserNotFoundException("Account "+command.getAccountId()+" not found");
+            }
+            Long testCaseId = command.getTestCaseId();
+            TestCase testCase = testCaseService.findOne(testCaseId);
+            if(testCase==null){
+                throw new TestCaseException(testCaseId);
+            }
+            for(TestStep testStep :testCase.getTestSteps()){
+                //TODO replace TestStep ID by the persistent one
+                userTestStepReportService.findOneByAccountAndTestStepId(user.getId(),testStep.getId());
+            }
+            /*TestStepValidationReport report =
+                    validationReportService.findOneByTestStepAndUser(testStepId, userId);
+            UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(),testStep.getVersion(),user,testStepId,);*/
+        } catch (UserNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
   @ApiOperation(value = "Download a test case validation report by the test case's id",
       nickname = "downloadTestCaseValidationReport",

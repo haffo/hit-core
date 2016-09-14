@@ -16,13 +16,15 @@ package gov.nist.auth.hit.core.domain;
 public class UserTestStepReport {
 
     private String xml;
+    private String html;
     private Double version;
     private Account account;
     private Long testStepPersistentId;
     private String comments;
 
-    public UserTestStepReport(String xml, Double version, Account account, Long testStepPersistentId, String comments) {
+    public UserTestStepReport(String xml, String html, Double version, Account account, Long testStepPersistentId, String comments) {
         this.xml = xml;
+        this.html = html;
         this.version = version;
         this.account = account;
         this.testStepPersistentId = testStepPersistentId;
@@ -67,5 +69,13 @@ public class UserTestStepReport {
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    public String getHtml() {
+        return html;
+    }
+
+    public void setHtml(String html) {
+        this.html = html;
     }
 }

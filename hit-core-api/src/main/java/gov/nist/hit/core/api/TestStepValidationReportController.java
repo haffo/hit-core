@@ -14,6 +14,7 @@ package gov.nist.hit.core.api;
 
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.auth.hit.core.domain.UserTestStepReport;
+import gov.nist.auth.hit.core.service.UserTestStepReportService;
 import gov.nist.hit.core.domain.*;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
@@ -69,6 +70,9 @@ public class TestStepValidationReportController {
 
   @Autowired
   private AccountService userService;
+
+  @Autowired
+  private UserTestStepReportService userTestStepReportService;
 
 
   @ApiOperation(value = "", hidden = true)
@@ -372,9 +376,13 @@ public class TestStepValidationReportController {
       if(testStep==null){
         throw new TestStepException(testStepId);
       }
+      //TODO replace TestStep ID by the persistent one
       TestStepValidationReport report =
-              validationReportService.findOneByTestStepAndUser(testStepId, userId);
-      UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(),testStep.getVersion(),user,testStepId,);
+              validationReportService.findOneByTestStepAndUser(testStep.getId(), userId);
+      //TODO replace TestStep ID by the persistent one
+      UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user,testStepId,report.getComments());
+      userTestStepReport = userTestStepReportService.save(userTestStepReport);
+      return userTestStepReport;
     } catch (UserNotFoundException e) {
       e.printStackTrace();
     }

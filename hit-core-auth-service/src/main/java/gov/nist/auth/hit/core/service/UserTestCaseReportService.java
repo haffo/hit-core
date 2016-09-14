@@ -17,7 +17,7 @@ import gov.nist.auth.hit.core.domain.UserTestCaseReport;
  */
 public interface UserTestCaseReportService {
 
-    UserTestCaseReport findOneByAccount(Long accountId);
+    UserTestCaseReport findOneByAccountAndTestCaseId(Long accountId,Long testCaseId);
 
     UserTestCaseReport save(UserTestCaseReport userTestCaseReport);
 
