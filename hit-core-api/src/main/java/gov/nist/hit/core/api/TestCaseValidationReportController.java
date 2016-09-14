@@ -81,10 +81,10 @@ public class TestCaseValidationReportController {
         logger.info("Saving persistent test step report");
         try {
             Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-            Account user = userService.findOne(command.getAccountId());
+            Account user = userService.findOne(userId);
             if(user==null){
-                logger.error("Account "+command.getAccountId()+" not found");
-                throw new UserNotFoundException("Account "+command.getAccountId()+" not found");
+                logger.error("Account "+userId+" not found");
+                throw new UserNotFoundException("Account "+userId+" not found");
             }
             Long testCaseId = command.getTestCaseId();
             TestCase testCase = testCaseService.findOne(testCaseId);

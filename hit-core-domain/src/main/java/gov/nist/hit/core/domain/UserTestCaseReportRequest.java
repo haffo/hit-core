@@ -16,15 +16,12 @@ package gov.nist.hit.core.domain;
 public class UserTestCaseReportRequest {
     private Long testCaseId;
 
-    private Long accountId;
-
     private String result;
 
     private String comments;
 
-    public UserTestCaseReportRequest(Long testCaseId, Long accountId, String result, String comments) {
+    public UserTestCaseReportRequest(Long testCaseId, String result, String comments) {
         this.testCaseId = testCaseId;
-        this.accountId = accountId;
         this.result = result;
         this.comments = comments;
     }
@@ -35,14 +32,6 @@ public class UserTestCaseReportRequest {
 
     public void setTestCaseId(Long testCaseId) {
         this.testCaseId = testCaseId;
-    }
-
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
     }
 
     public String getResult() {

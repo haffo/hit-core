@@ -16,11 +16,8 @@ package gov.nist.hit.core.domain;
 public class UserTestStepReportRequest {
     private Long testStepId;
 
-    private Long accountId;
-
     public UserTestStepReportRequest(Long testStepId, Long accountId) {
         this.testStepId = testStepId;
-        this.accountId = accountId;
     }
 
     public Long getTestStepId() {
@@ -31,11 +28,4 @@ public class UserTestStepReportRequest {
         this.testStepId = testStepId;
     }
 
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
-    }
 }
