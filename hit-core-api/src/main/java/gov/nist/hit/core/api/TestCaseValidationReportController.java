@@ -185,7 +185,6 @@ public class TestCaseValidationReportController {
     @RequestMapping(value = "/getPersistentUserTestCaseReportContent", method = RequestMethod.GET)
     public PersistentReportRequest getPersistentUserTestCaseReportContent(@ApiParam(value = "the id of the test case", required = true) @RequestParam("testCaseId") final Long testCaseId, HttpServletRequest request, HttpServletResponse response) throws ValidationReportException {
         PersistentReportRequest result = new PersistentReportRequest();
-        String html="";
         try {
             logger.info("Downloading HTML for the persistent test case report");
             Long userId = SessionContext.getCurrentUserId(request.getSession(false));
@@ -204,9 +203,9 @@ public class TestCaseValidationReportController {
             String title = testCase.getName().replaceAll(" ", "-");
             result.setHtml(testCaseValidationReportService.generateHtml(userTestCaseReport.getXml()));
             result.setVersionChanged(!testCase.getVersion().equals(userTestCaseReport.getVersion()));
-        } catch (ValidationReportException e) {
-            e.printStackTrace();
-            throw new ValidationReportException("Failed to download the reports");
+        } catch (Exception e) {
+            //The report does not exist. Do nothing.
+            logger.info("No report found.");
         }
         return result;
     }
