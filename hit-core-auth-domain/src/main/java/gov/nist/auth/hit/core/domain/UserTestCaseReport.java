@@ -1,6 +1,9 @@
 package gov.nist.auth.hit.core.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.ArrayList;
 
 /**
@@ -19,6 +22,9 @@ import java.util.ArrayList;
 @Entity
 public class UserTestCaseReport {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    protected Long id;
     private Double version;
     private ArrayList<UserTestStepReport> userTestStepReports;
     private Account account;

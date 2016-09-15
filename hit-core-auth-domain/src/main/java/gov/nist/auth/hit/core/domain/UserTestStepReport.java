@@ -1,6 +1,9 @@
 package gov.nist.auth.hit.core.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -17,7 +20,9 @@ import javax.persistence.Entity;
  */
 @Entity
 public class UserTestStepReport {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    protected Long id;
     private String xml;
     private String html;
     private Double version;
