@@ -14,6 +14,7 @@ package gov.nist.hit.core.api;
 
 import com.fasterxml.jackson.core.json.JsonGeneratorImpl;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.auth.hit.core.domain.UserTestCaseReport;
 import gov.nist.auth.hit.core.domain.UserTestStepReport;
@@ -41,6 +42,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,6 +76,7 @@ public class TestCaseValidationReportController {
     @Autowired
     private UserTestCaseReportService userTestCaseReportService;
 
+	@PreAuthorize("hasRole('tester')")
     @ApiOperation(value = "", hidden = true)
     @RequestMapping(value = "/savePersistentUserTestCaseReport", method = RequestMethod.POST, produces = "application/json")
     public UserTestCaseReport savePersistentUserTestCaseReport(@RequestBody UserTestCaseReportRequest command,HttpServletRequest request, HttpServletResponse response) {
@@ -130,6 +133,7 @@ public class TestCaseValidationReportController {
         return userTestStepReport;
     }
 
+	@PreAuthorize("hasRole('tester')")
     @ApiOperation(value = "Download a test case validation report by the test case's id",
             nickname = "downloadPersistentUserTestCaseReport",
             produces = "text/html,application/xml,application/pdf")
@@ -174,6 +178,7 @@ public class TestCaseValidationReportController {
         return true;
     }
 
+	@PreAuthorize("hasRole('tester')")
     @ApiOperation(value = "Get a test case validation report HTML content by the test case's id",
             nickname = "getPersistentUserTestCaseReportContent",
             produces = "text/html")
