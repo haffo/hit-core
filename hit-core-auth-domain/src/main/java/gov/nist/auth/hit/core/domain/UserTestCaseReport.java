@@ -1,9 +1,6 @@
 package gov.nist.auth.hit.core.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.ArrayList;
 
 /**
@@ -26,9 +23,10 @@ public class UserTestCaseReport {
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
     private Double version;
-    private ArrayList<UserTestStepReport> userTestStepReports;
-    private Account account;
+    //private ArrayList<UserTestStepReport> userTestStepReports;
+    private Long accountId;
     private Long testCasePersistentId;
+    @Column(columnDefinition = "LONGTEXT")
     private String xml;
 
     public Double getVersion() {
@@ -39,7 +37,7 @@ public class UserTestCaseReport {
         this.version = version;
     }
 
-    public ArrayList<UserTestStepReport> getUserTestStepReports() {
+    /*public ArrayList<UserTestStepReport> getUserTestStepReports() {
         return userTestStepReports;
     }
 
@@ -52,14 +50,14 @@ public class UserTestCaseReport {
 
     public void setUserTestStepReports(ArrayList<UserTestStepReport> userTestStepReports) {
         this.userTestStepReports = userTestStepReports;
+    }*/
+
+    public Long getAccountId() {
+        return accountId;
     }
 
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
     }
 
     public Long getTestCasePersistentId() {

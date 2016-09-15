@@ -20,6 +20,10 @@ public class UserTestCaseReportRequest {
 
     private String comments;
 
+    public UserTestCaseReportRequest() {
+        super();
+    }
+
     public UserTestCaseReportRequest(Long testCaseId, String result, String comments) {
         this.testCaseId = testCaseId;
         this.result = result;

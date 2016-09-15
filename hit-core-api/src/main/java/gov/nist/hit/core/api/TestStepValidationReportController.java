@@ -433,7 +433,7 @@ public class TestStepValidationReportController {
       }
       TestStepValidationReport report =
               validationReportService.findOneByTestStepAndUser(testStep.getPersistentId(), userId);
-      UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user,testStep.getPersistentId(),report.getComments());
+      UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user.getId(),testStep.getPersistentId(),report.getComments());
       userTestStepReport = userTestStepReportService.save(userTestStepReport);
       return userTestStepReport;
     } catch (UserNotFoundException e) {

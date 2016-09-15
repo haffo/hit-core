@@ -1,9 +1,6 @@
 package gov.nist.auth.hit.core.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -23,18 +20,20 @@ public class UserTestStepReport {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
+    @Column(columnDefinition = "TEXT")
     private String xml;
+    @Column(columnDefinition = "TEXT")
     private String html;
     private Double version;
-    private Account account;
+    private Long accountId;
     private Long testStepPersistentId;
     private String comments;
 
-    public UserTestStepReport(String xml, String html, Double version, Account account, Long testStepPersistentId, String comments) {
+    public UserTestStepReport(String xml, String html, Double version, Long accountId, Long testStepPersistentId, String comments) {
         this.xml = xml;
         this.html = html;
         this.version = version;
-        this.account = account;
+        this.accountId = accountId;
         this.testStepPersistentId = testStepPersistentId;
         this.comments = comments;
     }
@@ -55,12 +54,12 @@ public class UserTestStepReport {
         this.version = version;
     }
 
-    public Account getAccount() {
-        return account;
+    public Long getAccountId() {
+        return accountId;
     }
 
-    public void setAccount(Account account) {
-        this.account = account;
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
     }
 
     public Long getTestStepPersistentId() {

@@ -19,6 +19,6 @@ import org.springframework.data.jpa.repository.Query;
  */
 public interface UserTestStepReportRepository extends JpaRepository<UserTestStepReport, Long> {
 
-    @Query("select utsr from UserTestStepReport utsr where utsr.account.id = ?1 and utsr.testStepPersistentId = ?2")
+    @Query("select utsr from UserTestStepReport utsr where utsr.accountId = ?1 and utsr.testStepPersistentId = ?2")
     UserTestStepReport findOneByAccountIdAndTestStepId(Long accountId,Long testStepId);
 }

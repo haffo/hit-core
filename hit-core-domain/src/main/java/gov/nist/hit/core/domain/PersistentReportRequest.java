@@ -1,8 +1,4 @@
-package gov.nist.auth.hit.core.repo;
-
-import gov.nist.auth.hit.core.domain.UserTestCaseReport;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+package gov.nist.hit.core.domain;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -15,10 +11,27 @@ import org.springframework.data.jpa.repository.Query;
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
  * <p/>
- * Created by Maxence Lefort on 9/13/16.
+ * Created by Maxence Lefort on 9/15/16.
  */
-public interface UserTestCaseReportRepository extends JpaRepository<UserTestCaseReport, Long> {
+public class PersistentReportRequest {
 
-    @Query("select utcr from UserTestCaseReport utcr where utcr.accountId = ?1 and utcr.testCasePersistentId = ?2")
-    UserTestCaseReport findOneByAccountIdAndTestCaseId(Long accountId,Long testCaseId);
+    private String html;
+    private boolean versionChanged;
+
+
+    public String getHtml() {
+        return html;
+    }
+
+    public void setHtml(String html) {
+        this.html = html;
+    }
+
+    public boolean isVersionChanged() {
+        return versionChanged;
+    }
+
+    public void setVersionChanged(boolean versionChanged) {
+        this.versionChanged = versionChanged;
+    }
 }

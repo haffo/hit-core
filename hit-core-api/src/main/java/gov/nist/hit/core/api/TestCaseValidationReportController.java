@@ -12,15 +12,14 @@
 
 package gov.nist.hit.core.api;
 
+import com.fasterxml.jackson.core.json.JsonGeneratorImpl;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.auth.hit.core.domain.UserTestCaseReport;
 import gov.nist.auth.hit.core.domain.UserTestStepReport;
 import gov.nist.auth.hit.core.service.UserTestCaseReportService;
 import gov.nist.auth.hit.core.service.UserTestStepReportService;
-import gov.nist.hit.core.domain.TestCase;
-import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.domain.UserTestCaseReportRequest;
+import gov.nist.hit.core.domain.*;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
@@ -76,7 +75,7 @@ public class TestCaseValidationReportController {
     private UserTestCaseReportService userTestCaseReportService;
 
     @ApiOperation(value = "", hidden = true)
-    @RequestMapping(value = "/savePersistentUserTestStepReport", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/savePersistentUserTestCaseReport", method = RequestMethod.POST, produces = "application/json")
     public UserTestCaseReport savePersistentUserTestCaseReport(@RequestBody UserTestCaseReportRequest command,HttpServletRequest request, HttpServletResponse response) {
         logger.info("Saving persistent test step report");
         try {
@@ -91,13 +90,15 @@ public class TestCaseValidationReportController {
             if(testCase==null){
                 throw new TestCaseException(testCaseId);
             }
-            UserTestCaseReport userTestCaseReport = new UserTestCaseReport();
-            userTestCaseReport.setAccount(user);
+            UserTestCaseReport userTestCaseReport = userTestCaseReportService.findOneByAccountAndTestCaseId(user.getId(),testCase.getPersistentId());
+            if(userTestCaseReport==null)
+                userTestCaseReport = new UserTestCaseReport();
+            userTestCaseReport.setAccountId(user.getId());
             userTestCaseReport.setTestCasePersistentId(testCase.getPersistentId());
             userTestCaseReport.setVersion(testCase.getVersion());
             String xml = testCaseValidationReportService.generateXml(testCase,userId,command.getResult(),command.getComments());
             userTestCaseReport.setXml(xml);
-            for(TestStep testStep :testCase.getTestSteps()){
+            /*for(TestStep testStep :testCase.getTestSteps()){
                 UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(user.getId(), testStep.getPersistentId());
                 if(userTestStepReport==null){
                     userTestStepReport = generateUserTestStepReport(user, userId, testStep);
@@ -108,8 +109,9 @@ public class TestCaseValidationReportController {
                 } else {
                     logger.error("Unable to retrieve the report for testStep "+testStep.getId()+" and userId "+userId);
                 }
-            }
+            }*/
             userTestCaseReportService.save(userTestCaseReport);
+            logger.info("Persistent report successfully saved");
         } catch (UserNotFoundException e) {
             e.printStackTrace();
         }
@@ -123,7 +125,7 @@ public class TestCaseValidationReportController {
             logger.error("No report found for test step "+testStep.getId()+" and userId "+userId);
             return null;
         }
-        UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user,testStep.getPersistentId(),report.getComments());
+        UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user.getId(),testStep.getPersistentId(),report.getComments());
         userTestStepReport = userTestStepReportService.save(userTestStepReport);
         return userTestStepReport;
     }
@@ -172,7 +174,37 @@ public class TestCaseValidationReportController {
         return true;
     }
 
+    @ApiOperation(value = "Get a test case validation report HTML content by the test case's id",
+            nickname = "getPersistentUserTestCaseReportContent",
+            produces = "text/html")
+    @RequestMapping(value = "/getPersistentUserTestCaseReportContent", method = RequestMethod.GET)
+    public PersistentReportRequest getPersistentUserTestCaseReportContent(@ApiParam(value = "the id of the test case", required = true) @RequestParam("testCaseId") final Long testCaseId, HttpServletRequest request, HttpServletResponse response) throws ValidationReportException {
+        PersistentReportRequest result = new PersistentReportRequest();
+        String html="";
+        try {
+            logger.info("Downloading HTML for the persistent test case report");
+            Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+            if (userId == null || userService.findOne(userId) == null) {
+                logger.error("User not found");
+                throw new ValidationReportException("Invalid user credentials");
+            }
+            Account user = userService.findOne(userId);
+            TestCase testCase = testCaseService.findOne(testCaseId);
+            if (testCase == null){
+                logger.error("TestCase not found");
+                throw new TestCaseException(testCaseId);
+            }
 
+            UserTestCaseReport userTestCaseReport = userTestCaseReportService.findOneByAccountAndTestCaseId(user.getId(),testCase.getPersistentId());
+            String title = testCase.getName().replaceAll(" ", "-");
+            result.setHtml(testCaseValidationReportService.generateHtml(userTestCaseReport.getXml()));
+            result.setVersionChanged(!testCase.getVersion().equals(userTestCaseReport.getVersion()));
+        } catch (ValidationReportException e) {
+            e.printStackTrace();
+            throw new ValidationReportException("Failed to download the reports");
+        }
+        return result;
+    }
 
     @ApiOperation(value = "Download a test case validation report by the test case's id",
       nickname = "downloadTestCaseValidationReport",
