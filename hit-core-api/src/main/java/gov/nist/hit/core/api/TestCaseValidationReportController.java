@@ -200,9 +200,10 @@ public class TestCaseValidationReportController {
             }
 
             UserTestCaseReport userTestCaseReport = userTestCaseReportService.findOneByAccountAndTestCaseId(user.getId(),testCase.getPersistentId());
-            String title = testCase.getName().replaceAll(" ", "-");
-            result.setHtml(testCaseValidationReportService.generateHtml(userTestCaseReport.getXml()));
-            result.setVersionChanged(!testCase.getVersion().equals(userTestCaseReport.getVersion()));
+            if(userTestCaseReport!=null) {
+                result.setHtml(testCaseValidationReportService.generateHtml(userTestCaseReport.getXml()));
+                result.setVersionChanged(!testCase.getVersion().equals(userTestCaseReport.getVersion()));
+            }
         } catch (Exception e) {
             //The report does not exist. Do nothing.
             logger.info("No report found.");
