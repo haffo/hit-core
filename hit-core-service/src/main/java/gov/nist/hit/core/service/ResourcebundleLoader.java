@@ -939,9 +939,12 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testCaseObj = mapper.readTree(descriptorContent);
     tc.setName(testCaseObj.findValue("name").textValue());
-    tc.setPersistentId(testCaseObj.findValue("id").longValue());
+    if(testCaseObj.has("id")) {
+      tc.setPersistentId(testCaseObj.findValue("id").longValue());
+    }
     tc.setDescription(testCaseObj.findValue("description").textValue());
-    tc.setVersion(testCaseObj.findValue("version").doubleValue());
+    tc.setVersion(!testCaseObj.has("version")?1.0:testCaseObj.findValue("version").doubleValue());
+
     tc.setTestStory(testStory(location));
     tc.setJurorDocument(jurorDocument(location));
     if (testCaseObj.findValue("position") != null) {
@@ -1034,9 +1037,11 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testStepObj = mapper.readTree(descriptorContent);
     testStep.setName(testStepObj.findValue("name").textValue());
-    testStep.setPersistentId(testStepObj.findValue("id").longValue());
+    if(testStepObj.has("id")) {
+      testStep.setPersistentId(testStepObj.findValue("id").longValue());
+    }
     testStep.setDescription(testStepObj.findValue("description").textValue());
-    testStep.setVersion(testStepObj.findValue("version").doubleValue());
+    testStep.setVersion(!testStepObj.has("version")?1.0:testStepObj.findValue("version").doubleValue());
     JsonNode ttypeObj = testStepObj.findValue("type");
     String tttypeValue = ttypeObj != null ? ttypeObj.textValue() : null;
     TestingType testingType =
@@ -1141,9 +1146,11 @@ public abstract class ResourcebundleLoader {
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       TestCaseGroup tcg = new TestCaseGroup();
       tcg.setName(testPlanObj.findValue("name").textValue());
-      tcg.setPersistentId(testPlanObj.findValue("id").longValue());
+      if(testPlanObj.has("id")) {
+        tcg.setPersistentId(testPlanObj.findValue("id").longValue());
+      }
       tcg.setDescription(testPlanObj.findValue("description").textValue());
-      tcg.setVersion(testPlanObj.findValue("version").doubleValue());
+      tcg.setVersion(!testPlanObj.has("version")?1.0:testPlanObj.findValue("version").doubleValue());
       tcg.setTestStory(testStory(location));
       if (testPlanObj.findValue("position") != null) {
         tcg.setPosition(testPlanObj.findValue("position").intValue());
@@ -1180,10 +1187,12 @@ public abstract class ResourcebundleLoader {
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       TestPlan tp = new TestPlan();
-      tp.setPersistentId(testPlanObj.findValue("id").asLong());
+      if(testPlanObj.has("id")) {
+        tp.setPersistentId(testPlanObj.findValue("id").asLong());
+      }
       tp.setName(testPlanObj.findValue("name").textValue());
       tp.setDescription(testPlanObj.findValue("description").textValue());
-      tp.setVersion(testPlanObj.findValue("version").doubleValue());
+      tp.setVersion(!testPlanObj.has("version")?1.0:testPlanObj.findValue("version").doubleValue());
       tp.setTestStory(testStory(location));
       tp.setStage(stage);
 
@@ -1237,12 +1246,14 @@ public abstract class ResourcebundleLoader {
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       CFTestInstance parent = new CFTestInstance();
       parent.setName(testPlanObj.findValue("name").textValue());
-      parent.setPersistentId(testPlanObj.findValue("id").asLong());
+      if(testPlanObj.has("id")) {
+        parent.setPersistentId(testPlanObj.findValue("id").asLong());
+      }
       if (testPlanObj.findValue("position") != null) {
         parent.setPosition(testPlanObj.findValue("position").intValue());
       }
       parent.setDescription(testPlanObj.findValue("description").textValue());
-      parent.setVersion(testPlanObj.findValue("version").doubleValue());
+      parent.setVersion(!testPlanObj.has("version")?1.0:testPlanObj.findValue("version").doubleValue());
       parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
       List<Resource> resources = getDirectories(testObjectPath + "*/");
       for (Resource resource : resources) {
