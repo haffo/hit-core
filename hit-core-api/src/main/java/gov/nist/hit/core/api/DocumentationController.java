@@ -299,13 +299,13 @@ public class DocumentationController {
     String pattern = null;
     String name = null;
     if (stage == TestingStage.CB) {
-      pattern = "/*Contextbased/**/Message.t*";
+      pattern = "/*Contextbased/**/Message.*";
       name = "ContextbasedExampleMessages";
     } else if (stage == TestingStage.CF) {
-      pattern = "/*Contextfree/**/Message.t*";
+      pattern = "/*Contextfree/**/Message.*";
       name = "ContextfreeExampleMessages";
     } else if (stage == TestingStage.ISOLATED) {
-      pattern = "/*Isolated/**/Message.t*";
+      pattern = "/*Isolated/**/Message.*";
       name = "IsolatedExampleMessages";
     }
     return generateZip(pattern, name);
