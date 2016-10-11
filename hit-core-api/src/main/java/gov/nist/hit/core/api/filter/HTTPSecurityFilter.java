@@ -2,7 +2,6 @@ package gov.nist.hit.core.api.filter;
 
 import java.io.IOException;
 
-import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -46,16 +45,15 @@ public class HTTPSecurityFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
- 
+
     if (response instanceof HttpServletResponse) {
       HttpServletResponse httpResponse = (HttpServletResponse) response;
       httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
-      httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       httpResponse.setHeader("X-Content-Type-Options", "nosniff");
-       httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
+      httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
       httpResponse.setHeader("Access-Control-Allow-Headers", "rsbVersion");
- 
-//      httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
+
+      // httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
     }
 
     chain.doFilter(request, response);
