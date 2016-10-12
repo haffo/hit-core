@@ -49,10 +49,10 @@ public class HTTPSecurityFilter implements Filter {
     if (response instanceof HttpServletResponse) {
       HttpServletResponse httpResponse = (HttpServletResponse) response;
       httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
+      httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       httpResponse.setHeader("X-Content-Type-Options", "nosniff");
       httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
       httpResponse.setHeader("Access-Control-Allow-Headers", "rsbVersion");
-
       // httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
     }
 
