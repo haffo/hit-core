@@ -26,7 +26,7 @@ public class ValidationLogUtil {
     @Autowired
     private static Environment env;
 
-    private static String DEFAULT_LOG_FORMAT = "%date [Validation] %format - %messageId [%errorCount errors (%errorsInSegments), %warningCount warnings]";
+    private static String DEFAULT_LOG_FORMAT = "%date [Validation - %testingStage] %format - %messageId %validationResult [%errorCount errors (%errorsInSegments), %warningCount warnings]";
     private static String DEFAULT_LOG_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
     public static String generateValidationLog(TestContext testContext, EnhancedReport report){
@@ -40,6 +40,9 @@ public class ValidationLogUtil {
         //Replace the fields in log
         if (logFormat.contains("%date")) {
             logFormat.replace("%date", validationLogReport.getDate(logDateFormat));
+        }
+        if (logFormat.contains("%testingStage")) {
+            logFormat.replace("%testingStage", validationLogReport.getTestingStage());
         }
         if (logFormat.contains("%format")) {
             logFormat.replace("%format", validationLogReport.getFormat());
@@ -75,6 +78,13 @@ public class ValidationLogUtil {
         }
         if (logFormat.contains("%warningCount")) {
             logFormat.replace("%warningCount", String.valueOf(validationLogReport.getWarningCount()));
+        }
+        if (logFormat.contains("%validationResult")) {
+            if(validationLogReport.isValidationResult()){
+                logFormat.replace("%validationResult","SUCCESS");
+            } else {
+                logFormat.replace("%validationResult","FAILURE");
+            }
         }
         //return the populated log
         return logFormat;

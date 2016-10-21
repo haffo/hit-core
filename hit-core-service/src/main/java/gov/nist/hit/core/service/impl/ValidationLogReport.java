@@ -32,6 +32,7 @@ public class ValidationLogReport {
 
     private String messageId;
     private String format;
+    private String testingStage;
     private int errorCount = 0;
     private int warningCount = 0;
     private Date date;
@@ -93,6 +94,7 @@ public class ValidationLogReport {
         if(testContext != null){
             this.format = (testContext.getFormat()!=null?"":testContext.getFormat());
             this.messageId = (testContext.getType()!=null?"":testContext.getType());
+            this.testingStage = (testContext.getStage().name()!=null?"":testContext.getStage().name());
         }
     }
 
@@ -155,5 +157,13 @@ public class ValidationLogReport {
 
     public void setValidationResult(boolean validationResult) {
         this.validationResult = validationResult;
+    }
+
+    public String getTestingStage() {
+        return testingStage;
+    }
+
+    public void setTestingStage(String testingStage) {
+        this.testingStage = testingStage;
     }
 }
