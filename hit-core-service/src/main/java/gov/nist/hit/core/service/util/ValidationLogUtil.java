@@ -28,7 +28,7 @@ public class ValidationLogUtil {
     @Autowired
     private static Environment env;
 
-    private static String DEFAULT_LOG_FORMAT = "%date [Validation - %testingStage] %format - %messageId %validationResult [%errorCount errors (%errorsInSegments), %warningCount warnings]";
+    private static String DEFAULT_LOG_FORMAT = "%date [Validation - %testingStage] %format - %messageId %validationResult [%errorCount errors %errorsInSegments, %warningCount warnings]";
     private static String DEFAULT_LOG_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
     public static String generateValidationLog(TestContext testContext, EnhancedReport report){
@@ -60,7 +60,7 @@ public class ValidationLogUtil {
             //TODO Make the format a parameter?
             if (validationLogReport.getErrorCountInSegment().size() > 0) {
                 StringBuilder errorsInSegments = new StringBuilder();
-                errorsInSegments.append("[");
+                errorsInSegments.append("(");
                 boolean isFirst = true;
                 for (Map.Entry<String, Integer> segment : validationLogReport.getErrorCountInSegment().entrySet()) {
                     if(!isFirst){
@@ -72,10 +72,10 @@ public class ValidationLogUtil {
                     errorsInSegments.append(segment.getValue());
                     errorsInSegments.append(" errors)");
                 }
-                errorsInSegments.append("]");
+                errorsInSegments.append(")");
                 logFormat = logFormat.replace("%errorsInSegments", errorsInSegments.toString());
             } else {
-                logFormat = logFormat.replace("%errorsInSegments", "No errors");
+                logFormat = logFormat.replace("%errorsInSegments", "");
             }
         }
         if (logFormat.contains("%warningCount")) {
