@@ -46,6 +46,8 @@ public class TestContext implements Serializable {
   @Enumerated(EnumType.STRING)
   protected TestingStage stage;
 
+  @ApiModelProperty(required = true, value = "message ID of the test context", example="PSDI_08,NEWRX,etc...")
+  protected String type;
 
   public TestContext() {}
 
@@ -81,4 +83,11 @@ public class TestContext implements Serializable {
     this.stage = stage;
   }
 
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
 }

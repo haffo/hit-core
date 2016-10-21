@@ -96,8 +96,13 @@
 			<artifactId>spring-security-web</artifactId>
 			<version>${spring-security.version}</version>
 		</dependency>
-		
 
+
+		<dependency>
+			<groupId>gov.nist.healthcare.hl7.v2.unifiedreport</groupId>
+			<artifactId>report</artifactId>
+			<version>1.0.5</version>
+		</dependency>
 	</dependencies>
 
 
