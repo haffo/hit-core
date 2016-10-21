@@ -4,6 +4,7 @@ import gov.nist.healthcare.unified.model.EnhancedReport;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.service.impl.ValidationLogReport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Map;
  * <p/>
  * Created by Maxence Lefort on 6/9/16.
  */
+@PropertySource(value = {"classpath:app-auth-config.properties"})
 public class ValidationLogUtil {
 
     @Autowired
@@ -35,23 +37,23 @@ public class ValidationLogUtil {
 
     public static String generateValidationLog(ValidationLogReport validationLogReport) {
         //Read environment properties related to the validation logs
-        String logFormat = (env.getProperty("validation.logs.format").equals("")?env.getProperty("validation.logs.format"):DEFAULT_LOG_FORMAT);
-        String logDateFormat = (env.getProperty("validation.logs.date.format").equals("")?env.getProperty("validation.logs.date.format"):DEFAULT_LOG_DATE_FORMAT);
+        String logFormat = (env == null || env.getProperty("validation.logs.format")==null || "".equals(env.getProperty("validation.logs.format")) ?  DEFAULT_LOG_FORMAT : env.getProperty("validation.logs.format"));
+        String logDateFormat = (env == null || env.getProperty("validation.logs.date.format")==null || "".equals(env.getProperty("validation.logs.date.format")) ? DEFAULT_LOG_DATE_FORMAT : env.getProperty("validation.logs.date.format"));
         //Replace the fields in log
         if (logFormat.contains("%date")) {
-            logFormat.replace("%date", validationLogReport.getDate(logDateFormat));
+            logFormat = logFormat.replace("%date", validationLogReport.getDate(logDateFormat));
         }
         if (logFormat.contains("%testingStage")) {
-            logFormat.replace("%testingStage", validationLogReport.getTestingStage());
+            logFormat = logFormat.replace("%testingStage", validationLogReport.getTestingStage());
         }
         if (logFormat.contains("%format")) {
-            logFormat.replace("%format", validationLogReport.getFormat());
+            logFormat = logFormat.replace("%format", validationLogReport.getFormat());
         }
         if (logFormat.contains("%messageId")) {
-            logFormat.replace("%messageId", validationLogReport.getMessageId());
+            logFormat = logFormat.replace("%messageId", validationLogReport.getMessageId());
         }
         if (logFormat.contains("%errorCount")) {
-            logFormat.replace("%errorCount", String.valueOf(validationLogReport.getErrorCount()));
+            logFormat = logFormat.replace("%errorCount", String.valueOf(validationLogReport.getErrorCount()));
         }
         if (logFormat.contains("%errorsInSegments")) {
             //Generate the segment errors log
@@ -71,19 +73,19 @@ public class ValidationLogUtil {
                     errorsInSegments.append(" errors)");
                 }
                 errorsInSegments.append("]");
-                logFormat.replace("%errorsInSegments", errorsInSegments.toString());
+                logFormat = logFormat.replace("%errorsInSegments", errorsInSegments.toString());
             } else {
-                logFormat.replace("%errorsInSegments", "No errors");
+                logFormat = logFormat.replace("%errorsInSegments", "No errors");
             }
         }
         if (logFormat.contains("%warningCount")) {
-            logFormat.replace("%warningCount", String.valueOf(validationLogReport.getWarningCount()));
+            logFormat = logFormat.replace("%warningCount", String.valueOf(validationLogReport.getWarningCount()));
         }
         if (logFormat.contains("%validationResult")) {
             if(validationLogReport.isValidationResult()){
-                logFormat.replace("%validationResult","SUCCESS");
+                logFormat = logFormat.replace("%validationResult","SUCCESS");
             } else {
-                logFormat.replace("%validationResult","FAILURE");
+                logFormat = logFormat.replace("%validationResult","FAILURE");
             }
         }
         //return the populated log

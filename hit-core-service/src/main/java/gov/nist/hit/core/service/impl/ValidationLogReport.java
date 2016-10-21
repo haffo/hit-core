@@ -44,6 +44,7 @@ public class ValidationLogReport {
      */
     public ValidationLogReport(TestContext testContext, EnhancedReport report) {
         this.date = new Date();
+        this.errorCountInSegment = new HashMap<>();
         Detections detections = report.getDetections();
         //Loop on the classifications (Affirmative, Warning or Error)
         for (Classification classification : detections.classes()) {
@@ -58,7 +59,6 @@ public class ValidationLogReport {
                 if (this.errorCount > 0) {
                     //If there is more than 0 errors, then the validation failed
                     this.validationResult = false;
-                    this.errorCountInSegment = new HashMap<>();
                     //Loop on the errors
                     for (String key : classification.keys()) {
                         Collection collection = null;
@@ -92,9 +92,9 @@ public class ValidationLogReport {
         }
         //Parse the test context
         if(testContext != null){
-            this.format = (testContext.getFormat()!=null?"":testContext.getFormat());
-            this.messageId = (testContext.getType()!=null?"":testContext.getType());
-            this.testingStage = (testContext.getStage().name()!=null?"":testContext.getStage().name());
+            this.format = (testContext.getFormat()!=null?testContext.getFormat():"");
+            this.messageId = (testContext.getType()!=null?testContext.getType():"");
+            this.testingStage = (testContext.getStage().name()!=null?testContext.getStage().name():"");
         }
     }
 
