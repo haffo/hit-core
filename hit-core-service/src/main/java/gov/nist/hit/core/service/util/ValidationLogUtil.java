@@ -3,7 +3,9 @@ package gov.nist.hit.core.service.util;
 import gov.nist.healthcare.unified.model.EnhancedReport;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.service.impl.ValidationLogReport;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
@@ -22,14 +24,20 @@ import java.util.Map;
  * <p/>
  * Created by Maxence Lefort on 6/9/16.
  */
+@Configuration
+@ComponentScan(basePackages = "gov.nist.*")
 @PropertySource(value = {"classpath:app-auth-config.properties"})
-public class ValidationLogUtil {
+public class ValidationLogUtil implements EnvironmentAware {
 
-    @Autowired
-    private static Environment env;
+    public static Environment environment;
 
     private static String DEFAULT_LOG_FORMAT = "%date [Validation - %testingStage] %format - %messageId %validationResult [%errorCount errors %errorsInSegments, %warningCount warnings]";
     private static String DEFAULT_LOG_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+
+    @Override
+    public void setEnvironment(final Environment environment) {
+        this.environment = environment;
+    }
 
     public static String generateValidationLog(TestContext testContext, EnhancedReport report){
         return generateValidationLog(new ValidationLogReport(testContext,report));
@@ -37,8 +45,8 @@ public class ValidationLogUtil {
 
     public static String generateValidationLog(ValidationLogReport validationLogReport) {
         //Read environment properties related to the validation logs
-        String logFormat = (env == null || env.getProperty("validation.logs.format")==null || "".equals(env.getProperty("validation.logs.format")) ?  DEFAULT_LOG_FORMAT : env.getProperty("validation.logs.format"));
-        String logDateFormat = (env == null || env.getProperty("validation.logs.date.format")==null || "".equals(env.getProperty("validation.logs.date.format")) ? DEFAULT_LOG_DATE_FORMAT : env.getProperty("validation.logs.date.format"));
+        String logFormat = (environment == null || environment.getProperty("validation.logs.format")==null || "".equals(environment.getProperty("validation.logs.format")) ?  DEFAULT_LOG_FORMAT : environment.getProperty("validation.logs.format"));
+        String logDateFormat = (environment == null || environment.getProperty("validation.logs.date.format")==null || "".equals(environment.getProperty("validation.logs.date.format")) ? DEFAULT_LOG_DATE_FORMAT : environment.getProperty("validation.logs.date.format"));
         //Replace the fields in log
         if (logFormat.contains("%date")) {
             logFormat = logFormat.replace("%date", validationLogReport.getDate(logDateFormat));
