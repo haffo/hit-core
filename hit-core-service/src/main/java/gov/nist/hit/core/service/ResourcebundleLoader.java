@@ -1162,13 +1162,15 @@ public abstract class ResourcebundleLoader {
         String fileName = fileName(resource);
         String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
         Resource descriptorResource = getDescriptorResource(tcLocation);
-        String filename = descriptorResource.getFilename();
-        if (filename.endsWith("TestCaseGroup.json")) {
-          TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage, transportEnabled);
-          tcg.getTestCaseGroups().add(testCaseGroup);
-        } else if (filename.endsWith("TestCase.json")) {
-          TestCase testCase = testCase(tcLocation, stage, transportEnabled);
-          tcg.getTestCases().add(testCase);
+        if(descriptorResource!=null) {
+          String filename = descriptorResource.getFilename();
+          if (filename.endsWith("TestCaseGroup.json")) {
+            TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage, transportEnabled);
+            tcg.getTestCaseGroups().add(testCaseGroup);
+          } else if (filename.endsWith("TestCase.json")) {
+            TestCase testCase = testCase(tcLocation, stage, transportEnabled);
+            tcg.getTestCases().add(testCase);
+          }
         }
       }
       return tcg;

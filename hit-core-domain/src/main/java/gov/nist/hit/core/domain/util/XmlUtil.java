@@ -1,8 +1,8 @@
 package gov.nist.hit.core.domain.util;
 
-import gov.nist.hit.core.domain.XMLCoordinate;
-
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -23,14 +23,16 @@ import org.jdom2.located.Located;
 import org.jdom2.located.LocatedJDOMFactory;
 import org.jdom2.output.XMLOutputter;
 
+import gov.nist.hit.core.domain.XMLCoordinate;
+
 public class XmlUtil {
 
   public static String format(String xml) throws TransformerException, JDOMException, IOException {
     return prettyFormat(xml, 2);
   }
 
-  public static String prettyFormat(String input, int indent) throws TransformerException,
-      JDOMException, IOException {
+  public static String prettyFormat(String input, int indent)
+      throws TransformerException, JDOMException, IOException {
 
     // Source xmlInput = new StreamSource(new StringReader(input));
     // StringWriter stringWriter = new StringWriter();
@@ -59,7 +61,27 @@ public class XmlUtil {
     SAXBuilder builder = new SAXBuilder();
     builder.setJDOMFactory(new LocatedJDOMFactory());
     builder.setExpandEntities(false);
-    return builder.build(IOUtils.toInputStream(content));
+    try {
+      InputStreamReader isr = new InputStreamReader(IOUtils.toInputStream(content));
+      return builder.build(isr);
+    } catch (IOException e) {
+      throw new IOException("Could not parse the xml content. Is the encoding UTF-8 or UTF-16 ?");
+    }
+
+  }
+
+  public static InputStream toInputStream(String content) throws IOException {
+    InputStream res = null;
+    try {
+      res = toInputStream(content, "UTF-8");
+    } catch (Exception e) {
+      res = toInputStream(content, "UTF-16");
+    }
+    return res;
+  }
+
+  public static InputStream toInputStream(String content, String encoding) throws IOException {
+    return IOUtils.toInputStream(content, encoding);
   }
 
   public static String toString(Element element) {
