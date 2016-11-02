@@ -1,27 +1,23 @@
 package gov.nist.hit.core.domain;
 
-import io.swagger.annotations.ApiModelProperty;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 
@@ -29,57 +25,65 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  */
 @MappedSuperclass
-public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
+public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
 
-  @ApiModelProperty(required=true, value="name of the test case")
+  @ApiModelProperty(required = true, value = "name of the test case")
   @Column(columnDefinition = "TEXT")
   protected String name;
 
-  @Column(unique=true)
+  @Column(unique = true)
   protected Long persistentId;
 
 
-//  @Column
-//  private String parentName;
-//
-//  @Column
-//  private String testCaseName;
-//
-//  @Column
-//  private String testPlanName;
-//
-//  @Column
-//  private String testCaseGroupName;
-//
-//  @Column
-//  private String testStepName;
+  // @Column
+  // private String parentName;
+  //
+  // @Column
+  // private String testCaseName;
+  //
+  // @Column
+  // private String testPlanName;
+  //
+  // @Column
+  // private String testCaseGroupName;
+  //
+  // @Column
+  // private String testStepName;
 
-  @ApiModelProperty(required=false, value="description of the test case")
+  @ApiModelProperty(required = false, value = "description of the test case")
   @Column(columnDefinition = "TEXT")
   protected String description;
 
-  @ApiModelProperty(required=true, value="type of the test case")
+  @ApiModelProperty(required = true, value = "type of the test case")
   @NotNull
   @Enumerated(EnumType.STRING)
   protected ObjectType type;
 
-  @ApiModelProperty(required=false, value="stage of the test case")
+  @ApiModelProperty(required = false, value = "stage of the test case")
   @Enumerated(EnumType.STRING)
   protected TestingStage stage;
 
-  @ApiModelProperty(required=true, value="position of the test case")
+  @ApiModelProperty(required = true, value = "position of the test case")
   @Min(1)
   protected int position;
 
-  @ApiModelProperty(required=true, value="version of the test case")
+  @ApiModelProperty(required = true, value = "version of the test case")
   protected Double version;
 
-  @ApiModelProperty(required=true, value="test story of the test case")
+  @ApiModelProperty(required = true, value = "test story of the test case")
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact testStory;
 
-  
+
+  @ApiModelProperty(required = true, value = "test documents")
+  @OneToMany
+  @JoinTable(name = "test_document",
+      joinColumns = {@JoinColumn(name = "test_id", referencedColumnName = "id")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "document_id", referencedColumnName = "id", unique = true)})
+  protected Set<Document> documents = new HashSet<Document>();
+
   public String getName() {
     return name;
   }
@@ -137,46 +141,46 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
     this.testStory = testStory;
   }
 
- 
-//  public String getParentName() {
-//    return parentName;
-//  }
-//
-//  public void setParentName(String parentName) {
-//    this.parentName = parentName;
-//  }
-//
-//  public String getTestCaseName() {
-//    return testCaseName;
-//  }
-//
-//  public void setTestCaseName(String testCaseName) {
-//    this.testCaseName = testCaseName;
-//  }
-//
-//  public String getTestPlanName() {
-//    return testPlanName;
-//  }
-//
-//  public void setTestPlanName(String testPlanName) {
-//    this.testPlanName = testPlanName;
-//  }
-//
-//  public String getTestCaseGroupName() {
-//    return testCaseGroupName;
-//  }
-//
-//  public void setTestCaseGroupName(String testCaseGroupName) {
-//    this.testCaseGroupName = testCaseGroupName;
-//  }
-//
-//  public String getTestStepName() {
-//    return testStepName;
-//  }
-//
-//  public void setTestStepName(String testStepName) {
-//    this.testStepName = testStepName;
-//  }
+
+  // public String getParentName() {
+  // return parentName;
+  // }
+  //
+  // public void setParentName(String parentName) {
+  // this.parentName = parentName;
+  // }
+  //
+  // public String getTestCaseName() {
+  // return testCaseName;
+  // }
+  //
+  // public void setTestCaseName(String testCaseName) {
+  // this.testCaseName = testCaseName;
+  // }
+  //
+  // public String getTestPlanName() {
+  // return testPlanName;
+  // }
+  //
+  // public void setTestPlanName(String testPlanName) {
+  // this.testPlanName = testPlanName;
+  // }
+  //
+  // public String getTestCaseGroupName() {
+  // return testCaseGroupName;
+  // }
+  //
+  // public void setTestCaseGroupName(String testCaseGroupName) {
+  // this.testCaseGroupName = testCaseGroupName;
+  // }
+  //
+  // public String getTestStepName() {
+  // return testStepName;
+  // }
+  //
+  // public void setTestStepName(String testStepName) {
+  // this.testStepName = testStepName;
+  // }
 
   @Override
   public int compareTo(AbstractTestCase o) {
@@ -184,28 +188,35 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase>{
     return this.getPosition() - o.getPosition();
   }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		AbstractTestCase other = (AbstractTestCase) obj;
-		if (this.getPersistentId() != other.getPersistentId())
-			return false;
-		return true;
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    AbstractTestCase other = (AbstractTestCase) obj;
+    if (this.getPersistentId() != other.getPersistentId())
+      return false;
+    return true;
+  }
 
-	public Long getPersistentId() {
-		return persistentId;
-	}
+  public Long getPersistentId() {
+    return persistentId;
+  }
 
-	public void setPersistentId(Long persistentId) {
-		this.persistentId = persistentId;
-	}
+  public void setPersistentId(Long persistentId) {
+    this.persistentId = persistentId;
+  }
 
+  public Set<Document> getDocuments() {
+    return documents;
+  }
+
+  public void setDocuments(Set<Document> documents) {
+    this.documents = documents;
+  }
 
 
 
