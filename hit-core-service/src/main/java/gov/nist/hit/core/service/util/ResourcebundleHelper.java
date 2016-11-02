@@ -39,187 +39,180 @@ import com.google.common.io.Files;
  */
 public class ResourcebundleHelper {
 
-	static PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+  static PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-	public ResourcebundleHelper() {
-	}
+  public ResourcebundleHelper() {}
 
-	public static Resource getDescriptorFile(String pattern) throws IOException {
-		List<Resource> resources = getResources(pattern);
-		return resources != null && resources.size() > 0 ? resources.get(0)
-				.exists() ? resources.get(0) : null : null;
-	}
+  public static Resource getDescriptorFile(String pattern) throws IOException {
+    List<Resource> resources = getResources(pattern);
+    return resources != null && resources.size() > 0
+        ? resources.get(0).exists() ? resources.get(0) : null : null;
+  }
 
-	// public ResourcePatternResolver resourceResolver() {
-	// PathMatchingResourcePatternResolver resolver = new
-	// PathMatchingResourcePatternResolver();
-	// return resolver;
-	// }
+  // public ResourcePatternResolver resourceResolver() {
+  // PathMatchingResourcePatternResolver resolver = new
+  // PathMatchingResourcePatternResolver();
+  // return resolver;
+  // }
 
-	private static String classpath(String path) {
-		return "classpath*:" + path;
-	}
+  private static String classpath(String path) {
+    return "classpath*:" + path;
+  }
 
-	public static List<Resource> getResources(String path) {
-		try {
-			Resource[] files = resolver.getResources(classpath(path));
-			List<Resource> resources = Arrays.asList(files);
-			Collections.sort(resources, new Comparator<Resource>() {
+  public static List<Resource> getResources(String path) {
+    try {
+      Resource[] files = resolver.getResources(classpath(path));
+      List<Resource> resources = Arrays.asList(files);
+      Collections.sort(resources, new Comparator<Resource>() {
 
-				@Override
-				public int compare(Resource o1, Resource o2) {
-					// TODO Auto-generated method stub
-					try {
-						return o1.getURL().toString()
-								.compareTo(o2.getURL().toString());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					return 0;
-				}
-			});
-			return resources;
-		} catch (IOException e1) {
-			return new ArrayList<Resource>(1);
-		}
+        @Override
+        public int compare(Resource o1, Resource o2) {
+          // TODO Auto-generated method stub
+          try {
+            return o1.getURL().toString().compareTo(o2.getURL().toString());
+          } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+          return 0;
+        }
+      });
+      return resources;
+    } catch (IOException e1) {
+      return new ArrayList<Resource>(1);
+    }
 
-	}
+  }
 
-	public static Resource getResource(String location) {
-		try {
-			Resource resource = resolver.getResource(location);
-			return resource.exists() ? resource : null;
-		} catch (RuntimeException e) {
-			return null;
-		} catch (Exception e) {
-			return null;
-		}
-	}
+  public static Resource getResource(String location) {
+    try {
+      Resource resource = resolver.getResource(location);
+      return resource.exists() ? resource : null;
+    } catch (RuntimeException e) {
+      return null;
+    } catch (Exception e) {
+      return null;
+    }
+  }
 
-	public static List<Resource> getDirectories(String pattern)
-			throws IOException {
-		if (!pattern.endsWith("/")) {
-			pattern = pattern + "/";
-		}
-		List<Resource> resources = getResources(pattern);
-		List<Resource> directories = new ArrayList<Resource>();
-		for (Resource res : resources) {
-			if (res.getURL().toString().endsWith("/")) {
-				directories.add(res);
-			}
-		}
-		return directories;
-	}
+  public static List<Resource> getDirectories(String pattern) throws IOException {
+    if (!pattern.endsWith("/")) {
+      pattern = pattern + "/";
+    }
+    List<Resource> resources = getResources(pattern);
+    List<Resource> directories = new ArrayList<Resource>();
+    for (Resource res : resources) {
+      if (res.getURL().toString().endsWith("/")) {
+        directories.add(res);
+      }
+    }
+    return directories;
+  }
 
-	public static String file(String pattern) {
-		if (pattern.endsWith("/")) {
-			pattern = pattern.substring(0, pattern.length() - 1);
-		}
-		return "file:" + pattern;
-	}
+  public static String file(String pattern) {
+    if (pattern.endsWith("/")) {
+      pattern = pattern.substring(0, pattern.length() - 1);
+    }
+    return "file:" + pattern;
+  }
 
-	public static List<Resource> getResourcesFile(String path) {
-		try {
-			System.out.println("PATH : " + file(path));
-			Resource[] files = resolver.getResources(file(path));
-			List<Resource> resources = Arrays.asList(files);
-			Collections.sort(resources, new Comparator<Resource>() {
+  public static List<Resource> getResourcesFile(String path) {
+    try {
+      System.out.println("PATH : " + file(path));
+      Resource[] files = resolver.getResources(file(path));
+      List<Resource> resources = Arrays.asList(files);
+      Collections.sort(resources, new Comparator<Resource>() {
 
-				@Override
-				public int compare(Resource o1, Resource o2) {
-					// TODO Auto-generated method stub
-					try {
-						return o1.getURL().toString()
-								.compareTo(o2.getURL().toString());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					return 0;
-				}
-			});
-			return resources;
-		} catch (IOException e1) {
-			return new ArrayList<Resource>(1);
-		}
+        @Override
+        public int compare(Resource o1, Resource o2) {
+          // TODO Auto-generated method stub
+          try {
+            return o1.getURL().toString().compareTo(o2.getURL().toString());
+          } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+          return 0;
+        }
+      });
+      return resources;
+    } catch (IOException e1) {
+      return new ArrayList<Resource>(1);
+    }
 
-	}
+  }
 
-	public static Resource getResourceFile(String location) {
-		try {
-			Resource resource = resolver.getResource(file(location));
-			return resource.exists() ? resource : null;
-		} catch (RuntimeException e) {
-			return null;
-		} catch (Exception e) {
-			return null;
-		}
-	}
+  public static Resource getResourceFile(String location) {
+    try {
+      Resource resource = resolver.getResource(file(location));
+      return resource.exists() ? resource : null;
+    } catch (RuntimeException e) {
+      return null;
+    } catch (Exception e) {
+      return null;
+    }
+  }
 
-	public static List<Resource> getDirectoriesFile(String pattern)
-			throws IOException {
-		List<Resource> resources = getResourcesFile(pattern);
-		List<Resource> directories = new ArrayList<Resource>();
-		for (Resource res : resources) {
-			if (res.getURL().toString().endsWith("/")) {
-				directories.add(res);
-			}
-		}
-		return directories;
-	}
+  public static List<Resource> getDirectoriesFile(String pattern) throws IOException {
+    List<Resource> resources = getResourcesFile(pattern);
+    List<Resource> directories = new ArrayList<Resource>();
+    for (Resource res : resources) {
+      if (res.getURL().toString().endsWith("/")) {
+        directories.add(res);
+      }
+    }
+    return directories;
+  }
 
-	
-	public static String getResourcesFromZip(String URL) throws Exception {
-		System.out.println(URL);
-		URL url = new URL(URL);
 
-		// Read URL
-		InputStream in = url.openStream();
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		int nRead;
-		byte[] data = new byte[16384];
+  public static String getResourcesFromZip(String URL) throws Exception {
+    System.out.println(URL);
+    URL url = new URL(URL);
 
-		while ((nRead = in.read(data, 0, data.length)) != -1) {
-			buffer.write(data, 0, nRead);
-		}
-		buffer.flush();
+    // Read URL
+    InputStream in = url.openStream();
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    int nRead;
+    byte[] data = new byte[16384];
 
-		byte[] b = buffer.toByteArray();
-		buffer.close();
+    while ((nRead = in.read(data, 0, data.length)) != -1) {
+      buffer.write(data, 0, nRead);
+    }
+    buffer.flush();
 
-		// Create TEMP directory
-		File tmpDir = Files.createTempDir();
-		tmpDir.mkdir();
-		if (tmpDir.isDirectory()) {
+    byte[] b = buffer.toByteArray();
+    buffer.close();
 
-			// Extract ZIP
-			ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(b));
-			ZipEntry ze;
-			while ((ze = zip.getNextEntry()) != null) {
-				String filePath = tmpDir.getAbsolutePath() + File.separator
-						+ ze.getName();
-				if (!ze.isDirectory()) {
-					BufferedOutputStream bos = new BufferedOutputStream(
-							new FileOutputStream(filePath));
-					byte[] bytesIn = new byte[1024];
-					int read = 0;
-					while ((read = zip.read(bytesIn)) != -1) {
-						bos.write(bytesIn, 0, read);
-					}
-					bos.close();
-				} else {
-					File dir = new File(filePath);
-					dir.mkdir();
-				}
-				zip.closeEntry();
-			}
-			zip.close();
-			return tmpDir.getAbsolutePath();
+    // Create TEMP directory
+    File tmpDir = Files.createTempDir();
+    tmpDir.mkdir();
+    if (tmpDir.isDirectory()) {
 
-		} else {
-			throw new Exception("Could not create TMP directory");
-		}
-	}
+      // Extract ZIP
+      ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(b));
+      ZipEntry ze;
+      while ((ze = zip.getNextEntry()) != null) {
+        String filePath = tmpDir.getAbsolutePath() + File.separator + ze.getName();
+        if (!ze.isDirectory()) {
+          BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+          byte[] bytesIn = new byte[1024];
+          int read = 0;
+          while ((read = zip.read(bytesIn)) != -1) {
+            bos.write(bytesIn, 0, read);
+          }
+          bos.close();
+        } else {
+          File dir = new File(filePath);
+          dir.mkdir();
+        }
+        zip.closeEntry();
+      }
+      zip.close();
+      return tmpDir.getAbsolutePath();
+
+    } else {
+      throw new Exception("Could not create TMP directory");
+    }
+  }
 
 }
