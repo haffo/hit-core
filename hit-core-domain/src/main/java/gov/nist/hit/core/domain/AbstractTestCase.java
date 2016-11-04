@@ -7,8 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
+import javax.persistence.FetchType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -76,13 +75,9 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   protected TestArtifact testStory;
 
 
-  @ApiModelProperty(required = true, value = "test documents")
-  @OneToMany
-  @JoinTable(name = "test_document",
-      joinColumns = {@JoinColumn(name = "test_id", referencedColumnName = "id")},
-      inverseJoinColumns = {
-          @JoinColumn(name = "document_id", referencedColumnName = "id", unique = true)})
-  protected Set<Document> documents = new HashSet<Document>();
+  @ApiModelProperty(required = true, value = "Supplement documents")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  protected Set<Document> supplements = new HashSet<Document>();
 
   public String getName() {
     return name;
@@ -210,12 +205,12 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
     this.persistentId = persistentId;
   }
 
-  public Set<Document> getDocuments() {
-    return documents;
+  public Set<Document> getSupplements() {
+    return supplements;
   }
 
-  public void setDocuments(Set<Document> documents) {
-    this.documents = documents;
+  public void setSupplements(Set<Document> supplements) {
+    this.supplements = supplements;
   }
 
 

@@ -12,6 +12,17 @@
 
 package gov.nist.hit.core.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestStep;
@@ -26,17 +37,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 /**
  * @author Harold Affo (NIST)
  * 
@@ -46,116 +46,109 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "TestSteps", tags = "Test Steps")
 public class TestStepController {
 
-  Logger logger = LoggerFactory.getLogger(TestStepController.class);
+	Logger logger = LoggerFactory.getLogger(TestStepController.class);
 
-  @Autowired
-  private TestContextRepository testContextRepository;
+	@Autowired
+	private TestContextRepository testContextRepository;
 
-  @Autowired
-  private TestStepRepository testStepRepository;
+	@Autowired
+	private TestStepRepository testStepRepository;
 
-  @Autowired
-  protected TestCaseRepository testCaseRepository;
+	@Autowired
+	protected TestCaseRepository testCaseRepository;
 
-  @Autowired
-  private TestStepService testStepService;
+	@Autowired
+	private TestStepService testStepService;
 
-  @Autowired
-  private UserService userService;
+	@Autowired
+	private UserService userService;
 
-  @Autowired
-  private TestStepValidationReportService validationReportService;
+	@Autowired
+	private TestStepValidationReportService validationReportService;
 
-  /**
-   * find a test step by its id
-   * 
-   * @param teststepId
-   * @return
-   */
-  @ApiOperation(value = "Get a test step by its id", nickname = "getTestStepById")
-  @RequestMapping(value = "/{teststepId}", method = RequestMethod.GET,
-      produces = "application/json")
-  public TestStep testStep(
-      @ApiParam(value = "the id of the test step", required = true) @PathVariable final Long teststepId) {
-    logger.info("Fetching test step with id=" + teststepId);
-    TestStep testStep = testStepService.findOne(teststepId);
-    if (testStep == null) {
-      throw new TestCaseException(teststepId);
-    }
-    return testStep;
-  }
+	/**
+	 * find a test step by its id
+	 * 
+	 * @param teststepId
+	 * @return
+	 */
+	@ApiOperation(value = "Get a test step by its id", nickname = "getTestStepById")
+	@RequestMapping(value = "/{teststepId}", method = RequestMethod.GET, produces = "application/json")
+	public TestStep testStep(
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long teststepId) {
+		logger.info("Fetching test step with id=" + teststepId);
+		TestStep testStep = testStepService.findOne(teststepId);
+		if (testStep == null) {
+			throw new TestCaseException(teststepId);
+		}
+		return testStep;
+	}
 
-  /**
-   * find the test context of a test step
-   * 
-   * @param testStepId
-   * @return
-   */
-  @ApiOperation(value = "Get a test ste's test context by the test step's id",
-      nickname = "getTestStepTestContextByTestStepId")
-  @RequestMapping(value = "/{testStepId}/testcontext", method = RequestMethod.GET,
-      produces = "application/json")
-  public TestContext getTestStepTestContextByTestStepId(@ApiParam(
-      value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
-    logger.info("Fetching testContext from testStepId=" + testStepId);
-    TestContext testContext = testStep(testStepId).getTestContext();
-    if (testContext == null)
-      throw new TestCaseException("No testcontext available for teststep id=" + testStepId);
-    return testContext;
-  }
+	/**
+	 * find the test context of a test step
+	 * 
+	 * @param testStepId
+	 * @return
+	 */
+	@ApiOperation(value = "Get a test ste's test context by the test step's id", nickname = "getTestStepTestContextByTestStepId")
+	@RequestMapping(value = "/{testStepId}/testcontext", method = RequestMethod.GET, produces = "application/json")
+	public TestContext getTestStepTestContextByTestStepId(
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
+		logger.info("Fetching testContext from testStepId=" + testStepId);
+		TestContext testContext = testStep(testStepId).getTestContext();
+		if (testContext == null)
+			throw new TestCaseException("No testcontext available for teststep id=" + testStepId);
+		return testContext;
+	}
 
+	@ApiOperation(value = "Get a test step's details (juror document, test story etc...) by the test step's id", nickname = "getTestStepDetailByTestStepId")
+	@RequestMapping(value = "/{testStepId}/details", method = RequestMethod.GET)
+	public Map<String, Object> getTestStepDetailByTestStepId(
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
+		logger.info("Fetching artifacts of teststep with id=" + testStepId);
+		TestStep testStep = testStep(testStepId);
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("jurorDocument", testStep.getJurorDocument());
+		result.put("messageContent", testStep.getMessageContent());
+		result.put("testDataSpecification", testStep.getTestDataSpecification());
+		result.put("testStory", testStep.getTestStory());
+		result.put("supplements", testStep.getSupplements());
 
+		return result;
+	}
 
-  @ApiOperation(
-      value = "Get a test step's details (juror document, test story etc...) by the test step's id",
-      nickname = "getTestStepDetailByTestStepId")
-  @RequestMapping(value = "/{testStepId}/details", method = RequestMethod.GET)
-  public Map<String, TestArtifact> getTestStepDetailByTestStepId(@ApiParam(
-      value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
-    logger.info("Fetching artifacts of teststep with id=" + testStepId);
-    TestStep testStep = testStep(testStepId);
-    Map<String, TestArtifact> result = new HashMap<String, TestArtifact>();
-    result.put("jurorDocument", testStep.getJurorDocument());
-    result.put("messageContent", testStep.getMessageContent());
-    result.put("testDataSpecification", testStep.getTestDataSpecification());
-    result.put("testStory", testStep.getTestStory());
-    return result;
-  }
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/{testStepId}/jurordocument", method = RequestMethod.GET)
+	public TestArtifact tcJurordocument(@PathVariable final Long testStepId) {
+		logger.info("Fetching juror document of testcase/teststep with id=" + testStepId);
 
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/{testStepId}/jurordocument", method = RequestMethod.GET)
-  public TestArtifact tcJurordocument(@PathVariable final Long testStepId) {
-    logger.info("Fetching juror document of testcase/teststep with id=" + testStepId);
+		return testStepService.jurorDocument(testStepId);
 
-    return testStepService.jurorDocument(testStepId);
+	}
 
-  }
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/{testStepId}/messagecontent", method = RequestMethod.GET)
+	public TestArtifact tcMessageContent(@PathVariable final Long testStepId) {
+		logger.info("Fetching messagecontent of testcase/teststep with id=" + testStepId);
 
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/{testStepId}/messagecontent", method = RequestMethod.GET)
-  public TestArtifact tcMessageContent(@PathVariable final Long testStepId) {
-    logger.info("Fetching messagecontent of testcase/teststep with id=" + testStepId);
+		return testStepService.messageContent(testStepId);
 
-    return testStepService.messageContent(testStepId);
+	}
 
-  }
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/{testStepId}/teststory", method = RequestMethod.GET)
+	public TestArtifact tcTestStory(@PathVariable final Long testStepId) {
+		logger.info("Fetching teststory of testcase/teststep with id=" + testStepId);
 
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/{testStepId}/teststory", method = RequestMethod.GET)
-  public TestArtifact tcTestStory(@PathVariable final Long testStepId) {
-    logger.info("Fetching teststory of testcase/teststep with id=" + testStepId);
+		return testStepService.testStory(testStepId);
 
-    return testStepService.testStory(testStepId);
+	}
 
-  }
-
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/{testStepId}/tds", method = RequestMethod.GET)
-  public TestArtifact tcTestDataSpecification(@PathVariable final Long testStepId) {
-    logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testStepId);
-    return testStepService.testDataSpecification(testStepId);
-  }
-
-
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/{testStepId}/tds", method = RequestMethod.GET)
+	public TestArtifact tcTestDataSpecification(@PathVariable final Long testStepId) {
+		logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testStepId);
+		return testStepService.testDataSpecification(testStepId);
+	}
 
 }

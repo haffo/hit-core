@@ -885,7 +885,8 @@ public abstract class ResourcebundleLoader {
   }
 
   public void loadContextBasedTestCases() throws IOException {
-    List<Resource> resources = getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/");
+    List<Resource> resources =
+        ResourcebundleHelper.getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
@@ -899,7 +900,8 @@ public abstract class ResourcebundleLoader {
   }
 
   public void loadContextFreeTestCases() throws IOException, ProfileParserException {
-    List<Resource> resources = getDirectories(domainPath(CONTEXTFREE_PATTERN) + "*/");
+    List<Resource> resources =
+        ResourcebundleHelper.getDirectories(domainPath(CONTEXTFREE_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
@@ -936,10 +938,10 @@ public abstract class ResourcebundleLoader {
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").intValue());
     }
-    if (testCaseObj.has("documents")) {
-      tc.setDocuments(testDocuments(testCaseObj.findValue("documents")));
+    if (testCaseObj.has("supplements")) {
+      tc.getSupplements().addAll((testDocuments(location, testCaseObj.findValue("supplements"))));
     }
-    List<Resource> resources = getDirectories(location + "*");
+    List<Resource> resources = ResourcebundleHelper.getDirectories(location + "*");
     for (Resource resource : resources) {
       String fileName = fileName(resource);
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
@@ -1053,6 +1055,11 @@ public abstract class ResourcebundleLoader {
     if (!testingType.equals(TestingType.SUT_MANUAL) && !testingType.equals(TestingType.TA_MANUAL)) {
       testStep.setTestContext(testContext(location, testStepObj, stage));
     }
+
+    if (testStepObj.has("supplements")) {
+      testStep.getSupplements()
+          .addAll((testDocuments(location, testStepObj.findValue("supplements"))));
+    }
     testStep.setTestStory(testStory(location));
     testStep.setJurorDocument(jurorDocument(location));
     testStep.setMessageContent(messageContent(location));
@@ -1146,10 +1153,10 @@ public abstract class ResourcebundleLoader {
       } else {
         tcg.setPosition(1);
       }
-      if (testPlanObj.has("documents")) {
-        tcg.setDocuments(testDocuments(testPlanObj.findValue("documents")));
+      if (testPlanObj.has("supplements")) {
+        tcg.getSupplements().addAll(testDocuments(location, testPlanObj.findValue("supplements")));
       }
-      List<Resource> resources = getDirectories(location + "*/");
+      List<Resource> resources = ResourcebundleHelper.getDirectories(location + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
@@ -1211,10 +1218,10 @@ public abstract class ResourcebundleLoader {
       }
       tp.setTestPackage(testPackage(location));
       tp.setTestPlanSummary(testPlanSummary(location));
-      if (testPlanObj.has("documents")) {
-        tp.setDocuments(testDocuments(testPlanObj.findValue("documents")));
+      if (testPlanObj.has("supplements")) {
+        tp.getSupplements().addAll((testDocuments(location, testPlanObj.findValue("supplements"))));
       }
-      List<Resource> resources = getDirectories(location + "*/");
+      List<Resource> resources = ResourcebundleHelper.getDirectories(location + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String loca = fileName.substring(fileName.indexOf(location), fileName.length());
@@ -1254,11 +1261,12 @@ public abstract class ResourcebundleLoader {
       parent.setVersion(
           !testPlanObj.has("version") ? 1.0 : testPlanObj.findValue("version").doubleValue());
       parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
-      if (testPlanObj.has("documents")) {
-        parent.setDocuments(testDocuments(testPlanObj.findValue("documents")));
+      if (testPlanObj.has("supplements")) {
+        parent.getSupplements()
+            .addAll(testDocuments(testObjectPath, testPlanObj.findValue("supplements")));
       }
 
-      List<Resource> resources = getDirectories(testObjectPath + "*/");
+      List<Resource> resources = ResourcebundleHelper.getDirectories(testObjectPath + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
@@ -1457,7 +1465,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private Set<gov.nist.hit.core.domain.Document> testDocuments(JsonNode nodeObj) {
+  private Set<gov.nist.hit.core.domain.Document> testDocuments(String testPath, JsonNode nodeObj) {
     Set<gov.nist.hit.core.domain.Document> documents =
         new HashSet<gov.nist.hit.core.domain.Document>();
     Iterator<JsonNode> it = nodeObj.elements();
@@ -1465,15 +1473,27 @@ public abstract class ResourcebundleLoader {
       while (it.hasNext()) {
         JsonNode node = it.next();
         gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-        if (node.findValue("title") == null || node.findValue("link") == null
+        if (node.findValue("title") == null
+            || (node.findValue("link") == null && node.findValue("name") == null)
             || node.findValue("date") == null) {
           throw new IllegalArgumentException(
-              "The Download 'documents' field is missing one of those: title, link, date");
+              "The 'documents' field is missing one of those: title, link, name, date");
         }
-        document.setTitle(node.findValue("title").textValue());
-        document.setPath(node.findValue("link").textValue());
-        document.setDate(node.findValue("date").textValue());
-        document.setType(DocumentType.DELIVERABLE);
+        document
+            .setTitle(node.findValue("title") != null ? node.findValue("title").textValue() : null);
+        document
+            .setName(node.findValue("name") != null ? node.findValue("name").textValue() : null);
+        if (node.findValue("link") == null) {
+          document.setPath(node.findValue("name") != null
+              ? testPath + node.findValue("name").textValue() : null);
+        } else {
+          document.setPath(node.findValue("link").textValue());
+        }
+        document
+            .setDate(node.findValue("date") != null ? node.findValue("date").textValue() : null);
+        document.setType(DocumentType.TESTDOCUMENT);
+        document.setComments(
+            node.findValue("comments") != null ? node.findValue("comments").textValue() : null);
         documents.add(document);
       }
     }
@@ -1618,11 +1638,17 @@ public abstract class ResourcebundleLoader {
     this.obm = obm;
   }
 
-  public abstract List<Resource> getDirectories(String pattern) throws IOException;
+  public List<Resource> getDirectories(String pattern) throws IOException {
+    return ResourcebundleHelper.getDirectories(pattern);
+  }
 
-  public abstract Resource getResource(String pattern) throws IOException;
+  public Resource getResource(String pattern) throws IOException {
+    return ResourcebundleHelper.getResource(pattern);
+  }
 
-  public abstract List<Resource> getResources(String pattern) throws IOException;
+  public List<Resource> getResources(String pattern) throws IOException {
+    return ResourcebundleHelper.getResources(pattern);
+  }
 
 
 
