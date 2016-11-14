@@ -12,6 +12,40 @@
 
 package gov.nist.hit.core.service;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import gov.nist.auth.hit.core.repo.AccountRepository;
 import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.AppInfo;
@@ -59,40 +93,6 @@ import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
 import gov.nist.hit.core.service.util.ResourcebundleHelper;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public abstract class ResourcebundleLoader {
 
   static final public Logger logger = LoggerFactory.getLogger(ResourcebundleLoader.class);
@@ -139,19 +139,19 @@ public abstract class ResourcebundleLoader {
   public static final String REGISTRATION = "Registration.json";
 
   @Autowired
-  IntegrationProfileRepository integrationProfileRepository;
+  protected IntegrationProfileRepository integrationProfileRepository;
 
   @Autowired
-  MessageRepository messageRepository;
+  protected MessageRepository messageRepository;
 
   @Autowired
-  ConstraintsRepository constraintsRepository;
+  protected ConstraintsRepository constraintsRepository;
 
   @Autowired
-  AppInfoRepository appInfoRepository;
+  protected AppInfoRepository appInfoRepository;
 
   @Autowired
-  DocumentRepository documentRepository;
+  protected DocumentRepository documentRepository;
 
   @Autowired
   protected TestPlanRepository testPlanRepository;
@@ -261,7 +261,7 @@ public abstract class ResourcebundleLoader {
 
 
 
-  private void loadAppInfo() throws JsonProcessingException, IOException {
+  public void loadAppInfo() throws JsonProcessingException, IOException {
     logger.info("loading app info...");
     AppInfo appInfo = new AppInfo();
     JsonNode metaData = getMetaData();
@@ -270,64 +270,57 @@ public abstract class ResourcebundleLoader {
     appInfo.setAdminEmail(metaData.get("adminEmail").textValue());
     appInfo.setDomain(metaData.get("domain").textValue());
     appInfo.setHeader(metaData.get("header").textValue());
-    appInfo.setHomeTitle(metaData.get("homeTitle") != null ? metaData.get("homeTitle").textValue()
-        : null);
-    appInfo.setHomeContent(metaData.get("homeContent") != null ? metaData.get("homeContent")
-        .textValue() : null); // backward compatibility
+    appInfo.setHomeTitle(
+        metaData.get("homeTitle") != null ? metaData.get("homeTitle").textValue() : null);
+    appInfo.setHomeContent(
+        metaData.get("homeContent") != null ? metaData.get("homeContent").textValue() : null); // backward
+                                                                                               // compatibility
     appInfo.setName(metaData.get("name").textValue());
     appInfo.setVersion(metaData.get("version").textValue());
     appInfo.setDate(new Date().getTime() + "");
     Resource resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.PROFILE_PATTERN
-            + PROFILE_INFO_PATTERN);
+        this.getResource(ResourcebundleLoader.PROFILE_PATTERN + PROFILE_INFO_PATTERN);
     if (resource != null) {
       appInfo.setProfileInfo(FileUtil.getContent(resource));
     }
 
-    resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.VALUESET_PATTERN
-            + ResourcebundleLoader.VALUE_SET_COPYRIGHT_PATTERN);
+    resource = this.getResource(
+        ResourcebundleLoader.VALUESET_PATTERN + ResourcebundleLoader.VALUE_SET_COPYRIGHT_PATTERN);
     if (resource != null) {
       appInfo.setValueSetCopyright(FileUtil.getContent(resource));
     }
-    resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
-            + ResourcebundleLoader.CONFIDENTIALITY_PATTERN);
+    resource = this.getResource(
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.CONFIDENTIALITY_PATTERN);
     if (resource != null) {
       appInfo.setConfidentiality(FileUtil.getContent(resource));
     }
 
-    resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
-            + ResourcebundleLoader.DISCLAIMER_PATTERN);
+    resource = this
+        .getResource(ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.DISCLAIMER_PATTERN);
     if (resource != null) {
       appInfo.setDisclaimer(FileUtil.getContent(resource));
     }
 
-    resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
-            + ResourcebundleLoader.VALIDATIONRESULT_INFO_PATTERN);
+    resource = this.getResource(
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.VALIDATIONRESULT_INFO_PATTERN);
     if (resource != null) {
       appInfo.setValidationResultInfo(FileUtil.getContent(resource));
     }
 
-    resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
-            + ResourcebundleLoader.ACKNOWLEDGMENT_PATTERN);
+    resource = this.getResource(
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.ACKNOWLEDGMENT_PATTERN);
     if (resource != null) {
       appInfo.setAcknowledgment(FileUtil.getContent(resource));
     }
 
     resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
-            + ResourcebundleLoader.HOME_PATTERN);
+        this.getResource(ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.HOME_PATTERN);
     if (resource != null) {
       appInfo.setHomeContent(FileUtil.getContent(resource));
     }
 
-    resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
-            + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN);
+    resource = this.getResource(
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN);
     if (resource != null) {
       appInfo.setMessageContentInfo(FileUtil.getContent(resource));
     }
@@ -339,29 +332,28 @@ public abstract class ResourcebundleLoader {
     logger.info("loading app info...DONE");
   }
 
-  private void loadRegistration(AppInfo appInfo) throws JsonProcessingException, IOException {
+  public void loadRegistration(AppInfo appInfo) throws JsonProcessingException, IOException {
     Resource resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN
-            + ResourcebundleLoader.REGISTRATION);
+        this.getResource(ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.REGISTRATION);
     if (resource != null) {
       String content = FileUtil.getContent(resource);
       ObjectMapper mapper = new ObjectMapper();
       JsonNode node = mapper.readTree(content);
-      appInfo.setRegistrationTitle(node.findValue("title") != null ? node.findValue("title")
-          .textValue() : null);
-      appInfo.setRegistrationAgreement(node.findValue("agreement") != null ? node.findValue(
-          "agreement").textValue() : null);
-      appInfo.setRegistrationSubmittedContent(node.findValue("submittedContent") != null ? node
-          .findValue("submittedContent").textValue() : null);
-      appInfo.setRegistrationSubmittedTitle(node.findValue("submittedTitle") != null ? node
-          .findValue("submittedTitle").textValue() : null);
-      appInfo.setRegistrationAcceptanceTitle(node.findValue("acceptanceTitle") != null ? node
-          .findValue("acceptanceTitle").textValue() : null);
+      appInfo.setRegistrationTitle(
+          node.findValue("title") != null ? node.findValue("title").textValue() : null);
+      appInfo.setRegistrationAgreement(
+          node.findValue("agreement") != null ? node.findValue("agreement").textValue() : null);
+      appInfo.setRegistrationSubmittedContent(node.findValue("submittedContent") != null
+          ? node.findValue("submittedContent").textValue() : null);
+      appInfo.setRegistrationSubmittedTitle(node.findValue("submittedTitle") != null
+          ? node.findValue("submittedTitle").textValue() : null);
+      appInfo.setRegistrationAcceptanceTitle(node.findValue("acceptanceTitle") != null
+          ? node.findValue("acceptanceTitle").textValue() : null);
     }
   }
 
 
-  private void loadUserDocs() throws IOException {
+  public void loadUserDocs() throws IOException {
     logger.info("loading user documents...");
     Resource resource = getResource(USERDOCS_PATTERN + USERDOCS_FILE_PATTERN);
     if (resource != null) {
@@ -376,10 +368,10 @@ public abstract class ResourcebundleLoader {
           while (it.hasNext()) {
             JsonNode node = it.next();
             gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-            document.setPosition(node.findValue("order") != null ? node.findValue("order")
-                .intValue() : userDocs.size() + 1);
-            document.setTitle(node.findValue("title") != null ? node.findValue("title").textValue()
-                : null);
+            document.setPosition(node.findValue("order") != null
+                ? node.findValue("order").intValue() : userDocs.size() + 1);
+            document.setTitle(
+                node.findValue("title") != null ? node.findValue("title").textValue() : null);
             if (node.findValue("name") != null) {
               String path = node.findValue("name").textValue();
               if (path.endsWith("*")) {
@@ -392,11 +384,11 @@ public abstract class ResourcebundleLoader {
             } else if (node.findValue("link") != null) {
               document.setPath(node.findValue("link").textValue());
             }
-            document.setDate(node.findValue("date") != null ? node.findValue("date").textValue()
-                : null);
+            document.setDate(
+                node.findValue("date") != null ? node.findValue("date").textValue() : null);
             document.setType(DocumentType.USERDOC);
-            document.setComments(node.findValue("comments") != null ? node.findValue("comments")
-                .textValue() : null);
+            document.setComments(
+                node.findValue("comments") != null ? node.findValue("comments").textValue() : null);
             userDocs.add(document);
           }
           if (!userDocs.isEmpty()) {
@@ -408,7 +400,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private void loadTransport() throws IOException {
+  public void loadTransport() throws IOException {
     logger.info("loading protocols info...");
     JsonNode json = toJsonObj(TRANSPORT_PATTERN + TRANSPORT_CONF_PATTERN);
     if (json != null) {
@@ -422,17 +414,17 @@ public abstract class ResourcebundleLoader {
             TransportForms tForms = new TransportForms();
             tForms.setProtocol(node.findValue("protocol").textValue());
             tForms.setDomain(node.findValue("domain").textValue());
-            tForms.setDescription(node.findValue("description") != null ? node.findValue(
-                "description").textValue() : null);
+            tForms.setDescription(node.findValue("description") != null
+                ? node.findValue("description").textValue() : null);
             JsonNode forms = node.findValue("forms");
             if (forms.get("TA_INITIATOR") == null || forms.get("SUT_INITIATOR") == null) {
               throw new RuntimeException(
                   "Transport.json TA_INITIATOR or SUT_INITIATOR form is missing");
             }
-            tForms.setTaInitiatorForm(FileUtil.getContent(getResource(TRANSPORT_PATTERN
-                + forms.get("TA_INITIATOR").textValue())));
-            tForms.setSutInitiatorForm(FileUtil.getContent(getResource(TRANSPORT_PATTERN
-                + forms.get("SUT_INITIATOR").textValue())));
+            tForms.setTaInitiatorForm(FileUtil.getContent(
+                getResource(TRANSPORT_PATTERN + forms.get("TA_INITIATOR").textValue())));
+            tForms.setSutInitiatorForm(FileUtil.getContent(
+                getResource(TRANSPORT_PATTERN + forms.get("SUT_INITIATOR").textValue())));
             transportForms.add(tForms);
           } else {
             throw new RuntimeException(
@@ -466,14 +458,13 @@ public abstract class ResourcebundleLoader {
         String fileName = resource.getFilename();
         if (skipped == null || !skipped.contains(fileName)) {
           gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-          document.setTitle(resource.getFilename().substring(0,
-              resource.getFilename().indexOf(".xml")));
+          document.setTitle(
+              resource.getFilename().substring(0, resource.getFilename().indexOf(".xml")));
           document.setName(resource.getFilename());
           document.setPath(PROFILE_PATTERN + resource.getFilename());
           document.setType(DocumentType.PROFILE);
-          document
-              .setPosition(ordersObj != null && ordersObj.findValue(fileName) != null ? ordersObj
-                  .findValue(fileName).intValue() : 0);
+          document.setPosition(ordersObj != null && ordersObj.findValue(fileName) != null
+              ? ordersObj.findValue(fileName).intValue() : 0);
           resourceDocs.add(document);
         }
       }
@@ -498,14 +489,13 @@ public abstract class ResourcebundleLoader {
         String fileName = resource.getFilename();
         if (skipped == null || !skipped.contains(fileName)) {
           gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-          document.setTitle(resource.getFilename().substring(0,
-              resource.getFilename().indexOf(".xml")));
+          document.setTitle(
+              resource.getFilename().substring(0, resource.getFilename().indexOf(".xml")));
           document.setName(resource.getFilename());
           document.setPath(CONSTRAINT_PATTERN + resource.getFilename());
           document.setType(DocumentType.CONSTRAINT);
-          document
-              .setPosition(ordersObj != null && ordersObj.findValue(fileName) != null ? ordersObj
-                  .findValue(fileName).intValue() : 0);
+          document.setPosition(ordersObj != null && ordersObj.findValue(fileName) != null
+              ? ordersObj.findValue(fileName).intValue() : 0);
           resourceDocs.add(document);
         }
       }
@@ -534,14 +524,13 @@ public abstract class ResourcebundleLoader {
         String fileName = resource.getFilename();
         if (skipped == null || !skipped.contains(fileName)) {
           gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-          document.setTitle(resource.getFilename().substring(0,
-              resource.getFilename().indexOf(".xml")));
+          document.setTitle(
+              resource.getFilename().substring(0, resource.getFilename().indexOf(".xml")));
           document.setName(resource.getFilename());
           document.setPath(VALUESET_PATTERN + resource.getFilename());
           document.setType(DocumentType.TABLE);
-          document
-              .setPosition(ordersObj != null && ordersObj.findValue(fileName) != null ? ordersObj
-                  .findValue(fileName).intValue() : 0);
+          document.setPosition(ordersObj != null && ordersObj.findValue(fileName) != null
+              ? ordersObj.findValue(fileName).intValue() : 0);
           resourceDocs.add(document);
         }
       }
@@ -551,7 +540,7 @@ public abstract class ResourcebundleLoader {
 
 
 
-  private void loadResourcesDocs() throws IOException {
+  public void loadResourcesDocs() throws IOException {
     logger.info("loading resource documents...");
     List<gov.nist.hit.core.domain.Document> resourceDocs =
         new ArrayList<gov.nist.hit.core.domain.Document>();
@@ -563,7 +552,7 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private void loadKownIssues() throws IOException {
+  public void loadKownIssues() throws IOException {
     logger.info("loading known issues...");
     Resource resource = getResource(KNOWNISSUE_PATTERN + KNOWNISSUE_FILE_PATTERN);
     if (resource != null) {
@@ -578,19 +567,19 @@ public abstract class ResourcebundleLoader {
           while (it.hasNext()) {
             JsonNode node = it.next();
             gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-            document.setVersion(node.findValue("version") != null ? node.findValue("version")
-                .textValue() : null);
-            document.setTitle(node.findValue("title") != null ? node.findValue("title").textValue()
-                : null);
-            document.setName(node.findValue("name") != null ? node.findValue("name").textValue()
-                : null);
-            document.setPath(node.findValue("name") != null ? KNOWNISSUE_PATTERN
-                + node.findValue("name").textValue() : null);
-            document.setDate(node.findValue("date") != null ? node.findValue("date").textValue()
-                : null);
+            document.setVersion(
+                node.findValue("version") != null ? node.findValue("version").textValue() : null);
+            document.setTitle(
+                node.findValue("title") != null ? node.findValue("title").textValue() : null);
+            document.setName(
+                node.findValue("name") != null ? node.findValue("name").textValue() : null);
+            document.setPath(node.findValue("name") != null
+                ? KNOWNISSUE_PATTERN + node.findValue("name").textValue() : null);
+            document.setDate(
+                node.findValue("date") != null ? node.findValue("date").textValue() : null);
             document.setType(DocumentType.KNOWNISSUE);
-            document.setComments(node.findValue("comments") != null ? node.findValue("comments")
-                .textValue() : null);
+            document.setComments(
+                node.findValue("comments") != null ? node.findValue("comments").textValue() : null);
             knownIssues.add(document);
           }
           if (!knownIssues.isEmpty()) {
@@ -601,7 +590,7 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private void loadReleaseNotes() throws IOException {
+  public void loadReleaseNotes() throws IOException {
     logger.info("loading release notes...");
     Resource resource = getResource(RELEASENOTE_PATTERN + RELEASENOTE_FILE_PATTERN);
     if (resource != null) {
@@ -616,19 +605,19 @@ public abstract class ResourcebundleLoader {
           while (it.hasNext()) {
             JsonNode node = it.next();
             gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-            document.setVersion(node.findValue("version") != null ? node.findValue("version")
-                .textValue() : null);
-            document.setTitle(node.findValue("title") != null ? node.findValue("title").textValue()
-                : null);
-            document.setName(node.findValue("name") != null ? node.findValue("name").textValue()
-                : null);
-            document.setPath(node.findValue("name") != null ? RELEASENOTE_PATTERN
-                + node.findValue("name").textValue() : null);
-            document.setDate(node.findValue("date") != null ? node.findValue("date").textValue()
-                : null);
+            document.setVersion(
+                node.findValue("version") != null ? node.findValue("version").textValue() : null);
+            document.setTitle(
+                node.findValue("title") != null ? node.findValue("title").textValue() : null);
+            document.setName(
+                node.findValue("name") != null ? node.findValue("name").textValue() : null);
+            document.setPath(node.findValue("name") != null
+                ? RELEASENOTE_PATTERN + node.findValue("name").textValue() : null);
+            document.setDate(
+                node.findValue("date") != null ? node.findValue("date").textValue() : null);
             document.setType(DocumentType.RELEASENOTE);
-            document.setComments(node.findValue("comments") != null ? node.findValue("comments")
-                .textValue() : null);
+            document.setComments(
+                node.findValue("comments") != null ? node.findValue("comments").textValue() : null);
             releaseNotes.add(document);
           }
           if (!releaseNotes.isEmpty()) {
@@ -640,7 +629,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private void loadToolDownloads() throws IOException {
+  public void loadToolDownloads() throws IOException {
     logger.info("loading tool downloads...");
     JsonNode confObj = toJsonObj(TOOL_DOWNLOADS_PATTERN + TOOL_DOWNLOADS_CONF_PATTERN);
     if (confObj != null) {
@@ -702,11 +691,11 @@ public abstract class ResourcebundleLoader {
       });
       return resources.get(0);
     }
-    throw new IllegalArgumentException("Could not determine the most recent file matching "
-        + pathWithWilcard);
+    throw new IllegalArgumentException(
+        "Could not determine the most recent file matching " + pathWithWilcard);
   }
 
-  private void loadConstraints() throws IOException {
+  public void loadConstraints() throws IOException {
     logger.info("loading constraints...");
     List<Resource> resources = getResources(domainPath(CONSTRAINT_PATTERN) + "*.xml");
     if (resources != null && !resources.isEmpty()) {
@@ -714,6 +703,7 @@ public abstract class ResourcebundleLoader {
         String content = FileUtil.getContent(resource);
         Constraints constraints = constraint(content);
         cachedRepository.getCachedConstraints().put(constraints.getSourceId(), constraints);
+        this.constraintsRepository.save(constraints);
       }
     }
   }
@@ -738,7 +728,7 @@ public abstract class ResourcebundleLoader {
     return skipped;
   }
 
-  private void loadIntegrationProfiles() throws IOException {
+  public void loadIntegrationProfiles() throws IOException {
     logger.info("loading integration profiles...");
     List<Resource> resources = getResources(domainPath(PROFILE_PATTERN) + "*.xml");
     if (resources != null && !resources.isEmpty()) {
@@ -750,7 +740,7 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private void loadVocabularyLibraries() throws IOException {
+  public void loadVocabularyLibraries() throws IOException {
     logger.info("loading value set libraries...");
     List<Resource> resources = getResources(domainPath(VALUESET_PATTERN) + "*.xml");
     if (resources != null && !resources.isEmpty()) {
@@ -758,6 +748,7 @@ public abstract class ResourcebundleLoader {
         String content = FileUtil.getContent(resource);
         try {
           VocabularyLibrary vocabLibrary = vocabLibrary(content);
+          this.vocabularyLibraryRepository.save(vocabLibrary);
           cachedRepository.getCachedVocabLibraries().put(vocabLibrary.getSourceId(), vocabLibrary);
         } catch (UnsupportedOperationException e) {
         }
@@ -771,12 +762,11 @@ public abstract class ResourcebundleLoader {
     if (resource == null) {
       return null;
     }
-    Constraints constraints = new Constraints();
-    constraints.setXml(FileUtil.getContent(resource));
-    return constraints;
+    return constraint(FileUtil.getContent(resource));
+
   }
 
-  private IntegrationProfile integrationProfile(String content) {
+  protected IntegrationProfile integrationProfile(String content) {
     Document doc = this.stringToDom(content);
     IntegrationProfile integrationProfile = new IntegrationProfile();
     Element profileElement = (Element) doc.getElementsByTagName("ConformanceProfile").item(0);
@@ -787,14 +777,21 @@ public abstract class ResourcebundleLoader {
     Element conformanceProfilElementRoot =
         (Element) profileElement.getElementsByTagName("Messages").item(0);
     NodeList messages = conformanceProfilElementRoot.getElementsByTagName("Message");
+
+    // Message IDs
+    List<String> ids = new ArrayList<String>();
+
     for (int j = 0; j < messages.getLength(); j++) {
       Element elmCode = (Element) messages.item(j);
       String id = elmCode.getAttribute("ID");
+      ids.add(id);
+
       if (cachedRepository.getCachedProfiles().containsKey(id)) {
         throw new RuntimeException("Found duplicate conformance profile id " + id);
       }
       cachedRepository.getCachedProfiles().put(id, integrationProfile);
     }
+    integrationProfile.setMessages(ids);
     return integrationProfile;
   }
 
@@ -807,15 +804,17 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  private Constraints constraint(String content) {
+  protected Constraints constraint(String content) {
     Document doc = this.stringToDom(content);
     Constraints constraints = new Constraints();
+    constraints.setXml(content);
     Element constraintsElement = (Element) doc.getElementsByTagName("ConformanceContext").item(0);
     constraints.setSourceId(constraintsElement.getAttribute("UUID"));
+
     Element metaDataElement = (Element) constraintsElement.getElementsByTagName("MetaData").item(0);
-    constraints.setDescription(metaDataElement.getAttribute("Description"));
-    constraints.setXml(content);
-    constraintsRepository.save(constraints);
+    if (metaDataElement != null)
+      constraints.setDescription(metaDataElement.getAttribute("Description"));
+
     return constraints;
   }
 
@@ -838,14 +837,12 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  protected String jsonConformanceProfile(String integrationProfileXml,
-      String conformanceProfileId, String constraintsXml, String additionalConstraintsXml)
-      throws ProfileParserException, JsonProcessingException,
-      com.fasterxml.jackson.core.JsonProcessingException {
+  protected String jsonConformanceProfile(String integrationProfileXml, String conformanceProfileId,
+      String constraintsXml, String additionalConstraintsXml) throws ProfileParserException,
+      JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {
     try {
-      ProfileModel profileModel =
-          parseProfile(integrationProfileXml, conformanceProfileId, constraintsXml,
-              additionalConstraintsXml);
+      ProfileModel profileModel = parseProfile(integrationProfileXml, conformanceProfileId,
+          constraintsXml, additionalConstraintsXml);
       String json = obm.writeValueAsString(profileModel);
       return json;
     } catch (UnsupportedOperationException e) {
@@ -887,14 +884,14 @@ public abstract class ResourcebundleLoader {
     return path;
   }
 
-  private void loadContextBasedTestCases() throws IOException {
-    List<Resource> resources = getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/");
+  public void loadContextBasedTestCases() throws IOException {
+    List<Resource> resources =
+        ResourcebundleHelper.getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
-        String location =
-            fileName.substring(fileName.indexOf(domainPath(CONTEXTBASED_PATTERN)),
-                fileName.length());
+        String location = fileName.substring(fileName.indexOf(domainPath(CONTEXTBASED_PATTERN)),
+            fileName.length());
         TestPlan testPlan = testPlan(location, TestingStage.CB);
         if (testPlan != null)
           testPlanRepository.save(testPlan);
@@ -902,14 +899,14 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private void loadContextFreeTestCases() throws IOException, ProfileParserException {
-    List<Resource> resources = getDirectories(domainPath(CONTEXTFREE_PATTERN) + "*/");
+  public void loadContextFreeTestCases() throws IOException, ProfileParserException {
+    List<Resource> resources =
+        ResourcebundleHelper.getDirectories(domainPath(CONTEXTFREE_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
-        CFTestInstance testObject =
-            testObject(fileName.substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)),
-                fileName.length()));
+        CFTestInstance testObject = testObject(fileName
+            .substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)), fileName.length()));
         if (testObject != null) {
           testObject.setRoot(true);
           testInstanceRepository.save(testObject);
@@ -918,24 +915,33 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private TestCase testCase(String location, TestingStage stage, boolean transportSupported)
+  protected TestCase testCase(String location, TestingStage stage, boolean transportSupported)
       throws IOException {
     logger.info("Processing test case located at:" + location);
     TestCase tc = new TestCase();
-    Resource res = ResourcebundleHelper.getResource(location + "TestCase.json");
+    Resource res = this.getResource(location + "TestCase.json");
     if (res == null)
       throw new IllegalArgumentException("No TestCase.json found at " + location);
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testCaseObj = mapper.readTree(descriptorContent);
     tc.setName(testCaseObj.findValue("name").textValue());
+    if (testCaseObj.has("id")) {
+      tc.setPersistentId(testCaseObj.findValue("id").longValue());
+    }
     tc.setDescription(testCaseObj.findValue("description").textValue());
+    tc.setVersion(
+        !testCaseObj.has("version") ? 1.0 : testCaseObj.findValue("version").doubleValue());
+
     tc.setTestStory(testStory(location));
     tc.setJurorDocument(jurorDocument(location));
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").intValue());
     }
-    List<Resource> resources = getDirectories(location + "*");
+    if (testCaseObj.has("supplements")) {
+      tc.getSupplements().addAll((testDocuments(location, testCaseObj.findValue("supplements"))));
+    }
+    List<Resource> resources = ResourcebundleHelper.getDirectories(location + "*");
     for (Resource resource : resources) {
       String fileName = fileName(resource);
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
@@ -980,9 +986,9 @@ public abstract class ResourcebundleLoader {
           }
         }
         Map.Entry<String, JsonNode> targetPair = node.findValue("target").fields().next();
-        TestStepFieldPair target =
-            new TestStepFieldPair(findTestStep(tc.getTestSteps(),
-                parseTestStepPosition(targetPair.getKey())), targetPair.getValue().asText());
+        TestStepFieldPair target = new TestStepFieldPair(
+            findTestStep(tc.getTestSteps(), parseTestStepPosition(targetPair.getKey())),
+            targetPair.getValue().asText());
         if (source != null && target != null) {
           DataMapping dataMapping = new DataMapping(source, target, tc);
           logger.info("Saving data mapping : " + dataMapping.toString());
@@ -1011,27 +1017,30 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  private TestStep testStep(String location, TestingStage stage, boolean transportSupported)
+  protected TestStep testStep(String location, TestingStage stage, boolean transportSupported)
       throws IOException {
     logger.info("Processing test step at:" + location);
     TestStep testStep = new TestStep();
-    Resource res = ResourcebundleHelper.getResource(location + "TestStep.json");
+    Resource res = this.getResource(location + "TestStep.json");
     if (res == null)
       throw new IllegalArgumentException("No TestStep.json found at " + location);
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testStepObj = mapper.readTree(descriptorContent);
     testStep.setName(testStepObj.findValue("name").textValue());
+    if (testStepObj.has("id")) {
+      testStep.setPersistentId(testStepObj.findValue("id").longValue());
+    }
     testStep.setDescription(testStepObj.findValue("description").textValue());
+    testStep.setVersion(
+        !testStepObj.has("version") ? 1.0 : testStepObj.findValue("version").doubleValue());
     JsonNode ttypeObj = testStepObj.findValue("type");
     String tttypeValue = ttypeObj != null ? ttypeObj.textValue() : null;
-    TestingType testingType =
-        tttypeValue != null && !"".equals(tttypeValue) ? TestingType.valueOf(tttypeValue)
-            : TestingType.DATAINSTANCE;
+    TestingType testingType = tttypeValue != null && !"".equals(tttypeValue)
+        ? TestingType.valueOf(tttypeValue) : TestingType.DATAINSTANCE;
     testStep.setTestingType(testingType);
-    if (transportSupported
-        && (TestingType.SUT_INITIATOR.equals(testingType) || TestingType.TA_INITIATOR
-            .equals(testingType))) {
+    if (transportSupported && (TestingType.SUT_INITIATOR.equals(testingType)
+        || TestingType.TA_INITIATOR.equals(testingType))) {
       JsonNode protocolsNode = testStepObj.findValue("protocols");
       if (protocolsNode == null || !protocolsNode.isArray()) {
         throw new IllegalArgumentException(
@@ -1045,6 +1054,11 @@ public abstract class ResourcebundleLoader {
 
     if (!testingType.equals(TestingType.SUT_MANUAL) && !testingType.equals(TestingType.TA_MANUAL)) {
       testStep.setTestContext(testContext(location, testStepObj, stage));
+    }
+
+    if (testStepObj.has("supplements")) {
+      testStep.getSupplements()
+          .addAll((testDocuments(location, testStepObj.findValue("supplements"))));
     }
     testStep.setTestStory(testStory(location));
     testStep.setJurorDocument(jurorDocument(location));
@@ -1068,14 +1082,14 @@ public abstract class ResourcebundleLoader {
     TestArtifact doc = null;
 
     String path = location + type + ".html";
-    Resource resource = ResourcebundleHelper.getResource(path);
+    Resource resource = this.getResource(path);
     if (resource != null) {
       doc = doc == null ? new TestArtifact(type) : doc;
       doc.setHtml(FileUtil.getContent(resource));
     }
 
     path = location + type + ".pdf";
-    resource = ResourcebundleHelper.getResource(path);
+    resource = this.getResource(path);
     if (resource != null) {
       doc = doc == null ? new TestArtifact(type) : doc;
       doc.setPdfPath(path);
@@ -1084,7 +1098,7 @@ public abstract class ResourcebundleLoader {
 
     if (type.equals("TestStory")) { // TODO: Temporary hack
       path = location + type + ".json";
-      resource = ResourcebundleHelper.getResource(path);
+      resource = this.getResource(path);
       if (resource != null) {
         doc = doc == null ? new TestArtifact(type) : doc;
         doc.setJson(FileUtil.getContent(resource));
@@ -1115,10 +1129,10 @@ public abstract class ResourcebundleLoader {
 
 
 
-  private TestCaseGroup testCaseGroup(String location, TestingStage stage, boolean transportEnabled)
-      throws IOException {
+  protected TestCaseGroup testCaseGroup(String location, TestingStage stage,
+      boolean transportEnabled) throws IOException {
     logger.info("Processing test case group at:" + location);
-    Resource descriptorRsrce = ResourcebundleHelper.getResource(location + "TestCaseGroup.json");
+    Resource descriptorRsrce = this.getResource(location + "TestCaseGroup.json");
     if (descriptorRsrce == null)
       throw new IllegalArgumentException("No TestCaseGroup.json found at " + location);
     String descriptorContent = FileUtil.getContent(descriptorRsrce);
@@ -1127,19 +1141,27 @@ public abstract class ResourcebundleLoader {
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       TestCaseGroup tcg = new TestCaseGroup();
       tcg.setName(testPlanObj.findValue("name").textValue());
+      if (testPlanObj.has("id")) {
+        tcg.setPersistentId(testPlanObj.findValue("id").longValue());
+      }
       tcg.setDescription(testPlanObj.findValue("description").textValue());
+      tcg.setVersion(
+          !testPlanObj.has("version") ? 1.0 : testPlanObj.findValue("version").doubleValue());
       tcg.setTestStory(testStory(location));
       if (testPlanObj.findValue("position") != null) {
         tcg.setPosition(testPlanObj.findValue("position").intValue());
       } else {
         tcg.setPosition(1);
       }
-      List<Resource> resources = getDirectories(location + "*/");
+      if (testPlanObj.has("supplements")) {
+        tcg.getSupplements().addAll(testDocuments(location, testPlanObj.findValue("supplements")));
+      }
+      List<Resource> resources = ResourcebundleHelper.getDirectories(location + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
         Resource descriptorResource = getDescriptorResource(tcLocation);
-        if(descriptorResource!=null) {
+        if (descriptorResource != null) {
           String filename = descriptorResource.getFilename();
           if (filename.endsWith("TestCaseGroup.json")) {
             TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage, transportEnabled);
@@ -1156,9 +1178,9 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private TestPlan testPlan(String location, TestingStage stage) throws IOException {
+  protected TestPlan testPlan(String location, TestingStage stage) throws IOException {
     logger.info("Processing test plan  at:" + location);
-    Resource res = ResourcebundleHelper.getResource(location + "TestPlan.json");
+    Resource res = this.getResource(location + "TestPlan.json");
     if (res == null)
       throw new IllegalArgumentException("No TestPlan.json found at " + location);
     String descriptorContent = FileUtil.getContent(res);
@@ -1166,24 +1188,29 @@ public abstract class ResourcebundleLoader {
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       TestPlan tp = new TestPlan();
+      if (testPlanObj.has("id")) {
+        tp.setPersistentId(testPlanObj.findValue("id").asLong());
+      }
       tp.setName(testPlanObj.findValue("name").textValue());
       tp.setDescription(testPlanObj.findValue("description").textValue());
+      tp.setVersion(
+          !testPlanObj.has("version") ? 1.0 : testPlanObj.findValue("version").doubleValue());
       tp.setTestStory(testStory(location));
       tp.setStage(stage);
 
       if (testPlanObj.findValue("transport") != null
           && testPlanObj.findValue("transport").booleanValue()
           && (testPlanObj.findValue("domain") == null
-              || testPlanObj.findValue("domain").textValue() == null || testPlanObj.findValue(
-              "domain").textValue() == "")) {
+              || testPlanObj.findValue("domain").textValue() == null
+              || testPlanObj.findValue("domain").textValue() == "")) {
         throw new IllegalArgumentException(
             "Transport is supported for the following test plan but no domain is defined. Test Plan location="
                 + location);
       }
-      tp.setDomain(testPlanObj.findValue("domain") != null ? testPlanObj.findValue("domain")
-          .textValue() : null);
-      tp.setTransport(testPlanObj.findValue("transport") != null ? testPlanObj.findValue(
-          "transport").booleanValue() : false);
+      tp.setDomain(testPlanObj.findValue("domain") != null
+          ? testPlanObj.findValue("domain").textValue() : null);
+      tp.setTransport(testPlanObj.findValue("transport") != null
+          ? testPlanObj.findValue("transport").booleanValue() : false);
       if (testPlanObj.findValue("position") != null) {
         tp.setPosition(testPlanObj.findValue("position").intValue());
       } else {
@@ -1191,7 +1218,10 @@ public abstract class ResourcebundleLoader {
       }
       tp.setTestPackage(testPackage(location));
       tp.setTestPlanSummary(testPlanSummary(location));
-      List<Resource> resources = getDirectories(location + "*/");
+      if (testPlanObj.has("supplements")) {
+        tp.getSupplements().addAll((testDocuments(location, testPlanObj.findValue("supplements"))));
+      }
+      List<Resource> resources = ResourcebundleHelper.getDirectories(location + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String loca = fileName.substring(fileName.indexOf(location), fileName.length());
@@ -1210,9 +1240,9 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  private CFTestInstance testObject(String testObjectPath) throws IOException {
+  protected CFTestInstance testObject(String testObjectPath) throws IOException {
     logger.info("Processing test object at:" + testObjectPath);
-    Resource res = ResourcebundleHelper.getResource(testObjectPath + "TestObject.json");
+    Resource res = this.getResource(testObjectPath + "TestObject.json");
     if (res == null)
       throw new IllegalArgumentException("No TestObject.json found at " + testObjectPath);
     String descriptorContent = FileUtil.getContent(res);
@@ -1221,12 +1251,22 @@ public abstract class ResourcebundleLoader {
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
       CFTestInstance parent = new CFTestInstance();
       parent.setName(testPlanObj.findValue("name").textValue());
+      if (testPlanObj.has("id")) {
+        parent.setPersistentId(testPlanObj.findValue("id").asLong());
+      }
       if (testPlanObj.findValue("position") != null) {
         parent.setPosition(testPlanObj.findValue("position").intValue());
       }
       parent.setDescription(testPlanObj.findValue("description").textValue());
+      parent.setVersion(
+          !testPlanObj.has("version") ? 1.0 : testPlanObj.findValue("version").doubleValue());
       parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
-      List<Resource> resources = getDirectories(testObjectPath + "*/");
+      if (testPlanObj.has("supplements")) {
+        parent.getSupplements()
+            .addAll(testDocuments(testObjectPath, testPlanObj.findValue("supplements")));
+      }
+
+      List<Resource> resources = ResourcebundleHelper.getDirectories(testObjectPath + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
@@ -1235,24 +1275,21 @@ public abstract class ResourcebundleLoader {
           parent.getChildren().add(testObject);
         }
       }
-
       return parent;
     }
     return null;
   }
 
-  private void loadTestCasesDocumentation() throws IOException {
-    TestCaseDocumentation doc =
-        generateTestObjectDocumentation("Context-free", TestingStage.CF,
-            testInstanceRepository.findAllAsRoot());
+  public void loadTestCasesDocumentation() throws IOException {
+    TestCaseDocumentation doc = generateTestObjectDocumentation("Context-free", TestingStage.CF,
+        testInstanceRepository.findAllAsRoot());
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
       testCaseDocumentationRepository.save(doc);
     }
 
-    doc =
-        generateTestCaseDocumentation("Context-based", TestingStage.CB,
-            testPlanRepository.findAllByStage(TestingStage.CB));
+    doc = generateTestCaseDocumentation("Context-based", TestingStage.CB,
+        testPlanRepository.findAllByStage(TestingStage.CB));
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
       testCaseDocumentationRepository.save(doc);
@@ -1385,24 +1422,21 @@ public abstract class ResourcebundleLoader {
       doc.setTpsPath(tp.getTestPlanSummary() != null ? tp.getTestPlanSummary().getPdfPath() : null);
     } else if (ts instanceof TestStep) {
       TestStep tStep = (TestStep) ts;
-      doc.setMcPath(tStep.getMessageContent() != null ? tStep.getMessageContent().getPdfPath()
-          : null);
-      doc.setTdsPath(tStep.getTestDataSpecification() != null ? tStep.getTestDataSpecification()
-          .getPdfPath() : null);
-      doc.setJdPath(tStep.getJurorDocument() != null ? tStep.getJurorDocument().getPdfPath() : null);
+      doc.setMcPath(
+          tStep.getMessageContent() != null ? tStep.getMessageContent().getPdfPath() : null);
+      doc.setTdsPath(tStep.getTestDataSpecification() != null
+          ? tStep.getTestDataSpecification().getPdfPath() : null);
+      doc.setJdPath(
+          tStep.getJurorDocument() != null ? tStep.getJurorDocument().getPdfPath() : null);
     }
     return doc;
   }
 
   protected Resource getDescriptorResource(String location) throws IOException {
-    Resource resource = ResourcebundleHelper.getResource(location + "TestPlan.json");
-    resource =
-        resource == null ? ResourcebundleHelper.getResource(location + "TestCaseGroup.json")
-            : resource;
-    resource =
-        resource == null ? ResourcebundleHelper.getResource(location + "TestCase.json") : resource;
-    resource =
-        resource == null ? ResourcebundleHelper.getResource(location + "TestStep.json") : resource;
+    Resource resource = this.getResource(location + "TestPlan.json");
+    resource = resource == null ? this.getResource(location + "TestCaseGroup.json") : resource;
+    resource = resource == null ? this.getResource(location + "TestCase.json") : resource;
+    resource = resource == null ? this.getResource(location + "TestStep.json") : resource;
     resource = resource == null ? null : resource;
     return resource;
   }
@@ -1430,6 +1464,41 @@ public abstract class ResourcebundleLoader {
     return mapper.readTree(FileUtil.getContent(resource));
   }
 
+
+  private Set<gov.nist.hit.core.domain.Document> testDocuments(String testPath, JsonNode nodeObj) {
+    Set<gov.nist.hit.core.domain.Document> documents =
+        new HashSet<gov.nist.hit.core.domain.Document>();
+    Iterator<JsonNode> it = nodeObj.elements();
+    if (it != null) {
+      while (it.hasNext()) {
+        JsonNode node = it.next();
+        gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+        if (node.findValue("title") == null
+            || (node.findValue("link") == null && node.findValue("name") == null)
+            || node.findValue("date") == null) {
+          throw new IllegalArgumentException(
+              "The 'documents' field is missing one of those: title, link, name, date");
+        }
+        document
+            .setTitle(node.findValue("title") != null ? node.findValue("title").textValue() : null);
+        document
+            .setName(node.findValue("name") != null ? node.findValue("name").textValue() : null);
+        if (node.findValue("link") == null) {
+          document.setPath(node.findValue("name") != null
+              ? testPath + node.findValue("name").textValue() : null);
+        } else {
+          document.setPath(node.findValue("link").textValue());
+        }
+        document
+            .setDate(node.findValue("date") != null ? node.findValue("date").textValue() : null);
+        document.setType(DocumentType.TESTDOCUMENT);
+        document.setComments(
+            node.findValue("comments") != null ? node.findValue("comments").textValue() : null);
+        documents.add(document);
+      }
+    }
+    return documents;
+  }
 
   public TestPlanRepository getTestPlanRepository() {
     return testPlanRepository;
@@ -1535,7 +1604,8 @@ public abstract class ResourcebundleLoader {
     return vocabularyLibraryRepository;
   }
 
-  public void setVocabularyLibraryRepository(VocabularyLibraryRepository vocabularyLibraryRepository) {
+  public void setVocabularyLibraryRepository(
+      VocabularyLibraryRepository vocabularyLibraryRepository) {
     this.vocabularyLibraryRepository = vocabularyLibraryRepository;
   }
 

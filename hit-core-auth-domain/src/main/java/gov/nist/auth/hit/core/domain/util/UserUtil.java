@@ -20,8 +20,8 @@ import java.util.Random;
  */
 public class UserUtil {
 
-  public static final String[] AUTHORITY_LIST = {"user", "tester", "supervisor", "admin"};
-  public static final String[] ACCOUNT_TYPE_LIST = {"tester", "supervisor", "admin"};
+  public static final String[] AUTHORITY_LIST = {"user", "tester", "supervisor", "deployer", "admin"};
+  public static final String[] ACCOUNT_TYPE_LIST = {"tester", "supervisor", "deployer", "admin"};
 
   public static String generateRandom() {
     int mon = Calendar.getInstance().get(Calendar.MONTH);

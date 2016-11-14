@@ -13,6 +13,7 @@
 package gov.nist.hit.core.repo;
 
 import gov.nist.hit.core.domain.TestArtifact;
+import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestingStage;
 
@@ -42,5 +43,7 @@ public interface TestStepRepository extends JpaRepository<TestStep, Long> {
   @Query("select testStep from TestStep testStep where testStep.testContext != null and  testStep.testContext.id = :testContextId")
   public TestStep findOneByTestContextId(@Param("testContextId") Long testContextId);
 
+  @Query("select ts from TestStep ts where ts.persistentId = :id")
+  public TestStep getByPersistentId(@Param("id") Long id);
 
 }

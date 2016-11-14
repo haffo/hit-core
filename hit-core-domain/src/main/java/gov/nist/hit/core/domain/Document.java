@@ -7,10 +7,7 @@
  */
 package gov.nist.hit.core.domain;
 
-import io.swagger.annotations.ApiModel;
-
 import java.io.Serializable;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -18,16 +15,16 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import io.swagger.annotations.ApiModel;
 
 /**
  * @author Harold Affo (NIST)
  */
 @Entity
-@ApiModel(value="ConfoDocumentrmanceProfile", description="Data Model representing a document")
+@ApiModel(value = "Document", description = "Data Model representing a document")
 public class Document implements Serializable {
 
   @Id
@@ -37,11 +34,11 @@ public class Document implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String title;
-  
+
   private String name;
-  
-  private String path; 
-    
+
+  private String path;
+
   private String version;
 
   private String comments;
@@ -49,7 +46,7 @@ public class Document implements Serializable {
   private String date;
 
   private int position;
-  
+
   @JsonIgnore
   @Enumerated(EnumType.STRING)
   private DocumentType type;
@@ -58,42 +55,46 @@ public class Document implements Serializable {
     super();
   }
 
-//  public Document(DocumentType type, String title, String description, String path, String version, String format,
-//      String date) {
-//    this(type,title, description, path, version, format, date);
-//   }
+  // public Document(DocumentType type, String title, String description, String path, String
+  // version, String format,
+  // String date) {
+  // this(type,title, description, path, version, format, date);
+  // }
 
-//  public Document(DocumentType type,String title, String description, String path, String version) {
-//    this(type, title, description, path, version);
-//    }
+  // public Document(DocumentType type,String title, String description, String path, String
+  // version) {
+  // this(type, title, description, path, version);
+  // }
 
-//  public Document(DocumentType type, String title, String description, String path, String version, String format,
-//      String date) {
-//    super();
-//    this.title = title;
-//    this.description = description;
-//    this.path = path;
-//    this.version = version;
-//    this.format = format;
-//    this.date = date;
-//    this.type = type;
-//  }
-//
-//  public Document(DocumentType type, String title, String description, String path, String version) {
-//    super();
-//    this.title = title;
-//    this.description = description;
-//    this.path = path;
-//    this.version = version;
-//  }
-//
-//  public Document(DocumentType type, String title, String description) {
-//    this(type,title, description, null, null);
-//  }
-//
-//  public Document(DocumentType type, String title, String description, String path) {
-//    this(type,title, description, path, null);
-//  }
+  // public Document(DocumentType type, String title, String description, String path, String
+  // version, String format,
+  // String date) {
+  // super();
+  // this.title = title;
+  // this.description = description;
+  // this.path = path;
+  // this.version = version;
+  // this.format = format;
+  // this.date = date;
+  // this.type = type;
+  // }
+  //
+  // public Document(DocumentType type, String title, String description, String path, String
+  // version) {
+  // super();
+  // this.title = title;
+  // this.description = description;
+  // this.path = path;
+  // this.version = version;
+  // }
+  //
+  // public Document(DocumentType type, String title, String description) {
+  // this(type,title, description, null, null);
+  // }
+  //
+  // public Document(DocumentType type, String title, String description, String path) {
+  // this(type,title, description, path, null);
+  // }
 
   public String getPath() {
     return path;
@@ -167,5 +168,5 @@ public class Document implements Serializable {
     this.name = name;
   }
 
- 
+
 }

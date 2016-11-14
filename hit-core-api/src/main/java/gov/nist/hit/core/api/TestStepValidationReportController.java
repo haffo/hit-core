@@ -13,15 +13,16 @@
 package gov.nist.hit.core.api;
 
 import gov.nist.auth.hit.core.domain.Account;
-import gov.nist.hit.core.domain.TestResult;
-import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.domain.TestStepValidationReportRequest;
+import gov.nist.auth.hit.core.domain.UserTestStepReport;
+import gov.nist.auth.hit.core.service.UserTestStepReportService;
+import gov.nist.hit.core.domain.*;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
+import gov.nist.hit.core.service.exception.TestStepException;
+import gov.nist.hit.core.service.exception.UserNotFoundException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -69,6 +70,9 @@ public class TestStepValidationReportController {
 
   @Autowired
   private AccountService userService;
+
+  @Autowired
+  private UserTestStepReportService userTestStepReportService;
 
 
   @ApiOperation(value = "", hidden = true)
@@ -225,6 +229,61 @@ public class TestStepValidationReportController {
   // }
   // }
 
+  @ApiOperation(value = "Download the persistent message validation report of a test step by its testStep id and its user's account",
+      nickname = "downloadPersistentUserTestStepReport",
+      produces = "text/html,application/msword,application/xml,application/pdf")
+  @RequestMapping(value = "/downloadPersistentUserTestStepReport", method = RequestMethod.POST,
+      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+  public void downloadPersistentUserTestStepReport(
+      @ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
+      @ApiParam(value = "the account id of the user", required = true) @RequestParam("accountId") final Long accountId,
+      @ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") Long testStepId,
+      HttpServletRequest request, HttpServletResponse response) {
+    try {
+      logger.info("Downloading validation report  in " + format);
+      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+      if (userId == null || (userService.findOne(userId) == null))
+        throw new MessageValidationException("Invalid user credentials");
+      if (format == null)
+        throw new ValidationReportException("No format specified");
+      TestStep testStep = testStepService.findOne(testStepId);
+      if(testStep==null){
+        throw new TestStepException(testStepId);
+      }
+      UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(accountId,testStep.getPersistentId());
+      if(userTestStepReport==null){
+        logger.error("No testStep Report for account "+accountId+" and testStep "+testStepId);
+        throw new ValidationReportException("No testStepReport for account "+accountId+" and testStep "+testStepId);
+      }
+      if (userTestStepReport.getXml()==null) {
+        throw new ValidationReportException("No validation report available for this test step");
+      }
+      String title = testStep.getName();
+      String ext = format.toLowerCase();
+      InputStream io = null;
+      if ("HTML".equalsIgnoreCase(format)) {
+        io = IOUtils.toInputStream(validationReportService.generateHtml(userTestStepReport.getXml()), "UTF-8");
+        response.setContentType("text/html");
+      } else if ("XML".equalsIgnoreCase(format)) {
+        io = IOUtils.toInputStream(userTestStepReport.getXml(), "UTF-8");
+        response.setContentType("application/xml");
+      } else if ("PDF".equalsIgnoreCase(format)) {
+        io = validationReportService.generatePdf(userTestStepReport.getXml());
+        response.setContentType("application/pdf");
+      } else {
+        throw new ValidationReportException("Unsupported report format " + format);
+      }
+      title = title.replaceAll(" ", "-");
+      response.setHeader("Content-disposition", "attachment;filename=" + title
+          + "-ValidationReport." + ext);
+      FileCopyUtils.copy(io, response.getOutputStream());
+    } catch (ValidationReportException | IOException e) {
+      throw new ValidationReportException("Failed to generate the report");
+    } catch (Exception e) {
+      throw new ValidationReportException("Failed to generate the report");
+    }
+  }
+
   @ApiOperation(value = "Download the message validation report of a test step by its id",
       nickname = "download",
       produces = "text/html,application/msword,application/xml,application/pdf")
@@ -356,6 +415,32 @@ public class TestStepValidationReportController {
   // return true;
   // }
 
+  @ApiOperation(value = "", hidden = true)
+  @RequestMapping(value = "/savePersistentUserTestStepReport", method = RequestMethod.POST, produces = "application/json")
+  public UserTestStepReport savePersistentUserTestStepReport(@RequestBody UserTestStepReportRequest command,HttpServletRequest request, HttpServletResponse response) {
+    logger.info("Saving persistent test step report");
+    try {
+      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+      Account user = userService.findOne(userId);
+      if(user==null){
+        logger.error("Account "+userId+" not found");
+        throw new UserNotFoundException("Account "+userId+" not found");
+      }
+      Long testStepId = command.getTestStepId();
+      TestStep testStep = testStepService.findOne(testStepId);
+      if(testStep==null){
+        throw new TestStepException(testStepId);
+      }
+      TestStepValidationReport report =
+              validationReportService.findOneByTestStepAndUser(testStep.getPersistentId(), userId);
+      UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user.getId(),testStep.getPersistentId(),report.getComments());
+      userTestStepReport = userTestStepReportService.save(userTestStepReport);
+      return userTestStepReport;
+    } catch (UserNotFoundException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
 
   @ApiOperation(value = "", hidden = true)
   @RequestMapping(value = "/update", method = RequestMethod.POST, produces = "application/json")

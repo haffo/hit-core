@@ -1,3 +1,5 @@
+package gov.nist.hit.core.domain;
+
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
  * the Federal Government in the course of their official duties. Pursuant to title 17 Section 105
@@ -8,22 +10,28 @@
  * used. This software can be redistributed and/or modified freely provided that any derivative
  * works bear some notice that they are derived from it, and any modified versions bear some notice
  * that they have been modified.
+ * <p/>
+ * Created by Maxence Lefort on 9/15/16.
  */
+public class PersistentReportRequest {
 
-package gov.nist.hit.core.repo;
+    private String html;
+    private boolean versionChanged;
 
-import gov.nist.hit.core.domain.IntegrationProfile;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+    public String getHtml() {
+        return html;
+    }
 
-public interface IntegrationProfileRepository extends JpaRepository<IntegrationProfile, Long> {
+    public void setHtml(String html) {
+        this.html = html;
+    }
 
-	  @Query("select p from IntegrationProfile p where :mId member of p.messages")
-	  public IntegrationProfile findByMessageId(@Param("mId") String mId);
-	  
-	  @Query("select p from IntegrationProfile p where p.sourceId = :sourceId")
-	  public IntegrationProfile findBySourceId(@Param("sourceId") String sourceId);
+    public boolean isVersionChanged() {
+        return versionChanged;
+    }
 
+    public void setVersionChanged(boolean versionChanged) {
+        this.versionChanged = versionChanged;
+    }
 }

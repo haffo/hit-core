@@ -14,9 +14,11 @@ package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,139 +38,142 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class IntegrationProfile implements Serializable {
- 
-  private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  protected Long id;
+	private static final long serialVersionUID = 1L;
 
-  @NotNull
-  @JsonIgnore
-  @Column(columnDefinition = "LONGTEXT")
-  protected String xml; 
-  
- 
-  @Column(nullable = true)
-  protected String sourceId;
-  
-  @Column(nullable = true)
-  protected String name;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	protected Long id;
 
-  @Column(nullable = true)
-  protected String description; 
-  
-  @Column(nullable = true)
-  protected String key;
-  
-  @Column(nullable = true)
-  protected String type;
-  
-  @Column(nullable = true)
-  protected String schemaVersion;
-  
-  @Column(nullable = true)
-  protected String hl7Version;
-  
-   
-  public IntegrationProfile() {
-    super();
-  }
+	@NotNull
+	@JsonIgnore
+	@Column(columnDefinition = "LONGTEXT")
+	protected String xml;
 
-  public IntegrationProfile(String name, String description, String xml) {
-    super();
-    this.name = name;
-    this.description = description;
-    this.xml = xml;
-  }
+	@JsonIgnore
+	@NotNull
+	@Column(unique = true)
+	protected String sourceId;
 
- 
-  public IntegrationProfile(String xml) {
-    super();
-    this.name = null;
-    this.description = null;
-    this.xml = xml;
-  }
+	@Column(nullable = true)
+	protected String name;
 
-  public String getName() {
-    return name;
-  }
+	@Column(nullable = true)
+	protected String description;
 
-  public void setName(String name) {
-    this.name = name;
-  }
+	@Column(nullable = true)
+	protected String key;
 
-  public String getDescription() {
-    return description;
-  }
+	@Column(nullable = true)
+	protected String type;
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+	@Column(nullable = true)
+	protected String schemaVersion;
 
- 
+	@Column(nullable = true)
+	protected String hl7Version;
 
-  public String getKey() {
-    return key;
-  }
+	@Column(nullable = true)
+	@ElementCollection
+	@JsonIgnore
+	protected List<String> messages;
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+	public IntegrationProfile() {
+		super();
+	}
 
-  public Long getId() {
-    return id;
-  }
+	public IntegrationProfile(String name, String description, String xml) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.xml = xml;
+	}
 
-  public void setId(Long id) {
-    this.id = id;
-  } 
-  
-  
-  
+	public IntegrationProfile(String xml) {
+		super();
+		this.name = null;
+		this.description = null;
+		this.xml = xml;
+	}
 
-  public String getType() {
-    return type;
-  }
+	public List<String> getMessages() {
+		return messages;
+	}
 
-  public void setType(String type) {
-    this.type = type;
-  }
+	public void setMessages(List<String> messages) {
+		this.messages = messages;
+	}
 
-  public String getSchemaVersion() {
-    return schemaVersion;
-  }
+	public String getName() {
+		return name;
+	}
 
-  public void setSchemaVersion(String schemaVersion) {
-    this.schemaVersion = schemaVersion;
-  }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-  public String getHl7Version() {
-    return hl7Version;
-  }
+	public String getDescription() {
+		return description;
+	}
 
-  public void setHl7Version(String hl7Version) {
-    this.hl7Version = hl7Version;
-  }  
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-  public String getXml() {
-    return xml;
-  }
+	public String getKey() {
+		return key;
+	}
 
-  public void setXml(String xml) {
-    this.xml = xml;
-  }
+	public void setKey(String key) {
+		this.key = key;
+	}
 
- 
+	public Long getId() {
+		return id;
+	}
 
-  public String getSourceId() {
-    return sourceId;
-  }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-  public void setSourceId(String sourceId) {
-    this.sourceId = sourceId;
-  }
-   
- 
-  
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getSchemaVersion() {
+		return schemaVersion;
+	}
+
+	public void setSchemaVersion(String schemaVersion) {
+		this.schemaVersion = schemaVersion;
+	}
+
+	public String getHl7Version() {
+		return hl7Version;
+	}
+
+	public void setHl7Version(String hl7Version) {
+		this.hl7Version = hl7Version;
+	}
+
+	public String getXml() {
+		return xml;
+	}
+
+	public void setXml(String xml) {
+		this.xml = xml;
+	}
+
+	public String getSourceId() {
+		return sourceId;
+	}
+
+	public void setSourceId(String sourceId) {
+		this.sourceId = sourceId;
+	}
+
 }
