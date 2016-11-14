@@ -19,9 +19,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,68 +48,73 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @Api(value = "Messages", hidden = true)
 public class MessageController {
-  static final Logger logger = LoggerFactory.getLogger(MessageController.class);
+	static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
+	Set<String> allowedExtensions = new HashSet<String>(Arrays.asList("xml", "txt", "text", "hl7"));
 
-  /**
-   * TODO:remove
-   * 
-   * @param er7Message
-   * @param request
-   * @param response
-   * @return
-   * @throws MessageException
-   */
-  @RequestMapping(value = "/download", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public String download(
-      @ApiParam(value = "the content of the message", required = true) @RequestParam("content") String content,
-      @ApiParam(value = "the title of the message", required = false) @RequestParam(
-          value = "title", required = false) String title, HttpServletRequest request,
-      HttpServletResponse response) throws MessageDownloadException {
-    try {
-      logger.info("Downloading message");
-      InputStream io = IOUtils.toInputStream(content, "UTF-8");
-      response.setContentType("text/plain");
-      String fileName = "Message-" + new Date().getTime() + ".txt";
-      response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-      FileCopyUtils.copy(io, response.getOutputStream());
-    } catch (RuntimeException e) {
-      logger.debug("Failed to download the message ");
-      throw new MessageDownloadException(e);
-    } catch (Exception e) {
-      logger.debug("Failed to download the message ");
-      throw new MessageDownloadException(e);
-    }
-    return null;
-  }
+	/**
+	 * TODO:remove
+	 * 
+	 * @param er7Message
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws MessageException
+	 */
+	@RequestMapping(value = "/download", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+	public String download(
+			@ApiParam(value = "the content of the message", required = true) @RequestParam("content") String content,
+			@ApiParam(value = "the title of the message", required = false) @RequestParam(value = "title", required = false) String title,
+			HttpServletRequest request, HttpServletResponse response) throws MessageDownloadException {
+		try {
+			logger.info("Downloading message");
+			InputStream io = IOUtils.toInputStream(content, "UTF-8");
+			response.setContentType("text/plain");
+			String fileName = "Message-" + new Date().getTime() + ".txt";
+			response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+			FileCopyUtils.copy(io, response.getOutputStream());
+		} catch (RuntimeException e) {
+			logger.debug("Failed to download the message ");
+			throw new MessageDownloadException(e);
+		} catch (Exception e) {
+			logger.debug("Failed to download the message ");
+			throw new MessageDownloadException(e);
+		}
+		return null;
+	}
 
-  /**
-   * 
-   * @param part
-   * @return
-   * @throws MessageException
-   * @throws MalformedMessageException
-   */
-  @RequestMapping(value = "/upload", method = RequestMethod.POST,
-      consumes = {"multipart/form-data"})
-  public Map<String, String> upload(@RequestPart("file") MultipartFile part)
-      throws MessageUploadException {
-    try {
-      Map<String, String> map = new HashMap<String, String>();
-      InputStream in = part.getInputStream();
-      map.put("name", part.getName());
-      map.put("size", part.getSize() + "");
-      String content = IOUtils.toString(in);
-      map.put("content", content);
-      return map;
-    } catch (RuntimeException e) {
-      throw new MessageUploadException(e);
-    } catch (Exception e) {
-      throw new MessageUploadException(e);
-    }
+	/**
+	 * 
+	 * @param part
+	 * @return
+	 * @throws MessageException
+	 * @throws MalformedMessageException
+	 */
+	@RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = { "multipart/form-data" })
+	public Map<String, String> upload(@RequestPart("file") MultipartFile part) throws MessageUploadException {
+		try {
+			if (isSupported(part)) {
+				Map<String, String> map = new HashMap<String, String>();
+				InputStream in = part.getInputStream();
+				map.put("name", part.getName());
+				map.put("size", part.getSize() + "");
+				String content = IOUtils.toString(in);
+				map.put("content", content);
+				return map;
+			}
 
-  }
+		} catch (RuntimeException e) {
+			throw new MessageUploadException(e);
+		} catch (Exception e) {
+			throw new MessageUploadException(e);
+		}
+		throw new MessageUploadException("Unsupported file extension. Supported types are txt, xml");
+	}
 
+	private boolean isSupported(MultipartFile part) {
+		String name = part.getOriginalFilename();
+		String ext = name.substring(name.lastIndexOf(".") +1);
+		return allowedExtensions.contains(ext.toLowerCase());
+	}
 
 }
