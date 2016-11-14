@@ -6,5 +6,9 @@ public interface AppInfoService {
 
   public String getRsbVersion();
 
+  String getUploadPattern();
+
+  String getUploadMaxSize();
+
 
 }

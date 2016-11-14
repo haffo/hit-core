@@ -20,3 +20,4 @@ hit-core-service/src/test/resources/outputs/5-TestStepMessageValidationReport.xm
 hit-core-service/src/test/resources/outputs/TestCaseValidationReport.html
 hit-core-service/src/test/resources/outputs/TestCaseValidationReport.pdf
 hit-core-service/src/test/resources/outputs/TestCaseValidationReport.xml
+/bin/

@@ -101,6 +101,18 @@ public class AppInfo implements Serializable {
   private String registrationAcceptanceTitle;
 
 
+  private String uploadMaxSize;
+  private String uploadContentTypes; // comma separated supported mime-types and extensions
+
+
+  public AppInfo() {
+    uploadMaxSize = "10MB";
+    uploadContentTypes = "text/plain,text/xml,application/xml";
+
+  }
+
+
+
   public String getUrl() {
     return url;
   }
@@ -327,6 +339,30 @@ public class AppInfo implements Serializable {
 
   public void setRegistrationAcceptanceTitle(String registrationAcceptanceTitle) {
     this.registrationAcceptanceTitle = registrationAcceptanceTitle;
+  }
+
+
+
+  public String getUploadMaxSize() {
+    return uploadMaxSize;
+  }
+
+
+
+  public void setUploadMaxSize(String uploadMaxSize) {
+    this.uploadMaxSize = uploadMaxSize;
+  }
+
+
+
+  public String getUploadContentTypes() {
+    return uploadContentTypes;
+  }
+
+
+
+  public void setUploadContentTypes(String uploadContentTypes) {
+    this.uploadContentTypes = uploadContentTypes;
   }
 
 

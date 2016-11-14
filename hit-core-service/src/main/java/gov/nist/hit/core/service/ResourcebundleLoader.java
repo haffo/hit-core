@@ -328,6 +328,17 @@ public abstract class ResourcebundleLoader {
     loadRegistration(appInfo);
 
     appInfo.setApiDocsPath("/apidocs");
+
+    if (metaData.get("fileUpload") != null) {
+      JsonNode fileUpload = metaData.get("fileUpload");
+      if (fileUpload.get("contentTypes") != null) {
+        appInfo.setUploadContentTypes(fileUpload.get("contentTypes").textValue());
+      }
+      if (fileUpload.get("maxSize") != null) {
+        appInfo.setUploadMaxSize(fileUpload.get("maxSize").textValue());
+      }
+    }
+
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");
   }

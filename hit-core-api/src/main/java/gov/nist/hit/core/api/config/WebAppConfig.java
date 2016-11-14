@@ -37,113 +37,104 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan({"gov.nist.hit", "gov.nist.auth.hit"})
+@ComponentScan({ "gov.nist.hit", "gov.nist.auth.hit" })
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
+	@Override
+	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+		configurer.enable();
+	}
 
+	/*
+	 * Here we register the Hibernate4Module into an ObjectMapper, then set this
+	 * custom-configured ObjectMapper to the MessageConverter and return it to
+	 * be added to the HttpMessageConverters of our application
+	 */
+	public MappingJackson2HttpMessageConverter jacksonMessageConverter() {
+		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
 
-  @Override
-  public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-    configurer.enable();
-  }
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.INDENT_OUTPUT);
+		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		mapper.setSerializationInclusion(Include.NON_NULL);
 
-  /*
-   * Here we register the Hibernate4Module into an ObjectMapper, then set this custom-configured
-   * ObjectMapper to the MessageConverter and return it to be added to the HttpMessageConverters of
-   * our application
-   */
-  public MappingJackson2HttpMessageConverter jacksonMessageConverter() {
-    MappingJackson2HttpMessageConverter messageConverter =
-        new MappingJackson2HttpMessageConverter();
+		// Registering Hibernate4Module to support lazy objects
+		mapper.registerModule(new Hibernate4Module());
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.disable(SerializationFeature.INDENT_OUTPUT);
-    mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-    mapper.setSerializationInclusion(Include.NON_NULL);
+		messageConverter.setObjectMapper(mapper);
+		return messageConverter;
 
-    // Registering Hibernate4Module to support lazy objects
-    mapper.registerModule(new Hibernate4Module());
+	}
 
-    messageConverter.setObjectMapper(mapper);
-    return messageConverter;
+	// public GsonHttpMessageConverter gsonHttpMessageConverter() {
+	// Gson gson =
+	// new GsonBuilder().setExclusionStrategies(new
+	// AnnotationExclusionStrategy()).create();
+	// GsonHttpMessageConverter converter = new GsonHttpMessageConverter(gson);
+	// converter.setGson(gson);
+	// return converter;
+	// }
 
-  }
+	@Override
+	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+		// Here we add our custom-configured HttpMessageConverter
+		converters.add(jacksonMessageConverter());
+		StringHttpMessageConverter stringConverter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
+		stringConverter.setSupportedMediaTypes(Arrays.asList( //
+				MediaType.TEXT_PLAIN, //
+				MediaType.TEXT_HTML, //
+				MediaType.APPLICATION_JSON, MediaType.TEXT_XML, MediaType.APPLICATION_FORM_URLENCODED));
+		converters.add(stringConverter);
+		super.configureMessageConverters(converters);
+	}
 
-  // public GsonHttpMessageConverter gsonHttpMessageConverter() {
-  // Gson gson =
-  // new GsonBuilder().setExclusionStrategies(new AnnotationExclusionStrategy()).create();
-  // GsonHttpMessageConverter converter = new GsonHttpMessageConverter(gson);
-  // converter.setGson(gson);
-  // return converter;
-  // }
+	@Bean
+	public MultipartResolver multipartResolver() {
+		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+		multipartResolver.setMaxUploadSize(100000000);
+		multipartResolver.setDefaultEncoding("utf-8");
+		return multipartResolver;
+	}
 
-  @Override
-  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    // Here we add our custom-configured HttpMessageConverter
-    converters.add(jacksonMessageConverter());
-    StringHttpMessageConverter stringConverter =
-        new StringHttpMessageConverter(Charset.forName("UTF-8"));
-    stringConverter.setSupportedMediaTypes(Arrays.asList( //
-        MediaType.TEXT_PLAIN, //
-        MediaType.TEXT_HTML, //
-        MediaType.APPLICATION_JSON, MediaType.TEXT_XML,MediaType.APPLICATION_FORM_URLENCODED));
-    converters.add(stringConverter);
-    super.configureMessageConverters(converters);
-  }
+	// @Override
+	// public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	// registry.addResourceHandler("/docs/**").addResourceLocations("classpath*:/docs/");
+	// }
+	//
+	// @Bean
+	// public InternalResourceViewResolver getInternalResourceViewResolver() {
+	// InternalResourceViewResolver resolver = new
+	// InternalResourceViewResolver();
+	// resolver.setPrefix("classpath*:/docs/");
+	// resolver.setSuffix("*.html");
+	// return resolver;
+	// }
 
-  @Bean
-  public MultipartResolver multipartResolver() {
-    CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-    return multipartResolver;
-  }
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		registry.addRedirectViewController("/apidocs/v2/api-docs", "/v2/api-docs");
+		registry.addRedirectViewController("/apidocs/configuration/ui", "/configuration/ui");
+		registry.addRedirectViewController("/apidocs/configuration/security", "/configuration/security");
+		registry.addRedirectViewController("/apidocs/swagger-resources", "/swagger-resources");
+		registry.addRedirectViewController("/apidocs", "/apidocs/swagger-ui.html");
+		registry.addRedirectViewController("/apidocs/", "/apidocs/swagger-ui.html");
 
-  // @Override
-  // public void addResourceHandlers(ResourceHandlerRegistry registry) {
-  // registry.addResourceHandler("/docs/**").addResourceLocations("classpath*:/docs/");
-  // }
-  //
-  // @Bean
-  // public InternalResourceViewResolver getInternalResourceViewResolver() {
-  // InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-  // resolver.setPrefix("classpath*:/docs/");
-  // resolver.setSuffix("*.html");
-  // return resolver;
-  // }
+	}
 
+	// @Override
+	// public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	// registry.addResourceHandler("swagger-ui.html").addResourceLocations(
+	// "classpath:/META-INF/resources/");
+	//
+	// registry.addResourceHandler("/webjars/**").addResourceLocations(
+	// "classpath:/META-INF/resources/webjars/");
+	// }
 
-  @Override
-  public void addViewControllers(ViewControllerRegistry registry) {
-    registry.addRedirectViewController("/apidocs/v2/api-docs", "/v2/api-docs");
-    registry.addRedirectViewController("/apidocs/configuration/ui", "/configuration/ui");
-    registry
-        .addRedirectViewController("/apidocs/configuration/security", "/configuration/security");
-    registry.addRedirectViewController("/apidocs/swagger-resources", "/swagger-resources");
-    registry.addRedirectViewController("/apidocs", "/apidocs/swagger-ui.html");
-    registry.addRedirectViewController("/apidocs/", "/apidocs/swagger-ui.html");
-
-  }
-
-
-
-  // @Override
-  // public void addResourceHandlers(ResourceHandlerRegistry registry) {
-  // registry.addResourceHandler("swagger-ui.html").addResourceLocations(
-  // "classpath:/META-INF/resources/");
-  //
-  // registry.addResourceHandler("/webjars/**").addResourceLocations(
-  // "classpath:/META-INF/resources/webjars/");
-  // }
-
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/apidocs/**").addResourceLocations(
-        "classpath:/META-INF/resources/");
-    registry.addResourceHandler("swagger-ui.html").addResourceLocations(
-        "classpath:/META-INF/resources/");
-    registry.addResourceHandler("/webjars/**").addResourceLocations(
-        "classpath:/META-INF/resources/webjars/");
-  }
-
-
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/apidocs/**").addResourceLocations("classpath:/META-INF/resources/");
+		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+	}
 
 }
