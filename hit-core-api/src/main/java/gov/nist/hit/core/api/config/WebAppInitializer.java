@@ -11,8 +11,6 @@
  */
 package gov.nist.hit.core.api.config;
 
-import gov.nist.hit.core.service.ResourcebundleLoader;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration.Dynamic;
@@ -22,58 +20,59 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import gov.nist.hit.core.service.ResourcebundleLoader;
+
 public class WebAppInitializer implements WebApplicationInitializer
 
 {
 
-  @Override
-  public void onStartup(final ServletContext servletContext) throws ServletException {
+	@Override
+	public void onStartup(final ServletContext servletContext) throws ServletException {
 
-    final AnnotationConfigWebApplicationContext context1 =
-        new AnnotationConfigWebApplicationContext();
-    context1.setServletContext(servletContext);
-    context1.scan("gov.nist.hit.core", "gov.nist.auth.hit.core");
-    // web app servlet
-    servletContext.addListener(new ContextLoaderListener(context1));
-    Dynamic apiServlet = servletContext.addServlet("hit-api", new DispatcherServlet(context1));
-    apiServlet.setLoadOnStartup(1);
-    apiServlet.addMapping("/api/*");
-    apiServlet.setAsyncSupported(true);
+		final AnnotationConfigWebApplicationContext context1 = new AnnotationConfigWebApplicationContext();
+		context1.setServletContext(servletContext);
+		context1.scan("gov.nist.hit.core", "gov.nist.auth.hit.core");
+		// web app servlet
+		servletContext.addListener(new ContextLoaderListener(context1));
+		Dynamic apiServlet = servletContext.addServlet("hit-api", new DispatcherServlet(context1));
+		apiServlet.setLoadOnStartup(1);
+		apiServlet.addMapping("/api/*");
+		apiServlet.addMapping("/api/");
+		apiServlet.setAsyncSupported(true);
 
-    //
-    // FilterRegistration.Dynamic securityFilter =
-    // servletContext.addFilter("springSecurityFilterChain", DelegatingFilterProxy.class);
-    // securityFilter.addMappingForUrlPatterns(null, false, "/*");
-    //
-    // servletContext.addListener(new HttpSessionEventPublisher());
-    //
+		//
+		// FilterRegistration.Dynamic securityFilter =
+		// servletContext.addFilter("springSecurityFilterChain",
+		// DelegatingFilterProxy.class);
+		// securityFilter.addMappingForUrlPatterns(null, false, "/*");
+		//
+		// servletContext.addListener(new HttpSessionEventPublisher());
+		//
 
+		Dynamic apiDocsServlet = servletContext.addServlet("hit-api-docs", new DispatcherServlet(context1));
+		apiDocsServlet.setLoadOnStartup(1);
+		apiDocsServlet.addMapping("/apidocs/*");
 
-    Dynamic apiDocsServlet =
-        servletContext.addServlet("hit-api-docs", new DispatcherServlet(context1));
-    apiDocsServlet.setLoadOnStartup(1);
-    apiDocsServlet.addMapping("/apidocs/*");
+		// final AnnotationConfigWebApplicationContext context2 =
+		// new AnnotationConfigWebApplicationContext();
+		// context2.setServletContext(servletContext);
+		// Dynamic apiDocsServlet =
+		// servletContext.addServlet("hit-api-docs", new
+		// DispatcherServlet(context2));
+		// apiDocsServlet.setLoadOnStartup(1);
+		// apiDocsServlet.addMapping("/docs/*");
 
+		// Dynamic apiUiServlet = servletContext.addServlet("swagger-api-ui",
+		// new
+		// DispatcherServlet(root));
+		// apiUiServlet.setLoadOnStartup(3);
+		// apiUiServlet.addMapping("/docs/*");
 
-    // final AnnotationConfigWebApplicationContext context2 =
-    // new AnnotationConfigWebApplicationContext();
-    // context2.setServletContext(servletContext);
-    // Dynamic apiDocsServlet =
-    // servletContext.addServlet("hit-api-docs", new DispatcherServlet(context2));
-    // apiDocsServlet.setLoadOnStartup(1);
-    // apiDocsServlet.addMapping("/docs/*");
-
-    // Dynamic apiUiServlet = servletContext.addServlet("swagger-api-ui", new
-    // DispatcherServlet(root));
-    // apiUiServlet.setLoadOnStartup(3);
-    // apiUiServlet.addMapping("/docs/*");
-
-
-    try {
-      servletContext.setInitParameter("rsbVersion", ResourcebundleLoader.getRsbleVersion());
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
+		try {
+			servletContext.setInitParameter("rsbVersion", ResourcebundleLoader.getRsbleVersion());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }

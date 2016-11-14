@@ -12,12 +12,6 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.service.exception.MessageDownloadException;
-import gov.nist.hit.core.service.exception.MessageException;
-import gov.nist.hit.core.service.exception.MessageUploadException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
-
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
@@ -32,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,6 +34,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import gov.nist.hit.core.service.AppInfoService;
+import gov.nist.hit.core.service.exception.MessageDownloadException;
+import gov.nist.hit.core.service.exception.MessageException;
+import gov.nist.hit.core.service.exception.MessageUploadException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 
 /**
  * @author Harold Affo (NIST)
@@ -50,7 +52,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController {
 	static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
-	Set<String> allowedExtensions = new HashSet<String>(Arrays.asList("xml", "txt", "text", "hl7"));
+	@Autowired
+	private AppInfoService appInfoService;
 
 	/**
 	 * TODO:remove
@@ -93,28 +96,30 @@ public class MessageController {
 	@RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	public Map<String, String> upload(@RequestPart("file") MultipartFile part) throws MessageUploadException {
 		try {
-			if (isSupported(part)) {
-				Map<String, String> map = new HashMap<String, String>();
-				InputStream in = part.getInputStream();
-				map.put("name", part.getName());
-				map.put("size", part.getSize() + "");
-				String content = IOUtils.toString(in);
-				map.put("content", content);
-				return map;
-			}
-
+			validateContentType(part);
+			Map<String, String> map = new HashMap<String, String>();
+			InputStream in = part.getInputStream();
+			map.put("name", part.getName());
+			map.put("size", part.getSize() + "");
+			String content = IOUtils.toString(in);
+			map.put("content", content);
+			return map;
 		} catch (RuntimeException e) {
 			throw new MessageUploadException(e);
 		} catch (Exception e) {
 			throw new MessageUploadException(e);
 		}
-		throw new MessageUploadException("Unsupported file extension. Supported types are txt, xml");
 	}
 
-	private boolean isSupported(MultipartFile part) {
-		String name = part.getOriginalFilename();
-		String ext = name.substring(name.lastIndexOf(".") +1);
-		return allowedExtensions.contains(ext.toLowerCase());
+	private void validateContentType(MultipartFile part) throws MessageUploadException {
+		String pattern = appInfoService.getUploadPattern();
+		boolean valid = false;
+		if (pattern != null && pattern.length() > 0) {
+			Set<String> contentTypes = new HashSet<String>(Arrays.asList(pattern.split(",")));
+			valid = contentTypes.contains(part.getContentType());
+		}
+		if (!valid)
+			throw new MessageUploadException("Unsupported content type. Supported content types are:'" + pattern + "'");
 	}
 
 }
