@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gov.nist.hit.core</groupId>
 	<artifactId>hit-core</artifactId>
@@ -16,7 +17,27 @@
 		<module>hit-core-transport</module>
 		<module>hit-core-api</module>
 	</modules>
-
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>spring.profiles.active</name>
+					<value>development</value>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<id>production</id>
+			<activation>
+				<property>
+					<name>spring.profiles.active</name>
+					<value>production</value>
+				</property>
+			</activation>
+		</profile>
+	</profiles>
 	<properties>
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
