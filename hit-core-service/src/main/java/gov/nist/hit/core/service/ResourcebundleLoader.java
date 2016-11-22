@@ -808,7 +808,7 @@ public abstract class ResourcebundleLoader {
 
 	}
 
-	protected IntegrationProfile integrationProfile(String content) {
+	public IntegrationProfile integrationProfile(String content) {
 		Document doc = this.stringToDom(content);
 		IntegrationProfile integrationProfile = new IntegrationProfile();
 		Element profileElement = (Element) doc.getElementsByTagName(
@@ -850,7 +850,7 @@ public abstract class ResourcebundleLoader {
 		return null;
 	}
 
-	protected Constraints constraint(String content) {
+	public Constraints constraint(String content) {
 		Document doc = this.stringToDom(content);
 		Constraints constraints = new Constraints();
 		constraints.setXml(content);
