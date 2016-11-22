@@ -166,7 +166,7 @@ public class ResourcebundleHelper {
 
 
   public static String getResourcesFromZip(String URL) throws Exception {
-    System.out.println(URL);
+    System.out.println("URL : " + URL);
     URL url = new URL(URL);
 
     // Read URL
@@ -182,7 +182,7 @@ public class ResourcebundleHelper {
 
     byte[] b = buffer.toByteArray();
     buffer.close();
-
+    System.out.println("READ FINISH");
     // Create TEMP directory
     File tmpDir = Files.createTempDir();
     tmpDir.mkdir();

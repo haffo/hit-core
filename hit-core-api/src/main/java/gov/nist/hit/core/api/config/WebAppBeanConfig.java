@@ -12,6 +12,7 @@
 
 package gov.nist.hit.core.api.config;
 
+import gov.nist.hit.core.domain.ResourceUploadLock;
 import gov.nist.hit.core.service.CachedRepository;
 import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.impl.ZipGeneratorImpl;
@@ -19,6 +20,7 @@ import gov.nist.hit.core.service.impl.ZipGeneratorImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Profile;
 import org.springframework.remoting.jaxws.SimpleJaxWsServiceExporter;
 
 /**
@@ -29,14 +31,25 @@ import org.springframework.remoting.jaxws.SimpleJaxWsServiceExporter;
 @Configuration
 public class WebAppBeanConfig {
 
-  @Bean
-  public ZipGenerator zipGenerator() {
-    return new ZipGeneratorImpl();
-  } 
-  
-  @Bean
-  public CachedRepository cachedRepository() {
-    return new CachedRepository();
-  }
-    
+	@Bean
+	public ZipGenerator zipGenerator() {
+		return new ZipGeneratorImpl();
+	}
+
+	@Bean
+	public CachedRepository cachedRepository() {
+		return new CachedRepository();
+	}
+
+	@Bean
+	@Profile("development")
+	public ResourceUploadLock resourceFilterAllow() {
+		return new ResourceUploadLock(false);
+	}
+
+	@Bean
+	@Profile("production")
+	public ResourceUploadLock resourceFilterBlock() {
+		return new ResourceUploadLock(true);
+	}
 }
