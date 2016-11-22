@@ -343,6 +343,18 @@ public abstract class ResourcebundleLoader {
 		loadRegistration(appInfo);
 
 		appInfo.setApiDocsPath("/apidocs");
+
+		if (metaData.get("fileUpload") != null) {
+			JsonNode fileUpload = metaData.get("fileUpload");
+			if (fileUpload.get("contentTypes") != null) {
+				appInfo.setUploadContentTypes(fileUpload.get("contentTypes")
+						.textValue());
+			}
+			if (fileUpload.get("maxSize") != null) {
+				appInfo.setUploadMaxSize(fileUpload.get("maxSize").textValue());
+			}
+		}
+
 		appInfoRepository.save(appInfo);
 		logger.info("loading app info...DONE");
 	}
@@ -1001,8 +1013,7 @@ public abstract class ResourcebundleLoader {
 					(testDocuments(location,
 							testCaseObj.findValue("supplements"))));
 		}
-		List<Resource> resources = this.getDirectories(location
-				+ "*");
+		List<Resource> resources = this.getDirectories(location + "*");
 		for (Resource resource : resources) {
 			String fileName = fileName(resource);
 			String tcLocation = fileName.substring(fileName.indexOf(location),
@@ -1239,8 +1250,7 @@ public abstract class ResourcebundleLoader {
 						testDocuments(location,
 								testPlanObj.findValue("supplements")));
 			}
-			List<Resource> resources = this
-					.getDirectories(location + "*/");
+			List<Resource> resources = this.getDirectories(location + "*/");
 			for (Resource resource : resources) {
 				String fileName = fileName(resource);
 				String tcLocation = fileName.substring(
@@ -1366,8 +1376,8 @@ public abstract class ResourcebundleLoader {
 								testPlanObj.findValue("supplements")));
 			}
 
-			List<Resource> resources = this
-					.getDirectories(testObjectPath + "*/");
+			List<Resource> resources = this.getDirectories(testObjectPath
+					+ "*/");
 			for (Resource resource : resources) {
 				String fileName = fileName(resource);
 				String location = fileName.substring(
@@ -1750,24 +1760,27 @@ public abstract class ResourcebundleLoader {
 	}
 
 	public List<Resource> getDirectories(String pattern) throws IOException {
-		if(this.directory.isEmpty())
+		if (this.directory.isEmpty())
 			return ResourcebundleHelper.getDirectories(pattern);
 		else
-			return ResourcebundleHelper.getDirectoriesFile(this.directory + pattern);
+			return ResourcebundleHelper.getDirectoriesFile(this.directory
+					+ pattern);
 	}
 
 	public Resource getResource(String pattern) throws IOException {
-		if(this.directory.isEmpty())
+		if (this.directory.isEmpty())
 			return ResourcebundleHelper.getResource(pattern);
 		else
-			return ResourcebundleHelper.getResourceFile(this.directory + pattern);
+			return ResourcebundleHelper.getResourceFile(this.directory
+					+ pattern);
 	}
 
 	public List<Resource> getResources(String pattern) throws IOException {
-		if(this.directory.isEmpty())
+		if (this.directory.isEmpty())
 			return ResourcebundleHelper.getResources(this.directory + pattern);
 		else
-			return ResourcebundleHelper.getResourcesFile(this.directory + pattern);
+			return ResourcebundleHelper.getResourcesFile(this.directory
+					+ pattern);
 	}
 
 	public IntegrationProfileRepository getIntegrationProfileRepository() {
