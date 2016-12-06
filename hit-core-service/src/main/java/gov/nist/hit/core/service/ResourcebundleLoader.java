@@ -934,10 +934,10 @@ public abstract class ResourcebundleLoader {
     if (!testCaseObj.has("id")) {
       throw new IllegalArgumentException("Missing id for Test Case at " + location);
     }
-    tc.setPersistentId(testCaseObj.findValue("id").longValue());
+    tc.setPersistentId(Long.parseLong(testCaseObj.findValue("id").asText()));
     tc.setDescription(testCaseObj.findValue("description").textValue());
-    tc.setVersion(
-        !testCaseObj.has("version") ? 1.0 : testCaseObj.findValue("version").doubleValue());
+    tc.setVersion(!testCaseObj.has("version") ? 1.0
+        : Double.parseDouble(testCaseObj.findValue("version").asText()));
 
     tc.setTestStory(testStory(location));
     tc.setJurorDocument(jurorDocument(location));
@@ -1037,10 +1037,10 @@ public abstract class ResourcebundleLoader {
     if (!testStepObj.has("id")) {
       throw new IllegalArgumentException("Missing id for Test Step at " + location);
     }
-    testStep.setPersistentId(testStepObj.findValue("id").longValue());
+    testStep.setPersistentId(Long.parseLong(testStepObj.findValue("id").asText()));
     testStep.setDescription(testStepObj.findValue("description").textValue());
-    testStep.setVersion(
-        !testStepObj.has("version") ? 1.0 : testStepObj.findValue("version").doubleValue());
+    testStep.setVersion(!testStepObj.has("version") ? 1.0
+        : Double.parseDouble(testStepObj.findValue("version").asText()));
     JsonNode ttypeObj = testStepObj.findValue("type");
     String tttypeValue = ttypeObj != null ? ttypeObj.textValue() : null;
     TestingType testingType = tttypeValue != null && !"".equals(tttypeValue)
@@ -1148,10 +1148,10 @@ public abstract class ResourcebundleLoader {
         throw new IllegalArgumentException("Missing id for Test Case Group at " + location);
       }
 
-      tcg.setPersistentId(testPlanObj.findValue("id").longValue());
+      tcg.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       tcg.setDescription(testPlanObj.findValue("description").textValue());
-      tcg.setVersion(
-          !testPlanObj.has("version") ? 1.0 : testPlanObj.findValue("version").doubleValue());
+      tcg.setVersion(!testPlanObj.has("version") ? 1.0
+          : Double.parseDouble(testPlanObj.findValue("version").asText()));
       tcg.setTestStory(testStory(location));
       if (testPlanObj.findValue("position") != null) {
         tcg.setPosition(testPlanObj.findValue("position").intValue());
@@ -1196,11 +1196,11 @@ public abstract class ResourcebundleLoader {
       if (!testPlanObj.has("id")) {
         throw new IllegalArgumentException("Missing id for Test Plan at " + location);
       }
-      tp.setPersistentId(testPlanObj.findValue("id").asLong());
+      tp.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       tp.setName(testPlanObj.findValue("name").textValue());
       tp.setDescription(testPlanObj.findValue("description").textValue());
-      tp.setVersion(
-          !testPlanObj.has("version") ? 1.0 : testPlanObj.findValue("version").doubleValue());
+      tp.setVersion(!testPlanObj.has("version") ? 1.0
+          : Double.parseDouble(testPlanObj.findValue("version").asText()));
       tp.setTestStory(testStory(location));
       tp.setStage(stage);
 
@@ -1260,13 +1260,13 @@ public abstract class ResourcebundleLoader {
       if (!testPlanObj.has("id")) {
         throw new IllegalArgumentException("Missing id for Test Object at " + testObjectPath);
       }
-      parent.setPersistentId(testPlanObj.findValue("id").asLong());
+      parent.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       if (testPlanObj.findValue("position") != null) {
         parent.setPosition(testPlanObj.findValue("position").intValue());
       }
       parent.setDescription(testPlanObj.findValue("description").textValue());
-      parent.setVersion(
-          !testPlanObj.has("version") ? 1.0 : testPlanObj.findValue("version").doubleValue());
+      parent.setVersion(!testPlanObj.has("version") ? 1.0
+          : Double.parseDouble(testPlanObj.findValue("version").asText()));
       parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
       if (testPlanObj.has("supplements")) {
         parent.getSupplements()
