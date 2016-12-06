@@ -14,16 +14,7 @@ package gov.nist.hit.core.service;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -198,6 +189,8 @@ public abstract class ResourcebundleLoader {
   @Autowired
   protected VocabularyLibraryRepository vocabularyLibraryRepository;
 
+  private Map<Long,String> idLocationMap;
+
   public ResourcebundleLoader() {
     obm = new com.fasterxml.jackson.databind.ObjectMapper();
     obm.setSerializationInclusion(Include.NON_NULL);
@@ -237,6 +230,7 @@ public abstract class ResourcebundleLoader {
     if (isNewResourcebundle()) {
       logger.info("clearing tables...");
       clearDB();
+      this.idLocationMap = new HashMap<>();
       this.loadAppInfo();
       this.loadConstraints();
       this.loadVocabularyLibraries();
@@ -891,6 +885,17 @@ public abstract class ResourcebundleLoader {
     return path;
   }
 
+  private void checkPersistentId(Long persistentId,String location){
+    if(null==persistentId){
+      logger.error("Null id at location: " + location);
+    } else if (idLocationMap.containsKey(persistentId)&&!idLocationMap.get(persistentId).equals(location)&&location.toLowerCase().endsWith(
+        ".json")){
+      logger.error("Duplicate id ("+persistentId+") at location: "+location+" - already exists at location: "+idLocationMap.get(persistentId));
+    } else {
+      idLocationMap.put(persistentId,location);
+    }
+  }
+
   public void loadContextBasedTestCases() throws IOException {
     List<Resource> resources = this.getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/");
     if (resources != null && !resources.isEmpty()) {
@@ -899,8 +904,10 @@ public abstract class ResourcebundleLoader {
         String location = fileName.substring(fileName.indexOf(domainPath(CONTEXTBASED_PATTERN)),
             fileName.length());
         TestPlan testPlan = testPlan(location, TestingStage.CB);
-        if (testPlan != null)
+        if (testPlan != null) {
+          checkPersistentId(testPlan.getPersistentId(),location);
           testPlanRepository.save(testPlan);
+        }
       }
     }
   }
@@ -913,6 +920,7 @@ public abstract class ResourcebundleLoader {
         CFTestInstance testObject = testObject(fileName
             .substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)), fileName.length()));
         if (testObject != null) {
+          checkPersistentId(testObject.getPersistentId(),fileName);
           testObject.setRoot(true);
           testInstanceRepository.save(testObject);
         }
@@ -952,6 +960,7 @@ public abstract class ResourcebundleLoader {
       String fileName = fileName(resource);
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
       TestStep testStep = testStep(tcLocation, stage, transportSupported);
+      checkPersistentId(testStep.getPersistentId(),fileName);
       tc.addTestStep(testStep);
     }
 
@@ -1170,9 +1179,11 @@ public abstract class ResourcebundleLoader {
           String filename = descriptorResource.getFilename();
           if (filename.endsWith("TestCaseGroup.json")) {
             TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage, transportEnabled);
+            checkPersistentId(testCaseGroup.getPersistentId(),location);
             tcg.getTestCaseGroups().add(testCaseGroup);
           } else if (filename.endsWith("TestCase.json")) {
             TestCase testCase = testCase(tcLocation, stage, transportEnabled);
+            checkPersistentId(testCase.getPersistentId(),location);
             tcg.getTestCases().add(testCase);
           }
         }
@@ -1235,9 +1246,11 @@ public abstract class ResourcebundleLoader {
         String filename = descriptorResource.getFilename();
         if (filename.endsWith("TestCaseGroup.json")) {
           TestCaseGroup testCaseGroup = testCaseGroup(loca, stage, tp.isTransport());
+          checkPersistentId(testCaseGroup.getPersistentId(),fileName);
           tp.getTestCaseGroups().add(testCaseGroup);
         } else if (filename.endsWith("TestCase.json")) {
           TestCase testCase = testCase(loca, stage, tp.isTransport());
+          checkPersistentId(testCase.getPersistentId(),fileName);
           tp.getTestCases().add(testCase);
         }
       }
@@ -1279,6 +1292,7 @@ public abstract class ResourcebundleLoader {
         String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
         CFTestInstance testObject = testObject(location);
         if (testObject != null) {
+          checkPersistentId(testObject.getPersistentId(),fileName);
           parent.getChildren().add(testObject);
         }
       }
