@@ -30,7 +30,8 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   @Column(columnDefinition = "TEXT")
   protected String name;
 
-  @Column(unique = true)
+  @NotNull
+  @Column(unique = true, nullable = false)
   protected Long persistentId;
 
 
