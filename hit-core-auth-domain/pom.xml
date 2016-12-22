@@ -9,6 +9,12 @@
 		<artifactId>hit-core</artifactId>
 		<version>1.0.18-SNAPSHOT</version>
 	</parent>
-	<dependencies />
+	<dependencies >
+		<dependency>
+			<groupId>gov.nist.hit.core</groupId>
+			<artifactId>hit-core-domain</artifactId>
+			<version>1.0.18</version>
+		</dependency>
+	</dependencies>
 	
 </project>
