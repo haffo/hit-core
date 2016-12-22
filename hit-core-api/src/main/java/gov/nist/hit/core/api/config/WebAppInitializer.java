@@ -39,7 +39,6 @@ public class WebAppInitializer implements WebApplicationInitializer
 		apiServlet.addMapping("/api/*");
 		apiServlet.addMapping("/api/");
 		apiServlet.setAsyncSupported(true);
-
 		//
 		// FilterRegistration.Dynamic securityFilter =
 		// servletContext.addFilter("springSecurityFilterChain",
@@ -69,6 +68,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 		// apiUiServlet.addMapping("/docs/*");
 
 		try {
+			servletContext.setInitParameter("spring.profiles.default", "development");
 			servletContext.setInitParameter("rsbVersion", ResourcebundleLoader.getRsbleVersion());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
