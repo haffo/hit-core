@@ -1,6 +1,7 @@
 package gov.nist.hit.core.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -36,6 +37,9 @@ public class DataMapping implements Serializable{
     @OneToOne(cascade = CascadeType.ALL)
     protected TestStepFieldPair target;
 
+    @Column
+    protected Boolean optional;
+
     @JsonIgnore
     @ManyToOne(optional=true, cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     protected TestCase testCase;
@@ -44,10 +48,11 @@ public class DataMapping implements Serializable{
         super();
     }
 
-    public DataMapping(MappingSource source, TestStepFieldPair target, TestCase testCase) {
+    public DataMapping(MappingSource source, TestStepFieldPair target, TestCase testCase, Boolean optional) {
         this.source = source;
         this.target = target;
         this.testCase = testCase;
+        this.optional = optional;
     }
 
     public static long getSerialVersionUID() {
@@ -86,6 +91,14 @@ public class DataMapping implements Serializable{
         this.testCase = testCase;
     }
 
+    public Boolean getOptional() {
+        return optional;
+    }
+
+    public void setOptional(Boolean optional) {
+        this.optional = optional;
+    }
+
     @Override
     public String toString() {
         return "DataMapping{" +
@@ -93,6 +106,7 @@ public class DataMapping implements Serializable{
                 ", source=" + source +
                 ", target=" + target +
                 ", testCase=" + testCase +
+                ", optional=" + optional +
                 '}';
     }
 }
