@@ -1,7 +1,6 @@
 package gov.nist.hit.core.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
