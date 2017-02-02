@@ -1004,8 +1004,13 @@ public abstract class ResourcebundleLoader {
         TestStepFieldPair target = new TestStepFieldPair(
             findTestStep(tc.getTestSteps(), parseTestStepPosition(targetPair.getKey())),
             targetPair.getValue().asText());
+        Boolean optional = false;
+        JsonNode optionalNode = node.findValue("optional");
+        if(optionalNode !=null && optionalNode.asBoolean()){
+          optional = true;
+        }
         if (source != null && target != null) {
-          DataMapping dataMapping = new DataMapping(source, target, tc);
+          DataMapping dataMapping = new DataMapping(source, target, tc,optional);
           logger.info("Saving data mapping : " + dataMapping.toString());
           dataMappings.add(dataMapping);
         }
