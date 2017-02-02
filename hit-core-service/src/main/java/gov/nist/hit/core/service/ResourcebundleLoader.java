@@ -841,7 +841,7 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  protected String jsonConformanceProfile(String integrationProfileXml, String conformanceProfileId,
+  public String jsonConformanceProfile(String integrationProfileXml, String conformanceProfileId,
       String constraintsXml, String additionalConstraintsXml) throws ProfileParserException,
       JsonProcessingException, com.fasterxml.jackson.core.JsonProcessingException {
     try {
