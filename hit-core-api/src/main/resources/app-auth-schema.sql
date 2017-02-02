@@ -5,10 +5,7 @@ create table IF NOT EXISTS users(
      enabled boolean NOT NULL,
   accountNonExpired boolean NOT NULL,
   accountNonLocked boolean NOT NULL,
-  credentialsNonExpired boolean NOT NULL
-      
-      
-      );
+  credentialsNonExpired boolean NOT NULL);
 
   create table  IF NOT EXISTS authorities (
       username varchar(50) not null,
