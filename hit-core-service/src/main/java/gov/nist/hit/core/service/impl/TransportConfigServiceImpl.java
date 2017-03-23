@@ -74,10 +74,6 @@ public class TransportConfigServiceImpl implements TransportConfigService {
   @Override
   @org.springframework.transaction.annotation.Transactional("authTransactionManager")
   public TransportConfig save(TransportConfig config) {
-    List<TransportConfig> configs = transportConfigRepository.findAllByUserAndProtocolAndDomain(
-        config.getUserId(), config.getProtocol(), config.getDomain());
-    if (configs != null && !configs.isEmpty())
-      delete(configs);
     return transportConfigRepository.saveAndFlush(config);
   }
 
