@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import gov.nist.auth.hit.core.domain.TestingType;
 import io.swagger.annotations.ApiModel;
 
 @Entity

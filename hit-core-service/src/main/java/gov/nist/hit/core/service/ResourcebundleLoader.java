@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gov.nist.auth.hit.core.domain.TestingType;
 import gov.nist.auth.hit.core.repo.AccountRepository;
 import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.AppInfo;
@@ -62,7 +63,6 @@ import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepFieldPair;
 import gov.nist.hit.core.domain.TestingStage;
-import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.TransportForms;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.AppInfoRepository;

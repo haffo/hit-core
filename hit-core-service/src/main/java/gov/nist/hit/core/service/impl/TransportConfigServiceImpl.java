@@ -6,31 +6,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
-import gov.nist.hit.core.domain.KeyValuePair;
-import gov.nist.hit.core.domain.TestingType;
-import gov.nist.hit.core.domain.TransportConfig;
-import gov.nist.hit.core.repo.TransportConfigRepository;
+import gov.nist.auth.hit.core.domain.KeyValuePair;
+import gov.nist.auth.hit.core.domain.TestingType;
+import gov.nist.auth.hit.core.domain.TransportConfig;
+import gov.nist.auth.hit.core.repo.TransportConfigRepository;
 import gov.nist.hit.core.service.TransportConfigService;
 
 @Service
+@org.springframework.transaction.annotation.Transactional("authTransactionManager")
 public class TransportConfigServiceImpl implements TransportConfigService {
 
   @Autowired
   protected TransportConfigRepository transportConfigRepository;
 
+  @Autowired
+  private Environment env;
 
 
   @Autowired
-  @PersistenceContext(unitName = "base-tool")
-  protected EntityManager entityManager;
+  @Qualifier("authEMF")
+  private EntityManagerFactory entityManagerFactory;
 
   @Override
   public TransportConfig create(String protocol, String domain) {
@@ -68,6 +72,7 @@ public class TransportConfigServiceImpl implements TransportConfigService {
   }
 
   @Override
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
   public TransportConfig save(TransportConfig config) {
     List<TransportConfig> configs = transportConfigRepository.findAllByUserAndProtocolAndDomain(
         config.getUserId(), config.getProtocol(), config.getDomain());
@@ -78,12 +83,14 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
 
   @Override
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
   public TransportConfig findOne(Long id) {
     return transportConfigRepository.findOne(id);
   }
 
 
   @Override
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
   public TransportConfig findOneByUserAndProtocolAndDomain(Long userId, String protocol,
       String domain) {
     TransportConfig config =
@@ -129,13 +136,15 @@ public class TransportConfigServiceImpl implements TransportConfigService {
   public TransportConfig findOneByPropertiesAndProtocol(Map<String, String> criteria,
       TestingType type, String protocol) {
     String sql = toInitiatorQuery(criteria, type, protocol);
-    Query q = entityManager.createNativeQuery(sql, TransportConfig.class);
+    Query q =
+        entityManagerFactory.createEntityManager().createNativeQuery(sql, TransportConfig.class);
     TransportConfig tr = getSingleResult(q);
     return tr;
   }
 
 
   @Override
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
   public List<TransportConfig> findAllByUser(@Param("userId") Long userId) {
     return transportConfigRepository.findAllByUser(userId);
   }
@@ -162,10 +171,10 @@ public class TransportConfigServiceImpl implements TransportConfigService {
 
 
   @Override
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
   public void delete(List<TransportConfig> configs) {
     transportConfigRepository.delete(configs);
   }
-
 
 
 }
