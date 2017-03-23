@@ -14,6 +14,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Entity
 @ApiModel(value = "TransportConfig",
     description = "Data Model representing the configuration information of a transaction")
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"protocol", "domain", "userId"}))
 public class TransportConfig {
 
   @Id
@@ -30,17 +34,20 @@ public class TransportConfig {
 
   @ApiModelProperty(required = true, value = "protocol of the transaction",
       example = "soap, rest, etc...")
-  @Column(name = "PROTOCOL")
+  @NotNull
+  @Column(name = "PROTOCOL", nullable = false)
   private String protocol;
 
   @ApiModelProperty(required = true, value = "domain of the transaction",
       example = "iz, erx, etc...")
-  @Column(name = "DOMAIN")
+  @NotNull
+  @Column(name = "DOMAIN", nullable = false)
   private String domain;
 
   @ApiModelProperty(required = true, value = "id of the user executing the transaction",
       example = "soap, rest, etc...")
-  @Column(name = "USERID")
+  @NotNull
+  @Column(name = "USERID", nullable = false)
   private Long userId;
 
   @ApiModelProperty(required = true, value = "configuration information  provided by the sut")
