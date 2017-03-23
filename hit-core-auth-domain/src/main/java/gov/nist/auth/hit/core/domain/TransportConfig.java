@@ -1,7 +1,4 @@
-package gov.nist.hit.core.domain;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+package gov.nist.auth.hit.core.domain;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +14,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 
 @Entity
@@ -45,16 +45,16 @@ public class TransportConfig {
 
   @ApiModelProperty(required = true, value = "configuration information  provided by the sut")
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "sut_initiator_config", joinColumns = @JoinColumn(
-      name = "transport_config_id"))
+  @CollectionTable(name = "sut_initiator_config",
+      joinColumns = @JoinColumn(name = "transport_config_id"))
   @MapKeyColumn(name = "property_key")
   @Column(name = "property_value")
   protected Map<String, String> sutInitiator = new HashMap<String, String>();;
 
   @ApiModelProperty(required = true, value = "configuration information provided to the sut")
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "ta_initiator_config", joinColumns = @JoinColumn(
-      name = "transport_config_id"))
+  @CollectionTable(name = "ta_initiator_config",
+      joinColumns = @JoinColumn(name = "transport_config_id"))
   @MapKeyColumn(name = "property_key")
   @Column(name = "property_value")
   protected Map<String, String> taInitiator = new HashMap<String, String>();;

@@ -1,4 +1,4 @@
-package gov.nist.hit.core.domain;
+package gov.nist.auth.hit.core.domain;
 
 public class KeyValuePair {
   private String key;

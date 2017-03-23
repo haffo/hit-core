@@ -28,6 +28,8 @@ import javax.persistence.OrderBy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import gov.nist.auth.hit.core.domain.TestingType;
+
 @Entity
 @ApiModel(value="CFTestInstance", description="Data Model representing context-free test case")
 public class CFTestInstance extends TestStep implements Serializable {

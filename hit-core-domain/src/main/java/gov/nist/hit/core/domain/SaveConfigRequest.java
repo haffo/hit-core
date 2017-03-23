@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 
+import gov.nist.auth.hit.core.domain.TestingType;
+
 
  public class SaveConfigRequest {
    private Long userId;

@@ -10,10 +10,10 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import gov.nist.auth.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.TestResult;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.domain.TestingType;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.impl.TestStepValidationReportServiceImpl;
 

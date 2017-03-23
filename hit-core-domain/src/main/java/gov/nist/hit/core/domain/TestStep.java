@@ -36,6 +36,8 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import gov.nist.auth.hit.core.domain.TestingType;
+
 @ApiModel(value = "TestStep", description = "Data Model representing a test step")
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

@@ -48,17 +48,16 @@ public class HTTPSecurityFilter implements Filter {
 			throws IOException, ServletException {
 
 		if (response instanceof HttpServletResponse) {
-			String path = request.getServletContext().getContextPath();
-			if (!path.contains("/gvt")) {
 				HttpServletResponse httpResponse = (HttpServletResponse) response;
 				httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
 				httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 				httpResponse.setHeader("X-Content-Type-Options", "nosniff");
 				httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
-				httpResponse.setHeader("Access-Control-Allow-Headers", "rsbVersion");
-			}
-			// httpResponse.setHeader("Access-Control-Expose-Headers", "dTime");
-		}
+				httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+				httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
+			    httpResponse.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+			    httpResponse.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers,Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization,appVersion,rsbVersion");
+ 		}
 
 		chain.doFilter(request, response);
 
