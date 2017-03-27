@@ -1,14 +1,15 @@
 package gov.nist.hit.core.service;
 
+import gov.nist.hit.core.domain.AppInfo;
 
 public interface AppInfoService {
 
-
   public String getRsbVersion();
 
-  String getUploadPattern();
+  public String getUploadPattern();
 
-  String getUploadMaxSize();
+  public String getUploadMaxSize();
 
+  public AppInfo get();
 
 }

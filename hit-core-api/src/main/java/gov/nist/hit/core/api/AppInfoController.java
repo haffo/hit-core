@@ -12,19 +12,17 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.AppInfo;
-import gov.nist.hit.core.repo.AppInfoRepository;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import gov.nist.hit.core.domain.AppInfo;
+import gov.nist.hit.core.service.AppInfoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * @author Harold Affo (NIST)
@@ -35,28 +33,25 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "App Info", tags = "Application Information")
 public class AppInfoController {
 
+	@Autowired
+	private AppInfoService appInfoService;
 
-  @Autowired
-  private AppInfoRepository appInfoRepository;
+	@ApiOperation(value = "Get Application Information", nickname = "getAppInfo")
+	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
+	public AppInfo info(HttpServletRequest request) {
+		AppInfo appInfo = appInfoService.get();
+		if (appInfo == null) {
+			appInfo = new AppInfo();
+		}
+		appInfo.setUrl(getUrl(request));
+		return appInfo;
+	}
 
-  @ApiOperation(value = "Get Application Information", nickname = "getAppInfo")
-  @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public AppInfo info(HttpServletRequest request) {
-    List<AppInfo> infos = appInfoRepository.findAll();
-    if (infos != null && !infos.isEmpty()) {
-      AppInfo appInfo = infos.get(0);
-      appInfo.setUrl(getUrl(request));
-      return appInfo;
-    }
-    return new AppInfo();
-  }
-
-
-  private String getUrl(HttpServletRequest request) {
-    String scheme = request.getScheme();
-    String host = request.getHeader("Host");
-    // return scheme + "://" + host + "/hit-tool";
-    String url = scheme + "://" + host + request.getContextPath();
-    return url;
-  }
+	private String getUrl(HttpServletRequest request) {
+		String scheme = request.getScheme();
+		String host = request.getHeader("Host");
+		// return scheme + "://" + host + "/hit-tool";
+		String url = scheme + "://" + host + request.getContextPath();
+		return url;
+	}
 }

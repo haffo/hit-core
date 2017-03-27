@@ -56,6 +56,7 @@ import gov.nist.auth.hit.core.repo.util.AccountSpecsHelper;
 import gov.nist.hit.core.domain.ResponseMessage;
 import gov.nist.hit.core.service.AccountPasswordResetService;
 import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.AppInfoService;
 import gov.nist.hit.core.service.CustomSortHandler;
 import gov.nist.hit.core.service.RandomPasswordGenerator;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
@@ -94,8 +95,8 @@ public class AccountController {
 	@Value("${server.email}")
 	private String SERVER_EMAIL;
 
-	@Value("${admin.email}")
-	private String ADMIN_EMAIL;
+	@Autowired
+	private AppInfoService appInfoService;
 
 	@Value("${mail.tool}")
 	private String TOOL_NAME;
@@ -106,7 +107,7 @@ public class AccountController {
 	@Autowired
 	AccountPasswordResetService accountPasswordResetService;
 
-	@PreAuthorize("hasRole('supervisor') or hasRole('admin')")
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
 	@RequestMapping(value = "/accounts", method = RequestMethod.GET)
 	public List<Account> getAccounts() {
 
@@ -120,7 +121,7 @@ public class AccountController {
 		return accs;
 	}
 
-	@PreAuthorize("hasRole('supervisor') or hasRole('admin')")
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
 	@RequestMapping(value = "/authors/page", method = RequestMethod.GET)
 	public Page<ShortAccount> getProvidersPage(@RequestParam(required = false, defaultValue = "0") int value,
 			@RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size,
@@ -196,7 +197,7 @@ public class AccountController {
 	// return sap;
 	// }
 
-	@PreAuthorize("hasRole('supervisor') or hasRole('admin')")
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
 	@RequestMapping(value = "/shortaccounts/page", method = RequestMethod.GET)
 	public Page<ShortAccount> getShortAccountsPage(@RequestParam(required = false, defaultValue = "0") int value,
 			@RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size,
@@ -235,17 +236,20 @@ public class AccountController {
 		return sap;
 	}
 
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
 	@RequestMapping(value = "/shortaccounts", method = RequestMethod.GET)
 	public List<ShortAccount> getShortAccounts(@RequestParam(required = false) List<String> filter) {
 
 		List<ShortAccount> saccs = new LinkedList<ShortAccount>();
-		filter = filter != null ? filter : new LinkedList<String>();
+		filter = new LinkedList<String>();
 
 		User authU = userService.getCurrentUser();
+		Account ac = accountService.findByTheAccountsUsername(authU.getUsername());
+
 		if (authU != null && authU.isEnabled()) {
 			if (authU.getAuthorities().contains(new SimpleGrantedAuthority("tester"))) {
 				filter.clear();
-			} else if (authU.getAuthorities().contains(new SimpleGrantedAuthority("supervisor"))
+			} else if (appInfoService.get().getAdminEmails().contains(ac.getEmail())
 					|| authU.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) {
 				// Do nothing
 			} else {
@@ -256,9 +260,12 @@ public class AccountController {
 		}
 
 		List<Account> accs = accountService.findAll((new AccountSpecsHelper()).getSpecification(filter));
+		List<String> masterEmails = appInfoService.get().getAdminEmails();
+
 		if (accs != null && !accs.isEmpty()) {
 			for (Account acc : accs) {
-				if (!acc.isEntityDisabled()) {
+				if (!acc.isEntityDisabled() && !acc.getUsername().equals(authU.getUsername())
+						&& !masterEmails.contains(acc.getUsername())) {
 					ShortAccount sacc = new ShortAccount();
 					sacc.setId(acc.getId());
 					sacc.setEmail(acc.getEmail());
@@ -266,6 +273,7 @@ public class AccountController {
 					sacc.setPending(acc.isPending());
 					sacc.setEntityDisabled(acc.isEntityDisabled());
 					sacc.setUsername(acc.getUsername());
+					sacc.setAccountType(acc.getAccountType());
 					saccs.add(sacc);
 				}
 			}
@@ -342,7 +350,7 @@ public class AccountController {
 	 * 
 	 * { \"accountType\":\"\" , \"email\":\"\" }
 	 */
-	@PreAuthorize("hasRole('supervisor') or hasRole('admin')")
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
 	@RequestMapping(value = "/accounts/register", method = RequestMethod.POST)
 	public ResponseMessage registerUserWhenAuthenticated(@RequestBody Account account, HttpServletRequest request)
 			throws Exception {
@@ -437,7 +445,7 @@ public class AccountController {
 
 	}
 
-	@PreAuthorize("hasRole('supervisor') or hasRole('admin')")
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
 	@RequestMapping(value = "/accounts/{accountId}/resendregistrationinvite", method = RequestMethod.POST)
 	public ResponseMessage resendRegistrationWhenAuthenticated(@PathVariable Long accountId, HttpServletRequest request)
 			throws Exception {
@@ -482,7 +490,7 @@ public class AccountController {
 		return new ResponseMessage(ResponseMessage.Type.success, "resentRegistrationInvite", acc.getUsername());
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
 	@RequestMapping(value = "/accounts/{accountId}/approveaccount", method = RequestMethod.POST)
 	public ResponseMessage approveAccount(@PathVariable Long accountId, HttpServletRequest request) throws Exception {
 
@@ -502,7 +510,7 @@ public class AccountController {
 		return new ResponseMessage(ResponseMessage.Type.success, "accountApproved", acc.getUsername(), true);
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
 	@RequestMapping(value = "/accounts/{accountId}/suspendaccount", method = RequestMethod.POST)
 	public ResponseMessage suspendAccount(@PathVariable Long accountId, HttpServletRequest request) throws Exception {
 		// get account
@@ -672,7 +680,8 @@ public class AccountController {
 	/**
 	 * Admin wants to change user password
 	 */
-	@PreAuthorize("hasRole('admin')")
+
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
 	@RequestMapping(value = "/accounts/{accountId}/userpasswordchange", method = RequestMethod.POST)
 	public ResponseMessage adminChangeAccountPassword(@RequestBody AccountChangeCredentials acc,
 			@PathVariable Long accountId) {
@@ -697,6 +706,37 @@ public class AccountController {
 		this.sendChangeAccountPasswordNotification(onRecordAccount, newPassword);
 
 		return new ResponseMessage(ResponseMessage.Type.success, "accountPasswordReset",
+				onRecordAccount.getId().toString(), true);
+	}
+
+	/**
+	 * 
+	 * @param acc
+	 * @param accountId
+	 * @return
+	 */
+	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
+	@RequestMapping(value = "/accounts/{accountId}/useraccounttypechange", method = RequestMethod.POST)
+	public ResponseMessage adminChangeAccountType(@RequestBody AccountChangeCredentials acc,
+			@PathVariable Long accountId) {
+		String accountType = acc.getAccountType();
+		// check there is a username in the request
+		if (acc.getUsername() == null || acc.getUsername().isEmpty()) {
+			return new ResponseMessage(ResponseMessage.Type.danger, "usernameMissing", null);
+		}
+
+		Account onRecordAccount = accountService.findOne(accountId);
+		if (!onRecordAccount.getUsername().equals(acc.getUsername())) {
+			return new ResponseMessage(ResponseMessage.Type.danger, "invalidUsername", null);
+		}
+
+		userService.changeAccountTypeForUser(acc.getAccountType(), acc.getUsername());
+		onRecordAccount.setAccountType(accountType);
+		accountService.save(onRecordAccount);
+		// send email notification
+		this.sendChangeAccountTypeNotification(onRecordAccount, acc.getAccountType());
+
+		return new ResponseMessage(ResponseMessage.Type.success, "accountTypeChange",
 				onRecordAccount.getId().toString(), true);
 	}
 
@@ -929,6 +969,7 @@ public class AccountController {
 			if (a != null && !a.isPending()) {
 				cu = new CurrentUser();
 				cu.setUsername(u.getUsername());
+				cu.setEmail(a.getEmail());
 				cu.setAccountId(a.getId());
 				cu.setAuthenticated(true);
 				cu.setAuthorities(u.getAuthorities());
@@ -947,7 +988,7 @@ public class AccountController {
 		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Thank you for submitting an application for use of the "
 				+ TOOL_NAME + "\n\n" + "Please refer to the user guide for the detailed steps. " + "\n\n"
 				+ "Sincerely, " + "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n"
-				+ "P.S: If you need help, contact us at '" + ADMIN_EMAIL + "'");
+				+ "P.S: If you need help, contact us at '" + appInfoService.get().getAdminEmails().get(0) + "'");
 		try {
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
@@ -963,7 +1004,8 @@ public class AccountController {
 		msg.setText("Dear " + acc.getUsername() + " \n\n" + "You've successfully registered on the " + TOOL_NAME
 				+ " Site." + " \n" + "Your username is: " + acc.getUsername() + " \n\n"
 				+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n" + "The "
-				+ TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '" + ADMIN_EMAIL + "'");
+				+ TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
+				+ appInfoService.get().getAdminEmails().get(0) + "'");
 
 		try {
 			this.mailSender.send(msg);
@@ -975,7 +1017,7 @@ public class AccountController {
 	private void sendRegistrationNotificationToAdmin(Account acc) {
 		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 		msg.setSubject("New Registration Application on IGAMT");
-		msg.setTo(ADMIN_EMAIL);
+		msg.setTo(appInfoService.get().getAdminEmails().get(0));
 		msg.setText(
 				"Hello Admin,  \n A new application has been submitted and is waiting for approval. The user information are as follow: \n\n"
 						+ "Name: " + acc.getFullName() + "\n" + "Email: " + acc.getEmail() + "\n" + "Username: "
@@ -997,7 +1039,7 @@ public class AccountController {
 				+ "**** If you have not requested a new account, please disregard this email **** \n\n\n"
 				+ "Your account has been approved and you can proceed " + "to login .\n" + "\n\n" + "Sincerely, "
 				+ "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
-				+ ADMIN_EMAIL + "'");
+				+ appInfoService.get().getAdminEmails().get(0) + "'");
 		try {
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
@@ -1016,7 +1058,8 @@ public class AccountController {
 				+ "You need to change your password in order to login.\n"
 				+ "Copy and paste the following url to your browser to initiate the password change:\n" + url + " \n\n"
 				+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n" + "The "
-				+ TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '" + ADMIN_EMAIL + "'");
+				+ TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
+				+ appInfoService.get().getAdminEmails().get(0) + "'");
 
 		try {
 			this.mailSender.send(msg);
@@ -1035,7 +1078,7 @@ public class AccountController {
 				+ "You password reset request has been processed.\n"
 				+ "Copy and paste the following url to your browser to initiate the password change:\n" + url + " \n\n"
 				+ "Sincerely, " + "\n\n" + "The IGAMT Team" + "\n\n" + "P.S: If you need help, contact us at '"
-				+ ADMIN_EMAIL + "'");
+				+ appInfoService.get().getAdminEmails().get(0) + "'");
 
 		try {
 			this.mailSender.send(msg);
@@ -1067,6 +1110,19 @@ public class AccountController {
 				+ "Your new temporary password is ." + newPassword + " \n\n"
 				+ "Please update your password once logged in. \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
+		try {
+			this.mailSender.send(msg);
+		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		}
+	}
+
+	private void sendChangeAccountTypeNotification(Account acc, String newAccountType) {
+		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+		msg.setTo(acc.getEmail());
+		msg.setSubject("" + TOOL_NAME + " Account Type Change Notification");
+		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your account type has been successfully changed." + " \n\n"
+				+ "Your are now a " + newAccountType + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 		try {
 			this.mailSender.send(msg);
 		} catch (MailException ex) {

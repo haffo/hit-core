@@ -42,8 +42,8 @@ public interface UserService {
    * @param password the password
    * @param authorities the list of the authorities
    */
-  public abstract <T> void createUserWithAuthorities(String username, String password, T authorities)
-      throws Exception;
+  public abstract <T> void createUserWithAuthorities(String username, String password,
+      T authorities) throws Exception;
 
   /**
    * Changes the password for this principal
@@ -62,8 +62,8 @@ public interface UserService {
    * @param newPassword the new password for this principal
    * @throws BadCredentialsException the oldPassword is incorrect
    */
-  public abstract void changePasswordForUser(String oldPassword, String newPassword, String username)
-      throws BadCredentialsException;
+  public abstract void changePasswordForUser(String oldPassword, String newPassword,
+      String username) throws BadCredentialsException;
 
   /**
    * Changes the password for this username
@@ -85,7 +85,7 @@ public interface UserService {
    * Disables a user
    * 
    * @param username the name of the user to disable
-   * */
+   */
   public abstract void disableUser(String username);
 
   /**
@@ -111,5 +111,14 @@ public interface UserService {
          * 
          */
   public void enableUserCredentials(String username);
+
+  /**
+   * 
+   * @param newAccountType
+   * @param username
+   * @throws BadCredentialsException
+   */
+  public void changeAccountTypeForUser(String newAccountType, String username)
+      throws BadCredentialsException;
 
 }

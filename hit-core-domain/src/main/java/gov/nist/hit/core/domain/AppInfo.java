@@ -13,9 +13,13 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,7 +50,8 @@ public class AppInfo implements Serializable {
 
   private String header;
 
-  private String adminEmail;
+  @ElementCollection(fetch = FetchType.EAGER)
+  private List<String> adminEmails = new ArrayList<String>();
 
   private String homeTitle;
 
@@ -161,12 +166,12 @@ public class AppInfo implements Serializable {
     this.header = header;
   }
 
-  public String getAdminEmail() {
-    return adminEmail;
+  public List<String> getAdminEmails() {
+    return adminEmails;
   }
 
-  public void setAdminEmail(String adminEmail) {
-    this.adminEmail = adminEmail;
+  public void setAdminEmails(List<String> adminEmails) {
+    this.adminEmails = adminEmails;
   }
 
 
@@ -289,8 +294,8 @@ public class AppInfo implements Serializable {
   @Override
   public String toString() {
     return "AppInfo [id=" + id + ", url=" + url + ", version=" + version + ", date=" + date
-        + ", name=" + name + ", domain=" + domain + ", header=" + header + ", adminEmail="
-        + adminEmail + ", homeContent=" + homeContent + ", profileInfo=" + profileInfo + "]";
+        + ", name=" + name + ", domain=" + domain + ", header=" + header + ", adminEmails="
+        + adminEmails + ", homeContent=" + homeContent + ", profileInfo=" + profileInfo + "]";
   }
 
   public String getMailFrom() {

@@ -14,7 +14,17 @@ package gov.nist.hit.core.service;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -189,7 +199,7 @@ public abstract class ResourcebundleLoader {
   @Autowired
   protected VocabularyLibraryRepository vocabularyLibraryRepository;
 
-  private Map<Long,String> idLocationMap;
+  private Map<Long, String> idLocationMap;
 
   public ResourcebundleLoader() {
     obm = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -269,7 +279,20 @@ public abstract class ResourcebundleLoader {
     JsonNode metaData = getMetaData();
     String rsbVersion = getRsbleVersion();
     appInfo.setRsbVersion(rsbVersion);
-    appInfo.setAdminEmail(metaData.get("adminEmail").textValue());
+    if (metaData.get("adminEmail") == null) {
+      throw new RuntimeException("Administrator's email address is missing");
+    }
+
+    List<String> adminEmails = new ArrayList<String>();
+    if (metaData.get("adminEmail").isArray()) {
+      Iterator<JsonNode> it = metaData.get("adminEmail").iterator();
+      while (it.hasNext()) {
+        adminEmails.add(it.next().textValue());
+      }
+    } else {
+      adminEmails.add(metaData.get("adminEmail").textValue());
+    }
+    appInfo.setAdminEmails(adminEmails);
     appInfo.setDomain(metaData.get("domain").textValue());
     appInfo.setHeader(metaData.get("header").textValue());
     appInfo.setHomeTitle(
@@ -885,14 +908,16 @@ public abstract class ResourcebundleLoader {
     return path;
   }
 
-  private void checkPersistentId(Long persistentId,String location){
-    if(null==persistentId){
+  private void checkPersistentId(Long persistentId, String location) {
+    if (null == persistentId) {
       logger.error("Null id at location: " + location);
-    } else if (idLocationMap.containsKey(persistentId)&&!idLocationMap.get(persistentId).equals(location)&&location.toLowerCase().endsWith(
-        ".json")){
-      logger.error("Duplicate id ("+persistentId+") at location: "+location+" - already exists at location: "+idLocationMap.get(persistentId));
+    } else if (idLocationMap.containsKey(persistentId)
+        && !idLocationMap.get(persistentId).equals(location)
+        && location.toLowerCase().endsWith(".json")) {
+      logger.error("Duplicate id (" + persistentId + ") at location: " + location
+          + " - already exists at location: " + idLocationMap.get(persistentId));
     } else {
-      idLocationMap.put(persistentId,location);
+      idLocationMap.put(persistentId, location);
     }
   }
 
@@ -905,7 +930,7 @@ public abstract class ResourcebundleLoader {
             fileName.length());
         TestPlan testPlan = testPlan(location, TestingStage.CB);
         if (testPlan != null) {
-          checkPersistentId(testPlan.getPersistentId(),location);
+          checkPersistentId(testPlan.getPersistentId(), location);
           testPlanRepository.save(testPlan);
         }
       }
@@ -920,7 +945,7 @@ public abstract class ResourcebundleLoader {
         CFTestInstance testObject = testObject(fileName
             .substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)), fileName.length()));
         if (testObject != null) {
-          checkPersistentId(testObject.getPersistentId(),fileName);
+          checkPersistentId(testObject.getPersistentId(), fileName);
           testObject.setRoot(true);
           testInstanceRepository.save(testObject);
         }
@@ -960,7 +985,7 @@ public abstract class ResourcebundleLoader {
       String fileName = fileName(resource);
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
       TestStep testStep = testStep(tcLocation, stage, transportSupported);
-      checkPersistentId(testStep.getPersistentId(),fileName);
+      checkPersistentId(testStep.getPersistentId(), fileName);
       tc.addTestStep(testStep);
     }
 
@@ -1006,11 +1031,11 @@ public abstract class ResourcebundleLoader {
             targetPair.getValue().asText());
         Boolean optional = false;
         JsonNode optionalNode = node.findValue("optional");
-        if(optionalNode !=null && optionalNode.asBoolean()){
+        if (optionalNode != null && optionalNode.asBoolean()) {
           optional = true;
         }
         if (source != null && target != null) {
-          DataMapping dataMapping = new DataMapping(source, target, tc,optional);
+          DataMapping dataMapping = new DataMapping(source, target, tc, optional);
           logger.info("Saving data mapping : " + dataMapping.toString());
           dataMappings.add(dataMapping);
         }
@@ -1184,11 +1209,11 @@ public abstract class ResourcebundleLoader {
           String filename = descriptorResource.getFilename();
           if (filename.endsWith("TestCaseGroup.json")) {
             TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage, transportEnabled);
-            checkPersistentId(testCaseGroup.getPersistentId(),location);
+            checkPersistentId(testCaseGroup.getPersistentId(), location);
             tcg.getTestCaseGroups().add(testCaseGroup);
           } else if (filename.endsWith("TestCase.json")) {
             TestCase testCase = testCase(tcLocation, stage, transportEnabled);
-            checkPersistentId(testCase.getPersistentId(),location);
+            checkPersistentId(testCase.getPersistentId(), location);
             tcg.getTestCases().add(testCase);
           }
         }
@@ -1251,11 +1276,11 @@ public abstract class ResourcebundleLoader {
         String filename = descriptorResource.getFilename();
         if (filename.endsWith("TestCaseGroup.json")) {
           TestCaseGroup testCaseGroup = testCaseGroup(loca, stage, tp.isTransport());
-          checkPersistentId(testCaseGroup.getPersistentId(),fileName);
+          checkPersistentId(testCaseGroup.getPersistentId(), fileName);
           tp.getTestCaseGroups().add(testCaseGroup);
         } else if (filename.endsWith("TestCase.json")) {
           TestCase testCase = testCase(loca, stage, tp.isTransport());
-          checkPersistentId(testCase.getPersistentId(),fileName);
+          checkPersistentId(testCase.getPersistentId(), fileName);
           tp.getTestCases().add(testCase);
         }
       }
@@ -1297,7 +1322,7 @@ public abstract class ResourcebundleLoader {
         String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
         CFTestInstance testObject = testObject(location);
         if (testObject != null) {
-          checkPersistentId(testObject.getPersistentId(),fileName);
+          checkPersistentId(testObject.getPersistentId(), fileName);
           parent.getChildren().add(testObject);
         }
       }

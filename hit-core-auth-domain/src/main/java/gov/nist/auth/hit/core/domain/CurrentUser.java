@@ -22,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 public class CurrentUser {
 
   private String username;
+  private String email;
   private Long accountId;
   private boolean isAuthenticated = false;
   private boolean isPending = false;
@@ -107,6 +108,14 @@ public class CurrentUser {
 
   public void setGuestAccount(boolean guestAccount) {
     this.guestAccount = guestAccount;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
   }
 
 

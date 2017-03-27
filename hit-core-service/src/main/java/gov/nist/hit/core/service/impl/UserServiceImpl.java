@@ -11,10 +11,6 @@
  */
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.auth.hit.core.domain.util.UserUtil;
-import gov.nist.hit.core.service.CustomJdbcUserDetailsManager;
-import gov.nist.hit.core.service.UserService;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +30,10 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import gov.nist.auth.hit.core.domain.util.UserUtil;
+import gov.nist.hit.core.service.CustomJdbcUserDetailsManager;
+import gov.nist.hit.core.service.UserService;
+
 /**
  * @author fdevaulx
  * 
@@ -44,6 +44,10 @@ public class UserServiceImpl implements UserService {
   static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
   private final String DEFAULT_AUTHORITY = "user";
+  private final String TESTER_AUTHORITY = "tester";
+  private final String ADMIN_AUTHORITY = "admin";
+  private final String DEPLOYER_AUTHORITY = "deployer";
+
 
   @Autowired
   private CustomJdbcUserDetailsManager jdbcUserDetailsManager;
@@ -77,9 +81,8 @@ public class UserServiceImpl implements UserService {
     List<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
     roles.add(new SimpleGrantedAuthority(DEFAULT_AUTHORITY));
 
-    UserDetails userDetails =
-        new User(username, passwordEncoder.encodePassword(password, username), true, true, true,
-            true, roles);
+    UserDetails userDetails = new User(username, passwordEncoder.encodePassword(password, username),
+        true, true, true, true, roles);
 
     jdbcUserDetailsManager.createUser(userDetails);
   }
@@ -137,6 +140,25 @@ public class UserServiceImpl implements UserService {
         newEncodedPassword, username);
   }
 
+  @Override
+  public void changeAccountTypeForUser(String newAccountType, String username)
+      throws BadCredentialsException {
+    jdbcUserDetailsManager.getJdbcTemplate()
+        .update(jdbcUserDetailsManager.DEF_DELETE_USER_AUTHORITIES_SQL, username);
+    jdbcUserDetailsManager.getJdbcTemplate().update(jdbcUserDetailsManager.DEF_INSERT_AUTHORITY_SQL,
+        username, TESTER_AUTHORITY);
+    jdbcUserDetailsManager.getJdbcTemplate().update(jdbcUserDetailsManager.DEF_INSERT_AUTHORITY_SQL,
+        username, DEFAULT_AUTHORITY);
+    if (!TESTER_AUTHORITY.equals(newAccountType)) {
+      jdbcUserDetailsManager.getJdbcTemplate()
+          .update(jdbcUserDetailsManager.DEF_INSERT_AUTHORITY_SQL, username, newAccountType);
+      if (ADMIN_AUTHORITY.equals(newAccountType)) {
+        jdbcUserDetailsManager.getJdbcTemplate()
+            .update(jdbcUserDetailsManager.DEF_INSERT_AUTHORITY_SQL, username, DEPLOYER_AUTHORITY);
+      }
+    }
+  }
+
 
   /*
    * (non-Javadoc)
@@ -162,8 +184,8 @@ public class UserServiceImpl implements UserService {
       // logger.debug("^^^^^^^^^^^^^^^^^^ u.isEnabled? "+u.isEnabled()+" ^^^^^^^^^^^^^^^^");
       if (u.isEnabled()) {
         // logger.debug("^^^^^^^^^^^^^^^^^^ 0 ^^^^^^^^^^^^^^^^");
-        jdbcUserDetailsManager.getJdbcTemplate().update(
-            "update users set enabled = 0 where username = ?", u.getUsername());
+        jdbcUserDetailsManager.getJdbcTemplate()
+            .update("update users set enabled = 0 where username = ?", u.getUsername());
       }
     }
   }
@@ -183,9 +205,8 @@ public class UserServiceImpl implements UserService {
       }
     }
 
-    UserDetails userDetails =
-        new User(username, passwordEncoder.encodePassword(password, username), true, true, true,
-            true, roles);
+    UserDetails userDetails = new User(username, passwordEncoder.encodePassword(password, username),
+        true, true, true, true, roles);
 
     jdbcUserDetailsManager.createUser(userDetails);
   }

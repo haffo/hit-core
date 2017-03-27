@@ -11,14 +11,14 @@
  */
 package gov.nist.auth.hit.core.repo.util;
 
-import gov.nist.auth.hit.core.domain.Account;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.data.jpa.domain.Specification;
+
+import gov.nist.auth.hit.core.domain.Account;
 
 /**
  * @author fdevaulx

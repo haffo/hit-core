@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gov.nist.hit.core.domain.AppInfo;
 import gov.nist.hit.core.repo.AppInfoRepository;
 import gov.nist.hit.core.service.AppInfoService;
 
@@ -59,6 +60,15 @@ public class AppInfoServiceImpl implements AppInfoService {
       return null;
     }
     return list.get(0);
+  }
+
+  public AppInfo get() {
+    List<AppInfo> infos = appInfoRepository.findAll();
+    if (infos != null && !infos.isEmpty()) {
+      AppInfo appInfo = infos.get(0);
+      return appInfo;
+    }
+    return null;
   }
 
 

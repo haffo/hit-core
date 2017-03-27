@@ -11,8 +11,6 @@
  */
 package gov.nist.hit.core.service;
 
-import gov.nist.auth.hit.core.domain.Account;
-
 import java.io.Serializable;
 
 import org.slf4j.Logger;
@@ -22,6 +20,8 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+
+import gov.nist.auth.hit.core.domain.Account;
 
 /**
  * @author fdevaulx
@@ -34,6 +34,11 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
   @Autowired
   AccountService accountService;
+
+  @Autowired
+  AppInfoService appInfoService;
+
+
 
   /*
    * (non-Javadoc)
@@ -55,7 +60,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
       logger.debug("^^^^^^^^^^^^^^^^^ 3 acc.getId(): " + acc.getId() + " targetDomainObject: "
           + targetDomainObject + " ^^^^^^^^^^^^^^^^^^");
       if (acc.getId().equals(targetDomainObject)
-          || authentication.getAuthorities().contains(new SimpleGrantedAuthority("supervisor"))
+          || appInfoService.get().getAdminEmails().contains(acc.getEmail())
           || authentication.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) {
         return true;
       }
@@ -80,8 +85,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
       if (acc == null) {
         return false;
       }
-      if (acc.getId() == targetId
-          || authentication.getAuthorities().contains(new SimpleGrantedAuthority("supervisor"))
+      if (acc.getId() == targetId || appInfoService.get().getAdminEmails().contains(acc.getEmail())
           || authentication.getAuthorities().contains(new SimpleGrantedAuthority("admin"))) {
         return true;
       }
