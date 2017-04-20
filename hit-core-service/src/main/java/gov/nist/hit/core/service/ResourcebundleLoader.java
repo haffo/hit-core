@@ -202,6 +202,7 @@ public abstract class ResourcebundleLoader {
   private Map<Long, String> idLocationMap;
 
   public ResourcebundleLoader() {
+	idLocationMap = new HashMap<>();
     obm = new com.fasterxml.jackson.databind.ObjectMapper();
     obm.setSerializationInclusion(Include.NON_NULL);
     this.directory = "";
