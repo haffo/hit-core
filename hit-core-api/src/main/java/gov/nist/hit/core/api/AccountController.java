@@ -264,7 +264,7 @@ public class AccountController {
 
 		if (accs != null && !accs.isEmpty()) {
 			for (Account acc : accs) {
-				if (!acc.isEntityDisabled() && !acc.getUsername().equals(authU.getUsername())
+				if (acc.getUsername() != null && !acc.isEntityDisabled() && !acc.getUsername().equals(authU.getUsername())
 						&& !masterEmails.contains(acc.getUsername())) {
 					ShortAccount sacc = new ShortAccount();
 					sacc.setId(acc.getId());
