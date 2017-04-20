@@ -99,6 +99,10 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @JsonIgnore
   @ManyToOne(optional=true,fetch = FetchType.EAGER)
   protected TestCase testCase;
+  
+  @JsonIgnore
+  @OneToMany(mappedBy = "testStep", cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
+  protected List<TestStepValidationReport> reports;
 
  
   public TestStep(String name) {
