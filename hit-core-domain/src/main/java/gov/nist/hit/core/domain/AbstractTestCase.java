@@ -193,7 +193,7 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
     if (getClass() != obj.getClass())
       return false;
     AbstractTestCase other = (AbstractTestCase) obj;
-    if (this.getPersistentId() != other.getPersistentId())
+    if (!this.getPersistentId().equals(other.getPersistentId()))
       return false;
     return true;
   }
