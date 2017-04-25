@@ -214,5 +214,42 @@ public class ResourcebundleHelper {
       throw new Exception("Could not create TMP directory");
     }
   }
+  
+  public static String getResourcesFromZip(InputStream stream) throws Exception {
+		// Create TEMP directory
+		File tmpDir = Files.createTempDir();
+		tmpDir.mkdir();
+		String DIR_PATH = tmpDir.getAbsolutePath();
+		byte[] buffer = new byte[1024];
+
+		if (tmpDir.isDirectory()) {
+
+			// Extract ZIP
+			ZipInputStream zip = new ZipInputStream(stream);
+			ZipEntry ze = zip.getNextEntry();
+			while (ze != null) {
+				String fileName = ze.getName();
+				File newFile = new File(DIR_PATH + File.separator + fileName);
+				System.out.println("file unzip : " + newFile.getAbsoluteFile());
+				new File(newFile.getParent()).mkdirs();
+
+				FileOutputStream fos = new FileOutputStream(newFile);
+
+				int len;
+				while ((len = zip.read(buffer)) > 0) {
+					fos.write(buffer, 0, len);
+				}
+
+				fos.close();
+				ze = zip.getNextEntry();
+			}
+			zip.closeEntry();
+			zip.close();
+			System.out.println("Done");
+			return DIR_PATH;
+		} else {
+			throw new Exception("Could not create TMP directory");
+		}
+	}
 
 }
