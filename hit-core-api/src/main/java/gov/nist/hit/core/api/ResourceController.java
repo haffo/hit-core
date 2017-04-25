@@ -24,10 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/editResources")
@@ -38,16 +39,19 @@ public class ResourceController {
 	private ResourceLoader resourceLoader;
 	
 
+	
 	@ModelAttribute("requestObj")
-	public AddOrUpdateRequest initRequest(@RequestBody AddOrUpdateRequest req)
+	public AddOrUpdateRequest initRequest(@RequestPart("file") MultipartFile file, @RequestPart("id") Long id)
 			throws Exception {
-		if(req != null && req.getUrl() != null && !req.getUrl().isEmpty()){
-			String zipFolder = ResourcebundleHelper.getResourcesFromZip(req.getUrl());
-			req.setZip(zipFolder);
+		AddOrUpdateRequest request = new AddOrUpdateRequest();
+		if (!file.isEmpty()) {
+			String zipFolder = ResourcebundleHelper.getResourcesFromZip(file.getInputStream());
+			request.setZip(zipFolder);
 		}
-		
-		return req;
+		request.setId(id);
+		return request;
 	}
+
 	
 // Context Based API Methods
 
