@@ -1016,7 +1016,7 @@ public class AccountController {
 
 	private void sendRegistrationNotificationToAdmin(Account acc) {
 		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-		msg.setSubject("New Registration Application on IGAMT");
+		msg.setSubject("New Registration Application on " +TOOL_NAME);
 		msg.setTo(appInfoService.get().getAdminEmails().get(0));
 		msg.setText(
 				"Hello Admin,  \n A new application has been submitted and is waiting for approval. The user information are as follow: \n\n"
@@ -1077,7 +1077,7 @@ public class AccountController {
 				+ "**** If you have not requested a password reset, please disregard this email **** \n\n\n"
 				+ "You password reset request has been processed.\n"
 				+ "Copy and paste the following url to your browser to initiate the password change:\n" + url + " \n\n"
-				+ "Sincerely, " + "\n\n" + "The IGAMT Team" + "\n\n" + "P.S: If you need help, contact us at '"
+				+ "Sincerely, " + "\n\n" + "The "+TOOL_NAME+" Team" + "\n\n" + "P.S: If you need help, contact us at '"
 				+ appInfoService.get().getAdminEmails().get(0) + "'");
 
 		try {
