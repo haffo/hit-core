@@ -33,6 +33,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -94,6 +96,7 @@ import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
 import gov.nist.hit.core.service.util.ResourcebundleHelper;
 
+@PropertySource(value = { "classpath:app-auth-config.properties" })
 public abstract class ResourcebundleLoader {
 
   static final public Logger logger = LoggerFactory.getLogger(ResourcebundleLoader.class);
@@ -200,6 +203,10 @@ public abstract class ResourcebundleLoader {
   protected VocabularyLibraryRepository vocabularyLibraryRepository;
 
   private Map<Long, String> idLocationMap;
+  
+  @Value("${admin.emails}")
+  private List<String> adminEmails;
+  
 
   public ResourcebundleLoader() {
 	idLocationMap = new HashMap<>();
@@ -259,6 +266,8 @@ public abstract class ResourcebundleLoader {
       cachedRepository.getCachedVocabLibraries().clear();
       cachedRepository.getCachedConstraints().clear();
       logger.info("resource bundle loaded successfully...");
+    }else{
+    	this.loadDynamicValues();
     }
   }
 
@@ -279,21 +288,7 @@ public abstract class ResourcebundleLoader {
     AppInfo appInfo = new AppInfo();
     JsonNode metaData = getMetaData();
     String rsbVersion = getRsbleVersion();
-    appInfo.setRsbVersion(rsbVersion);
-    if (metaData.get("adminEmail") == null) {
-      throw new RuntimeException("Administrator's email address is missing");
-    }
-
-    List<String> adminEmails = new ArrayList<String>();
-    if (metaData.get("adminEmail").isArray()) {
-      Iterator<JsonNode> it = metaData.get("adminEmail").iterator();
-      while (it.hasNext()) {
-        adminEmails.add(it.next().textValue());
-      }
-    } else {
-      adminEmails.add(metaData.get("adminEmail").textValue());
-    }
-    appInfo.setAdminEmails(adminEmails);
+    appInfo.setRsbVersion(rsbVersion);    
     appInfo.setDomain(metaData.get("domain").textValue());
     appInfo.setHeader(metaData.get("header").textValue());
     appInfo.setHomeTitle(
@@ -1544,6 +1539,26 @@ public abstract class ResourcebundleLoader {
     }
     return documents;
   }
+  
+  
+  
+	  /**
+	 * @throws JsonProcessingException
+	 * @throws IOException
+	 * Loads values dynamically at each app startup (not only at database creation)
+	 */
+	public void loadDynamicValues() throws JsonProcessingException, IOException {
+	    logger.info("loading app info...");
+	    AppInfo appInfo = appInfoService.get();
+	    
+	    if (adminEmails == null) {
+	      throw new RuntimeException("Administrator emails address are missing");
+	    }
+	    appInfo.setAdminEmails(adminEmails);
+	    
+	    appInfoRepository.save(appInfo);
+	    logger.info("loading app info...DONE");
+	}
 
   public TestPlanRepository getTestPlanRepository() {
     return testPlanRepository;
@@ -1754,4 +1769,5 @@ public abstract class ResourcebundleLoader {
   // this.cachedConstraints = cachedConstraints;
   // }
 
+ 
 }
