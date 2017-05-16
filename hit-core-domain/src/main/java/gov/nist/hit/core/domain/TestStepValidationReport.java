@@ -31,10 +31,11 @@ public class TestStepValidationReport implements Serializable {
   private Long userId;
 
   @JsonIgnore
-  @Column(columnDefinition = "TEXT")
+  @Column(columnDefinition = "LONGTEXT")
   private String xml;
 
   @Transient
+  @Column(columnDefinition = "LONGTEXT")
   private String html;
 
 
