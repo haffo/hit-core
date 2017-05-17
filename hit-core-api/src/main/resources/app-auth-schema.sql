@@ -12,6 +12,6 @@ create table IF NOT EXISTS users(
       authority varchar(50) not null,
       constraint fk_authorities_users foreign key(username) references users(username));
   
-  create unique index IF NOT EXISTS ix_auth_username on authorities (username,authority);
+--  create unique index IF NOT EXISTS ix_auth_username on authorities (username,authority);
       
       

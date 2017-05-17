@@ -3,17 +3,17 @@ package gov.nist.hit.core.domain;
 import java.io.Serializable;
 
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
+@Table(name = "VocabularyLibrary")
 public class VocabularyLibrary implements Serializable {
  
  
@@ -35,7 +35,7 @@ public class VocabularyLibrary implements Serializable {
   protected String description;
   
   @JsonIgnore
-  protected String key;
+  protected String key_;
   
   @JsonIgnore
   @Column(columnDefinition = "LONGTEXT")
@@ -95,11 +95,11 @@ public class VocabularyLibrary implements Serializable {
   }
 
   public String getKey() {
-    return key;
+    return key_;
   }
 
   public void setKey(String key) {
-    this.key = key;
+    this.key_ = key;
   }
   
   
