@@ -387,7 +387,9 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
 
 			if ((index = tmp.indexOf(tcs)) != -1) {
 				tcs.setId(tmp.get(index).getId());
-				tcs.getTestContext().setId(tmp.get(index).getTestContext().getId());
+				if(tmp.get(index).getTestContext() != null){
+					tcs.getTestContext().setId(tmp.get(index).getTestContext().getId());
+				}
 				tmp.set(index, tcs);
 			} else {
 				tmp.add(tcs);

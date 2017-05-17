@@ -62,10 +62,10 @@ public class IntegrationProfile implements Serializable {
 	protected String description;
 
 	@Column(nullable = true)
-	protected String key;
+	protected String key_;
 
 	@Column(nullable = true)
-	protected String type;
+	protected String type_;
 
 	@Column(nullable = true)
 	protected String schemaVersion;
@@ -121,11 +121,11 @@ public class IntegrationProfile implements Serializable {
 	}
 
 	public String getKey() {
-		return key;
+		return key_;
 	}
 
 	public void setKey(String key) {
-		this.key = key;
+		this.key_ = key;
 	}
 
 	public Long getId() {
@@ -137,11 +137,11 @@ public class IntegrationProfile implements Serializable {
 	}
 
 	public String getType() {
-		return type;
+		return type_;
 	}
 
 	public void setType(String type) {
-		this.type = type;
+		this.type_ = type;
 	}
 
 	public String getSchemaVersion() {
