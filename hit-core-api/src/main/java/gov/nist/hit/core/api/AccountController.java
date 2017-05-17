@@ -68,7 +68,7 @@ import gov.nist.hit.core.service.UserService;
  * 
  */
 @RestController
-@PropertySource(value = { "classpath:app-auth-config.properties" })
+@PropertySource(value = { "classpath:app-config.properties" })
 public class AccountController {
 
 	static final Logger logger = LoggerFactory.getLogger(AccountController.class);
@@ -264,7 +264,8 @@ public class AccountController {
 
 		if (accs != null && !accs.isEmpty()) {
 			for (Account acc : accs) {
-				if (acc.getUsername() != null && !acc.isEntityDisabled() && !acc.getUsername().equals(authU.getUsername())
+				if (acc.getUsername() != null && !acc.isEntityDisabled()
+						&& !acc.getUsername().equals(authU.getUsername())
 						&& !masterEmails.contains(acc.getUsername())) {
 					ShortAccount sacc = new ShortAccount();
 					sacc.setId(acc.getId());

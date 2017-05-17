@@ -12,7 +12,7 @@
          http://www.springframework.org/schema/jee
          http://www.springframework.org/schema/jee/spring-jee.xsd">
 
-	<context:property-placeholder location="classpath:app-auth-config.properties" />
+	<context:property-placeholder location="classpath:app-config.properties" />
 
 	<sec:http pattern="/blank.html" security="none" />
 	<sec:http pattern="/Error.html" security="none" />

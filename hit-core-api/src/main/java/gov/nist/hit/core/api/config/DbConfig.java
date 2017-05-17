@@ -42,80 +42,80 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableJpaRepositories(value = "gov.nist.hit")
-@PropertySource(value = "classpath:app-db.properties")
+@PropertySource(value = "classpath:app-config.properties")
 @EnableTransactionManagement(proxyTargetClass = true)
 public class DbConfig {
 
-  @Autowired
-  private Environment env;
+	@Autowired
+	private Environment env;
 
-  @Bean
-  public DataSource dataSource() {
-    DriverManagerDataSource dataSource = new DriverManagerDataSource();
-    dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
-    dataSource.setPassword(env.getProperty("jdbc.password"));
-    dataSource.setUrl(env.getProperty("jdbc.url"));
-    dataSource.setUsername(env.getProperty("jdbc.username"));
-    return dataSource;
-  }
+	@Bean
+	public DataSource dataSource() {
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
+		dataSource.setPassword(env.getProperty("jdbc.password"));
+		dataSource.setUrl(env.getProperty("jdbc.url"));
+		dataSource.setUsername(env.getProperty("jdbc.username"));
+		return dataSource;
+	}
 
-  @Bean
-  public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource,
-      JpaVendorAdapter jpaVendorAdapter) {
-    LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
-    lef.setDataSource(dataSource);
-    lef.setJpaVendorAdapter(jpaVendorAdapter);
-    lef.setPackagesToScan("gov.nist.hit");
-    lef.setJpaProperties(jpaProperties());
-    lef.setPersistenceUnitName("base-tool");
-    // lef.setPersistenceUnitManager(persistenceUnitManager);
-    lef.setLoadTimeWeaver(new InstrumentationLoadTimeWeaver());
-    return lef;
-  }
+	@Bean
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource,
+			JpaVendorAdapter jpaVendorAdapter) {
+		LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
+		lef.setDataSource(dataSource);
+		lef.setJpaVendorAdapter(jpaVendorAdapter);
+		lef.setPackagesToScan("gov.nist.hit");
+		lef.setJpaProperties(jpaProperties());
+		lef.setPersistenceUnitName("base-tool");
+		// lef.setPersistenceUnitManager(persistenceUnitManager);
+		lef.setLoadTimeWeaver(new InstrumentationLoadTimeWeaver());
+		return lef;
+	}
 
-  @Bean
-  public JpaVendorAdapter jpaVendorAdapter() {
-    HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
-    jpaVendorAdapter.setShowSql(Boolean.getBoolean(env.getProperty("jpa.showSql")));
-    jpaVendorAdapter.setGenerateDdl(Boolean.getBoolean(env.getProperty("jpa.generateDdl")));
-    jpaVendorAdapter.setDatabase(Database.valueOf(env.getProperty("jpa.database")));
-    jpaVendorAdapter.setDatabasePlatform(env.getProperty("jpa.databasePlatform"));
-    return jpaVendorAdapter;
-  }
+	@Bean
+	public JpaVendorAdapter jpaVendorAdapter() {
+		HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
+		jpaVendorAdapter.setShowSql(Boolean.getBoolean(env.getProperty("jpa.showSql")));
+		jpaVendorAdapter.setGenerateDdl(Boolean.getBoolean(env.getProperty("jpa.generateDdl")));
+		jpaVendorAdapter.setDatabase(Database.valueOf(env.getProperty("jpa.database")));
+		jpaVendorAdapter.setDatabasePlatform(env.getProperty("jpa.databasePlatform"));
+		return jpaVendorAdapter;
+	}
 
-  private Properties jpaProperties() {
-    Properties properties = new Properties();
-    // properties.put("hibernate.cache.use_second_level_cache",
-    // env.getProperty("hibernate.cache.use_second_level_cache"));
-    // properties.put("hibernate.cache.region.factory_class",
-    // env.getProperty("hibernate.cache.region.factory_class"));
-    // properties.put("hibernate.cache.use_query_cache",
-    // env.getProperty("hibernate.cache.use_query_cache"));
-    properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
-    properties.put("hibernate.dialect", env.getProperty("jpa.databasePlatform"));
-    properties.put("hibernate.globally_quoted_identifiers",
-        env.getProperty("hibernate.globally_quoted_identifiers"));
-    properties.put("hibernate.connection.url", env.getProperty("jdbc.url"));
+	private Properties jpaProperties() {
+		Properties properties = new Properties();
+		// properties.put("hibernate.cache.use_second_level_cache",
+		// env.getProperty("hibernate.cache.use_second_level_cache"));
+		// properties.put("hibernate.cache.region.factory_class",
+		// env.getProperty("hibernate.cache.region.factory_class"));
+		// properties.put("hibernate.cache.use_query_cache",
+		// env.getProperty("hibernate.cache.use_query_cache"));
+		properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+		properties.put("hibernate.dialect", env.getProperty("jpa.databasePlatform"));
+		properties.put("hibernate.globally_quoted_identifiers",
+				env.getProperty("hibernate.globally_quoted_identifiers"));
+		properties.put("hibernate.connection.url", env.getProperty("jdbc.url"));
 
-    return properties;
-  }
+		return properties;
+	}
 
-  @Bean
-  public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
-    JpaTransactionManager transactionManager = new JpaTransactionManager();
-    transactionManager.setEntityManagerFactory(entityManagerFactory);
-    transactionManager.setJpaDialect(new HibernateJpaDialect());
-    return transactionManager;
-  }
+	@Bean
+	public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+		JpaTransactionManager transactionManager = new JpaTransactionManager();
+		transactionManager.setEntityManagerFactory(entityManagerFactory);
+		transactionManager.setJpaDialect(new HibernateJpaDialect());
+		return transactionManager;
+	}
 
-  @Bean
-  PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
-    return new PersistenceExceptionTranslationPostProcessor();
-  }
-  //
-  // @Bean
-  // PersistenceUnitManager persistenceUnitManager() {
-  // return new DefaultPersistenceUnitManager();
-  // }
+	@Bean
+	PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
+		return new PersistenceExceptionTranslationPostProcessor();
+	}
+	//
+	// @Bean
+	// PersistenceUnitManager persistenceUnitManager() {
+	// return new DefaultPersistenceUnitManager();
+	// }
 
 }
