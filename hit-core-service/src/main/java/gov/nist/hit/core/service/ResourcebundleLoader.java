@@ -96,7 +96,7 @@ import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
 import gov.nist.hit.core.service.util.ResourcebundleHelper;
 
-@PropertySource(value = { "classpath:app-auth-config.properties" })
+@PropertySource(value = { "classpath:app-config.properties" })
 public abstract class ResourcebundleLoader {
 
   static final public Logger logger = LoggerFactory.getLogger(ResourcebundleLoader.class);
