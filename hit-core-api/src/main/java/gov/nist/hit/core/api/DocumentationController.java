@@ -64,7 +64,7 @@ public class DocumentationController {
 	private ZipGenerator zipGenerator;
 
 	@ApiOperation(value = "Get all context-based test cases documentation info", nickname = "getContextbasedTestCaseDocumentationInfo")
-	@Cacheable(value = "HitCache", key = "'testcases-documentation'")
+//	@Cacheable(value = "HitCache", key = "'testcases-documentation'")
 	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
 	public TestCaseDocumentation testCases() {
 		logger.info("Fetching test case documentation");
@@ -73,7 +73,7 @@ public class DocumentationController {
 	}
 
 	@ApiOperation(value = "Get all release notes", nickname = "getAllReleaseNotes")
-	@Cacheable(value = "HitCache", key = "'releasenotes'")
+//	@Cacheable(value = "HitCache", key = "'releasenotes'")
 	@RequestMapping(value = "/releasenotes", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> releaseNotes() {
 		logger.info("Fetching  all release notes");
@@ -81,7 +81,7 @@ public class DocumentationController {
 	}
 
 	@ApiOperation(value = "Get all user docs", nickname = "getAllUserDocs")
-	@Cacheable(value = "HitCache", key = "'userdocs'")
+//	@Cacheable(value = "HitCache", key = "'userdocs'")
 	@RequestMapping(value = "/userdocs", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> userDocs() {
 		logger.info("Fetching  all release notes");
@@ -89,7 +89,7 @@ public class DocumentationController {
 	}
 
 	@ApiOperation(value = "Get all known issues", nickname = "getAllKnownIssues")
-	@Cacheable(value = "HitCache", key = "'knownissues'")
+//	@Cacheable(value = "HitCache", key = "'knownissues'")
 	@RequestMapping(value = "/knownissues", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> knownIssues() {
 		logger.info("Fetching  all known issues");
@@ -97,7 +97,7 @@ public class DocumentationController {
 	}
 
 	@ApiOperation(value = "Get all resources docs", nickname = "getAllResourceDocs")
-	@Cacheable(value = "HitCache", key = "#type.name() + 'resource-documentation'")
+//	@Cacheable(value = "HitCache", key = "#type.name() + 'resource-documentation'")
 	@RequestMapping(value = "/resourcedocs", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> resourcedocs(@RequestParam("type") DocumentType type) {
 		logger.info("Fetching all resources docs of type=" + type);
@@ -105,7 +105,7 @@ public class DocumentationController {
 	}
 
 	@ApiOperation(value = "Get all deliverables", nickname = "getAllDeliverables")
-	@Cacheable(value = "HitCache", key = "'deliverables-documentation'")
+//	@Cacheable(value = "HitCache", key = "'deliverables-documentation'")
 	@RequestMapping(value = "/deliverables", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> toolDownloads() {
 		logger.info("Fetching all tooldownloads");
@@ -113,7 +113,7 @@ public class DocumentationController {
 	}
 
 	@ApiOperation(value = "Get the installation guide info", nickname = "getInstallationGuide")
-	@Cacheable(value = "HitCache", key = "'installationguide-documentation'")
+//	@Cacheable(value = "HitCache", key = "'installationguide-documentation'")
 	@RequestMapping(value = "/installationguide", method = RequestMethod.GET, produces = "application/json")
 	public Document installationGuide() {
 		logger.info("Fetching installation guide");

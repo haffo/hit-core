@@ -1,14 +1,19 @@
 package gov.nist.hit.core.service;
 
-import gov.nist.hit.core.domain.TestingStage;
+import java.util.List;
+
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
-
-import java.util.List;
+import gov.nist.hit.core.domain.TestingStage;
 
 public interface TestPlanService {
 
+  @Deprecated
   public List<TestPlan> findAllByStage(TestingStage stage);
 
+  public TestPlan findOne(Long testPlanId);
+
   public List<TestArtifact> findAllTestPackages(TestingStage stage);
+
+  List<TestPlan> findShortAllByStage(TestingStage stage);
 }

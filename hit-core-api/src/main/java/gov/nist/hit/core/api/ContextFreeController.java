@@ -43,7 +43,7 @@ public class ContextFreeController {
 
   @ApiOperation(value = "Get all context-free test cases list",
       nickname = "getAllContextFreeTestCases")
-  @Cacheable(value = "HitCache", key = "'cf-testcases'")
+//  @Cacheable(value = "HitCache", key = "'cf-testcases'")
   @RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
   public List<CFTestInstance> testCases() {
     logger.info("Fetching all testCases...");

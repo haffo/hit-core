@@ -12,21 +12,25 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.TestArtifact;
-import gov.nist.hit.core.domain.TestPlan;
-import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.domain.TestingStage;
-
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import gov.nist.hit.core.domain.TestArtifact;
+import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestingStage;
+
 public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 
+  @Deprecated
   @Query("select tp from TestPlan tp where tp.stage = :stage")
   public List<TestPlan> findAllByStage(@Param("stage") TestingStage stage);
+
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain) from TestPlan tp where tp.stage = ?1")
+  public List<TestPlan> findShortAllByStage(TestingStage stage);
+
 
   @Query("select tp.testPackage from TestPlan tp where tp.stage = :stage")
   public List<TestArtifact> findAllTestPackages(@Param("stage") TestingStage stage);
@@ -39,7 +43,7 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 
   @Query("select tp.testPackage from TestPlan tp where tp.id = :id")
   public TestArtifact testPackage(@Param("id") Long id);
-  
+
   @Query("select tp from TestPlan tp where tp.persistentId = :id")
   public TestPlan getByPersistentId(@Param("id") Long id);
 

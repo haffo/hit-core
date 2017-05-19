@@ -12,7 +12,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,7 +29,7 @@ public class ZipGeneratorImpl implements ZipGenerator {
   }
 
   @Override
-  @Cacheable(value = "HitCache", key = "#type")
+  // @Cacheable(value = "HitCache", key = "#type")
   public String generate(String pattern, String type) throws Exception {
     List<Resource> resources = ResourcebundleHelper.getResources(pattern);
     if (resources != null) {

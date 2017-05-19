@@ -138,10 +138,10 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
-	
+
 	@Bean
 	public ConversionService conversionService() {
-	    return new DefaultConversionService();
+		return new DefaultConversionService();
 	}
 
-}	
+}

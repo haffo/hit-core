@@ -1,21 +1,12 @@
 package gov.nist.hit.core.domain;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,56 +15,70 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
-import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "TestPlan", description = "Data Model representing a test plan")
 @Entity
-public class TestPlan extends AbstractTestCase  implements Serializable {
+public class TestPlan extends AbstractTestCase implements Serializable {
 
   private static final long serialVersionUID = 8324105895492403037L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id; 
-  
+  private Long id;
+
   @ApiModelProperty(required = false, value = "summary of the test plan")
-  @JsonIgnoreProperties(value = {"html","json"})
-  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
-  protected TestArtifact testPlanSummary; 
+  @JsonIgnoreProperties(value = {"html", "json"})
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
+  protected TestArtifact testPlanSummary;
 
   @ApiModelProperty(required = false, value = "test package of the test plan")
-  @JsonIgnoreProperties(value = {"html","json"})
-  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval=true)
+  @JsonIgnoreProperties(value = {"html", "json"})
+  @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact testPackage;
-  
+
 
   public TestPlan() {
     this.type = ObjectType.TestPlan;
   }
-  
+
   @ApiModelProperty(required = false, value = "list of test cases of the test plan")
-  @OneToMany(orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER,
+      cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
   @JoinTable(name = "tp_tc", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcase_id")})
   private List<TestCase> testCases = new ArrayList<TestCase>();
 
   @ApiModelProperty(required = false, value = "list of test case groups of the test plan")
-  @OneToMany(orphanRemoval=true,fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "tp_tcg", joinColumns = {@JoinColumn(name = "testplan_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcasegroup_id")})
-    private List<TestCaseGroup> testCaseGroups = new ArrayList<TestCaseGroup>();
+  private List<TestCaseGroup> testCaseGroups = new ArrayList<TestCaseGroup>();
 
   @ApiModelProperty(required = true, value = "transport support of the test plan")
   private boolean transport;
-  
-  @ApiModelProperty(required = true, value = "domain of the test plan", example="iz, erx, etc...")
+
+  @ApiModelProperty(required = true, value = "domain of the test plan", example = "iz, erx, etc...")
   @Column(nullable = true)
   private String domain;
-   
+
+
+
+  public TestPlan(Long id, String name, String description, int position, boolean transport,
+      String domain) {
+    super();
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.position = position;
+    this.transport = transport;
+    this.domain = domain;
+  }
+
   public Long getId() {
     return id;
   }
@@ -95,13 +100,13 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
   }
 
   public List<TestCaseGroup> getTestCaseGroups() {
-     return testCaseGroups;
+    return testCaseGroups;
   }
 
   public void setTestCaseGroups(List<TestCaseGroup> testCaseGroups) {
     this.testCaseGroups = testCaseGroups;
   }
-  
+
   public boolean isTransport() {
     return transport;
   }
@@ -134,7 +139,6 @@ public class TestPlan extends AbstractTestCase  implements Serializable {
     this.domain = domain;
   }
 
-  
- 
+
 
 }

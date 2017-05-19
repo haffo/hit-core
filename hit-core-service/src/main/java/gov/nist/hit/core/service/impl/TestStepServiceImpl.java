@@ -1,16 +1,15 @@
 package gov.nist.hit.core.service.impl;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.service.TestStepService;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
 
 @Service
 public class TestStepServiceImpl implements TestStepService {
@@ -44,7 +43,7 @@ public class TestStepServiceImpl implements TestStepService {
   }
 
   @Override
-  @Cacheable(value = "HitCache", key = "#stage.name() + 'TestSteps'")
+  // @Cacheable(value = "HitCache", key = "#stage.name() + 'TestSteps'")
   public List<TestStep> findAllByStage(TestingStage stage) {
     return testStepRepository.findAllByStage(stage);
   }

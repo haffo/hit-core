@@ -12,6 +12,16 @@
 
 package gov.nist.hit.core.api;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
@@ -23,17 +33,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 /**
  * @author Harold Affo (NIST)
  */
@@ -42,49 +41,73 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "Context based test cases api", tags = "Context-based Test cases")
 public class ContextBasedController {
 
-  static final Logger logger = LoggerFactory.getLogger(ContextBasedController.class);
+	static final Logger logger = LoggerFactory.getLogger(ContextBasedController.class);
 
-  @Autowired
-  private TestPlanService testPlanService;
+	@Autowired
+	private TestPlanService testPlanService;
 
-  @Autowired
-  private TestCaseService testCaseService;
+	@Autowired
+	private TestCaseService testCaseService;
 
-  @Autowired
-  private TestStepService testStepService;
+	@Autowired
+	private TestStepService testStepService;
 
+	// @ApiOperation(value = "Get all context-based test cases list", nickname =
+	// "getAllContextBasedTestCases")
+	// @Cacheable(value = "HitCache", key = "'cb-testcases'")
+	// @RequestMapping(value = "/testcases", method = RequestMethod.GET,
+	// produces = "application/json")
+	// public List<TestPlan> testCases() {
+	// logger.info("Fetching all testCases...");
+	// List<TestPlan> testPlans =
+	// testPlanService.findAllByStage(TestingStage.CB);
+	// return testPlans;
+	// }
 
-  @ApiOperation(value = "Get all context-based test cases list",
-      nickname = "getAllContextBasedTestCases")
-  @Cacheable(value = "HitCache", key = "'cb-testcases'")
-  @RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
-  public List<TestPlan> testCases() {
-    logger.info("Fetching all testCases...");
-    List<TestPlan> testPlans = testPlanService.findAllByStage(TestingStage.CB);
-    return testPlans;
-  }
+	@ApiOperation(value = "Get all context-based test cases list", nickname = "getAllContextBasedTestCases")
+	// @Cacheable(value = "HitCache", key = "'cb-testplans'")
+	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
+	public List<TestPlan> testPlans() {
+		logger.info("Fetching all testplans...");
+		return testPlanService.findShortAllByStage(TestingStage.CB);
+	}
 
-  @ApiOperation(value = "Get a context-based test case by id",
-      nickname = "getOneContextBasedTestCaseById")
-  @RequestMapping(value = "/testcases/{testCaseId}", method = RequestMethod.GET,
-      produces = "application/json")
-  public TestCase testCase(
-      @ApiParam(value = "the id of the test case", required = true) @PathVariable final Long testCaseId) {
-    logger.info("Fetching  test case...");
-    TestCase testCase = testCaseService.findOne(testCaseId);
-    return testCase;
-  }
+	@ApiOperation(value = "Get a context-based test plan by id", nickname = "getOneContextBasedTestPlanById")
+	@RequestMapping(value = "/testplans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
+	public TestPlan testPlan(
+			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId) {
+		logger.info("Fetching  test case...");
+		return testPlanService.findOne(testPlanId);
+	}
 
-  @ApiOperation(value = "Get a context-based test step by id",
-      nickname = "getOneContextBasedTestStepById", hidden = true)
-  @RequestMapping(value = "/teststeps/{testStepId}", method = RequestMethod.GET,
-      produces = "application/json")
-  public TestStep testStep(
-      @ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
-    logger.info("Fetching  test step...");
-    TestStep testStep = testStepService.findOne(testStepId);
-    return testStep;
-  }
+	// @ApiOperation(value = "Get all context-based test cases list", nickname =
+	// "getAllContextBasedTestCases")
+	// @RequestMapping(value = "/testcases", method = RequestMethod.GET,
+	// produces = "application/json")
+	// public JsonView<List<TestPlan>> testCases() {
+	// logger.info("Fetching all testCases...");
+	// List<TestPlan> testPlans =
+	// testPlanService.findAllByStage(TestingStage.CB);
+	// return JsonView.with(testPlans).onClass(TestPlan.class,
+	// match().exclude("testCases").exclude("testCaseGroups"));
+	// }
 
+	@ApiOperation(value = "Get a context-based test case by id", nickname = "getOneContextBasedTestCaseById")
+	@RequestMapping(value = "/testcases/{testCaseId}", method = RequestMethod.GET, produces = "application/json")
+	public TestCase testCase(
+			@ApiParam(value = "the id of the test case", required = true) @PathVariable final Long testCaseId) {
+		logger.info("Fetching  test case...");
+		TestCase testCase = testCaseService.findOne(testCaseId);
+		return testCase;
+	}
+
+	@ApiOperation(value = "Get a context-based test step by id", nickname = "getOneContextBasedTestStepById", hidden = true)
+	@RequestMapping(value = "/teststeps/{testStepId}", method = RequestMethod.GET, produces = "application/json")
+	public TestStep testStep(
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
+		logger.info("Fetching  test step...");
+		TestStep testStep = testStepService.findOne(testStepId);
+		return testStep;
+	}
 
 }
