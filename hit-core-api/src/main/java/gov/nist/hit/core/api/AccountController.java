@@ -224,6 +224,8 @@ public class AccountController {
 					sacc.setFullName(acc.getFullName());
 					sacc.setAccountType(acc.getAccountType());
 					sacc.setUsername(acc.getUsername());
+					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
+					sacc.setAccountType(acc.getAccountType());
 
 					saccs.add(sacc);
 				}
@@ -275,6 +277,7 @@ public class AccountController {
 					sacc.setEntityDisabled(acc.isEntityDisabled());
 					sacc.setUsername(acc.getUsername());
 					sacc.setAccountType(acc.getAccountType());
+					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
 					saccs.add(sacc);
 				}
 			}
@@ -955,6 +958,7 @@ public class AccountController {
 			accountService.reconcileAccounts(guestId, a.getId());
 		}
 		SessionContext.setCurrentUserId(session, a.getId());
+		recordLastLoggedInDate(a.getId());
 		return new ResponseMessage(ResponseMessage.Type.success, "loginSuccess", "succes");
 	}
 
@@ -977,6 +981,7 @@ public class AccountController {
 				cu.setPending(a.isPending());
 				cu.setFullName(a.getFullName());
 				cu.setGuestAccount(false);
+				cu.setLastTestPlanPersistenceId(a.getLastTestPlanPersistenceId());
 			}
 		}
 		return cu;
@@ -1017,7 +1022,7 @@ public class AccountController {
 
 	private void sendRegistrationNotificationToAdmin(Account acc) {
 		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-		msg.setSubject("New Registration Application on " +TOOL_NAME);
+		msg.setSubject("New Registration Application on " + TOOL_NAME);
 		msg.setTo(appInfoService.get().getAdminEmails().get(0));
 		msg.setText(
 				"Hello Admin,  \n A new application has been submitted and is waiting for approval. The user information are as follow: \n\n"
@@ -1078,8 +1083,8 @@ public class AccountController {
 				+ "**** If you have not requested a password reset, please disregard this email **** \n\n\n"
 				+ "You password reset request has been processed.\n"
 				+ "Copy and paste the following url to your browser to initiate the password change:\n" + url + " \n\n"
-				+ "Sincerely, " + "\n\n" + "The "+TOOL_NAME+" Team" + "\n\n" + "P.S: If you need help, contact us at '"
-				+ appInfoService.get().getAdminEmails().get(0) + "'");
+				+ "Sincerely, " + "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n"
+				+ "P.S: If you need help, contact us at '" + appInfoService.get().getAdminEmails().get(0) + "'");
 
 		try {
 			this.mailSender.send(msg);
@@ -1247,8 +1252,13 @@ public class AccountController {
 			cu.setAccountId(account.getId());
 			cu.setAuthenticated(false);
 			cu.setGuestAccount(true);
+			recordLastLoggedInDate(account.getId());
 		}
 		return cu;
+	}
+
+	private void recordLastLoggedInDate(Long accountId) {
+		accountService.recordLastLoggedInDate(accountId, new Date());
 	}
 
 	// @RequestMapping(value = "/accounts/guest/delete", method =

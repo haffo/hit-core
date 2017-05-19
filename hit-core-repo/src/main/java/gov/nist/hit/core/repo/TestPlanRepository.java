@@ -28,7 +28,7 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
   @Query("select tp from TestPlan tp where tp.stage = :stage")
   public List<TestPlan> findAllByStage(@Param("stage") TestingStage stage);
 
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain) from TestPlan tp where tp.stage = ?1")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1")
   public List<TestPlan> findShortAllByStage(TestingStage stage);
 
 

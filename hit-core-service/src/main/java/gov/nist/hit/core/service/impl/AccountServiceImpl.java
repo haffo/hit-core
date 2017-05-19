@@ -1,5 +1,6 @@
 package gov.nist.hit.core.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -165,6 +166,19 @@ public class AccountServiceImpl implements AccountService {
     return accountRepository.findByTheAccountsAccountType(accountType);
   }
 
+  @Override
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
+  public void recordLastTestPlan(Long accountId, Long testPlanPersistenceId) {
+    accountRepository.recordLastTestPlan(accountId, testPlanPersistenceId);
+  }
+
+
+  @Override
+  @org.springframework.transaction.annotation.Transactional("authTransactionManager")
+  public void recordLastLoggedInDate(Long accountId, Date date) {
+    // TODO Auto-generated method stub
+    accountRepository.recordLastLoggedInDate(accountId, date);
+  }
 
 
 }

@@ -69,7 +69,7 @@ public class TestPlan extends AbstractTestCase implements Serializable {
 
 
   public TestPlan(Long id, String name, String description, int position, boolean transport,
-      String domain) {
+      String domain, Long persistentId) {
     super();
     this.id = id;
     this.name = name;
@@ -77,6 +77,8 @@ public class TestPlan extends AbstractTestCase implements Serializable {
     this.position = position;
     this.transport = transport;
     this.domain = domain;
+    this.persistentId = persistentId;
+
   }
 
   public Long getId() {

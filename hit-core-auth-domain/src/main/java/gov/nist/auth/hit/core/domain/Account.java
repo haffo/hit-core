@@ -12,6 +12,7 @@
 package gov.nist.auth.hit.core.domain;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author fdevaulx
+ * @author Harold Affo
  * 
  */
 @Entity
@@ -78,9 +80,11 @@ public class Account implements Serializable {
   // @OneToMany(mappedBy = "user")
   // private Set<TransportConfig> configs = new HashSet<TransportConfig>();
 
-
-
   private Boolean signedConfidentialityAgreement = false;
+
+  private Long lastTestPlanPersistenceId;
+
+  private Date lastLoggedInDate;
 
   public Account() {
     this(null);
@@ -227,6 +231,22 @@ public class Account implements Serializable {
 
   public void setGuestAccount(boolean guestAccount) {
     this.guestAccount = guestAccount;
+  }
+
+  public Long getLastTestPlanPersistenceId() {
+    return lastTestPlanPersistenceId;
+  }
+
+  public void setLastTestPlanPersistenceId(Long lastTestPlanPersistenceId) {
+    this.lastTestPlanPersistenceId = lastTestPlanPersistenceId;
+  }
+
+  public Date getLastLoggedInDate() {
+    return lastLoggedInDate;
+  }
+
+  public void setLastLoggedInDate(Date lastLoggedInDate) {
+    this.lastLoggedInDate = lastLoggedInDate;
   }
 
 

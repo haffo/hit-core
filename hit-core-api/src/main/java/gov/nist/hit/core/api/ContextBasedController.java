@@ -14,6 +14,9 @@ package gov.nist.hit.core.api;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,7 @@ import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestingStage;
+import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestPlanService;
 import gov.nist.hit.core.service.TestStepService;
@@ -52,6 +56,9 @@ public class ContextBasedController {
 	@Autowired
 	private TestStepService testStepService;
 
+	@Autowired
+	private AccountService userService;
+
 	// @ApiOperation(value = "Get all context-based test cases list", nickname =
 	// "getAllContextBasedTestCases")
 	// @Cacheable(value = "HitCache", key = "'cb-testcases'")
@@ -75,9 +82,19 @@ public class ContextBasedController {
 	@ApiOperation(value = "Get a context-based test plan by id", nickname = "getOneContextBasedTestPlanById")
 	@RequestMapping(value = "/testplans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
 	public TestPlan testPlan(
-			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId) {
+			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId,
+			HttpServletRequest request, HttpServletResponse response) {
 		logger.info("Fetching  test case...");
-		return testPlanService.findOne(testPlanId);
+		TestPlan testPlan = testPlanService.findOne(testPlanId);
+		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+		recordTestPlan(testPlan, userId);
+		return testPlan;
+	}
+
+	private void recordTestPlan(TestPlan testPlan, Long userId) {
+		if (testPlan != null && userId != null) {
+			userService.recordLastTestPlan(userId, testPlan.getPersistentId());
+		}
 	}
 
 	// @ApiOperation(value = "Get all context-based test cases list", nickname =

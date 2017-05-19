@@ -29,6 +29,8 @@ public class CurrentUser {
   private Collection<GrantedAuthority> authorities;
   private String fullName;
   private boolean guestAccount = false;
+  private Long lastTestPlanPersistenceId;
+
 
   /**
    * @return the username
@@ -116,6 +118,14 @@ public class CurrentUser {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public Long getLastTestPlanPersistenceId() {
+    return lastTestPlanPersistenceId;
+  }
+
+  public void setLastTestPlanPersistenceId(Long lastTestPlanPersistenceId) {
+    this.lastTestPlanPersistenceId = lastTestPlanPersistenceId;
   }
 
 

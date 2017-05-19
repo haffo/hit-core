@@ -1,10 +1,13 @@
 package gov.nist.auth.hit.core.repo;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import gov.nist.auth.hit.core.domain.Account;
 
@@ -35,4 +38,16 @@ public interface AccountRepository
      * */
   @Query("select a from Account a where a.accountType = ?1")
   public List<Account> findByTheAccountsAccountType(String accountType);
+
+  @Modifying
+  @Query("update Account a set a.lastTestPlanPersistenceId = :testPlanPersistenceId where a.id = :accountId and a.guestAccount = false")
+  public void recordLastTestPlan(@Param("accountId") Long accountId,
+      @Param("testPlanPersistenceId") Long testPlanPersistenceId);
+
+  @Modifying
+  @Query("update Account a set a.lastLoggedInDate = :lastLoggedInDate where a.id = :accountId")
+  public void recordLastLoggedInDate(@Param("accountId") Long accountId,
+      @Param("lastLoggedInDate") Date lastLoggedInDate);
+
+
 }

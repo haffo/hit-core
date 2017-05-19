@@ -1,11 +1,12 @@
 package gov.nist.hit.core.service;
 
-import gov.nist.auth.hit.core.domain.Account;
-
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+import gov.nist.auth.hit.core.domain.Account;
 
 
 public interface AccountService extends JpaSpecificationExecutor<Account> {
@@ -29,6 +30,11 @@ public interface AccountService extends JpaSpecificationExecutor<Account> {
   Account findByTheAccountsEmail(String email);
 
   List<Account> findByTheAccountsAccountType(String accountType);
+
+  void recordLastTestPlan(Long accountId, Long testPlanPersistenceId);
+
+  void recordLastLoggedInDate(Long accountId, Date date);
+
 
 
 }
