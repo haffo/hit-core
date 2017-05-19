@@ -98,8 +98,18 @@ public class AuthConfig {
 		mailSender.setHost(env.getProperty("mail.host"));
 		mailSender.setPort(Integer.valueOf(env.getProperty("mail.port")));
 		mailSender.setProtocol(env.getProperty("mail.protocol"));
+		if (env.getProperty("mail.username") != null)
+			mailSender.setUsername(env.getProperty("mail.username"));
+		if (env.getProperty("mail.password") != null)
+			mailSender.setPassword(env.getProperty("mail.password"));
 		Properties javaMailProperties = new Properties();
-		javaMailProperties.setProperty("mail.smtp.auth", env.getProperty("mail.auth"));
+		if (env.getProperty("mail.auth") != null)
+			javaMailProperties.setProperty("mail.smtp.auth", env.getProperty("mail.auth"));
+		if (env.getProperty("mail.starttls.enable") != null)
+			javaMailProperties.setProperty("mail.smtp.starttls.enable", env.getProperty("mail.starttls.enable"));
+		if (env.getProperty("mail.quitwait") != null)
+			javaMailProperties.setProperty("mail.smtp.quitwait", env.getProperty("mail.quitwait"));
+
 		javaMailProperties.setProperty("mail.debug", env.getProperty("mail.debug"));
 		mailSender.setJavaMailProperties(javaMailProperties);
 		return mailSender;
