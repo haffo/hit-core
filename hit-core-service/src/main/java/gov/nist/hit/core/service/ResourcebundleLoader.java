@@ -266,9 +266,8 @@ public abstract class ResourcebundleLoader {
       cachedRepository.getCachedVocabLibraries().clear();
       cachedRepository.getCachedConstraints().clear();
       logger.info("resource bundle loaded successfully...");
-    }else{
-    	this.loadDynamicValues();
     }
+    this.loadDynamicValues();
   }
 
   public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage)

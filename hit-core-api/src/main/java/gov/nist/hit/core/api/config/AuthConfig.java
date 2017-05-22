@@ -16,6 +16,7 @@ import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -96,19 +97,25 @@ public class AuthConfig {
 	public JavaMailSenderImpl mailSender() {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 		mailSender.setHost(env.getProperty("mail.host"));
-		mailSender.setPort(Integer.valueOf(env.getProperty("mail.port")));
-		mailSender.setProtocol(env.getProperty("mail.protocol"));
-		if (env.getProperty("mail.username") != null)
+		if (StringUtils.isNotEmpty(env.getProperty("mail.username")))
 			mailSender.setUsername(env.getProperty("mail.username"));
-		if (env.getProperty("mail.password") != null)
+		if (StringUtils.isNotEmpty(env.getProperty("mail.password")))
 			mailSender.setPassword(env.getProperty("mail.password"));
+		mailSender.setPort(Integer.valueOf(env.getProperty("mail.port")));
+		if (StringUtils.isNotEmpty(env.getProperty("mail.protocol"))) {
+			mailSender.setProtocol(env.getProperty("mail.protocol"));
+		}
+
 		Properties javaMailProperties = new Properties();
-		if (env.getProperty("mail.auth") != null)
+
+		if (StringUtils.isNotEmpty(env.getProperty("mail.protocol")))
+			javaMailProperties.setProperty("mail.transport.protocol", env.getProperty("mail.protocol"));
+
+		if (StringUtils.isNotEmpty(env.getProperty("mail.auth")))
 			javaMailProperties.setProperty("mail.smtp.auth", env.getProperty("mail.auth"));
-		if (env.getProperty("mail.starttls.enable") != null)
+
+		if (StringUtils.isNotEmpty(env.getProperty("mail.starttls.enable")))
 			javaMailProperties.setProperty("mail.smtp.starttls.enable", env.getProperty("mail.starttls.enable"));
-		if (env.getProperty("mail.quitwait") != null)
-			javaMailProperties.setProperty("mail.smtp.quitwait", env.getProperty("mail.quitwait"));
 
 		javaMailProperties.setProperty("mail.debug", env.getProperty("mail.debug"));
 		mailSender.setJavaMailProperties(javaMailProperties);
