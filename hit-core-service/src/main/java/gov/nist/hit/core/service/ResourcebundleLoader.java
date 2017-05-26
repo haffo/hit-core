@@ -96,7 +96,7 @@ import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
 import gov.nist.hit.core.service.util.ResourcebundleHelper;
 
-@PropertySource(value = { "classpath:app-config.properties" })
+@PropertySource(value = {"classpath:app-config.properties"})
 public abstract class ResourcebundleLoader {
 
   static final public Logger logger = LoggerFactory.getLogger(ResourcebundleLoader.class);
@@ -203,13 +203,13 @@ public abstract class ResourcebundleLoader {
   protected VocabularyLibraryRepository vocabularyLibraryRepository;
 
   private Map<Long, String> idLocationMap;
-  
+
   @Value("${admin.emails}")
   private List<String> adminEmails;
-  
+
 
   public ResourcebundleLoader() {
-	idLocationMap = new HashMap<>();
+    idLocationMap = new HashMap<>();
     obm = new com.fasterxml.jackson.databind.ObjectMapper();
     obm.setSerializationInclusion(Include.NON_NULL);
     this.directory = "";
@@ -287,7 +287,7 @@ public abstract class ResourcebundleLoader {
     AppInfo appInfo = new AppInfo();
     JsonNode metaData = getMetaData();
     String rsbVersion = getRsbleVersion();
-    appInfo.setRsbVersion(rsbVersion);    
+    appInfo.setRsbVersion(rsbVersion);
     appInfo.setDomain(metaData.get("domain").textValue());
     appInfo.setHeader(metaData.get("header").textValue());
     appInfo.setHomeTitle(
@@ -1035,6 +1035,7 @@ public abstract class ResourcebundleLoader {
           dataMappings.add(dataMapping);
         }
       }
+      tc.setStage(stage);
       tc.setDataMappings(dataMappings);
     }
 
@@ -1108,6 +1109,7 @@ public abstract class ResourcebundleLoader {
     if (testStepObj.findValue("position") != null) {
       testStep.setPosition(testStepObj.findValue("position").intValue());
     }
+    testStep.setStage(stage);
     return testStep;
   }
 
@@ -1538,26 +1540,26 @@ public abstract class ResourcebundleLoader {
     }
     return documents;
   }
-  
-  
-  
-	  /**
-	 * @throws JsonProcessingException
-	 * @throws IOException
-	 * Loads values dynamically at each app startup (not only at database creation)
-	 */
-	public void loadDynamicValues() throws JsonProcessingException, IOException {
-	    logger.info("loading app info...");
-	    AppInfo appInfo = appInfoService.get();
-	    
-	    if (adminEmails == null) {
-	      throw new RuntimeException("Administrator emails address are missing");
-	    }
-	    appInfo.setAdminEmails(adminEmails);
-	    
-	    appInfoRepository.save(appInfo);
-	    logger.info("loading app info...DONE");
-	}
+
+
+
+  /**
+   * @throws JsonProcessingException
+   * @throws IOException Loads values dynamically at each app startup (not only at database
+   *         creation)
+   */
+  public void loadDynamicValues() throws JsonProcessingException, IOException {
+    logger.info("loading app info...");
+    AppInfo appInfo = appInfoService.get();
+
+    if (adminEmails == null) {
+      throw new RuntimeException("Administrator emails address are missing");
+    }
+    appInfo.setAdminEmails(adminEmails);
+
+    appInfoRepository.save(appInfo);
+    logger.info("loading app info...DONE");
+  }
 
   public TestPlanRepository getTestPlanRepository() {
     return testPlanRepository;
@@ -1768,5 +1770,5 @@ public abstract class ResourcebundleLoader {
   // this.cachedConstraints = cachedConstraints;
   // }
 
- 
+
 }

@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * @author Harold Affo (harold.affo@nist.gov) Apr 7, 2015
  */
-@Configuration
+@Configuration(value = "AuthConfig")
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableJpaRepositories(value = "gov.nist.auth.hit.core.repo", entityManagerFactoryRef = "authEMF", transactionManagerRef = "authTransactionManager")
 @PropertySource(value = { "classpath:app-config.properties" })

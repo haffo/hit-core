@@ -1,18 +1,5 @@
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.hit.core.domain.TestCase;
-import gov.nist.hit.core.domain.TestCaseValidationResult;
-import gov.nist.hit.core.domain.TestResult;
-import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.repo.TestCaseValidationReportRepository;
-import gov.nist.hit.core.repo.TestStepValidationReportRepository;
-import gov.nist.hit.core.service.AccountService;
-import gov.nist.hit.core.service.TestCaseValidationReportService;
-import gov.nist.hit.core.service.TestStepValidationReportService;
-import gov.nist.hit.core.service.exception.ValidationReportException;
-import gov.nist.hit.core.service.util.HtmlUtil;
-import gov.nist.hit.core.service.util.ReportUtil;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +17,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import nu.xom.Attribute;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +24,20 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.ibm.icu.util.Calendar;
+
+import gov.nist.hit.core.domain.TestCase;
+import gov.nist.hit.core.domain.TestCaseValidationResult;
+import gov.nist.hit.core.domain.TestResult;
+import gov.nist.hit.core.domain.TestStepValidationReport;
+import gov.nist.hit.core.repo.TestCaseValidationReportRepository;
+import gov.nist.hit.core.repo.TestStepValidationReportRepository;
+import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.TestCaseValidationReportService;
+import gov.nist.hit.core.service.TestStepValidationReportService;
+import gov.nist.hit.core.service.exception.ValidationReportException;
+import gov.nist.hit.core.service.util.HtmlUtil;
+import gov.nist.hit.core.service.util.ReportUtil;
+import nu.xom.Attribute;
 
 @Service
 public class TestCaseValidationReportServiceImpl implements TestCaseValidationReportService {
@@ -108,29 +107,25 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
       serviceProvider.appendChild("NIST");
       headerReport.appendChild(serviceProvider);
 
-      nu.xom.Element validationType =
-          new nu.xom.Element("testcasevalidationreport:ValidationType",
-              "http://www.nist.gov/healthcare/validation/testcase/report");
+      nu.xom.Element validationType = new nu.xom.Element("testcasevalidationreport:ValidationType",
+          "http://www.nist.gov/healthcare/validation/testcase/report");
       validationType.appendChild("Context-Based");
       headerReport.appendChild(validationType);
 
-      nu.xom.Element type =
-          new nu.xom.Element("testcasevalidationreport:Type",
-              "http://www.nist.gov/healthcare/validation/testcase/report");
+      nu.xom.Element type = new nu.xom.Element("testcasevalidationreport:Type",
+          "http://www.nist.gov/healthcare/validation/testcase/report");
       type.appendChild("Test Case Validation");
       headerReport.appendChild(type);
 
-      nu.xom.Element dateOfTest =
-          new nu.xom.Element("testcasevalidationreport:DateOfTest",
-              "http://www.nist.gov/healthcare/validation/testcase/report");
-      dateOfTest.appendChild(ReportUtil.dateOfTest(result.getDate() != null ? result.getDate()
-          : Calendar.getInstance().getTime()));
+      nu.xom.Element dateOfTest = new nu.xom.Element("testcasevalidationreport:DateOfTest",
+          "http://www.nist.gov/healthcare/validation/testcase/report");
+      dateOfTest.appendChild(ReportUtil.dateOfTest(
+          result.getDate() != null ? result.getDate() : Calendar.getInstance().getTime()));
       headerReport.appendChild(dateOfTest);
 
       headerReport.addAttribute(new Attribute("Result", getTestCaseResult(result.getResult())));
-      nu.xom.Element comments =
-          new nu.xom.Element("testcasevalidationreport:Comments",
-              "http://www.nist.gov/healthcare/validation/testcase/report");
+      nu.xom.Element comments = new nu.xom.Element("testcasevalidationreport:Comments",
+          "http://www.nist.gov/healthcare/validation/testcase/report");
       headerReport.appendChild(comments);
       comments.appendChild(result.getComments());
 
@@ -142,21 +137,18 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
                 "http://www.nist.gov/healthcare/validation/testcase/report");
         headerReport.appendChild(testCaseReference);
 
-        nu.xom.Element testCase =
-            new nu.xom.Element("testcasevalidationreport:TestCase",
-                "http://www.nist.gov/healthcare/validation/testcase/report");
+        nu.xom.Element testCase = new nu.xom.Element("testcasevalidationreport:TestCase",
+            "http://www.nist.gov/healthcare/validation/testcase/report");
         testCase.appendChild(nav.get("testCase"));
         testCaseReference.appendChild(testCase);
 
-        nu.xom.Element testPlan =
-            new nu.xom.Element("testcasevalidationreport:TestPlan",
-                "http://www.nist.gov/healthcare/validation/testcase/report");
+        nu.xom.Element testPlan = new nu.xom.Element("testcasevalidationreport:TestPlan",
+            "http://www.nist.gov/healthcare/validation/testcase/report");
         testPlan.appendChild(nav.get("testPlan"));
         testCaseReference.appendChild(testPlan);
 
-        nu.xom.Element testGroup =
-            new nu.xom.Element("testcasevalidationreport:TestGroup",
-                "http://www.nist.gov/healthcare/validation/testcase/report");
+        nu.xom.Element testGroup = new nu.xom.Element("testcasevalidationreport:TestGroup",
+            "http://www.nist.gov/healthcare/validation/testcase/report");
         testGroup.appendChild(nav.get("testGroup"));
         testCaseReference.appendChild(testGroup);
       }
@@ -166,10 +158,12 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
               "http://www.nist.gov/healthcare/validation/testcase/report");
       report.appendChild(testCaseReportContent);
 
-      for(int i=1;i<=result.getTestStepReports().size();i++) {
+      for (int i = 1; i <= result.getTestStepReports().size(); i++) {
         for (TestStepValidationReport testStepReport : result.getTestStepReports()) {
-          if(testStepReport.getTestStep().getPosition()==i) {
-            testCaseReportContent.appendChild(ReportUtil.getXmlElement(testStepReport.getXml()));
+          if (testStepReport.getTestStep().getPosition() == i) {
+            String xml = testStepValidationReportService
+                .generateXmlTestStepValidationReport(testStepReport.getXml(), testStepReport);
+            testCaseReportContent.appendChild(ReportUtil.getXmlElement(xml));
           }
         }
       }
