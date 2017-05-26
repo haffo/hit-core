@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 
 @Entity
 public class TestStepValidationReport implements Serializable {
@@ -23,13 +24,16 @@ public class TestStepValidationReport implements Serializable {
   private Long id;
 
   @JsonIgnore
+  
   @ManyToOne(optional = false)
   private TestStep testStep;
 
   @JsonIgnore
+  
   private Long userId;
 
   @JsonIgnore
+  
   @Column(columnDefinition = "LONGTEXT")
   private String xml;
 

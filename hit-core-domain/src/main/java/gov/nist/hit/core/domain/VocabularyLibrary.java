@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,36 +17,45 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "VocabularyLibrary")
 public class VocabularyLibrary implements Serializable {
- 
- 
+
+
   private static final long serialVersionUID = 1L;
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
-  
+
   @JsonIgnore
+
   @NotNull
   @Column(unique = true)
   protected String sourceId;
-  
+
   @JsonIgnore
-  protected String name; 
-  
+
+  protected String name;
+
   @JsonIgnore
+
   protected String description;
-  
+
   @JsonIgnore
+
   protected String key_;
-  
+
   @JsonIgnore
+
   @Column(columnDefinition = "LONGTEXT")
   protected String xml;
 
   @JsonIgnore
   @Column(columnDefinition = "LONGTEXT")
-  protected String json; 
-  
+  protected String json;
+
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  protected TestScope scope = TestScope.GLOBAL;
+
   public String getXml() {
     return xml;
   }
@@ -60,8 +71,6 @@ public class VocabularyLibrary implements Serializable {
   public void setJson(String json) {
     this.json = json;
   }
-
-
 
 
 
@@ -101,17 +110,17 @@ public class VocabularyLibrary implements Serializable {
   public void setKey(String key) {
     this.key_ = key;
   }
-  
-  
+
+
   public Long getId() {
-	return id;
+    return id;
   }
 
   public void setId(Long id) {
-	this.id = id;
+    this.id = id;
   }
 
-public VocabularyLibrary() {
+  public VocabularyLibrary() {
     super();
     // TODO Auto-generated constructor stub
   }

@@ -12,9 +12,6 @@
 
 package gov.nist.hit.core.domain;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +28,10 @@ import javax.persistence.MapKeyColumn;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @(#) UserTransaction.java
@@ -59,10 +60,12 @@ public class Transaction implements java.io.Serializable {
 
   @ApiModelProperty(required = true, value = "user executing the transaction")
   @JsonIgnore
+  
   protected Long userId;
 
   @ApiModelProperty(required = true, value = "list of properties of the transaction")
   @JsonIgnore
+  
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "transaction_config", joinColumns = @JoinColumn(name = "transaction_id"))
   @MapKeyColumn(name = "property_key")
@@ -71,6 +74,7 @@ public class Transaction implements java.io.Serializable {
 
   @ApiModelProperty(required = false, value = "id of the response message id of the transaction")
   @JsonIgnore
+  
   @Column(nullable = true)
   protected Long responseMessageId;
 

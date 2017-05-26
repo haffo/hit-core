@@ -12,6 +12,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 
 import gov.nist.auth.hit.core.domain.TestingType;
 import io.swagger.annotations.ApiModel;
@@ -23,6 +24,7 @@ public class CFTestInstance extends TestStep implements Serializable {
   private static final long serialVersionUID = 8805967508478985159L;
 
   @JsonIgnore
+  
   private boolean root;
 
   public CFTestInstance() {

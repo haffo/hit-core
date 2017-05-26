@@ -113,28 +113,32 @@ public class TestStepValidationReportController {
 	// return report;
 	// }
 
-	private TestStepValidationReport findUserTestStepValidationReportByTestStep(Long testStepId, Long userId) {
-		TestStepValidationReport report = null;
-		List<TestStepValidationReport> reports = validationReportService.findAllByTestStepAndUser(testStepId, userId);
-		if (reports != null && !reports.isEmpty()) {
-			if (reports.size() == 1) {
-				report = reports.get(0);
-			} else {
-				validationReportService.delete(reports);
-			}
-		}
-		return report;
-	}
-
-	private void deleteByTestStepId(Long testStepId, Long userId) {
-		try {
-			List<TestStepValidationReport> reports = validationReportService.findAllByTestStepAndUser(testStepId,
-					userId);
-			validationReportService.delete(reports);
-		} catch (RuntimeException e) {
-		} catch (Exception e) {
-		}
-	}
+	// private TestStepValidationReport
+	// findUserTestStepValidationReportByTestStep(Long testStepId, Long userId)
+	// {
+	// TestStepValidationReport report = null;
+	// List<TestStepValidationReport> reports =
+	// validationReportService.findAllByTestStepAndUser(testStepId, userId);
+	// if (reports != null && !reports.isEmpty()) {
+	// if (reports.size() == 1) {
+	// report = reports.get(0);
+	// } else {
+	// validationReportService.delete(reports);
+	// }
+	// }
+	// return report;
+	// }
+	//
+	// private void deleteByTestStepId(Long testStepId, Long userId) {
+	// try {
+	// List<TestStepValidationReport> reports =
+	// validationReportService.findAllByTestStepAndUser(testStepId,
+	// userId);
+	// validationReportService.delete(reports);
+	// } catch (RuntimeException e) {
+	// } catch (Exception e) {
+	// }
+	// }
 
 	// @ApiOperation(value = "", hidden = true)
 	// @RequestMapping(value = "/create", method = RequestMethod.POST, produces

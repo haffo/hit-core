@@ -14,8 +14,9 @@ package gov.nist.hit.core.domain;
 import java.io.Serializable;
 
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,23 +31,27 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 public class Constraints implements Serializable {
- 
- 
+
+
   private static final long serialVersionUID = 1L;
 
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
-  
+
   @JsonIgnore
+
   @NotNull
   @Column(unique = true)
   protected String sourceId;
 
   @Column(nullable = true)
   protected String description;
-  
+
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  protected TestScope scope = TestScope.GLOBAL;
 
   @NotNull
   @Column(columnDefinition = "LONGTEXT", nullable = false)
@@ -54,9 +59,10 @@ public class Constraints implements Serializable {
 
   public Constraints() {
     super();
+    scope = TestScope.GLOBAL;
   }
 
-  
+
 
   public String getXml() {
     return xml;
@@ -75,13 +81,13 @@ public class Constraints implements Serializable {
     this.xml = constraintContent;
   }
 
-//  public Long getId() {
-//    return id;
-//  }
-//
-//  public void setId(Long id) {
-//    this.id = id;
-//  }
+  // public Long getId() {
+  // return id;
+  // }
+  //
+  // public void setId(Long id) {
+  // this.id = id;
+  // }
 
   public String getSourceId() {
     return sourceId;
@@ -101,17 +107,16 @@ public class Constraints implements Serializable {
 
 
 
-public Long getId() {
-	return id;
-}
+  public Long getId() {
+    return id;
+  }
 
 
 
-public void setId(Long id) {
-	this.id = id;
-} 
-  
-  
-  
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+
 
 }

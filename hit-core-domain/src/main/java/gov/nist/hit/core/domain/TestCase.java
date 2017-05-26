@@ -1,15 +1,11 @@
 package gov.nist.hit.core.domain;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -19,6 +15,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "TestCase", description = "Data Model representing a test case")
 @Entity
@@ -29,7 +29,7 @@ public class TestCase extends AbstractTestCase implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-  
+
   public TestCase() {
     super();
     this.type = ObjectType.TestCase;
@@ -47,6 +47,7 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   @ApiModelProperty(required = false, value = "juror document of the test case")
   @JsonIgnore
+  
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact jurorDocument;
 

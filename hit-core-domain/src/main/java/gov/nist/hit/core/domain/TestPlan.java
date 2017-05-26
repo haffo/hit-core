@@ -33,6 +33,7 @@ public class TestPlan extends AbstractTestCase implements Serializable {
 
   @ApiModelProperty(required = false, value = "summary of the test plan")
   @JsonIgnoreProperties(value = {"html", "json"})
+
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact testPlanSummary;
 

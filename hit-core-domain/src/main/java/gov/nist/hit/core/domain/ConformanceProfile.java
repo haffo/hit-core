@@ -12,23 +12,20 @@
 
 package gov.nist.hit.core.domain;
 
-import io.swagger.annotations.ApiModel;
-
 import java.io.Serializable;
 
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.Expose;
+
+import io.swagger.annotations.ApiModel;
 
 /**
  * @author Harold Affo (NIST)
@@ -36,35 +33,40 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 
 @Entity
-@ApiModel(value="ConformanceProfile", description="Data Model representing the conformance profile")
+@ApiModel(value = "ConformanceProfile",
+    description = "Data Model representing the conformance profile")
 public class ConformanceProfile implements Serializable {
- 
+
   private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  protected Long id; 
-  
+  protected Long id;
+
   @JsonIgnore
-  @ManyToOne
-  IntegrationProfile integrationProfile; 
   
+  @ManyToOne
+  IntegrationProfile integrationProfile;
+
   @NotNull
   @JsonIgnore
+  
   @Column(nullable = false)
   protected String sourceId;
 
   @NotNull
   @JsonIgnore
+  
   @Column(columnDefinition = "LONGTEXT")
   protected String json;
 
-  
+
   @JsonIgnore
+  
   @Column(columnDefinition = "LONGTEXT")
   protected String xml;
-  
- 
+
+
   public IntegrationProfile getIntegrationProfile() {
     return integrationProfile;
   }
@@ -75,11 +77,11 @@ public class ConformanceProfile implements Serializable {
 
   public ConformanceProfile() {
     super();
-  }  
+  }
 
   public ConformanceProfile(String json) {
     super();
-     this.json = json;
+    this.json = json;
   }
 
   public Long getId() {
@@ -88,9 +90,9 @@ public class ConformanceProfile implements Serializable {
 
   public void setId(Long id) {
     this.id = id;
-  } 
-  
-    
+  }
+
+
   public String getJson() {
     return json;
   }
@@ -114,10 +116,7 @@ public class ConformanceProfile implements Serializable {
   public void setXml(String xml) {
     this.xml = xml;
   }
- 
- 
-  
-  
-  
-  
+
+
+
 }

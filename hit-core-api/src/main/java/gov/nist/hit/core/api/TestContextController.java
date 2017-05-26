@@ -1,5 +1,6 @@
 package gov.nist.hit.core.api;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,9 +26,9 @@ import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.MessageParser;
 import gov.nist.hit.core.service.MessageValidator;
+import gov.nist.hit.core.service.Serializer;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
-import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationReportConverter;
 import gov.nist.hit.core.service.exception.MessageParserException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
@@ -49,10 +50,10 @@ public abstract class TestContextController {
 	private TestStepService testStepService;
 
 	@Autowired
-	private UserService userService;
+	private AccountService accountService;
 
 	@Autowired
-	private AccountService accountService;
+	private Serializer serializer;
 
 	public abstract MessageValidator getMessageValidator();
 
@@ -78,10 +79,15 @@ public abstract class TestContextController {
 	@RequestMapping(value = "/{testContextId}/parseMessage", method = RequestMethod.POST, produces = "application/json")
 	public MessageModel parseMessageWithTestContext(
 			@ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
-			@ApiParam(value = "the request to be parsed", required = true) @RequestBody final MessageParserCommand command)
-			throws MessageParserException {
+			@ApiParam(value = "the request to be parsed", required = true) @RequestBody final MessageParserCommand command,
+			HttpServletRequest request, HttpServletResponse response) throws MessageParserException, IOException {
 		logger.info("Parsing message");
-		return getMessageParser().parse(getTestContext(testContextId), command);
+		MessageModel result = getMessageParser().parse(getTestContext(testContextId), command);
+		// OutputStream out = response.getOutputStream();
+		// return serializer.toByte(result);
+		// out.flush();
+		// out.close();
+		return result;
 	}
 
 	@ApiOperation(value = "Validate a message in a test context", nickname = "validateMessageWithTestContext")
@@ -100,6 +106,7 @@ public abstract class TestContextController {
 			result.setHtml(null);
 			result.setXml(null);
 			result.setReportId(report.getId());
+			// return serializer.toJson(result);
 
 			return result;
 		} catch (Exception e) {

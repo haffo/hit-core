@@ -18,19 +18,22 @@ import gov.nist.auth.hit.core.domain.TestingType;
 import io.swagger.annotations.ApiModel;
 
 @Entity
-@ApiModel(value="UserCFTestInstance", description="Data Model representing  user context-free test case")
+@ApiModel(value = "UserCFTestInstance",
+    description = "Data Model representing  user context-free test case")
 public class UserCFTestInstance extends TestStep implements Serializable {
 
   private static final long serialVersionUID = 880596750847898512L;
 
   @JsonIgnore
+
   private boolean root;
-  
+
   public UserCFTestInstance() {
-	    super();
-	    this.type = ObjectType.TestObject;
-	    this.testingType = TestingType.DATAINSTANCE;
-	  }
+    super();
+    this.type = ObjectType.TestObject;
+    this.testingType = TestingType.DATAINSTANCE;
+    scope = TestScope.USER;
+  }
 
   public UserCFTestInstance(String name) {
     super(name);
@@ -44,10 +47,12 @@ public class UserCFTestInstance extends TestStep implements Serializable {
   private List<UserCFTestInstance> children = new ArrayList<UserCFTestInstance>();
 
 
+  @Override
   public TestContext getTestContext() {
     return testContext;
   }
 
+  @Override
   public void setTestContext(TestContext testContext) {
     this.testContext = testContext;
   }
@@ -70,10 +75,12 @@ public class UserCFTestInstance extends TestStep implements Serializable {
     this.root = root;
   }
 
+  @Override
   public TestingType getTestingType() {
     return testingType;
   }
 
+  @Override
   public void setTestingType(TestingType testingType) {
     this.testingType = testingType;
   }

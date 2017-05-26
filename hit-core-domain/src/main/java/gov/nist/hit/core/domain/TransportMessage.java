@@ -13,26 +13,22 @@
 package gov.nist.hit.core.domain;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 
 /**
  * @(#) TransportMessage.java
@@ -44,22 +40,24 @@ public class TransportMessage implements java.io.Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
- 
+
 
   @NotNull
   @Column(nullable = false)
   protected Long messageId;
 
   @JsonIgnore
+  
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name="transport_message_config", joinColumns=@JoinColumn(name="transport_message_id"))
+  @CollectionTable(name = "transport_message_config",
+      joinColumns = @JoinColumn(name = "transport_message_id"))
   @MapKeyColumn(name = "property_key")
   @Column(name = "property_value")
   protected Map<String, String> properties = new HashMap<String, String>();
- 
+
   public TransportMessage() {
     super();
-   }
+  }
 
   public Long getId() {
     return id;
@@ -79,7 +77,7 @@ public class TransportMessage implements java.io.Serializable {
 
   public TransportMessage(Long messageId, Map<String, String> properties) {
     super();
-     this.messageId = messageId;
+    this.messageId = messageId;
     this.properties = properties;
   }
 
@@ -90,8 +88,7 @@ public class TransportMessage implements java.io.Serializable {
   public void setProperties(Map<String, String> properties) {
     this.properties = properties;
   }
- 
-  
-  
+
+
 
 }

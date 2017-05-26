@@ -13,23 +13,19 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Harold Affo (NIST)
@@ -39,141 +35,146 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 public class IntegrationProfile implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  protected Long id;
 
-	@NotNull
-	@JsonIgnore
-	@Column(columnDefinition = "LONGTEXT")
-	protected String xml;
+  @NotNull
+  @JsonIgnore
+  @Column(columnDefinition = "LONGTEXT")
+  protected String xml;
 
-	@JsonIgnore
-	@NotNull
-	@Column(unique = true)
-	protected String sourceId;
+  @JsonIgnore
+  @NotNull
+  @Column(unique = true)
+  protected String sourceId;
 
-	@Column(nullable = true)
-	protected String name;
+  @Column(nullable = true)
+  protected String name;
 
-	@Column(nullable = true)
-	protected String description;
+  @Column(nullable = true)
+  protected String description;
 
-	@Column(nullable = true)
-	protected String key_;
+  @Column(nullable = true)
+  protected String key_;
 
-	@Column(nullable = true)
-	protected String type_;
+  @Column(nullable = true)
+  protected String type_;
 
-	@Column(nullable = true)
-	protected String schemaVersion;
+  @Column(nullable = true)
+  protected String schemaVersion;
 
-	@Column(nullable = true)
-	protected String hl7Version;
+  @Column(nullable = true)
+  protected String hl7Version;
 
-	@Column(nullable = true)
-	@ElementCollection
-	@JsonIgnore
-	protected List<String> messages;
+  @Column(nullable = true)
+  @ElementCollection
+  @JsonIgnore
+  protected List<String> messages;
 
-	public IntegrationProfile() {
-		super();
-	}
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  protected TestScope scope = TestScope.GLOBAL;
 
-	public IntegrationProfile(String name, String description, String xml) {
-		super();
-		this.name = name;
-		this.description = description;
-		this.xml = xml;
-	}
+  public IntegrationProfile() {
+    super();
+    scope = TestScope.GLOBAL;
+  }
 
-	public IntegrationProfile(String xml) {
-		super();
-		this.name = null;
-		this.description = null;
-		this.xml = xml;
-	}
+  public IntegrationProfile(String name, String description, String xml) {
+    super();
+    this.name = name;
+    this.description = description;
+    this.xml = xml;
+  }
 
-	public List<String> getMessages() {
-		return messages;
-	}
+  public IntegrationProfile(String xml) {
+    super();
+    this.name = null;
+    this.description = null;
+    this.xml = xml;
+  }
 
-	public void setMessages(List<String> messages) {
-		this.messages = messages;
-	}
+  public List<String> getMessages() {
+    return messages;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public void setMessages(List<String> messages) {
+    this.messages = messages;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public String getDescription() {
-		return description;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+  public String getDescription() {
+    return description;
+  }
 
-	public String getKey() {
-		return key_;
-	}
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	public void setKey(String key) {
-		this.key_ = key;
-	}
+  public String getKey() {
+    return key_;
+  }
 
-	public Long getId() {
-		return id;
-	}
+  public void setKey(String key) {
+    this.key_ = key;
+  }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public String getType() {
-		return type_;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public void setType(String type) {
-		this.type_ = type;
-	}
+  public String getType() {
+    return type_;
+  }
 
-	public String getSchemaVersion() {
-		return schemaVersion;
-	}
+  public void setType(String type) {
+    this.type_ = type;
+  }
 
-	public void setSchemaVersion(String schemaVersion) {
-		this.schemaVersion = schemaVersion;
-	}
+  public String getSchemaVersion() {
+    return schemaVersion;
+  }
 
-	public String getHl7Version() {
-		return hl7Version;
-	}
+  public void setSchemaVersion(String schemaVersion) {
+    this.schemaVersion = schemaVersion;
+  }
 
-	public void setHl7Version(String hl7Version) {
-		this.hl7Version = hl7Version;
-	}
+  public String getHl7Version() {
+    return hl7Version;
+  }
 
-	public String getXml() {
-		return xml;
-	}
+  public void setHl7Version(String hl7Version) {
+    this.hl7Version = hl7Version;
+  }
 
-	public void setXml(String xml) {
-		this.xml = xml;
-	}
+  public String getXml() {
+    return xml;
+  }
 
-	public String getSourceId() {
-		return sourceId;
-	}
+  public void setXml(String xml) {
+    this.xml = xml;
+  }
 
-	public void setSourceId(String sourceId) {
-		this.sourceId = sourceId;
-	}
+  public String getSourceId() {
+    return sourceId;
+  }
+
+  public void setSourceId(String sourceId) {
+    this.sourceId = sourceId;
+  }
 
 }

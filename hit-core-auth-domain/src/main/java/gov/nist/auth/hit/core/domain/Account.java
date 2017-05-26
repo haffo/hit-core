@@ -26,6 +26,7 @@ import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.gson.annotations.Expose;
 
 /**
  * @author fdevaulx
@@ -46,9 +47,11 @@ public class Account implements Serializable {
   private String registrationPassword;
 
   @JsonIgnore
+  
   private boolean entityDisabled = false;
 
   @JsonIgnore
+  
   // TODO remove it and check it doesn't affect REST API security
   private boolean pending = false;
 
@@ -70,6 +73,7 @@ public class Account implements Serializable {
 
 
   @JsonIgnore
+  
   private boolean guestAccount = true;
 
 
