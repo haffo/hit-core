@@ -1,6 +1,7 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,9 +11,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
 
 @Entity
 public class TestStepValidationReport implements Serializable {
@@ -24,22 +28,23 @@ public class TestStepValidationReport implements Serializable {
   private Long id;
 
   @JsonIgnore
-  
+
   @ManyToOne(optional = false)
   private TestStep testStep;
 
   @JsonIgnore
-  
   private Long userId;
 
   @JsonIgnore
-  
+
   @Column(columnDefinition = "LONGTEXT")
   private String xml;
 
   @Column(columnDefinition = "LONGTEXT")
   private String html;
 
+  @Column(columnDefinition = "LONGTEXT")
+  private String json;
 
   @Enumerated(EnumType.STRING)
   private TestResult result = null;
@@ -47,11 +52,24 @@ public class TestStepValidationReport implements Serializable {
   @Column(columnDefinition = "TEXT")
   private String comments;
 
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date dateUpdated;
+
   public TestStepValidationReport(String content, TestStep testStep, Long accountId) {
     super();
     this.xml = content;
     this.testStep = testStep;
     this.userId = accountId;
+  }
+
+  @PrePersist
+  protected void onCreate() {
+    dateUpdated = new Date();
+  }
+
+  @PreUpdate
+  protected void onUpdate() {
+    dateUpdated = new Date();
   }
 
 
@@ -124,6 +142,24 @@ public class TestStepValidationReport implements Serializable {
 
   public void setHtml(String html) {
     this.html = html;
+  }
+
+
+  public Date getDateUpdated() {
+    return dateUpdated;
+  }
+
+
+  public void setDateUpdated(Date dateUpdated) {
+    this.dateUpdated = dateUpdated;
+  }
+
+  public String getJson() {
+    return json;
+  }
+
+  public void setJson(String json) {
+    this.json = json;
   }
 
 

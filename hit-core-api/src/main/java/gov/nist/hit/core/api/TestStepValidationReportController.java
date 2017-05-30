@@ -14,6 +14,8 @@ package gov.nist.hit.core.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -560,17 +562,74 @@ public class TestStepValidationReportController {
 			String tmpXml = generateXml(report, testStep.getStage());
 			report.setHtml(validationReportService.generateHtml(tmpXml));
 			report.setXml(null);
+			report.setJson(null);
 			return report;
 		} catch (Exception e) {
 			throw new ValidationReportException("Failed to generate the report");
 		}
 	}
 
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/json", method = RequestMethod.GET, produces = "application/json")
+	public String getReportJson(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
+			HttpServletRequest request, HttpServletResponse response) {
+		try {
+			logger.info("Getting validation report json");
+			TestStepValidationReport report = getValidationReport(testStepId, testReportId, request);
+			return report != null ? report.getJson() : null;
+		} catch (Exception e) {
+			throw new ValidationReportException("Failed to generate the report");
+		}
+	}
+
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/html", method = RequestMethod.GET, produces = "application/json")
+	public String getReportHtml(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
+			HttpServletRequest request, HttpServletResponse response) {
+		try {
+			logger.info("Getting validation report html");
+			TestStepValidationReport report = getValidationReport(testStepId, testReportId, request);
+			return report != null ? report.getHtml() : null;
+		} catch (Exception e) {
+			throw new ValidationReportException("Failed to generate the report");
+		}
+	}
+
+	private TestStepValidationReport getValidationReport(Long testStepId, Long testReportId, HttpServletRequest request)
+			throws MessageValidationException {
+		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+		if (userId == null || ((userService.findOne(userId)) == null))
+			throw new MessageValidationException("Invalid user credentials");
+		if (testStepId == null || ((testStepService.findOne(testStepId)) == null))
+			throw new ValidationReportException("No test step or unknown test step specified");
+		TestStepValidationReport report = findReport(testReportId, testStepId, userId);
+		if (!userId.equals(report.getUserId()))
+			throw new MessageValidationException("Invalid user credentials");
+		return report;
+	}
+
 	private TestStepValidationReport findReport(Long testReportId, Long testStepId, Long userId) {
-		if (testReportId != null)
+		if (testReportId != null) {
 			return validationReportService.findOne(testReportId);
-		else
-			return validationReportService.findOneByTestStepAndUser(testStepId, userId);
+		} else {
+			List<TestStepValidationReport> reports = validationReportService.findAllByTestStepAndUser(testStepId,
+					userId);
+			if (reports != null && reports.size() > 1) {
+				Collections.sort(reports, new Comparator<TestStepValidationReport>() {
+					@Override
+					public int compare(TestStepValidationReport o1, TestStepValidationReport o2) {
+						return o2.getDateUpdated().compareTo(o1.getDateUpdated());
+					}
+				});
+				for (int i = 1; i < reports.size(); i++) {
+					validationReportService.delete(reports.get(i).getId());
+				}
+			}
+			if (reports.size() == 1)
+				return reports.get(0);
+		}
+
+		return null;
 	}
 
 	private String generateXml(TestStepValidationReport report, TestingStage stage) {
