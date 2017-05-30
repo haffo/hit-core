@@ -1,48 +1,37 @@
 package gov.nist.hit.core.domain;
 
-import io.swagger.annotations.ApiModel;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
-import javax.persistence.OrderBy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 
 import gov.nist.auth.hit.core.domain.TestingType;
+import io.swagger.annotations.ApiModel;
 
 @Entity
-@ApiModel(value="CFTestInstance", description="Data Model representing context-free test case")
+@ApiModel(value = "CFTestInstance", description = "Data Model representing context-free test case")
 public class CFTestInstance extends TestStep implements Serializable {
 
   private static final long serialVersionUID = 8805967508478985159L;
 
   @JsonIgnore
+  
   private boolean root;
 
   public CFTestInstance() {
     super();
     this.type = ObjectType.TestObject;
     this.testingType = TestingType.DATAINSTANCE;
+    this.stage = TestingStage.CF;
   }
 
 
@@ -56,10 +45,12 @@ public class CFTestInstance extends TestStep implements Serializable {
   private List<CFTestInstance> children = new ArrayList<CFTestInstance>();
 
 
+  @Override
   public TestContext getTestContext() {
     return testContext;
   }
 
+  @Override
   public void setTestContext(TestContext testContext) {
     this.testContext = testContext;
   }
@@ -82,10 +73,12 @@ public class CFTestInstance extends TestStep implements Serializable {
     this.root = root;
   }
 
+  @Override
   public TestingType getTestingType() {
     return testingType;
   }
 
+  @Override
   public void setTestingType(TestingType testingType) {
     this.testingType = testingType;
   }

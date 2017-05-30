@@ -12,18 +12,26 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.IntegrationProfile;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
+import gov.nist.hit.core.domain.IntegrationProfile;
+import gov.nist.hit.core.domain.TestScope;
 
 public interface IntegrationProfileRepository extends JpaRepository<IntegrationProfile, Long> {
 
-	  @Query("select p from IntegrationProfile p where :mId member of p.messages")
-	  public IntegrationProfile findByMessageId(@Param("mId") String mId);
-	  
-	  @Query("select p from IntegrationProfile p where p.sourceId = :sourceId")
-	  public IntegrationProfile findBySourceId(@Param("sourceId") String sourceId);
+  @Query("select p from IntegrationProfile p where :mId member of p.messages")
+  public IntegrationProfile findByMessageId(@Param("mId") String mId);
+
+  @Query("select p from IntegrationProfile p where p.sourceId = :sourceId")
+  public IntegrationProfile findBySourceId(@Param("sourceId") String sourceId);
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from IntegrationProfile to where to.scope = :scope")
+  public void deleteByScope(@Param("scope") TestScope scope);
 
 }

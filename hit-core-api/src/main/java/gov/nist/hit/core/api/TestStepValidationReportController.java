@@ -12,24 +12,10 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.auth.hit.core.domain.Account;
-import gov.nist.auth.hit.core.domain.UserTestStepReport;
-import gov.nist.auth.hit.core.service.UserTestStepReportService;
-import gov.nist.hit.core.domain.*;
-import gov.nist.hit.core.service.AccountService;
-import gov.nist.hit.core.service.TestCaseService;
-import gov.nist.hit.core.service.TestStepService;
-import gov.nist.hit.core.service.TestStepValidationReportService;
-import gov.nist.hit.core.service.exception.MessageValidationException;
-import gov.nist.hit.core.service.exception.TestStepException;
-import gov.nist.hit.core.service.exception.UserNotFoundException;
-import gov.nist.hit.core.service.exception.ValidationReportException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +34,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import gov.nist.auth.hit.core.domain.Account;
+import gov.nist.auth.hit.core.domain.UserTestStepReport;
+import gov.nist.auth.hit.core.service.UserTestStepReportService;
+import gov.nist.hit.core.domain.TestResult;
+import gov.nist.hit.core.domain.TestStep;
+import gov.nist.hit.core.domain.TestStepValidationReport;
+import gov.nist.hit.core.domain.TestStepValidationReportRequest;
+import gov.nist.hit.core.domain.TestingStage;
+import gov.nist.hit.core.domain.UserTestStepReportRequest;
+import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.TestCaseService;
+import gov.nist.hit.core.service.TestStepService;
+import gov.nist.hit.core.service.TestStepValidationReportService;
+import gov.nist.hit.core.service.exception.MessageValidationException;
+import gov.nist.hit.core.service.exception.TestStepException;
+import gov.nist.hit.core.service.exception.UserNotFoundException;
+import gov.nist.hit.core.service.exception.ValidationReportException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 /**
  * @author Harold Affo (NIST)
  * 
@@ -57,487 +64,623 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "Test Step validation report api", tags = "Test Step Validation Report")
 public class TestStepValidationReportController {
 
-  static final Logger logger = LoggerFactory.getLogger(TestStepValidationReportController.class);
+	static final Logger logger = LoggerFactory.getLogger(TestStepValidationReportController.class);
 
-  @Autowired
-  private TestStepValidationReportService validationReportService;
+	@Autowired
+	private TestStepValidationReportService validationReportService;
 
-  @Autowired
-  private TestStepService testStepService;
+	@Autowired
+	private TestStepService testStepService;
 
-  @Autowired
-  private TestCaseService testCaseService;
+	@Autowired
+	private TestCaseService testCaseService;
 
-  @Autowired
-  private AccountService userService;
+	@Autowired
+	private AccountService userService;
 
-  @Autowired
-  private UserTestStepReportService userTestStepReportService;
+	@Autowired
+	private UserTestStepReportService userTestStepReportService;
 
+	// @ApiOperation(value = "", hidden = true)
+	// @RequestMapping(value = "/init", method = RequestMethod.POST, consumes =
+	// "application/x-www-form-urlencoded; charset=UTF-8")
+	// public TestStepValidationReport createNew(
+	// @ApiParam(value = "the id of the test step", required = true)
+	// @RequestParam("testStepId") Long testStepId,
+	// HttpServletRequest request, HttpServletResponse response) {
+	// TestStepValidationReport report = null;
+	// try {
+	// logger.info("Create a new Test Step validation report");
+	// Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+	// Account user = null;
+	// if (userId == null || ((user = userService.findOne(userId)) == null))
+	// throw new MessageValidationException("Invalid user credentials");
+	// TestStep testStep = null;
+	// if (testStepId == null || ((testStep =
+	// testStepService.findOne(testStepId)) == null))
+	// throw new ValidationReportException("No test step or unknown test step
+	// specified");
+	// report = findUserTestStepValidationReportByTestStep(testStepId, userId);
+	// if (report == null) {
+	// report = new TestStepValidationReport();
+	// report.setTestStep(testStep);
+	// report.setUserId(user.getId());
+	// validationReportService.save(report);
+	// }
+	// } catch (ValidationReportException e) {
+	// logger.info("Failed to initialize a Test Step validation report");
+	// } catch (Exception e) {
+	// logger.info("Failed to initialize a Test Step validation report");
+	// }
+	// return report;
+	// }
 
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/init", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public TestStepValidationReport createNew(@ApiParam(value = "the id of the test step",
-      required = true) @RequestParam("testStepId") Long testStepId, HttpServletRequest request,
-      HttpServletResponse response) {
-    TestStepValidationReport report = null;
-    try {
-      logger.info("Create a new Test Step validation report");
-      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      Account user = null;
-      if (userId == null || ((user = userService.findOne(userId)) == null))
-        throw new MessageValidationException("Invalid user credentials");
-      TestStep testStep = null;
-      if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
-        throw new ValidationReportException("No test step or unknown test step specified");
-      report = findUserTestStepValidationReportByTestStep(testStepId, userId);
-      if (report == null) {
-        report = new TestStepValidationReport();
-        report.setTestStep(testStep);
-        report.setUserId(user.getId());
-        validationReportService.save(report);
-      }
-    } catch (ValidationReportException e) {
-      logger.info("Failed to initialize a Test Step validation report");
-    } catch (Exception e) {
-      logger.info("Failed to initialize a Test Step validation report");
-    }
-    return report;
-  }
+	// private TestStepValidationReport
+	// findUserTestStepValidationReportByTestStep(Long testStepId, Long userId)
+	// {
+	// TestStepValidationReport report = null;
+	// List<TestStepValidationReport> reports =
+	// validationReportService.findAllByTestStepAndUser(testStepId, userId);
+	// if (reports != null && !reports.isEmpty()) {
+	// if (reports.size() == 1) {
+	// report = reports.get(0);
+	// } else {
+	// validationReportService.delete(reports);
+	// }
+	// }
+	// return report;
+	// }
+	//
+	// private void deleteByTestStepId(Long testStepId, Long userId) {
+	// try {
+	// List<TestStepValidationReport> reports =
+	// validationReportService.findAllByTestStepAndUser(testStepId,
+	// userId);
+	// validationReportService.delete(reports);
+	// } catch (RuntimeException e) {
+	// } catch (Exception e) {
+	// }
+	// }
 
+	// @ApiOperation(value = "", hidden = true)
+	// @RequestMapping(value = "/create", method = RequestMethod.POST, produces
+	// = "application/json")
+	// public TestStepValidationReport create(@RequestBody
+	// TestStepValidationReportRequest command,
+	// HttpServletRequest request, HttpServletResponse response) {
+	// try {
+	// logger.info("Saving validation report");
+	// Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+	// Account user = null;
+	// if (userId == null || ((user = userService.findOne(userId)) == null))
+	// throw new MessageValidationException("Invalid user credentials");
+	// TestStep testStep = null;
+	// Long testStepId = command.getTestStepId();
+	// if (testStepId == null || ((testStep =
+	// testStepService.findOne(testStepId)) == null))
+	// throw new ValidationReportException("No test step or unknown test step
+	// specified");
+	// TestStepValidationReport report = null;
+	// List<TestStepValidationReport> reports =
+	// validationReportService.findAllByTestStepAndUser(testStepId,
+	// userId);
+	// if (reports != null && !reports.isEmpty()) {
+	// if (reports.size() == 1) {
+	// report = reports.get(0);
+	// } else {
+	// validationReportService.delete(reports);
+	// report = new TestStepValidationReport();
+	// }
+	// } else {
+	// report = new TestStepValidationReport();
+	// }
+	// report.setTestStep(testStep);
+	// report.setUserId(user.getId());
+	// report.setXml(xmlMessageValidationReport);
+	// validationReportService.save(report);
+	// return report;
+	// } catch (ValidationReportException e) {
+	// throw new ValidationReportException("Failed to download the report");
+	// } catch (Exception e) {
+	// throw new ValidationReportException("Failed to download the report");
+	// }
+	// }
 
-  private TestStepValidationReport findUserTestStepValidationReportByTestStep(Long testStepId,
-      Long userId) {
-    TestStepValidationReport report = null;
-    List<TestStepValidationReport> reports =
-        validationReportService.findAllByTestStepAndUser(testStepId, userId);
-    if (reports != null && !reports.isEmpty()) {
-      if (reports.size() == 1) {
-        report = reports.get(0);
-      } else {
-        validationReportService.delete(reports);
-      }
-    }
-    return report;
-  }
+	// @ApiOperation(value = "", hidden = true)
+	// @RequestMapping(value = "/create", method = RequestMethod.POST, produces
+	// = "application/json")
+	// public TestStepValidationReport create(@RequestBody
+	// TestStepValidationReportRequest command,
+	// HttpServletRequest request, HttpServletResponse response) {
+	// try {
+	// logger.info("Saving validation report");
+	// Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+	// Account user = null;
+	// if (userId == null || ((user = userService.findOne(userId)) == null))
+	// throw new MessageValidationException("Invalid user credentials");
+	// TestStep testStep = null;
+	// Long testStepId = command.getTestStepId();
+	// String comments = command.getComments();
+	// String result = command.getResult();
+	// String xmlMessageValidationReport =
+	// command.getXmlMessageValidationReport();
+	// if (testStepId == null || ((testStep =
+	// testStepService.findOne(testStepId)) == null))
+	// throw new ValidationReportException("No test step or unknown test step
+	// specified");
+	//
+	// TestStepValidationReport report = null;
+	// List<TestStepValidationReport> reports =
+	// validationReportService.findAllByTestStepAndUser(testStepId, userId);
+	// if (reports != null && !reports.isEmpty()) {
+	// if (reports.size() == 1) {
+	// report = reports.get(0);
+	// } else {
+	// validationReportService.delete(reports);
+	// report = new TestStepValidationReport();
+	// }
+	// } else {
+	// report = new TestStepValidationReport();
+	// }
+	// report.setTestStep(testStep);
+	// report.setUserId(user.getId());
+	// report.setComments(comments);
+	// report.setResult(StringUtils.isNotEmpty(result) ?
+	// TestResult.valueOf(result) : null);
+	// String xml = report.getXml();
+	// if (StringUtils.isNotEmpty(xmlMessageValidationReport)) {
+	// xml =
+	// validationReportService.generateXmlTestStepValidationReport(xmlMessageValidationReport,
+	// report);
+	// report.setXml(xml);
+	// }
+	// if (StringUtils.isNotEmpty(xml)) {
+	// report.setHtml(validationReportService.generateHtml(xml));
+	// }
+	// validationReportService.save(report);
+	// return report;
+	// } catch (ValidationReportException e) {
+	// throw new ValidationReportException("Failed to generate the report");
+	// } catch (Exception e) {
+	// throw new ValidationReportException("Failed to generate the report");
+	// }
+	// }
 
-  private void deleteByTestStepId(Long testStepId, Long userId) {
-    try {
-      List<TestStepValidationReport> reports =
-          validationReportService.findAllByTestStepAndUser(testStepId, userId);
-      validationReportService.delete(reports);
-    } catch (RuntimeException e) {
-    } catch (Exception e) {
-    }
-  }
+	@ApiOperation(value = "Download the persistent message validation report of a test step by its testStep id and its user's account", nickname = "downloadPersistentUserTestStepReport", produces = "text/html,application/msword,application/xml,application/pdf")
+	@RequestMapping(value = "/downloadPersistentUserTestStepReport", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+	public void downloadPersistentUserTestStepReport(
+			@ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
+			@ApiParam(value = "the account id of the user", required = true) @RequestParam("accountId") final Long accountId,
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") Long testStepId,
+			HttpServletRequest request, HttpServletResponse response) {
+		try {
+			logger.info("Downloading validation report  in " + format);
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId == null || (userService.findOne(userId) == null))
+				throw new MessageValidationException("Invalid user credentials");
+			if (format == null)
+				throw new ValidationReportException("No format specified");
+			TestStep testStep = testStepService.findOne(testStepId);
+			if (testStep == null) {
+				throw new TestStepException(testStepId);
+			}
+			UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(accountId,
+					testStep.getPersistentId());
+			if (userTestStepReport == null) {
+				logger.error("No testStep Report for account " + accountId + " and testStep " + testStepId);
+				throw new ValidationReportException(
+						"No testStepReport for account " + accountId + " and testStep " + testStepId);
+			}
+			if (userTestStepReport.getXml() == null) {
+				throw new ValidationReportException("No validation report available for this test step");
+			}
+			String title = testStep.getName();
+			String ext = format.toLowerCase();
+			InputStream io = null;
+			if ("HTML".equalsIgnoreCase(format)) {
+				io = IOUtils.toInputStream(validationReportService.generateHtml(userTestStepReport.getXml()), "UTF-8");
+				response.setContentType("text/html");
+			} else if ("XML".equalsIgnoreCase(format)) {
+				io = IOUtils.toInputStream(userTestStepReport.getXml(), "UTF-8");
+				response.setContentType("application/xml");
+			} else if ("PDF".equalsIgnoreCase(format)) {
+				io = validationReportService.generatePdf(userTestStepReport.getXml());
+				response.setContentType("application/pdf");
+			} else {
+				throw new ValidationReportException("Unsupported report format " + format);
+			}
+			title = title.replaceAll(" ", "-");
+			response.setHeader("Content-disposition", "attachment;filename=" + title + "-ValidationReport." + ext);
+			FileCopyUtils.copy(io, response.getOutputStream());
+		} catch (ValidationReportException | IOException e) {
+			throw new ValidationReportException("Failed to generate the report");
+		} catch (Exception e) {
+			throw new ValidationReportException("Failed to generate the report");
+		}
+	}
 
+	@ApiOperation(value = "Download the message validation report of a test step by its id", nickname = "download", produces = "text/html,application/msword,application/xml,application/pdf")
+	@RequestMapping(value = "/{testStepValidationReportId}/download", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
+	public void download(
+			@ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepValidationReportId") Long testStepValidationReportId,
+			HttpServletRequest request, HttpServletResponse response) {
+		try {
+			logger.info("Downloading validation report  in " + format);
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId == null || (userService.findOne(userId) == null))
+				throw new MessageValidationException("Invalid user credentials");
+			if (format == null)
+				throw new ValidationReportException("No format specified");
+			TestStepValidationReport report = validationReportService.findOne(testStepValidationReportId);
 
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json")
-  public TestStepValidationReport create(@RequestBody TestStepValidationReportRequest command,
-      HttpServletRequest request, HttpServletResponse response) {
-    try {
-      logger.info("Saving validation report");
-      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      Account user = null;
-      if (userId == null || ((user = userService.findOne(userId)) == null))
-        throw new MessageValidationException("Invalid user credentials");
-      TestStep testStep = null;
-      Long testStepId = command.getTestStepId();
-      String xmlMessageValidationReport = command.getXmlMessageValidationReport();
-      if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
-        throw new ValidationReportException("No test step or unknown test step specified");
-      TestStepValidationReport report = null;
-      List<TestStepValidationReport> reports =
-          validationReportService.findAllByTestStepAndUser(testStepId, userId);
-      if (reports != null && !reports.isEmpty()) {
-        if (reports.size() == 1) {
-          report = reports.get(0);
-        } else {
-          validationReportService.delete(reports);
-          report = new TestStepValidationReport();
-        }
-      } else {
-        report = new TestStepValidationReport();
-      }
-      report.setTestStep(testStep);
-      report.setUserId(user.getId());
-      report.setXml(xmlMessageValidationReport);
-      validationReportService.save(report);
-      return report;
-    } catch (ValidationReportException e) {
-      throw new ValidationReportException("Failed to download the report");
-    } catch (Exception e) {
-      throw new ValidationReportException("Failed to download the report");
-    }
-  }
+			if (report == null) {
+				throw new ValidationReportException("No validation report found for this test step");
+			}
 
+			if (report.getUserId() == null || !userId.equals(report.getUserId())) {
+				throw new MessageValidationException("Forbidden access");
+			}
 
+			TestStep testStep = report.getTestStep();
 
-  // @ApiOperation(value = "", hidden = true)
-  // @RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json")
-  // public TestStepValidationReport create(@RequestBody TestStepValidationReportRequest command,
-  // HttpServletRequest request, HttpServletResponse response) {
-  // try {
-  // logger.info("Saving validation report");
-  // Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-  // Account user = null;
-  // if (userId == null || ((user = userService.findOne(userId)) == null))
-  // throw new MessageValidationException("Invalid user credentials");
-  // TestStep testStep = null;
-  // Long testStepId = command.getTestStepId();
-  // String comments = command.getComments();
-  // String result = command.getResult();
-  // String xmlMessageValidationReport = command.getXmlMessageValidationReport();
-  // if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
-  // throw new ValidationReportException("No test step or unknown test step specified");
-  //
-  // TestStepValidationReport report = null;
-  // List<TestStepValidationReport> reports =
-  // validationReportService.findAllByTestStepAndUser(testStepId, userId);
-  // if (reports != null && !reports.isEmpty()) {
-  // if (reports.size() == 1) {
-  // report = reports.get(0);
-  // } else {
-  // validationReportService.delete(reports);
-  // report = new TestStepValidationReport();
-  // }
-  // } else {
-  // report = new TestStepValidationReport();
-  // }
-  // report.setTestStep(testStep);
-  // report.setUserId(user.getId());
-  // report.setComments(comments);
-  // report.setResult(StringUtils.isNotEmpty(result) ? TestResult.valueOf(result) : null);
-  // String xml = report.getXml();
-  // if (StringUtils.isNotEmpty(xmlMessageValidationReport)) {
-  // xml =
-  // validationReportService.generateXmlTestStepValidationReport(xmlMessageValidationReport,
-  // report);
-  // report.setXml(xml);
-  // }
-  // if (StringUtils.isNotEmpty(xml)) {
-  // report.setHtml(validationReportService.generateHtml(xml));
-  // }
-  // validationReportService.save(report);
-  // return report;
-  // } catch (ValidationReportException e) {
-  // throw new ValidationReportException("Failed to generate the report");
-  // } catch (Exception e) {
-  // throw new ValidationReportException("Failed to generate the report");
-  // }
-  // }
+			if (testStep == null)
+				throw new ValidationReportException("No associated test step found");
 
-  @ApiOperation(value = "Download the persistent message validation report of a test step by its testStep id and its user's account",
-      nickname = "downloadPersistentUserTestStepReport",
-      produces = "text/html,application/msword,application/xml,application/pdf")
-  @RequestMapping(value = "/downloadPersistentUserTestStepReport", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public void downloadPersistentUserTestStepReport(
-      @ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
-      @ApiParam(value = "the account id of the user", required = true) @RequestParam("accountId") final Long accountId,
-      @ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") Long testStepId,
-      HttpServletRequest request, HttpServletResponse response) {
-    try {
-      logger.info("Downloading validation report  in " + format);
-      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      if (userId == null || (userService.findOne(userId) == null))
-        throw new MessageValidationException("Invalid user credentials");
-      if (format == null)
-        throw new ValidationReportException("No format specified");
-      TestStep testStep = testStepService.findOne(testStepId);
-      if(testStep==null){
-        throw new TestStepException(testStepId);
-      }
-      UserTestStepReport userTestStepReport = userTestStepReportService.findOneByAccountAndTestStepId(accountId,testStep.getPersistentId());
-      if(userTestStepReport==null){
-        logger.error("No testStep Report for account "+accountId+" and testStep "+testStepId);
-        throw new ValidationReportException("No testStepReport for account "+accountId+" and testStep "+testStepId);
-      }
-      if (userTestStepReport.getXml()==null) {
-        throw new ValidationReportException("No validation report available for this test step");
-      }
-      String title = testStep.getName();
-      String ext = format.toLowerCase();
-      InputStream io = null;
-      if ("HTML".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(validationReportService.generateHtml(userTestStepReport.getXml()), "UTF-8");
-        response.setContentType("text/html");
-      } else if ("XML".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(userTestStepReport.getXml(), "UTF-8");
-        response.setContentType("application/xml");
-      } else if ("PDF".equalsIgnoreCase(format)) {
-        io = validationReportService.generatePdf(userTestStepReport.getXml());
-        response.setContentType("application/pdf");
-      } else {
-        throw new ValidationReportException("Unsupported report format " + format);
-      }
-      title = title.replaceAll(" ", "-");
-      response.setHeader("Content-disposition", "attachment;filename=" + title
-          + "-ValidationReport." + ext);
-      FileCopyUtils.copy(io, response.getOutputStream());
-    } catch (ValidationReportException | IOException e) {
-      throw new ValidationReportException("Failed to generate the report");
-    } catch (Exception e) {
-      throw new ValidationReportException("Failed to generate the report");
-    }
-  }
+			String xmlReport = generateXml(report, testStep.getStage());
+			String title = testStep.getName();
+			String ext = format.toLowerCase();
+			InputStream io = null;
+			if ("HTML".equalsIgnoreCase(format)) {
+				io = IOUtils.toInputStream(generateHtml(xmlReport), "UTF-8");
+				response.setContentType("text/html");
+			} else if ("XML".equalsIgnoreCase(format)) {
+				io = IOUtils.toInputStream(xmlReport, "UTF-8");
+				response.setContentType("application/xml");
+			} else if ("PDF".equalsIgnoreCase(format)) {
+				io = validationReportService.generatePdf(xmlReport);
+				response.setContentType("application/pdf");
+			} else {
+				throw new ValidationReportException("Unsupported report format " + format);
+			}
+			title = title.replaceAll(" ", "-");
+			response.setHeader("Content-disposition", "attachment;filename=" + title + "-ValidationReport." + ext);
+			FileCopyUtils.copy(io, response.getOutputStream());
+		} catch (ValidationReportException | IOException e) {
+			throw new ValidationReportException("Failed to generate the report");
+		} catch (Exception e) {
+			throw new ValidationReportException("Failed to generate the report");
+		}
+	}
 
-  @ApiOperation(value = "Download the message validation report of a test step by its id",
-      nickname = "download",
-      produces = "text/html,application/msword,application/xml,application/pdf")
-  @RequestMapping(value = "/{testStepValidationReportId}/download", method = RequestMethod.POST,
-      consumes = "application/x-www-form-urlencoded; charset=UTF-8")
-  public void download(
-      @ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
-      @ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepValidationReportId") Long testStepValidationReportId,
-      HttpServletRequest request, HttpServletResponse response) {
-    try {
-      logger.info("Downloading validation report  in " + format);
-      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      if (userId == null || (userService.findOne(userId) == null))
-        throw new MessageValidationException("Invalid user credentials");
-      if (format == null)
-        throw new ValidationReportException("No format specified");
-      TestStepValidationReport report = validationReportService.findOne(testStepValidationReportId);
-      String xmlReport = null;
-      if (report == null || ((xmlReport = report.getXml()) == null)) {
-        throw new ValidationReportException("No validation report available for this test step");
-      }
-      if (report.getUserId() == null || !userId.equals(report.getUserId())) {
-        throw new MessageValidationException("Forbidden access");
-      }
+	// @ApiOperation(value = "Get the html format of an test step validation
+	// report",
+	// nickname = "generateHtml")
+	// @RequestMapping(value = "/{testStepValidationReportId}/generateHtml",
+	// method = RequestMethod.POST, produces = "application/json")
+	// public Map<String, String> generateHtml(
+	// @ApiParam(value = "the id of the test step validation report", required =
+	// true)
+	// @PathVariable("testStepValidationReportId") Long
+	// testStepValidationReportId,
+	// HttpServletRequest request, HttpServletResponse response) {
+	// try {
+	// logger.info("Generating html test step validation report");
+	// Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+	// if (userId == null || (userService.findOne(userId) == null))
+	// throw new MessageValidationException("Invalid user credentials");
+	// TestStepValidationReport report =
+	// validationReportService.findOne(testStepValidationReportId);
+	// String xmlReport = null;
+	// if (report == null || ((xmlReport = report.getXml()) == null)) {
+	// throw new ValidationReportException("No validation report found for this
+	// test step");
+	// }
+	// if (report.getUser() == null || report.getUser().getId() != userId) {
+	// throw new MessageValidationException("Forbidden access");
+	// }
+	// TestStep testStep = report.getTestStep();
+	// if (testStep == null)
+	// throw new ValidationReportException("No associated test step found");
+	// String html = validationReportService.generateHtml(xmlReport);
+	// Map<String, String> res = new HashMap<String, String>(1);
+	// res.put("html", html);
+	// return res;
+	// } catch (ValidationReportException e) {
+	// throw new ValidationReportException("Failed to download the report");
+	// } catch (Exception e) {
+	// throw new ValidationReportException("Failed to download the report");
+	// }
+	// }
 
-      TestStep testStep = report.getTestStep();
-      if (testStep == null)
-        throw new ValidationReportException("No associated test step found");
-      String title = testStep.getName();
-      String ext = format.toLowerCase();
-      InputStream io = null;
-      if ("HTML".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(generateHtml(xmlReport), "UTF-8");
-        response.setContentType("text/html");
-      } else if ("XML".equalsIgnoreCase(format)) {
-        io = IOUtils.toInputStream(xmlReport, "UTF-8");
-        response.setContentType("application/xml");
-      } else if ("PDF".equalsIgnoreCase(format)) {
-        io = validationReportService.generatePdf(xmlReport);
-        response.setContentType("application/pdf");
-      } else {
-        throw new ValidationReportException("Unsupported report format " + format);
-      }
-      title = title.replaceAll(" ", "-");
-      response.setHeader("Content-disposition", "attachment;filename=" + title
-          + "-ValidationReport." + ext);
-      FileCopyUtils.copy(io, response.getOutputStream());
-    } catch (ValidationReportException | IOException e) {
-      throw new ValidationReportException("Failed to generate the report");
-    } catch (Exception e) {
-      throw new ValidationReportException("Failed to generate the report");
-    }
-  }
+	// @ApiOperation(value = "Update the result of a test step by the test
+	// step's id",
+	// nickname = "updateResult")
+	// @RequestMapping(value = "/updateResult", method = RequestMethod.POST)
+	// public boolean updateResult(
+	// @ApiParam(value = "the id of the test step", required = true)
+	// @RequestParam("testStepId") final
+	// Long testStepId,
+	// @ApiParam(value = "the result", required = true) @RequestParam("result")
+	// final String result,
+	// HttpServletRequest request) throws MessageValidationException {
+	// logger.info("Setting a test step result");
+	// Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+	// if (userId == null || userService.findOne(userId) == null)
+	// throw new ValidationReportException("Invalid user credentials");
+	// TestStepValidationReport report =
+	// validationReportService.findOneByTestStepAndUser(testStepId, userId);
+	// if (report != null) {
+	// report.setResult(TestResult.valueOf(result));
+	// }
+	// return true;
+	// }
+	//
+	// @ApiOperation(value = "Save the comments of a test step by the test
+	// step's id",
+	// nickname = "updateComments")
+	// @RequestMapping(value = "/updateComments", method = RequestMethod.POST)
+	// public boolean updateComments(
+	// @ApiParam(value = "the id of the test step", required = true)
+	// @RequestParam("testStepId") final
+	// Long testStepId,
+	// @ApiParam(value = "the comments", required = true)
+	// @RequestParam("comments") final String
+	// comments,
+	// HttpServletRequest request) throws MessageValidationException {
+	// logger.info("Setting a test step comments");
+	// Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+	// if (userId == null || userService.findOne(userId) == null)
+	// throw new ValidationReportException("Invalid user credentials");
+	// TestStepValidationReport report =
+	// validationReportService.findOneByTestStepAndUser(testStepId, userId);
+	// if (report != null) {
+	// report.setComments(comments);
+	// }
+	// return true;
+	// }
 
-  // @ApiOperation(value = "Get the html format of an test step validation report",
-  // nickname = "generateHtml")
-  // @RequestMapping(value = "/{testStepValidationReportId}/generateHtml",
-  // method = RequestMethod.POST, produces = "application/json")
-  // public Map<String, String> generateHtml(
-  // @ApiParam(value = "the id of the test step validation report", required = true)
-  // @PathVariable("testStepValidationReportId") Long testStepValidationReportId,
-  // HttpServletRequest request, HttpServletResponse response) {
-  // try {
-  // logger.info("Generating html test step validation report");
-  // Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-  // if (userId == null || (userService.findOne(userId) == null))
-  // throw new MessageValidationException("Invalid user credentials");
-  // TestStepValidationReport report = validationReportService.findOne(testStepValidationReportId);
-  // String xmlReport = null;
-  // if (report == null || ((xmlReport = report.getXml()) == null)) {
-  // throw new ValidationReportException("No validation report found for this test step");
-  // }
-  // if (report.getUser() == null || report.getUser().getId() != userId) {
-  // throw new MessageValidationException("Forbidden access");
-  // }
-  // TestStep testStep = report.getTestStep();
-  // if (testStep == null)
-  // throw new ValidationReportException("No associated test step found");
-  // String html = validationReportService.generateHtml(xmlReport);
-  // Map<String, String> res = new HashMap<String, String>(1);
-  // res.put("html", html);
-  // return res;
-  // } catch (ValidationReportException e) {
-  // throw new ValidationReportException("Failed to download the report");
-  // } catch (Exception e) {
-  // throw new ValidationReportException("Failed to download the report");
-  // }
-  // }
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/savePersistentUserTestStepReport", method = RequestMethod.POST, produces = "application/json")
+	public UserTestStepReport savePersistentUserTestStepReport(@RequestBody UserTestStepReportRequest command,
+			HttpServletRequest request, HttpServletResponse response) {
+		logger.info("Saving persistent test step report");
+		try {
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			Account user = userService.findOne(userId);
+			if (user == null) {
+				logger.error("Account " + userId + " not found");
+				throw new UserNotFoundException("Account " + userId + " not found");
+			}
+			Long testStepId = command.getTestStepId();
+			TestStep testStep = testStepService.findOne(testStepId);
+			if (testStep == null) {
+				throw new TestStepException(testStepId);
+			}
+			TestStepValidationReport report = validationReportService
+					.findOneByTestStepAndUser(testStep.getPersistentId(), userId);
+			UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(),
+					testStep.getVersion(), user.getId(), testStep.getPersistentId(), report.getComments());
+			userTestStepReport = userTestStepReportService.save(userTestStepReport);
+			return userTestStepReport;
+		} catch (UserNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
+	// @ApiOperation(value = "", hidden = true)
+	// @RequestMapping(value = "/update", method = RequestMethod.POST, produces
+	// = "application/json")
+	// public TestStepValidationReport update(@RequestBody
+	// TestStepValidationReportRequest command,
+	// HttpServletRequest request, HttpServletResponse response) {
+	// try {
+	// logger.info("Saving validation report");
+	// Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+	// Account user = null;
+	// if (userId == null || ((user = userService.findOne(userId)) == null))
+	// throw new MessageValidationException("Invalid user credentials");
+	// TestStep testStep = null;
+	// Long testStepId = command.getTestStepId();
+	// String comments = command.getComments();
+	// String result = command.getResult();
+	// String xmlMessageValidationReport =
+	// command.getXmlMessageValidationReport();
+	// if (testStepId == null || ((testStep =
+	// testStepService.findOne(testStepId)) == null))
+	// throw new ValidationReportException("No test step or unknown test step
+	// specified");
+	// TestStepValidationReport report =
+	// validationReportService.findOneByTestStepAndUser(testStepId, userId);
+	// if (report != null) {
+	// report.setTestStep(testStep);
+	// report.setUserId(user.getId());
+	// report.setComments(comments);
+	// report.setResult(StringUtils.isNotEmpty(result) && result != null ?
+	// TestResult
+	// .valueOf(result) : null);
+	// String finalXmlReport = null;
+	// if (StringUtils.isNotEmpty(xmlMessageValidationReport)
+	// && xmlMessageValidationReport != null) {
+	// finalXmlReport =
+	// validationReportService.generateXmlTestStepValidationReport(
+	// xmlMessageValidationReport, report);
+	// } else {
+	// if (StringUtils.isNotEmpty(report.getXml()) && report.getXml() != null) {
+	// finalXmlReport =
+	// validationReportService.updateXmlTestValidationReportElement(report);
+	// } else if (StringUtils.isNotEmpty(comments) || report.getResult() !=
+	// null) {
+	// finalXmlReport =
+	// validationReportService.generateXmlTestStepValidationReport(null,
+	// report);
+	// }
+	// }
+	// if (finalXmlReport != null) {
+	// report.setXml(finalXmlReport);
+	// report.setHtml(validationReportService.generateHtml(finalXmlReport));
+	// validationReportService.save(report);
+	// }
+	// }
+	//
+	// return report;
+	// } catch (Exception e) {
+	// throw new ValidationReportException("Failed to generate the report");
+	// }
+	// }
 
-  // @ApiOperation(value = "Update the result of a test step by the test step's id",
-  // nickname = "updateResult")
-  // @RequestMapping(value = "/updateResult", method = RequestMethod.POST)
-  // public boolean updateResult(
-  // @ApiParam(value = "the id of the test step", required = true) @RequestParam("testStepId") final
-  // Long testStepId,
-  // @ApiParam(value = "the result", required = true) @RequestParam("result") final String result,
-  // HttpServletRequest request) throws MessageValidationException {
-  // logger.info("Setting a test step result");
-  // Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-  // if (userId == null || userService.findOne(userId) == null)
-  // throw new ValidationReportException("Invalid user credentials");
-  // TestStepValidationReport report =
-  // validationReportService.findOneByTestStepAndUser(testStepId, userId);
-  // if (report != null) {
-  // report.setResult(TestResult.valueOf(result));
-  // }
-  // return true;
-  // }
-  //
-  // @ApiOperation(value = "Save the comments of a test step by the test step's id",
-  // nickname = "updateComments")
-  // @RequestMapping(value = "/updateComments", method = RequestMethod.POST)
-  // public boolean updateComments(
-  // @ApiParam(value = "the id of the test step", required = true) @RequestParam("testStepId") final
-  // Long testStepId,
-  // @ApiParam(value = "the comments", required = true) @RequestParam("comments") final String
-  // comments,
-  // HttpServletRequest request) throws MessageValidationException {
-  // logger.info("Setting a test step comments");
-  // Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-  // if (userId == null || userService.findOne(userId) == null)
-  // throw new ValidationReportException("Invalid user credentials");
-  // TestStepValidationReport report =
-  // validationReportService.findOneByTestStepAndUser(testStepId, userId);
-  // if (report != null) {
-  // report.setComments(comments);
-  // }
-  // return true;
-  // }
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/save", method = RequestMethod.POST, produces = "application/json")
+	public TestStepValidationReport saveReport(@RequestBody TestStepValidationReportRequest command,
+			HttpServletRequest request, HttpServletResponse response) {
+		try {
+			logger.info("Saving validation report");
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			Account user = null;
+			if (userId == null || ((user = userService.findOne(userId)) == null))
+				throw new MessageValidationException("Invalid user credentials");
+			TestStep testStep = null;
+			Long testStepId = command.getTestStepId();
+			String comments = command.getComments();
+			String result = command.getResult();
+			if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
+				throw new ValidationReportException("No test step or unknown test step specified");
+			Long testReportId = command.getReportId();
+			TestStepValidationReport report = findReport(testReportId, testStepId, userId);
+			if (report == null) {
+				report = new TestStepValidationReport();
+				report.setTestStep(testStep);
+				report.setUserId(userId);
+			}
 
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/savePersistentUserTestStepReport", method = RequestMethod.POST, produces = "application/json")
-  public UserTestStepReport savePersistentUserTestStepReport(@RequestBody UserTestStepReportRequest command,HttpServletRequest request, HttpServletResponse response) {
-    logger.info("Saving persistent test step report");
-    try {
-      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      Account user = userService.findOne(userId);
-      if(user==null){
-        logger.error("Account "+userId+" not found");
-        throw new UserNotFoundException("Account "+userId+" not found");
-      }
-      Long testStepId = command.getTestStepId();
-      TestStep testStep = testStepService.findOne(testStepId);
-      if(testStep==null){
-        throw new TestStepException(testStepId);
-      }
-      TestStepValidationReport report =
-              validationReportService.findOneByTestStepAndUser(testStep.getPersistentId(), userId);
-      UserTestStepReport userTestStepReport = new UserTestStepReport(report.getXml(), report.getHtml(), testStep.getVersion(),user.getId(),testStep.getPersistentId(),report.getComments());
-      userTestStepReport = userTestStepReportService.save(userTestStepReport);
-      return userTestStepReport;
-    } catch (UserNotFoundException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
+			if (!userId.equals(report.getUserId()))
+				throw new MessageValidationException("Invalid user credentials");
+			report.setComments(comments);
+			report.setResult(StringUtils.isNotEmpty(result) && result != null ? TestResult.valueOf(result) : null);
+			validationReportService.save(report);
+			String tmpXml = generateXml(report, testStep.getStage());
+			report.setHtml(validationReportService.generateHtml(tmpXml));
+			report.setXml(null);
+			report.setJson(null);
+			return report;
+		} catch (Exception e) {
+			throw new ValidationReportException("Failed to generate the report");
+		}
+	}
 
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/update", method = RequestMethod.POST, produces = "application/json")
-  public TestStepValidationReport update(@RequestBody TestStepValidationReportRequest command,
-      HttpServletRequest request, HttpServletResponse response) {
-    try {
-      logger.info("Saving validation report");
-      Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-      Account user = null;
-      if (userId == null || ((user = userService.findOne(userId)) == null))
-        throw new MessageValidationException("Invalid user credentials");
-      TestStep testStep = null;
-      Long testStepId = command.getTestStepId();
-      String comments = command.getComments();
-      String result = command.getResult();
-      String xmlMessageValidationReport = command.getXmlMessageValidationReport();
-      if (testStepId == null || ((testStep = testStepService.findOne(testStepId)) == null))
-        throw new ValidationReportException("No test step or unknown test step specified");
-      TestStepValidationReport report =
-          validationReportService.findOneByTestStepAndUser(testStepId, userId);
-      if (report != null) {
-        report.setTestStep(testStep);
-        report.setUserId(user.getId());
-        report.setComments(comments);
-        report.setResult(StringUtils.isNotEmpty(result) && result != null ? TestResult
-            .valueOf(result) : null);
-        String finalXmlReport = null;
-        if (StringUtils.isNotEmpty(xmlMessageValidationReport)
-            && xmlMessageValidationReport != null) {
-          finalXmlReport =
-              validationReportService.generateXmlTestStepValidationReport(
-                  xmlMessageValidationReport, report);
-        } else {
-          if (StringUtils.isNotEmpty(report.getXml()) && report.getXml() != null) {
-            finalXmlReport = validationReportService.updateXmlTestValidationReportElement(report);
-          } else if (StringUtils.isNotEmpty(comments) || report.getResult() != null) {
-            finalXmlReport =
-                validationReportService.generateXmlTestStepValidationReport(null, report);
-          }
-        }
-        if (finalXmlReport != null) {
-          report.setXml(finalXmlReport);
-          report.setHtml(validationReportService.generateHtml(finalXmlReport));
-          validationReportService.save(report);
-        }
-      }
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/json", method = RequestMethod.GET, produces = "application/json")
+	public String getReportJson(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
+			HttpServletRequest request, HttpServletResponse response) {
+		try {
+			logger.info("Getting validation report json");
+			TestStepValidationReport report = getValidationReport(testStepId, testReportId, request);
+			return report != null ? report.getJson() : null;
+		} catch (Exception e) {
+			throw new ValidationReportException("Failed to generate the report");
+		}
+	}
 
-      return report;
-    } catch (Exception e) {
-      throw new ValidationReportException("Failed to generate the report");
-    }
-  }
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/html", method = RequestMethod.GET, produces = "application/json")
+	public String getReportHtml(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
+			HttpServletRequest request, HttpServletResponse response) {
+		try {
+			logger.info("Getting validation report html");
+			TestStepValidationReport report = getValidationReport(testStepId, testReportId, request);
+			return report != null ? report.getHtml() : null;
+		} catch (Exception e) {
+			throw new ValidationReportException("Failed to generate the report");
+		}
+	}
 
-  /**
-   * Clear the user records related to a test step
-   * 
-   * @param testStepId
-   * @param request
-   * @return
-   * @throws MessageValidationException
-   */
-  @ApiOperation(value = "", hidden = true)
-  @RequestMapping(value = "/{testStepId}/clearRecords", method = RequestMethod.POST)
-  public boolean clearRecords(
-      @ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") final Long testStepId,
-      HttpServletRequest request) throws MessageValidationException {
-    logger.info("Generating html validation report");
-    Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-    if (userId == null || userService.findOne(userId) == null)
-      throw new ValidationReportException("Invalid user credentials");
-    TestStepValidationReport result =
-        validationReportService.findOneByTestStepAndUser(testStepId, userId);
-    if (result != null) {
-      validationReportService.delete(result.getId());
-    }
-    return true;
-  }
+	private TestStepValidationReport getValidationReport(Long testStepId, Long testReportId, HttpServletRequest request)
+			throws MessageValidationException {
+		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+		if (userId == null || ((userService.findOne(userId)) == null))
+			throw new MessageValidationException("Invalid user credentials");
+		if (testStepId == null || ((testStepService.findOne(testStepId)) == null))
+			throw new ValidationReportException("No test step or unknown test step specified");
+		TestStepValidationReport report = findReport(testReportId, testStepId, userId);
+		if (!userId.equals(report.getUserId()))
+			throw new MessageValidationException("Invalid user credentials");
+		return report;
+	}
 
+	private TestStepValidationReport findReport(Long testReportId, Long testStepId, Long userId) {
+		if (testReportId != null) {
+			return validationReportService.findOne(testReportId);
+		} else {
+			List<TestStepValidationReport> reports = validationReportService.findAllByTestStepAndUser(testStepId,
+					userId);
+			if (reports != null && reports.size() > 1) {
+				Collections.sort(reports, new Comparator<TestStepValidationReport>() {
+					@Override
+					public int compare(TestStepValidationReport o1, TestStepValidationReport o2) {
+						return o2.getDateUpdated().compareTo(o1.getDateUpdated());
+					}
+				});
+				for (int i = 1; i < reports.size(); i++) {
+					validationReportService.delete(reports.get(i).getId());
+				}
+			}
+			if (reports.size() == 1)
+				return reports.get(0);
+		}
 
+		return null;
+	}
 
-  public InputStream generatePdf(TestStepValidationReport report) {
-    try {
-      InputStream io = null;
-      String xmlReport = report.getXml();
-      io = validationReportService.generatePdf(xmlReport);
-      return io;
-    } catch (ValidationReportException e) {
-      throw new ValidationReportException("Failed to generate the report pdf");
-    } catch (Exception e) {
-      throw new ValidationReportException("Failed to generate the report pdf");
-    }
-  }
+	private String generateXml(TestStepValidationReport report, TestingStage stage) {
+		if (TestingStage.CF.equals(stage)) {
+			return validationReportService.updateXmlTestValidationReportElement(report);
+		} else {
+			return validationReportService.generateXmlTestStepValidationReport(report.getXml(), report);
+		}
+	}
 
-  private String generateHtml(String xmlReport) {
-    return validationReportService.generateHtml(xmlReport);
-  }
+	/**
+	 * Clear the user records related to a test step
+	 * 
+	 * @param testStepId
+	 * @param request
+	 * @return
+	 * @throws MessageValidationException
+	 */
+	@ApiOperation(value = "", hidden = true)
+	@RequestMapping(value = "/{testStepId}/clearRecords", method = RequestMethod.POST)
+	public boolean clearRecords(
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") final Long testStepId,
+			HttpServletRequest request) throws MessageValidationException {
+		logger.info("Generating html validation report");
+		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+		if (userId == null || userService.findOne(userId) == null)
+			throw new ValidationReportException("Invalid user credentials");
+		List<TestStepValidationReport> results = validationReportService.findAllByTestStepAndUser(testStepId, userId);
+		if (results != null) {
+			for (TestStepValidationReport report : results) {
+				validationReportService.delete(report.getId());
+			}
+		}
+		return true;
+	}
 
+	public InputStream generatePdf(TestStepValidationReport report) {
+		try {
+			InputStream io = null;
+			String xmlReport = report.getXml();
+			io = validationReportService.generatePdf(xmlReport);
+			return io;
+		} catch (ValidationReportException e) {
+			throw new ValidationReportException("Failed to generate the report pdf");
+		} catch (Exception e) {
+			throw new ValidationReportException("Failed to generate the report pdf");
+		}
+	}
 
+	private String generateHtml(String xmlReport) {
+		return validationReportService.generateHtml(xmlReport);
+	}
 
 }

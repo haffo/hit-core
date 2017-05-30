@@ -7,7 +7,10 @@ public class TestStepValidationReportRequest {
 
   private Long userId;
 
-  private String xmlMessageValidationReport;
+  private Long reportId;
+
+
+  // private String xmlMessageValidationReport;
 
   private final String result = null;
 
@@ -27,7 +30,6 @@ public class TestStepValidationReportRequest {
     super();
     this.testStepId = testStepId;
     this.userId = userId;
-    this.xmlMessageValidationReport = xmlMessageValidationReport;
     this.comments = comments;
   }
 
@@ -50,16 +52,16 @@ public class TestStepValidationReportRequest {
   }
 
 
-  public String getXmlMessageValidationReport() {
-    return xmlMessageValidationReport;
-  }
-
-
-
-  public void setXmlMessageValidationReport(String xmlMessageValidationReport) {
-    this.xmlMessageValidationReport = xmlMessageValidationReport;
-  }
-
+  // public String getXmlMessageValidationReport() {
+  // return xmlMessageValidationReport;
+  // }
+  //
+  //
+  //
+  // public void setXmlMessageValidationReport(String xmlMessageValidationReport) {
+  // this.xmlMessageValidationReport = xmlMessageValidationReport;
+  // }
+  //
 
 
   public String getComments() {
@@ -72,6 +74,18 @@ public class TestStepValidationReportRequest {
 
   public String getResult() {
     return result;
+  }
+
+
+
+  public Long getReportId() {
+    return reportId;
+  }
+
+
+
+  public void setReportId(Long reportId) {
+    this.reportId = reportId;
   }
 
 

@@ -12,13 +12,15 @@
 package gov.nist.auth.hit.core.domain;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.hibernate.validator.constraints.Email;
@@ -46,9 +48,11 @@ public class Account implements Serializable {
   private String registrationPassword;
 
   @JsonIgnore
+
   private boolean entityDisabled = false;
 
   @JsonIgnore
+
   // TODO remove it and check it doesn't affect REST API security
   private boolean pending = false;
 
@@ -70,6 +74,7 @@ public class Account implements Serializable {
 
 
   @JsonIgnore
+
   private boolean guestAccount = true;
 
 
@@ -84,6 +89,7 @@ public class Account implements Serializable {
 
   private Long lastTestPlanPersistenceId;
 
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastLoggedInDate;
 
   public Account() {

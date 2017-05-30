@@ -1,10 +1,16 @@
 package gov.nist.hit.core.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -21,45 +27,49 @@ import java.io.Serializable;
  */
 @Entity
 public class TestStepFieldPair extends MappingSource implements Serializable {
-    /*@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;*/
+  /*
+   * @Id
+   * 
+   * @GeneratedValue(strategy = GenerationType.AUTO) protected Long id;
+   */
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    protected TestStep testStep;
+  @JsonIgnore
+  
+  @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  protected TestStep testStep;
 
-    @NotNull
-    @Column
-    protected String field;
+  @NotNull
+  @Column
+  protected String field;
 
-    public TestStepFieldPair(TestStep testStep, String field) {
-        super();
-        this.testStep = testStep;
-        this.field = field;
-    }
+  public TestStepFieldPair(TestStep testStep, String field) {
+    super();
+    this.testStep = testStep;
+    this.field = field;
+  }
 
-    public TestStepFieldPair() {
-        super();
-    }
+  public TestStepFieldPair() {
+    super();
+  }
 
-    public TestStep getTestStep() {
-        return testStep;
-    }
+  public TestStep getTestStep() {
+    return testStep;
+  }
 
-    public void setTestStep(TestStep testStep) {
-        this.testStep = testStep;
-    }
+  public void setTestStep(TestStep testStep) {
+    this.testStep = testStep;
+  }
 
-    public String getField() {
-        return field;
-    }
+  public String getField() {
+    return field;
+  }
 
-    public void setField(String field) {
-        this.field = field;
-    }
+  public void setField(String field) {
+    this.field = field;
+  }
 
-    public Long getId(){
-        return super.getId();
-    }
+  @Override
+  public Long getId() {
+    return super.getId();
+  }
 }

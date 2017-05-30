@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * 
  */
 
-@Configuration
+@Configuration(value = "DBConfig")
 @EnableJpaRepositories(value = "gov.nist.hit")
 @PropertySource(value = "classpath:app-config.properties")
 @EnableTransactionManagement(proxyTargetClass = true)

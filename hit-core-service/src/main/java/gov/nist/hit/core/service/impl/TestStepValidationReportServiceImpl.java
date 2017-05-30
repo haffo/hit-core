@@ -1,13 +1,5 @@
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.hit.core.domain.ManualValidationResult;
-import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.repo.TestStepValidationReportRepository;
-import gov.nist.hit.core.service.TestStepValidationReportService;
-import gov.nist.hit.core.service.exception.ValidationReportException;
-import gov.nist.hit.core.service.util.HtmlUtil;
-import gov.nist.hit.core.service.util.ReportUtil;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,9 +17,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import nu.xom.Attribute;
-import nu.xom.Document;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -36,6 +25,16 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.ibm.icu.util.Calendar;
+
+import gov.nist.hit.core.domain.ManualValidationResult;
+import gov.nist.hit.core.domain.TestStepValidationReport;
+import gov.nist.hit.core.repo.TestStepValidationReportRepository;
+import gov.nist.hit.core.service.TestStepValidationReportService;
+import gov.nist.hit.core.service.exception.ValidationReportException;
+import gov.nist.hit.core.service.util.HtmlUtil;
+import gov.nist.hit.core.service.util.ReportUtil;
+import nu.xom.Attribute;
+import nu.xom.Document;
 
 @Service
 public class TestStepValidationReportServiceImpl implements TestStepValidationReportService {
@@ -128,10 +127,9 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   @Override
   public String generateHtml(String xml) throws ValidationReportException {
     try {
-      if (StringUtils.isNotEmpty(xml)) {
-        String xslt =
-            IOUtils.toString(TestCaseValidationReportServiceImpl.class
-                .getResourceAsStream(HTML_XSL));
+      if (xml != null && StringUtils.isNotEmpty(xml)) {
+        String xslt = IOUtils
+            .toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(HTML_XSL));
         TransformerFactory transFact = TransformerFactory.newInstance();
         transFact.setURIResolver(new XsltURIResolver());
         Transformer transformer =
@@ -157,9 +155,8 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   public String generateXhtml(String xml) throws ValidationReportException {
     try {
       if (StringUtils.isNotEmpty(xml)) {
-        String xslt =
-            IOUtils
-                .toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(PDF_XSL));
+        String xslt = IOUtils
+            .toString(TestCaseValidationReportServiceImpl.class.getResourceAsStream(PDF_XSL));
         TransformerFactory transFact = TransformerFactory.newInstance();
         transFact.setURIResolver(new XsltURIResolver());
         Transformer transformer =
@@ -306,35 +303,29 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
       report.addNamespaceDeclaration("manualvalidationreport",
           "http://www.nist.gov/healthcare/validation/manual/report");
 
-      nu.xom.Element headerReport =
-          new nu.xom.Element("manualvalidationreport:HeaderReport",
-              "http://www.nist.gov/healthcare/validation/manual/report");
+      nu.xom.Element headerReport = new nu.xom.Element("manualvalidationreport:HeaderReport",
+          "http://www.nist.gov/healthcare/validation/manual/report");
       report.appendChild(headerReport);
 
-      nu.xom.Element serviceProvider =
-          new nu.xom.Element("manualvalidationreport:ServiceProvider",
-              "http://www.nist.gov/healthcare/validation/manual/report");
+      nu.xom.Element serviceProvider = new nu.xom.Element("manualvalidationreport:ServiceProvider",
+          "http://www.nist.gov/healthcare/validation/manual/report");
       serviceProvider.appendChild("NIST");
       headerReport.appendChild(serviceProvider);
 
-      nu.xom.Element validationType =
-          new nu.xom.Element("manualvalidationreport:ValidationType",
-              "http://www.nist.gov/healthcare/validation/manual/report");
+      nu.xom.Element validationType = new nu.xom.Element("manualvalidationreport:ValidationType",
+          "http://www.nist.gov/healthcare/validation/manual/report");
       validationType.appendChild("Context-Based");
       headerReport.appendChild(validationType);
 
-      nu.xom.Element type =
-          new nu.xom.Element("manualvalidationreport:Type",
-              "http://www.nist.gov/healthcare/validation/manual/report");
+      nu.xom.Element type = new nu.xom.Element("manualvalidationreport:Type",
+          "http://www.nist.gov/healthcare/validation/manual/report");
       type.appendChild("Manual");
       headerReport.appendChild(type);
 
-      nu.xom.Element dateOfTest =
-          new nu.xom.Element("manualvalidationreport:DateOfTest",
-              "http://www.nist.gov/healthcare/validation/manual/report");
-      dateOfTest
-          .appendChild(ReportUtil.dateOfTest(validationResult.getDate() != null ? validationResult
-              .getDate() : Calendar.getInstance().getTime()));
+      nu.xom.Element dateOfTest = new nu.xom.Element("manualvalidationreport:DateOfTest",
+          "http://www.nist.gov/healthcare/validation/manual/report");
+      dateOfTest.appendChild(ReportUtil.dateOfTest(validationResult.getDate() != null
+          ? validationResult.getDate() : Calendar.getInstance().getTime()));
       headerReport.appendChild(dateOfTest);
 
 
@@ -345,39 +336,33 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
                 "http://www.nist.gov/healthcare/validation/manual/report");
         report.appendChild(testCaseReference);
 
-        nu.xom.Element testCase =
-            new nu.xom.Element("manualvalidationreport:TestCase",
-                "http://www.nist.gov/healthcare/validation/manual/report");
+        nu.xom.Element testCase = new nu.xom.Element("manualvalidationreport:TestCase",
+            "http://www.nist.gov/healthcare/validation/manual/report");
         testCase.appendChild(nav.get("testCase"));
         testCaseReference.appendChild(testCase);
 
-        nu.xom.Element testPlan =
-            new nu.xom.Element("manualvalidationreport:TestPlan",
-                "http://www.nist.gov/healthcare/validation/manual/report");
+        nu.xom.Element testPlan = new nu.xom.Element("manualvalidationreport:TestPlan",
+            "http://www.nist.gov/healthcare/validation/manual/report");
         testPlan.appendChild(nav.get("testPlan"));
         testCaseReference.appendChild(testPlan);
 
-        nu.xom.Element testStep =
-            new nu.xom.Element("manualvalidationreport:TestStep",
-                "http://www.nist.gov/healthcare/validation/manual/report");
+        nu.xom.Element testStep = new nu.xom.Element("manualvalidationreport:TestStep",
+            "http://www.nist.gov/healthcare/validation/manual/report");
         testStep.appendChild(nav.get("testStep"));
         testCaseReference.appendChild(testStep);
 
-        nu.xom.Element testGroup =
-            new nu.xom.Element("manualvalidationreport:TestGroup",
-                "http://www.nist.gov/healthcare/validation/manual/report");
+        nu.xom.Element testGroup = new nu.xom.Element("manualvalidationreport:TestGroup",
+            "http://www.nist.gov/healthcare/validation/manual/report");
         testGroup.appendChild(nav.get("testGroup"));
         testCaseReference.appendChild(testGroup);
       }
 
-      nu.xom.Element specificReport =
-          new nu.xom.Element("manualvalidationreport:SpecificReport",
-              "http://www.nist.gov/healthcare/validation/manual/report");
+      nu.xom.Element specificReport = new nu.xom.Element("manualvalidationreport:SpecificReport",
+          "http://www.nist.gov/healthcare/validation/manual/report");
       report.appendChild(specificReport);
       specificReport.addAttribute(new Attribute("Result", validationResult.getValue()));
-      nu.xom.Element comments =
-          new nu.xom.Element("manualvalidationreport:Comments",
-              "http://www.nist.gov/healthcare/validation/manual/report");
+      nu.xom.Element comments = new nu.xom.Element("manualvalidationreport:Comments",
+          "http://www.nist.gov/healthcare/validation/manual/report");
       specificReport.appendChild(comments);
       comments.appendChild(validationResult.getComments());
       return report.toXML();
@@ -409,7 +394,7 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
       throws ValidationReportException {
     try {
       nu.xom.Element element = updateElement(report);
-      return element.toXML();
+      return element != null ? element.toXML() : null;
     } catch (RuntimeException e) {
       throw new ValidationReportException(e);
     } catch (Exception e) {
@@ -420,23 +405,40 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   private nu.xom.Element updateElement(TestStepValidationReport result)
       throws ValidationReportException {
     try {
-      Document report = ReportUtil.getDocument(result.getXml());
-      nu.xom.Element rootElement = report.getRootElement();
-      nu.xom.Elements headerElements = rootElement.getChildElements();
-      nu.xom.Element headerElement = headerElements.get(0);
-      nu.xom.Element cmtElement = headerElement.getChildElements().get(1);
-      cmtElement.removeChildren();
-      cmtElement.appendChild(result.getComments());
-      if (headerElement.getAttribute("Result") != null) {
-        headerElement.removeAttribute(headerElement.getAttribute("Result"));
+      if (result.getXml() != null) {
+        Document report = ReportUtil.getDocument(result.getXml());
+        nu.xom.Element rootElement = report.getRootElement();
+        nu.xom.Elements headerElements = rootElement.getChildElements();
+        nu.xom.Element headerElement = headerElements.get(0);
+        nu.xom.Element cmtElement = headerElement.getChildElements().get(1);
+        cmtElement.removeChildren();
+        cmtElement.appendChild(result.getComments());
+        if (headerElement.getAttribute("Result") != null) {
+          headerElement.removeAttribute(headerElement.getAttribute("Result"));
+        }
+        headerElement.addAttribute(
+            new Attribute("Result", ReportUtil.getTestCaseResult(result.getResult())));
+        return report.getDocument().getRootElement();
       }
-      headerElement.addAttribute(new Attribute("Result", ReportUtil.getTestCaseResult(result
-          .getResult())));
-      return report.getDocument().getRootElement();
+      return null;
     } catch (RuntimeException e) {
       throw new ValidationReportException(e);
     } catch (Exception e) {
       throw new ValidationReportException(e);
     }
+  }
+
+
+  @Override
+  public TestStepValidationReport saveXmlReport(Long testStepId, Long userId, String xmlReport) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public TestStepValidationReport saveHtmlReport(Long testStepId, Long userId, String htmlReport) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

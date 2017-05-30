@@ -12,20 +12,19 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.CFTestInstance;
-import gov.nist.hit.core.service.TestObjectService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import gov.nist.hit.core.domain.CFTestInstance;
+import gov.nist.hit.core.service.TestObjectService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * @author Harold Affo (NIST)
@@ -36,28 +35,25 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "Context-free test cases api", tags = "Context-free test cases")
 public class ContextFreeController {
 
-  static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
+	static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
 
-  @Autowired
-  private TestObjectService testObjectService;
+	@Autowired
+	private TestObjectService testObjectService;
 
-  @ApiOperation(value = "Get all context-free test cases list",
-      nickname = "getAllContextFreeTestCases")
-//  @Cacheable(value = "HitCache", key = "'cf-testcases'")
-  @RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
-  public List<CFTestInstance> testCases() {
-    logger.info("Fetching all testCases...");
-    return testObjectService.findAllAsRoot();
-  }
+	@ApiOperation(value = "Get all context-free test cases list", nickname = "getAllContextFreeTestCases")
+	// @Cacheable(value = "HitCache", key = "'cf-testcases'")
+	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
+	public List<CFTestInstance> testCases() {
+		logger.info("Fetching all testCases...");
+		return testObjectService.findAllAsRoot();
+	}
 
-  public TestObjectService getTestObjectService() {
-    return testObjectService;
-  }
+	public TestObjectService getTestObjectService() {
+		return testObjectService;
+	}
 
-  public void setTestObjectService(TestObjectService testObjectService) {
-    this.testObjectService = testObjectService;
-  }
-
-
+	public void setTestObjectService(TestObjectService testObjectService) {
+		this.testObjectService = testObjectService;
+	}
 
 }

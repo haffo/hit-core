@@ -1,22 +1,7 @@
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.MessageModel;
-import gov.nist.hit.core.domain.MessageParserCommand;
-import gov.nist.hit.core.domain.MessageValidationCommand;
-import gov.nist.hit.core.domain.MessageValidationResult;
-import gov.nist.hit.core.domain.TestContext;
-import gov.nist.hit.core.service.MessageParser;
-import gov.nist.hit.core.service.MessageValidator;
-import gov.nist.hit.core.service.TestStepService;
-import gov.nist.hit.core.service.TestStepValidationReportService;
-import gov.nist.hit.core.service.UserService;
-import gov.nist.hit.core.service.ValidationReportConverter;
-import gov.nist.hit.core.service.exception.MessageParserException;
-import gov.nist.hit.core.service.exception.MessageValidationException;
-import gov.nist.hit.core.service.exception.TestCaseException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,75 +15,148 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import gov.nist.auth.hit.core.domain.Account;
+import gov.nist.hit.core.domain.MessageModel;
+import gov.nist.hit.core.domain.MessageParserCommand;
+import gov.nist.hit.core.domain.MessageValidationCommand;
+import gov.nist.hit.core.domain.MessageValidationResult;
+import gov.nist.hit.core.domain.TestContext;
+import gov.nist.hit.core.domain.TestStep;
+import gov.nist.hit.core.domain.TestStepValidationReport;
+import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.MessageParser;
+import gov.nist.hit.core.service.MessageValidator;
+import gov.nist.hit.core.service.Serializer;
+import gov.nist.hit.core.service.TestStepService;
+import gov.nist.hit.core.service.TestStepValidationReportService;
+import gov.nist.hit.core.service.ValidationReportConverter;
+import gov.nist.hit.core.service.exception.MessageParserException;
+import gov.nist.hit.core.service.exception.MessageValidationException;
+import gov.nist.hit.core.service.exception.TestCaseException;
+import gov.nist.hit.core.service.exception.ValidationReportException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 @Api(value = "TestContexts", tags = "Test contexts")
 public abstract class TestContextController {
 
-  Logger logger = LoggerFactory.getLogger(TestContextController.class);
+	Logger logger = LoggerFactory.getLogger(TestContextController.class);
 
-  @Autowired
-  private TestStepValidationReportService validationReportService;
+	@Autowired
+	private TestStepValidationReportService validationReportService;
 
-  @Autowired
-  private TestStepService testStepService;
+	@Autowired
+	private TestStepService testStepService;
 
-  @Autowired
-  private UserService userService;
+	@Autowired
+	private AccountService accountService;
 
+	@Autowired
+	private Serializer serializer;
 
-  public abstract MessageValidator getMessageValidator();
+	public abstract MessageValidator getMessageValidator();
 
-  public abstract MessageParser getMessageParser();
+	public abstract MessageParser getMessageParser();
 
-  public abstract TestContext getTestContext(Long testContextId);
+	public abstract TestContext getTestContext(Long testContextId);
 
-  public abstract ValidationReportConverter getValidatioReportConverter();
+	public abstract ValidationReportConverter getValidatioReportConverter();
 
+	@ApiOperation(value = "Get a test context by its id", nickname = "getTestContextById")
+	@RequestMapping(value = "/{testContextId}", produces = "application/json", method = RequestMethod.GET)
+	public TestContext getTestContextById(
+			@ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId) {
+		logger.info("Fetching testContext with id=" + testContextId);
+		TestContext testContext = getTestContext(testContextId);
+		if (testContext == null) {
+			throw new TestCaseException("No test context available with id=" + testContextId);
+		}
+		return testContext;
+	}
 
-  @ApiOperation(value = "Get a test context by its id", nickname = "getTestContextById")
-  @RequestMapping(value = "/{testContextId}", produces = "application/json",
-      method = RequestMethod.GET)
-  public TestContext getTestContextById(@ApiParam(value = "the id of the test context",
-      required = true) @PathVariable final Long testContextId) {
-    logger.info("Fetching testContext with id=" + testContextId);
-    TestContext testContext = getTestContext(testContextId);
-    if (testContext == null) {
-      throw new TestCaseException("No test context available with id=" + testContextId);
-    }
-    return testContext;
-  }
+	@ApiOperation(value = "Parse a message in a test context", nickname = "parseMessageWithTestContext")
+	@RequestMapping(value = "/{testContextId}/parseMessage", method = RequestMethod.POST, produces = "application/json")
+	public MessageModel parseMessageWithTestContext(
+			@ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
+			@ApiParam(value = "the request to be parsed", required = true) @RequestBody final MessageParserCommand command,
+			HttpServletRequest request, HttpServletResponse response) throws MessageParserException, IOException {
+		logger.info("Parsing message");
+		MessageModel result = getMessageParser().parse(getTestContext(testContextId), command);
+		// OutputStream out = response.getOutputStream();
+		// return serializer.toByte(result);
+		// out.flush();
+		// out.close();
+		return result;
+	}
 
-  @ApiOperation(value = "Parse a message in a test context",
-      nickname = "parseMessageWithTestContext")
-  @RequestMapping(value = "/{testContextId}/parseMessage", method = RequestMethod.POST,
-      produces = "application/json")
-  public MessageModel parseMessageWithTestContext(
-      @ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
-      @ApiParam(value = "the request to be parsed", required = true) @RequestBody final MessageParserCommand command)
-      throws MessageParserException {
-    logger.info("Parsing message");
-    return getMessageParser().parse(getTestContext(testContextId), command);
-  }
+	@ApiOperation(value = "Validate a message in a test context", nickname = "validateMessageWithTestContext")
+	@RequestMapping(value = "/{testContextId}/validateMessage", method = RequestMethod.POST, produces = "application/json")
+	public MessageValidationResult validateMessageWithTestContext(
+			@ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
+			@ApiParam(value = "the request to be validated", required = true) @RequestBody final MessageValidationCommand command,
+			HttpServletRequest request, HttpServletResponse response, HttpSession session)
+			throws MessageValidationException {
+		try {
+			logger.info("Validating a message");
+			TestContext testContext = getTestContext(testContextId);
+			MessageValidationResult result = getMessageValidator().validate(testContext, command);
+			TestStepValidationReport report = saveReport(testContextId, result,
+					SessionContext.getCurrentUserId(request.getSession(false)));
+			result.setHtml(null);
+			result.setXml(null);
+			result.setReportId(report.getId());
+			// return serializer.toJson(result);
 
+			return result;
+		} catch (Exception e) {
+			throw new MessageValidationException(e);
+		}
+	}
 
-  @ApiOperation(value = "Validate a message in a test context",
-      nickname = "validateMessageWithTestContex")
-  @RequestMapping(value = "/{testContextId}/validateMessage", method = RequestMethod.POST,
-      produces = "application/json")
-  public MessageValidationResult validateMessageWithTestContex(
-      @ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
-      @ApiParam(value = "the request to be validated", required = true) @RequestBody final MessageValidationCommand command,
-      HttpServletRequest request, HttpServletResponse response, HttpSession session)
-      throws MessageValidationException {
-    try {
-      logger.info("Validating a message");
-      MessageValidationResult result =
-          getMessageValidator().validate(getTestContext(testContextId), command);
-      result.setXml(getValidatioReportConverter().toXML(result.getJson()));
-      return result;
-    } catch (Exception e) {
-      throw new MessageValidationException(e);
-    }
-  }
+	/**
+	 * Save the report
+	 * 
+	 * @param testContextId:
+	 *            id of the current context
+	 * @param result:
+	 *            validation result
+	 * @param userId:
+	 *            id of the user in session
+	 * @return: the saved report
+	 * @throws Exception
+	 */
+	private TestStepValidationReport saveReport(Long testContextId, MessageValidationResult result, Long userId)
+			throws Exception {
+		TestStep testStep = testStepService.findOneByTestContext(testContextId);
+		Account account = null;
+		if (userId == null || (account = accountService.findOne(userId)) == null) {
+			logger.error("User not found");
+			throw new ValidationReportException("Invalid user credentials");
+		}
+		TestStepValidationReport report = findUserTestStepValidationReportByTestStep(testStep.getId(), account.getId());
+		if (report == null) {
+			report = new TestStepValidationReport();
+			report.setTestStep(testStep);
+			report.setUserId(account.getId());
+		}
+		report.setXml((getValidatioReportConverter().toXML(result.getJson())));
+		report.setJson(result.getJson());
+		report.setHtml(null);
+		return validationReportService.save(report);
+	}
+
+	private TestStepValidationReport findUserTestStepValidationReportByTestStep(Long testStepId, Long userId) {
+		TestStepValidationReport report = null;
+		List<TestStepValidationReport> reports = validationReportService.findAllByTestStepAndUser(testStepId, userId);
+		if (reports != null && !reports.isEmpty()) {
+			if (reports.size() == 1) {
+				report = reports.get(0);
+			} else {
+				validationReportService.delete(reports);
+			}
+		}
+		return report;
+	}
 
 }

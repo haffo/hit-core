@@ -1,11 +1,22 @@
 package gov.nist.hit.core.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -21,52 +32,54 @@ import java.util.Map;
  * Created by Maxence Lefort on 1/28/16.
  */
 @Entity
-public class UserConfig implements Serializable{
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;
+public class UserConfig implements Serializable {
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  protected Long id;
 
-    @JsonIgnore
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name="user_config_properties", joinColumns=@JoinColumn(name="user_config_properties_id"))
-    @MapKeyColumn(name = "property_key")
-    @Column(name = "property_value")
-    protected Map<String, String> properties = new HashMap<String, String>();
+  @JsonIgnore
+  
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "user_config_properties",
+      joinColumns = @JoinColumn(name = "user_config_properties_id"))
+  @MapKeyColumn(name = "property_key")
+  @Column(name = "property_value")
+  protected Map<String, String> properties = new HashMap<String, String>();
 
-    @Column
-    protected Long userId;
+  @Column
+  protected Long userId;
 
-    public UserConfig(Map<String, String> properties,Long userId) {
-        super();
-        this.properties = properties;
-        this.userId = userId;
-    }
+  public UserConfig(Map<String, String> properties, Long userId) {
+    super();
+    this.properties = properties;
+    this.userId = userId;
+  }
 
-    public UserConfig() {
-        super();
-    }
+  public UserConfig() {
+    super();
+  }
 
-    public Long getId() {
-        return id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public Map<String, String> getProperties() {
-        return properties;
-    }
+  public Map<String, String> getProperties() {
+    return properties;
+  }
 
-    public void setProperties(Map<String, String> properties) {
-        this.properties = properties;
-    }
+  public void setProperties(Map<String, String> properties) {
+    this.properties = properties;
+  }
 
-    public Long getUserId() {
-        return userId;
-    }
+  public Long getUserId() {
+    return userId;
+  }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
 }

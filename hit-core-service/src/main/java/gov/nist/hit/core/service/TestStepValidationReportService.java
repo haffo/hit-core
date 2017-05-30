@@ -1,11 +1,11 @@
 package gov.nist.hit.core.service;
 
+import java.io.InputStream;
+import java.util.List;
+
 import gov.nist.hit.core.domain.ManualValidationResult;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.service.exception.ValidationReportException;
-
-import java.io.InputStream;
-import java.util.List;
 
 public interface TestStepValidationReportService {
 
@@ -28,6 +28,11 @@ public interface TestStepValidationReportService {
   List<TestStepValidationReport> findAllByUser(Long userId);
 
   TestStepValidationReport findOneByIdAndUser(Long reportId, Long userId);
+
+  TestStepValidationReport saveXmlReport(Long testStepId, Long userId, String xmlReport);
+
+  TestStepValidationReport saveHtmlReport(Long testStepId, Long userId, String htmlReport);
+
 
 
   /**

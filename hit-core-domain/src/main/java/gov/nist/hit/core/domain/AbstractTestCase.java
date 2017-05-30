@@ -72,6 +72,7 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
 
   @ApiModelProperty(required = true, value = "test story of the test case")
   @JsonIgnore
+
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact testStory;
 
@@ -79,6 +80,10 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   @ApiModelProperty(required = true, value = "Supplement documents")
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   protected Set<Document> supplements = new HashSet<Document>();
+
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  protected TestScope scope = TestScope.GLOBAL;
 
   public String getName() {
     return name;

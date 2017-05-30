@@ -1,10 +1,20 @@
 package gov.nist.hit.core.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -20,92 +30,89 @@ import java.io.Serializable;
  * Created by Maxence Lefort on 1/28/16.
  */
 @Entity
-public class DataMapping implements Serializable{
+public class DataMapping implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  protected Long id;
 
-    @NotNull
-    @ManyToOne(cascade = CascadeType.ALL)
-    protected MappingSource source;
+  @NotNull
+  @ManyToOne(cascade = CascadeType.ALL)
+  protected MappingSource source;
 
-    @NotNull
-    @OneToOne(cascade = CascadeType.ALL)
-    protected TestStepFieldPair target;
+  @NotNull
+  @OneToOne(cascade = CascadeType.ALL)
+  protected TestStepFieldPair target;
 
-    @Column
-    protected Boolean optional;
+  @Column
+  protected Boolean optional;
 
-    @JsonIgnore
-    @ManyToOne(optional=true, cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    protected TestCase testCase;
+  @JsonIgnore
+  
+  @ManyToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  protected TestCase testCase;
 
-    public DataMapping(){
-        super();
-    }
+  public DataMapping() {
+    super();
+  }
 
-    public DataMapping(MappingSource source, TestStepFieldPair target, TestCase testCase, Boolean optional) {
-        this.source = source;
-        this.target = target;
-        this.testCase = testCase;
-        this.optional = optional;
-    }
+  public DataMapping(MappingSource source, TestStepFieldPair target, TestCase testCase,
+      Boolean optional) {
+    this.source = source;
+    this.target = target;
+    this.testCase = testCase;
+    this.optional = optional;
+  }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
+  public static long getSerialVersionUID() {
+    return serialVersionUID;
+  }
 
-    public Long getId() {
-        return id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public MappingSource getSource() {
-        return source;
-    }
+  public MappingSource getSource() {
+    return source;
+  }
 
-    public void setSource(TestStepFieldPair source) {
-        this.source = source;
-    }
+  public void setSource(TestStepFieldPair source) {
+    this.source = source;
+  }
 
-    public TestStepFieldPair getTarget() {
-        return target;
-    }
+  public TestStepFieldPair getTarget() {
+    return target;
+  }
 
-    public void setTarget(TestStepFieldPair target) {
-        this.target = target;
-    }
+  public void setTarget(TestStepFieldPair target) {
+    this.target = target;
+  }
 
-    public TestCase getTestCase() {
-        return testCase;
-    }
+  public TestCase getTestCase() {
+    return testCase;
+  }
 
-    public void setTestCase(TestCase testCase) {
-        this.testCase = testCase;
-    }
+  public void setTestCase(TestCase testCase) {
+    this.testCase = testCase;
+  }
 
-    public Boolean getOptional() {
-        return optional;
-    }
+  public Boolean getOptional() {
+    return optional;
+  }
 
-    public void setOptional(Boolean optional) {
-        this.optional = optional;
-    }
+  public void setOptional(Boolean optional) {
+    this.optional = optional;
+  }
 
-    @Override
-    public String toString() {
-        return "DataMapping{" +
-                "id=" + id +
-                ", source=" + source +
-                ", target=" + target +
-                ", testCase=" + testCase +
-                ", optional=" + optional +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "DataMapping{" + "id=" + id + ", source=" + source + ", target=" + target + ", testCase="
+        + testCase + ", optional=" + optional + '}';
+  }
 }

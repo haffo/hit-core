@@ -1,34 +1,33 @@
 package gov.nist.hit.core.domain;
 
+import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-@ApiModel(value="MessageValidationResult", description="Data Model representing the result of a message validation")
+@ApiModel(value = "MessageValidationResult",
+    description = "Data Model representing the result of a message validation")
 public class MessageValidationResult implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(required=true, value="json validation report")
+  @ApiModelProperty(required = false, value = "generated validation report id")
+  private Long reportId;
+
+  @ApiModelProperty(required = true, value = "json validation report")
   private String json;
 
-  @ApiModelProperty(required=false, value="html validation report")
+  @JsonIgnore
+  
+  @ApiModelProperty(required = false, value = "html validation report")
   private String html;
 
-  @ApiModelProperty(required=false, value="xml validation report")
+  @JsonIgnore
+  
+  @ApiModelProperty(required = false, value = "xml validation report")
   private String xml;
 
   public MessageValidationResult(String json, String html) {
@@ -36,6 +35,12 @@ public class MessageValidationResult implements Serializable {
     this.json = json;
     this.html = html;
   }
+
+  public MessageValidationResult(String json) {
+    super();
+    this.json = json;
+  }
+
 
   public MessageValidationResult() {
     // TODO Auto-generated constructor stub
@@ -65,6 +70,14 @@ public class MessageValidationResult implements Serializable {
     this.xml = xml;
   }
 
-  
+  public Long getReportId() {
+    return reportId;
+  }
+
+  public void setReportId(Long reportId) {
+    this.reportId = reportId;
+  }
+
+
 
 }

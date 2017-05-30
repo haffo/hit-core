@@ -58,6 +58,8 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.disable(SerializationFeature.INDENT_OUTPUT);
 		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		// mapper.disable(SerializationFeature.FLUSH_AFTER_WRITE_VALUE);
+		// mapper.enable(SerializationFeature.USE_EQUALITY_FOR_OBJECT_ID);
 		mapper.setSerializationInclusion(Include.NON_NULL);
 
 		// Registering Hibernate4Module to support lazy objects

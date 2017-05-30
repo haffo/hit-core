@@ -12,6 +12,18 @@
 
 package gov.nist.hit.core.api;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.core.convert.ConversionFailedException;
+import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 import gov.nist.hit.core.domain.ResponseMessage;
 import gov.nist.hit.core.service.exception.DocumentationException;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
@@ -28,18 +40,6 @@ import gov.nist.hit.core.service.exception.XmlFormatterException;
 import gov.nist.hit.core.service.exception.XmlParserException;
 import io.swagger.annotations.Api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.TypeMismatchException;
-import org.springframework.core.convert.ConversionFailedException;
-import org.springframework.expression.spel.SpelEvaluationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 /**
  * @author Harold Affo (NIST)
  * 
@@ -47,169 +47,172 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Api(hidden = true)
 @ControllerAdvice
 public class MainExceptionHandler {
-  static final Logger logger = LoggerFactory.getLogger(MainExceptionHandler.class);
+	static final Logger logger = LoggerFactory.getLogger(MainExceptionHandler.class);
 
-  public MainExceptionHandler() {
-    super();
-  }
+	public MainExceptionHandler() {
+		super();
+	}
 
+	@ExceptionHandler(RuntimeException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseBody
+	public String exception(RuntimeException ex) {
+		logger.error(ex.getMessage(), ex);
+		ex.printStackTrace();
+		return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
+	}
 
+	@ResponseBody
+	@ExceptionHandler(Exception.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public String exception(Exception ex) {
+		logger.error(ex.getMessage(), ex);
+		ex.printStackTrace();
+		return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
+	}
 
-  @ExceptionHandler(RuntimeException.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  @ResponseBody
-  public String exception(RuntimeException ex) {
-    logger.error(ex.getMessage(), ex);
-    ex.printStackTrace();
-    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(TestCaseException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public String testCaseException(TestCaseException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(Exception.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public String exception(Exception ex) {
-    logger.error(ex.getMessage(), ex);
-    ex.printStackTrace();
-    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(MessageValidationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String messageValidationException(MessageValidationException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Sorry, cannot validate the message provided.\n" + "DEBUG:\n" + ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(TestCaseException.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public String testCaseException(TestCaseException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(TransportException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String transportException(TransportException ex) {
+		logger.error(ex.getMessage(), ex);
+		return ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(MessageValidationException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String messageValidationException(MessageValidationException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Sorry, cannot validate the message provided.\n" + "DEBUG:\n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(MessageParserException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String messageParserException(MessageParserException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Sorry, cannot parse the message provided. \n" + ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(TransportException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String transportException(TransportException ex) {
-    logger.error(ex.getMessage(), ex);
-    return ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(ValidationReportException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String reportException(ValidationReportException ex) {
+		logger.error(ex.getMessage(), ex);
+		return ex.getMessage() + ". \n";
+	}
 
+	@ResponseBody
+	@ExceptionHandler(ProfileParserException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String profileParserExeption(ProfileParserException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Sorry, integrationProfile cannot be parsed.\n" + ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(MessageParserException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String messageParserException(MessageParserException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Sorry, cannot parse the message provided. \n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(XmlParserException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String xmlParserException(XmlParserException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Malformed xml content:\n" + ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(ValidationReportException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String reportException(ValidationReportException ex) {
-    logger.error(ex.getMessage(), ex);
-    return ex.getMessage() + ". \n";
-  }
+	@ResponseBody
+	@ExceptionHandler(XmlFormatterException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String xmlFormatterException(XmlFormatterException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Malformed xml content.\n" + ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(ProfileParserException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String profileParserExeption(ProfileParserException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Sorry, integrationProfile cannot be parsed.\n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(DownloadDocumentException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public String downloadException(DownloadDocumentException ex) {
+		logger.error(ex.getMessage(), ex);
+		return ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(XmlParserException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String xmlParserException(XmlParserException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Malformed xml content:\n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(DocumentationException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public String documentationException(DocumentationException ex) {
+		logger.error(ex.getMessage(), ex);
+		return ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(XmlFormatterException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String xmlFormatterException(XmlFormatterException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Malformed xml content.\n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(MessageUploadException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String messageUpload(MessageUploadException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Sorry, cannot upload the message.\n" + "DEBUG:\n" + ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(DownloadDocumentException.class)
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  public String documentationException(DocumentationException ex) {
-    logger.error(ex.getMessage(), ex);
-    return ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(MessageDownloadException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public String messageDownload(MessageDownloadException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Sorry, cannot download the message.\n" + "DEBUG:\n" + ex.getMessage();
+	}
 
-  @ResponseBody
-  @ExceptionHandler(MessageUploadException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String messageUpload(MessageUploadException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Sorry, cannot upload the message.\n" + "DEBUG:\n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(ConversionFailedException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String conversionFailedException(ConversionFailedException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Invalid input.\n";
+	}
 
-  @ResponseBody
-  @ExceptionHandler(MessageDownloadException.class)
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  public String messageDownload(MessageDownloadException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Sorry, cannot download the message.\n" + "DEBUG:\n" + ex.getMessage();
-  }
+	@ResponseBody
+	@ExceptionHandler(IllegalArgumentException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String illegalArgumentException(IllegalArgumentException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Invalid input.\n";
+	}
 
-  @ResponseBody
-  @ExceptionHandler(ConversionFailedException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String conversionFailedException(ConversionFailedException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Invalid input.\n";
-  }
+	@ResponseBody
+	@ExceptionHandler(TypeMismatchException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String illegalArgumentException(TypeMismatchException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Invalid input.\n";
+	}
 
-  @ResponseBody
-  @ExceptionHandler(IllegalArgumentException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String illegalArgumentException(IllegalArgumentException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Invalid input.\n";
-  }
+	@ResponseBody
+	@ExceptionHandler(SpelEvaluationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String spelEvaluationException(SpelEvaluationException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "Invalid input.\n";
+	}
 
-  @ResponseBody
-  @ExceptionHandler(TypeMismatchException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String illegalArgumentException(TypeMismatchException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Invalid input.\n";
-  }
+	@ResponseBody
+	@ExceptionHandler(UserNotFoundException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String userNotFoundException(UserNotFoundException ex) {
+		logger.error(ex.getMessage(), ex);
+		return "User could not be found.\n";
+	}
 
-  @ResponseBody
-  @ExceptionHandler(SpelEvaluationException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String spelEvaluationException(SpelEvaluationException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "Invalid input.\n";
-  }
-
-  @ResponseBody
-  @ExceptionHandler(UserNotFoundException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String userNotFoundException(UserNotFoundException ex) {
-    logger.error(ex.getMessage(), ex);
-    return "User could not be found.\n";
-  }
-
-  @ResponseBody
-  @ExceptionHandler(AccessDeniedException.class)
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  public ResponseMessage accessDeniedException(AccessDeniedException ex) {
-    logger.error("ERROR: Access Denied", ex);
-    return new ResponseMessage(ResponseMessage.Type.danger, "accessDenied");
-  }
-
-
+	@ResponseBody
+	@ExceptionHandler(AccessDeniedException.class)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	public ResponseMessage accessDeniedException(AccessDeniedException ex) {
+		logger.error("ERROR: Access Denied", ex);
+		return new ResponseMessage(ResponseMessage.Type.danger, "accessDenied");
+	}
 
 }
