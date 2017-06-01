@@ -34,6 +34,7 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   @Column(unique = true, nullable = false)
   protected Long persistentId;
 
+  @JsonIgnore
   @Column(nullable = true)
   protected String authorUsername;
 
@@ -87,6 +88,8 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   @NotNull
   @Enumerated(EnumType.STRING)
   protected TestScope scope = TestScope.GLOBAL;
+
+  protected boolean preloaded = true;
 
   public String getName() {
     return name;
@@ -236,6 +239,14 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
 
   public void setScope(TestScope scope) {
     this.scope = scope;
+  }
+
+  public boolean isPreloaded() {
+    return preloaded;
+  }
+
+  public void setPreloaded(boolean preloaded) {
+    this.preloaded = preloaded;
   }
 
 

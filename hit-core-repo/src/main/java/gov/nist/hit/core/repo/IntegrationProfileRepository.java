@@ -19,7 +19,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import gov.nist.hit.core.domain.IntegrationProfile;
-import gov.nist.hit.core.domain.TestScope;
 
 public interface IntegrationProfileRepository extends JpaRepository<IntegrationProfile, Long> {
 
@@ -29,9 +28,15 @@ public interface IntegrationProfileRepository extends JpaRepository<IntegrationP
   @Query("select p from IntegrationProfile p where p.sourceId = :sourceId")
   public IntegrationProfile findBySourceId(@Param("sourceId") String sourceId);
 
+
   @Modifying
   @Transactional(value = "transactionManager")
-  @Query("delete from IntegrationProfile to where to.scope = :scope")
-  public void deleteByScope(@Param("scope") TestScope scope);
+  @Query("delete from IntegrationProfile to where to.preloaded = true")
+  public void deletePreloaded();
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from IntegrationProfile to where to.preloaded = false")
+  public void deleteNonPreloaded();
 
 }

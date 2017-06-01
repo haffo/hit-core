@@ -9,12 +9,9 @@ import gov.nist.hit.core.domain.TestingStage;
 
 public interface TestPlanService {
 
-  @Deprecated
-  public List<TestPlan> findAllByStage(TestingStage stage);
+  TestPlan findOne(Long testPlanId);
 
-  public TestPlan findOne(Long testPlanId);
-
-  public List<TestArtifact> findAllTestPackages(TestingStage stage);
+  List<TestArtifact> findAllTestPackages(TestingStage stage);
 
   List<TestPlan> findShortAllByStage(TestingStage stage);
 

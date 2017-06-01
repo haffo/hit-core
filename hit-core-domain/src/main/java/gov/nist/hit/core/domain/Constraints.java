@@ -15,8 +15,6 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  */
 @Entity
-public class Constraints implements Serializable {
+public class Constraints extends ValidationArtifact implements Serializable {
 
 
   private static final long serialVersionUID = 1L;
@@ -50,16 +48,11 @@ public class Constraints implements Serializable {
   protected String description;
 
   @NotNull
-  @Enumerated(EnumType.STRING)
-  protected TestScope scope = TestScope.GLOBAL;
-
-  @NotNull
   @Column(columnDefinition = "LONGTEXT", nullable = false)
   protected String xml;
 
   public Constraints() {
     super();
-    scope = TestScope.GLOBAL;
   }
 
 

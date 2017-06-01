@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "VocabularyLibrary")
-public class VocabularyLibrary implements Serializable {
+public class VocabularyLibrary extends ValidationArtifact implements Serializable {
 
 
   private static final long serialVersionUID = 1L;
@@ -52,9 +50,7 @@ public class VocabularyLibrary implements Serializable {
   @Column(columnDefinition = "LONGTEXT")
   protected String json;
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  protected TestScope scope = TestScope.GLOBAL;
+
 
   public String getXml() {
     return xml;

@@ -11,38 +11,32 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
-
 import gov.nist.auth.hit.core.domain.TestingType;
 import io.swagger.annotations.ApiModel;
 
 @Entity
-@ApiModel(value = "CFTestInstance", description = "Data Model representing context-free test case")
-public class CFTestInstance extends TestStep implements Serializable {
+@ApiModel(value = "CFTestStep", description = "Data Model representing context-free test case")
+public class CFTestStep extends TestStep implements Serializable {
 
   private static final long serialVersionUID = 8805967508478985159L;
 
-  @JsonIgnore
-  
-  private boolean root;
-
-  public CFTestInstance() {
+  public CFTestStep() {
     super();
     this.type = ObjectType.TestObject;
     this.testingType = TestingType.DATAINSTANCE;
     this.stage = TestingStage.CF;
+    this.scope = TestScope.GLOBAL;
   }
 
 
-  public CFTestInstance(String name) {
+  public CFTestStep(String name) {
     super(name);
   }
 
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
   @JoinTable(name = "cf_tc", joinColumns = {@JoinColumn(name = "parent_id")},
       inverseJoinColumns = {@JoinColumn(name = "child_id")})
-  private List<CFTestInstance> children = new ArrayList<CFTestInstance>();
+  private List<CFTestStep> children = new ArrayList<CFTestStep>();
 
 
   @Override
@@ -56,22 +50,14 @@ public class CFTestInstance extends TestStep implements Serializable {
   }
 
 
-  public List<CFTestInstance> getChildren() {
+  public List<CFTestStep> getChildren() {
     return children;
   }
 
-  public void setChildren(List<CFTestInstance> children) {
+  public void setChildren(List<CFTestStep> children) {
     this.children = children;
   }
 
-
-  public boolean isRoot() {
-    return root;
-  }
-
-  public void setRoot(boolean root) {
-    this.root = root;
-  }
 
   @Override
   public TestingType getTestingType() {

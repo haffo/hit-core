@@ -62,18 +62,6 @@ public class ContextBasedController {
 	@Autowired
 	private AccountService userService;
 
-	// @ApiOperation(value = "Get all context-based test cases list", nickname =
-	// "getAllContextBasedTestCases")
-	// @Cacheable(value = "HitCache", key = "'cb-testcases'")
-	// @RequestMapping(value = "/testcases", method = RequestMethod.GET,
-	// produces = "application/json")
-	// public List<TestPlan> testCases() {
-	// logger.info("Fetching all testCases...");
-	// List<TestPlan> testPlans =
-	// testPlanService.findAllByStage(TestingStage.CB);
-	// return testPlans;
-	// }
-
 	@ApiOperation(value = "Get all context-based test cases list by scope", nickname = "getTestPlansByScope")
 	// @Cacheable(value = "HitCache", key = "'cb-testplans'")
 	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
@@ -95,7 +83,7 @@ public class ContextBasedController {
 		return null;
 	}
 
-	@ApiOperation(value = "Get a context-based test plan by id", nickname = "getOneContextBasedTestPlanById")
+	@ApiOperation(value = "Get a context-based test plan by id", nickname = "getOneTestPlanById")
 	@RequestMapping(value = "/testplans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
 	public TestPlan testPlan(
 			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId,

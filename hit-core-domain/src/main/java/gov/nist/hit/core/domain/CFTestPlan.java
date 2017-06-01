@@ -2,6 +2,7 @@ package gov.nist.hit.core.domain;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -13,13 +14,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
-public class UserTestCaseGroup implements Serializable {
+public class CFTestPlan extends AbstractTestCase implements Serializable {
 
   private static final long serialVersionUID = 880596750847898513L;
 
@@ -27,70 +26,68 @@ public class UserTestCaseGroup implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-
-
-  public UserTestCaseGroup() {
+  public CFTestPlan() {
     super();
+    this.scope = TestScope.GLOBAL;
+    this.preloaded = true;
+    this.type = ObjectType.TestPlan;
+    this.stage = TestingStage.CF;
   }
 
-  @JsonIgnore
-  @NotNull
-  private Long userId;
+  public CFTestPlan(Long id, String name, String description, int position, Long persistentId) {
+    super();
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.position = position;
+    this.persistentId = persistentId;
+  }
 
-  @NotNull
-  private String name;
-  private String description;
 
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
-  @JoinTable(name = "gvt_tcg_tc",
-      joinColumns = {@JoinColumn(name = "gvt_tcg_id", referencedColumnName = "id")},
-      inverseJoinColumns = {@JoinColumn(name = "gvt_tc_id", referencedColumnName = "id")})
-
+  @JoinTable(name = "cf_tcg_tc",
+      joinColumns = {@JoinColumn(name = "cf_tcg_id", referencedColumnName = "id")},
+      inverseJoinColumns = {@JoinColumn(name = "cf_tc_id", referencedColumnName = "id")})
   @JsonProperty("children")
-  private List<UserCFTestInstance> testCases;
+  private List<CFTestStep> testCases = new ArrayList<CFTestStep>();
 
-  @JsonIgnore
-  @NotNull
-  private boolean preloaded;
 
-  public Long getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Long userId) {
-    this.userId = userId;
-  }
-
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
 
+  @Override
   public void setDescription(String description) {
     this.description = description;
   }
 
-  public List<UserCFTestInstance> getTestCases() {
+  public List<CFTestStep> getTestCases() {
     return testCases;
   }
 
-  public void setTestCases(List<UserCFTestInstance> testCases) {
+  public void setTestCases(List<CFTestStep> testCases) {
     this.testCases = testCases;
   }
 
-  public boolean isPreloaded() {
-    return preloaded;
+  public Long getId() {
+    return id;
   }
 
-  public void setPreloaded(boolean preloaded) {
-    this.preloaded = preloaded;
+  public void setId(Long id) {
+    this.id = id;
   }
+
+
 
 }

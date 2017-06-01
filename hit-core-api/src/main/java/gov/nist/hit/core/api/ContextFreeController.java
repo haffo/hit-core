@@ -14,17 +14,28 @@ package gov.nist.hit.core.api;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import gov.nist.hit.core.domain.CFTestInstance;
-import gov.nist.hit.core.service.TestObjectService;
+import gov.nist.auth.hit.core.domain.Account;
+import gov.nist.hit.core.domain.CFTestPlan;
+import gov.nist.hit.core.domain.TestScope;
+import gov.nist.hit.core.domain.TestingStage;
+import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.CFTestPlanService;
+import gov.nist.hit.core.service.CFTestStepService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * @author Harold Affo (NIST)
@@ -38,22 +49,75 @@ public class ContextFreeController {
 	static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
 
 	@Autowired
-	private TestObjectService testObjectService;
+	private CFTestStepService testStepService;
 
-	@ApiOperation(value = "Get all context-free test cases list", nickname = "getAllContextFreeTestCases")
-	// @Cacheable(value = "HitCache", key = "'cf-testcases'")
-	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
-	public List<CFTestInstance> testCases() {
-		logger.info("Fetching all testCases...");
-		return testObjectService.findAllAsRoot();
+	@Autowired
+	private CFTestPlanService testPlanService;
+
+	@Autowired
+	private AccountService userService;
+
+	@ApiOperation(value = "Get all context-free test plans list by scope", nickname = "getTestPlansByScope")
+	// @Cacheable(value = "HitCache", key = "'cb-testplans'")
+	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
+	public List<CFTestPlan> getTestPlansByScope(
+			@ApiParam(value = "the scope of the test plans", required = true) @RequestParam final TestScope scope,
+			HttpServletRequest request, HttpServletResponse response) {
+		logger.info("Fetching context-free testplans of scope=" + scope + "...");
+		if (TestScope.USER.equals(scope)) {
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId != null) {
+				Account account = userService.findOne(userId);
+				if (account != null) {
+					return testPlanService.findShortAllByStageAndAuthor(TestingStage.CF, account.getUsername());
+				}
+			}
+		} else {
+			return testPlanService.findShortAllByStageAndScope(TestingStage.CF, scope);
+		}
+		return null;
 	}
 
-	public TestObjectService getTestObjectService() {
-		return testObjectService;
+	@ApiOperation(value = "Get a context-free test plan by id", nickname = "getOneTestPlanById")
+	@RequestMapping(value = "/testplans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
+	public CFTestPlan testPlan(
+			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId,
+			HttpServletRequest request, HttpServletResponse response) {
+		logger.info("Fetching  test case...");
+		CFTestPlan testPlan = testPlanService.findOne(testPlanId);
+		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+		recordTestPlan(testPlan, userId);
+		return testPlan;
 	}
 
-	public void setTestObjectService(TestObjectService testObjectService) {
-		this.testObjectService = testObjectService;
+	private void recordTestPlan(CFTestPlan testPlan, Long userId) {
+		if (testPlan != null && userId != null) {
+			userService.recordLastCFTestPlan(userId, testPlan.getPersistentId());
+		}
+	}
+
+	public CFTestStepService getTestStepService() {
+		return testStepService;
+	}
+
+	public void setTestStepService(CFTestStepService testStepService) {
+		this.testStepService = testStepService;
+	}
+
+	public CFTestPlanService getTestPlanService() {
+		return testPlanService;
+	}
+
+	public void setTestPlanService(CFTestPlanService testPlanService) {
+		this.testPlanService = testPlanService;
+	}
+
+	public AccountService getUserService() {
+		return userService;
+	}
+
+	public void setUserService(AccountService userService) {
+		this.userService = userService;
 	}
 
 }

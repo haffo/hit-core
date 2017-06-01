@@ -18,7 +18,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 
 public interface VocabularyLibraryRepository extends JpaRepository<VocabularyLibrary, Long> {
@@ -29,11 +28,17 @@ public interface VocabularyLibraryRepository extends JpaRepository<VocabularyLib
   @Query("select vocab.json from VocabularyLibrary vocab where vocab.id = :valueSetLibraryId")
   public String getJson(@Param("valueSetLibraryId") Long valueSetLibraryId);
 
-  @Transactional(value = "transactionManager")
-  @Modifying
-  @Query("delete from VocabularyLibrary to where to.scope = :scope")
-  public void deleteByScope(@Param("scope") TestScope scope);
 
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from VocabularyLibrary to where to.preloaded = true")
+  public void deletePreloaded();
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from VocabularyLibrary to where to.preloaded = false")
+  public void deleteNonPreloaded();
 
 
 }

@@ -12,28 +12,23 @@
 
 package gov.nist.hit.core.repo;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import gov.nist.hit.core.domain.CFTestInstance;
+import gov.nist.hit.core.domain.CFTestStep;
 import gov.nist.hit.core.domain.TestScope;
 
-public interface CFTestInstanceRepository extends JpaRepository<CFTestInstance, Long> {
+public interface CFTestStepRepository extends JpaRepository<CFTestStep, Long> {
 
-  @Query("select to from CFTestInstance to where to.root = true")
-  public List<CFTestInstance> findAllAsRoot();
-
-  @Query("select to from CFTestInstance to where to.persistentId = :id")
-  public CFTestInstance getByPersistentId(@Param("id") Long id);
+  @Query("select to from CFTestStep to where to.persistentId = :id")
+  public CFTestStep getByPersistentId(@Param("id") Long id);
 
   @Modifying
   @Transactional(value = "transactionManager")
-  @Query("delete from CFTestInstance to where to.scope = :scope")
+  @Query("delete from CFTestStep to where to.scope = :scope")
   public void deleteByScope(@Param("scope") TestScope scope);
 
 

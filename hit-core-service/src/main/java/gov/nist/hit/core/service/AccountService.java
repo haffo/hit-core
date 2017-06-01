@@ -35,6 +35,8 @@ public interface AccountService extends JpaSpecificationExecutor<Account> {
 
   void recordLastLoggedInDate(Long accountId, Date date);
 
+  void recordLastCFTestPlan(Long accountId, Long testPlanPersistenceId);
+
 
 
 }

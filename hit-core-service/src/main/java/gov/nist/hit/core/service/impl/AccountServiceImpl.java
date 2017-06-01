@@ -180,5 +180,10 @@ public class AccountServiceImpl implements AccountService {
     accountRepository.recordLastLoggedInDate(accountId, date);
   }
 
+  @Override
+  public void recordLastCFTestPlan(Long accountId, Long testPlanPersistenceId) {
+    accountRepository.recordLastCFTestPlan(accountId, testPlanPersistenceId);
+  }
+
 
 }

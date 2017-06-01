@@ -18,8 +18,6 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 
 @Entity
-public class IntegrationProfile implements Serializable {
+public class IntegrationProfile extends ValidationArtifact implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -74,13 +72,8 @@ public class IntegrationProfile implements Serializable {
   @JsonIgnore
   protected List<String> messages;
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  protected TestScope scope = TestScope.GLOBAL;
-
   public IntegrationProfile() {
     super();
-    scope = TestScope.GLOBAL;
   }
 
   public IntegrationProfile(String name, String description, String xml) {

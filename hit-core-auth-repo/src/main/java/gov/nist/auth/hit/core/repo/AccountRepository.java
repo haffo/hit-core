@@ -49,5 +49,11 @@ public interface AccountRepository
   public void recordLastLoggedInDate(@Param("accountId") Long accountId,
       @Param("lastLoggedInDate") Date lastLoggedInDate);
 
+  @Modifying
+  @Query("update Account a set a.lastCFTestPlanPersistenceId = :testPlanPersistenceId where a.id = :accountId and a.guestAccount = false")
+  public void recordLastCFTestPlan(@Param("accountId") Long accountId,
+      @Param("testPlanPersistenceId") Long testPlanPersistenceId);
+
+
 
 }

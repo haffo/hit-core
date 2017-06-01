@@ -15,8 +15,10 @@ package gov.nist.hit.core.repo;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
@@ -25,9 +27,12 @@ import gov.nist.hit.core.domain.TestingStage;
 
 public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 
-  @Deprecated
-  @Query("select tp from TestPlan tp where tp.stage = :stage")
+  @Query("select tp from TestPlan tp where tp.stage= :stage")
   public List<TestPlan> findAllByStage(@Param("stage") TestingStage stage);
+
+  @Query("select tp from TestPlan tp where tp.stage=:stage and tp.scope=:scope")
+  public List<TestPlan> findAllByStageAndScope(@Param("stage") TestingStage stage,
+      @Param("scope") TestScope scope);
 
   @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1")
   public List<TestPlan> findShortAllByStage(TestingStage stage);
@@ -53,6 +58,16 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 
   @Query("select tp from TestPlan tp where tp.persistentId = :id")
   public TestPlan getByPersistentId(@Param("id") Long id);
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from TestPlan to where to.preloaded = true")
+  public void deletePreloaded();
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from TestPlan to where to.preloaded = false")
+  public void deleteNonPreloaded();
 
 
 }

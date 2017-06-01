@@ -89,6 +89,8 @@ public class Account implements Serializable {
 
   private Long lastTestPlanPersistenceId;
 
+  private Long lastCFTestPlanPersistenceId;
+
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastLoggedInDate;
 
@@ -253,6 +255,14 @@ public class Account implements Serializable {
 
   public void setLastLoggedInDate(Date lastLoggedInDate) {
     this.lastLoggedInDate = lastLoggedInDate;
+  }
+
+  public Long getLastCFTestPlanPersistenceId() {
+    return lastCFTestPlanPersistenceId;
+  }
+
+  public void setLastCFTestPlanPersistenceId(Long lastCFTestPlanPersistenceId) {
+    this.lastCFTestPlanPersistenceId = lastCFTestPlanPersistenceId;
   }
 
 

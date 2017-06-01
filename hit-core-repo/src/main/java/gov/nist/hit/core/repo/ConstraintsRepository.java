@@ -19,7 +19,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import gov.nist.hit.core.domain.Constraints;
-import gov.nist.hit.core.domain.TestScope;
 
 public interface ConstraintsRepository extends JpaRepository<Constraints, Long> {
 
@@ -28,7 +27,12 @@ public interface ConstraintsRepository extends JpaRepository<Constraints, Long> 
 
   @Modifying
   @Transactional(value = "transactionManager")
-  @Query("delete from Constraints to where to.scope = :scope")
-  public void deleteByScope(@Param("scope") TestScope scope);
+  @Query("delete from Constraints to where to.preloaded = true")
+  public void deletePreloaded();
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from Constraints to where to.preloaded = false")
+  public void deleteNonPreloaded();
 
 }

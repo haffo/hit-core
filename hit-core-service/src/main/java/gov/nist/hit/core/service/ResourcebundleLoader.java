@@ -53,7 +53,8 @@ import gov.nist.auth.hit.core.domain.TestingType;
 import gov.nist.auth.hit.core.repo.AccountRepository;
 import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.AppInfo;
-import gov.nist.hit.core.domain.CFTestInstance;
+import gov.nist.hit.core.domain.CFTestPlan;
+import gov.nist.hit.core.domain.CFTestStep;
 import gov.nist.hit.core.domain.Constraints;
 import gov.nist.hit.core.domain.DataMapping;
 import gov.nist.hit.core.domain.DocumentType;
@@ -79,7 +80,8 @@ import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.TransportForms;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.AppInfoRepository;
-import gov.nist.hit.core.repo.CFTestInstanceRepository;
+import gov.nist.hit.core.repo.CFTestPlanRepository;
+import gov.nist.hit.core.repo.CFTestStepRepository;
 import gov.nist.hit.core.repo.ConstraintsRepository;
 import gov.nist.hit.core.repo.DataMappingRepository;
 import gov.nist.hit.core.repo.DocumentRepository;
@@ -163,7 +165,11 @@ public abstract class ResourcebundleLoader {
   protected TestPlanRepository testPlanRepository;
 
   @Autowired
-  protected CFTestInstanceRepository testInstanceRepository;
+  protected CFTestStepRepository cfTestStepRepository;
+
+  @Autowired
+  protected CFTestPlanRepository cfTestPlanRepository;
+
 
   @Autowired
   protected TestStepRepository testStepRepository;
@@ -233,11 +239,11 @@ public abstract class ResourcebundleLoader {
   public void clearDB() {
     appInfoRepository.deleteAll();
     validationResultRepository.deleteAll();
-    testPlanRepository.deleteAll();
-    testInstanceRepository.deleteByScope(TestScope.GLOBAL);
-    constraintsRepository.deleteByScope(TestScope.GLOBAL);
-    vocabularyLibraryRepository.deleteByScope(TestScope.GLOBAL);
-    integrationProfileRepository.deleteByScope(TestScope.GLOBAL);
+    testPlanRepository.deletePreloaded();
+    cfTestPlanRepository.deletePreloaded();
+    constraintsRepository.deletePreloaded();
+    vocabularyLibraryRepository.deletePreloaded();
+    integrationProfileRepository.deletePreloaded();
     testCaseDocumentationRepository.deleteAll();
     transportFormsRepository.deleteAll();
     documentRepository.deleteAll();
@@ -938,12 +944,12 @@ public abstract class ResourcebundleLoader {
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
-        CFTestInstance testObject = testObject(fileName
-            .substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)), fileName.length()));
-        if (testObject != null) {
-          checkPersistentId(testObject.getPersistentId(), fileName);
-          testObject.setRoot(true);
-          testInstanceRepository.save(testObject);
+        String location = fileName.substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)),
+            fileName.length());
+        CFTestPlan testPlan = cfTestPlan(location);
+        if (testPlan != null) {
+          checkPersistentId(testPlan.getPersistentId(), fileName);
+          cfTestPlanRepository.save(testPlan);
         }
       }
     }
@@ -1287,7 +1293,51 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  protected CFTestInstance testObject(String testObjectPath) throws IOException {
+
+  protected CFTestPlan cfTestPlan(String testPlanPath) throws IOException {
+    logger.info("Processing test plan at:" + testPlanPath);
+    Resource res = this.getResource(testPlanPath + "TestObject.json");
+    if (res == null)
+      throw new IllegalArgumentException("No TestObject.json found at " + testPlanPath);
+    String descriptorContent = FileUtil.getContent(res);
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode testPlanObj = mapper.readTree(descriptorContent);
+    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
+      CFTestPlan testPlan = new CFTestPlan();
+      testPlan.setName(testPlanObj.findValue("name").textValue());
+      if (!testPlanObj.has("id")) {
+        throw new IllegalArgumentException("Missing id for Test Object at " + testPlanPath);
+      }
+      testPlan.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
+      if (testPlanObj.findValue("position") != null) {
+        testPlan.setPosition(testPlanObj.findValue("position").intValue());
+      }
+      testPlan.setDescription(testPlanObj.findValue("description").textValue());
+      testPlan.setVersion(!testPlanObj.has("version") ? 1.0
+          : Double.parseDouble(testPlanObj.findValue("version").asText()));
+      if (testPlanObj.has("supplements")) {
+        testPlan.getSupplements()
+            .addAll(testDocuments(testPlanPath, testPlanObj.findValue("supplements")));
+      }
+
+      List<Resource> resources = this.getDirectories(testPlanPath + "*/");
+      for (Resource resource : resources) {
+        String fileName = fileName(resource);
+        String location = fileName.substring(fileName.indexOf(testPlanPath), fileName.length());
+        CFTestStep testStep = testObject(location);
+        if (testStep != null) {
+          checkPersistentId(testStep.getPersistentId(), fileName);
+          testPlan.getTestCases().add(testStep);
+        }
+      }
+      return testPlan;
+    }
+    return null;
+  }
+
+
+
+  protected CFTestStep testObject(String testObjectPath) throws IOException {
     logger.info("Processing test object at:" + testObjectPath);
     Resource res = this.getResource(testObjectPath + "TestObject.json");
     if (res == null)
@@ -1296,7 +1346,7 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
-      CFTestInstance parent = new CFTestInstance();
+      CFTestStep parent = new CFTestStep();
       parent.setName(testPlanObj.findValue("name").textValue());
       if (!testPlanObj.has("id")) {
         throw new IllegalArgumentException("Missing id for Test Object at " + testObjectPath);
@@ -1318,7 +1368,7 @@ public abstract class ResourcebundleLoader {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
-        CFTestInstance testObject = testObject(location);
+        CFTestStep testObject = testObject(location);
         if (testObject != null) {
           checkPersistentId(testObject.getPersistentId(), fileName);
           parent.getChildren().add(testObject);
@@ -1331,14 +1381,13 @@ public abstract class ResourcebundleLoader {
 
   public void loadTestCasesDocumentation() throws IOException {
     TestCaseDocumentation doc = generateTestObjectDocumentation("Context-free", TestingStage.CF,
-        testInstanceRepository.findAllAsRoot());
+        cfTestPlanRepository.findAllByStageAndScope(TestingStage.CF, TestScope.GLOBAL));
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
       testCaseDocumentationRepository.save(doc);
     }
-
     doc = generateTestCaseDocumentation("Context-based", TestingStage.CB,
-        testPlanRepository.findAllByStage(TestingStage.CB));
+        testPlanRepository.findAllByStageAndScope(TestingStage.CB, TestScope.GLOBAL));
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
       testCaseDocumentationRepository.save(doc);
@@ -1360,13 +1409,13 @@ public abstract class ResourcebundleLoader {
   }
 
   private TestCaseDocumentation generateTestObjectDocumentation(String title, TestingStage stage,
-      List<CFTestInstance> tos) throws IOException {
+      List<CFTestPlan> tos) throws IOException {
     if (tos != null && !tos.isEmpty()) {
       TestCaseDocumentation documentation = new TestCaseDocumentation();
       documentation.setTitle(title);
       documentation.setStage(stage);
       Collections.sort(tos);
-      for (CFTestInstance to : tos) {
+      for (CFTestPlan to : tos) {
         documentation.getChildren().add(generateTestCaseDocument(to));
       }
       return documentation;
@@ -1437,19 +1486,34 @@ public abstract class ResourcebundleLoader {
     return doc;
   }
 
-  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(CFTestInstance to)
+  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(CFTestStep to)
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(to.getTestContext());
     doc = initTestCaseDocument(to, doc);
     doc.setId(to.getId());
     if (to.getChildren() != null && !to.getChildren().isEmpty()) {
       Collections.sort(to.getChildren());
-      for (CFTestInstance child : to.getChildren()) {
+      for (CFTestStep child : to.getChildren()) {
         doc.getChildren().add(generateTestCaseDocument(child));
       }
     }
     return doc;
   }
+
+  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(CFTestPlan tp)
+      throws IOException {
+    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
+    doc.setId(tp.getId());
+    if (tp.getTestCases() != null && !tp.getTestCases().isEmpty()) {
+      Collections.sort(tp.getTestCases());
+      for (CFTestStep tc : tp.getTestCases()) {
+        doc.getChildren().add(generateTestCaseDocument(tc));
+      }
+    }
+    return doc;
+  }
+
+
 
   private gov.nist.hit.core.domain.TestCaseDocument initTestCaseDocument(AbstractTestCase ts)
       throws IOException {
@@ -1586,13 +1650,6 @@ public abstract class ResourcebundleLoader {
     this.documentRepository = documentRepository;
   }
 
-  public CFTestInstanceRepository getTestInstanceRepository() {
-    return testInstanceRepository;
-  }
-
-  public void setTestInstanceRepository(CFTestInstanceRepository testInstanceRepository) {
-    this.testInstanceRepository = testInstanceRepository;
-  }
 
   public CachedRepository getCachedRepository() {
     return cachedRepository;
@@ -1739,37 +1796,30 @@ public abstract class ResourcebundleLoader {
     this.constraintsRepository = constraintsRepository;
   }
 
-  // public Map<String, IntegrationProfile> getCachedProfiles() {
-  // return cachedProfiles;
-  // }
-  //
-  //
-  // public void setCachedProfiles(Map<String, IntegrationProfile>
-  // cachedProfiles) {
-  // this.cachedProfiles = cachedProfiles;
-  // }
-  //
-  //
-  // public Map<String, VocabularyLibrary> getCachedVocabLibraries() {
-  // return cachedVocabLibraries;
-  // }
-  //
-  //
-  // public void setCachedVocabLibraries(Map<String, VocabularyLibrary>
-  // cachedVocabLibraries) {
-  // this.cachedVocabLibraries = cachedVocabLibraries;
-  // }
-  //
-  //
-  // public Map<String, Constraints> getCachedConstraints() {
-  // return cachedConstraints;
-  // }
-  //
-  //
-  // public void setCachedConstraints(Map<String, Constraints>
-  // cachedConstraints) {
-  // this.cachedConstraints = cachedConstraints;
-  // }
+  public CFTestStepRepository getCfTestStepRepository() {
+    return cfTestStepRepository;
+  }
+
+  public void setCfTestStepRepository(CFTestStepRepository cfTestStepRepository) {
+    this.cfTestStepRepository = cfTestStepRepository;
+  }
+
+  public CFTestPlanRepository getCfTestPlanRepository() {
+    return cfTestPlanRepository;
+  }
+
+  public void setCfTestPlanRepository(CFTestPlanRepository cfTestPlanRepository) {
+    this.cfTestPlanRepository = cfTestPlanRepository;
+  }
+
+  public DataMappingRepository getDataMappingRepository() {
+    return dataMappingRepository;
+  }
+
+  public void setDataMappingRepository(DataMappingRepository dataMappingRepository) {
+    this.dataMappingRepository = dataMappingRepository;
+  }
+
 
 
 }

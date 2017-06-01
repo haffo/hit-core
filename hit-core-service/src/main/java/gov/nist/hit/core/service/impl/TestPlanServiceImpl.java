@@ -18,10 +18,6 @@ public class TestPlanServiceImpl implements TestPlanService {
   @Autowired
   private TestPlanRepository testPlanRepository;
 
-  @Override
-  public List<TestPlan> findAllByStage(TestingStage stage) {
-    return testPlanRepository.findAllByStage(stage);
-  }
 
   @Override
   public List<TestPlan> findShortAllByStage(TestingStage stage) {

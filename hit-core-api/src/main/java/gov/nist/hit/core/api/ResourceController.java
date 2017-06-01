@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gov.nist.hit.core.domain.AddOrUpdateRequest;
-import gov.nist.hit.core.domain.CFTestInstance;
+import gov.nist.hit.core.domain.CFTestStep;
 import gov.nist.hit.core.domain.ResourceUploadStatus;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseGroup;
@@ -228,8 +228,8 @@ public class ResourceController {
 		List<ResourceUploadStatus> results = new ArrayList<>();
 		resourceLoader.setDirectory(request.getZip() + "/");
 		
-		List<CFTestInstance> cases = resourceLoader.createCFTC();
-		for(CFTestInstance tc : cases){
+		List<CFTestStep> cases = resourceLoader.createCFTC();
+		for(CFTestStep tc : cases){
 			ResourceUploadStatus tmp = resourceLoader.handleCFTC(request.getId(), tc);
 			results.add(tmp);
 		}
