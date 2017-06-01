@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.service.TestPlanService;
@@ -28,6 +29,12 @@ public class TestPlanServiceImpl implements TestPlanService {
   }
 
   @Override
+  public List<TestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope) {
+    return testPlanRepository.findShortAllByStageAndScope(stage, scope);
+  }
+
+
+  @Override
   public List<TestArtifact> findAllTestPackages(TestingStage stage) {
     return testPlanRepository.findAllTestPackages(stage);
   }
@@ -36,6 +43,11 @@ public class TestPlanServiceImpl implements TestPlanService {
   public TestPlan findOne(Long testPlanId) {
     // TODO Auto-generated method stub
     return testPlanRepository.findOne(testPlanId);
+  }
+
+  @Override
+  public List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername) {
+    return testPlanRepository.findShortAllByStageAndAuthor(stage, authorUsername);
   }
 
 

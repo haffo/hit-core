@@ -20,6 +20,7 @@ import org.springframework.data.repository.query.Param;
 
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestingStage;
 
 public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
@@ -30,6 +31,12 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 
   @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1")
   public List<TestPlan> findShortAllByStage(TestingStage stage);
+
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.scope = ?2")
+  public List<TestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
+
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2")
+  public List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
 
 
   @Query("select tp.testPackage from TestPlan tp where tp.stage = :stage")

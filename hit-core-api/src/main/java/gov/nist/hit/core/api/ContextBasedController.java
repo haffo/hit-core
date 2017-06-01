@@ -23,10 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.service.AccountService;
@@ -71,12 +74,25 @@ public class ContextBasedController {
 	// return testPlans;
 	// }
 
-	@ApiOperation(value = "Get all context-based test cases list", nickname = "getAllContextBasedTestCases")
+	@ApiOperation(value = "Get all context-based test cases list by scope", nickname = "getTestPlansByScope")
 	// @Cacheable(value = "HitCache", key = "'cb-testplans'")
 	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
-	public List<TestPlan> testPlans() {
-		logger.info("Fetching all testplans...");
-		return testPlanService.findShortAllByStage(TestingStage.CB);
+	public List<TestPlan> getTestPlansByScope(
+			@ApiParam(value = "the scope of the test plans", required = true) @RequestParam final TestScope scope,
+			HttpServletRequest request, HttpServletResponse response) {
+		logger.info("Fetching all testplans of type=" + scope + "...");
+		if (TestScope.USER.equals(scope)) {
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId != null) {
+				Account account = userService.findOne(userId);
+				if (account != null) {
+					return testPlanService.findShortAllByStageAndAuthor(TestingStage.CB, account.getUsername());
+				}
+			}
+		} else {
+			return testPlanService.findShortAllByStageAndScope(TestingStage.CB, scope);
+		}
+		return null;
 	}
 
 	@ApiOperation(value = "Get a context-based test plan by id", nickname = "getOneContextBasedTestPlanById")

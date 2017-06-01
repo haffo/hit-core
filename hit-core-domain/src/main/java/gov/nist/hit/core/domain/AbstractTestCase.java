@@ -34,6 +34,8 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   @Column(unique = true, nullable = false)
   protected Long persistentId;
 
+  @Column(nullable = true)
+  protected String authorUsername;
 
   // @Column
   // private String parentName;
@@ -50,24 +52,25 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   // @Column
   // private String testStepName;
 
-  @ApiModelProperty(required = false, value = "description of the test case")
+  @ApiModelProperty(required = false, value = "description of the test")
   @Column(columnDefinition = "TEXT")
   protected String description;
 
-  @ApiModelProperty(required = true, value = "type of the test case")
+  @ApiModelProperty(required = true, value = "type of the test")
   @NotNull
   @Enumerated(EnumType.STRING)
   protected ObjectType type;
 
-  @ApiModelProperty(required = false, value = "stage of the test case")
+  @ApiModelProperty(required = false, value = "stage of the test")
   @Enumerated(EnumType.STRING)
   protected TestingStage stage;
 
-  @ApiModelProperty(required = true, value = "position of the test case")
+
+  @ApiModelProperty(required = true, value = "position of the test")
   @Min(1)
   protected int position;
 
-  @ApiModelProperty(required = true, value = "version of the test case")
+  @ApiModelProperty(required = true, value = "version of the test")
   protected Double version;
 
   @ApiModelProperty(required = true, value = "test story of the test case")
@@ -217,6 +220,22 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
 
   public void setSupplements(Set<Document> supplements) {
     this.supplements = supplements;
+  }
+
+  public String getAuthorUsername() {
+    return authorUsername;
+  }
+
+  public void setAuthorUsername(String authorUsername) {
+    this.authorUsername = authorUsername;
+  }
+
+  public TestScope getScope() {
+    return scope;
+  }
+
+  public void setScope(TestScope scope) {
+    this.scope = scope;
   }
 
 

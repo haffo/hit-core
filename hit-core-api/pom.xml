@@ -171,12 +171,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>1.4.187</version>
-		</dependency>
-
-		<dependency>
 			<groupId>gov.nist.healthcare.mu.core.stat</groupId>
 			<artifactId>stat-logging</artifactId>
 			<version>0.0.1</version>
