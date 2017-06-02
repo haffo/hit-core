@@ -12,8 +12,6 @@
 
 package gov.nist.hit.core.api;
 
-import io.swagger.annotations.Api;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -25,17 +23,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Harold Affo (NIST)
  * 
  */
-@Api(hidden = true)
 @Controller
 @RequestMapping("/")
 public class IndexController {
 
-  @RequestMapping(method = RequestMethod.GET)
-  public void index(HttpServletRequest request) {
-    HttpSession session = request.getSession();
-    if (session == null) {
-      request.getSession(true);
-    }
-  }
+	@RequestMapping(method = RequestMethod.GET)
+	public void index(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		if (session == null) {
+			request.getSession(true);
+		}
+	}
 
 }

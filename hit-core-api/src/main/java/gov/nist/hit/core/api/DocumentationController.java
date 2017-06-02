@@ -39,8 +39,6 @@ import gov.nist.hit.core.repo.DocumentRepository;
 import gov.nist.hit.core.service.TestCaseDocumentationService;
 import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 /**
@@ -49,7 +47,6 @@ import io.swagger.annotations.ApiParam;
  */
 @RequestMapping("/documentation")
 @RestController
-@Api(value = "Documentation", tags = "Documentation")
 public class DocumentationController {
 
 	static final Logger logger = LoggerFactory.getLogger(DocumentationController.class);
@@ -63,7 +60,6 @@ public class DocumentationController {
 	@Autowired
 	private ZipGenerator zipGenerator;
 
-	@ApiOperation(value = "Get all context-based test cases documentation info", nickname = "getContextbasedTestCaseDocumentationInfo")
 	@Cacheable(value = "HitCache", key = "'testcases-documentation'")
 	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
 	public TestCaseDocumentation testCases() {
@@ -72,7 +68,6 @@ public class DocumentationController {
 		return doc;
 	}
 
-	@ApiOperation(value = "Get all release notes", nickname = "getAllReleaseNotes")
 	@Cacheable(value = "HitCache", key = "'releasenotes'")
 	@RequestMapping(value = "/releasenotes", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> releaseNotes() {
@@ -80,7 +75,6 @@ public class DocumentationController {
 		return documentRepository.findAllReleaseNotes();
 	}
 
-	@ApiOperation(value = "Get all user docs", nickname = "getAllUserDocs")
 	@Cacheable(value = "HitCache", key = "'userdocs'")
 	@RequestMapping(value = "/userdocs", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> userDocs() {
@@ -88,7 +82,6 @@ public class DocumentationController {
 		return documentRepository.findAllUserDocs();
 	}
 
-	@ApiOperation(value = "Get all known issues", nickname = "getAllKnownIssues")
 	@Cacheable(value = "HitCache", key = "'knownissues'")
 	@RequestMapping(value = "/knownissues", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> knownIssues() {
@@ -96,7 +89,6 @@ public class DocumentationController {
 		return documentRepository.findAllKnownIssues();
 	}
 
-	@ApiOperation(value = "Get all resources docs", nickname = "getAllResourceDocs")
 	@Cacheable(value = "HitCache", key = "#type.name() + 'resource-documentation'")
 	@RequestMapping(value = "/resourcedocs", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> resourcedocs(@RequestParam("type") DocumentType type) {
@@ -104,7 +96,6 @@ public class DocumentationController {
 		return documentRepository.findAllResourceDocs(type);
 	}
 
-	@ApiOperation(value = "Get all deliverables", nickname = "getAllDeliverables")
 	@Cacheable(value = "HitCache", key = "'deliverables-documentation'")
 	@RequestMapping(value = "/deliverables", method = RequestMethod.GET, produces = "application/json")
 	public List<Document> toolDownloads() {
@@ -112,7 +103,6 @@ public class DocumentationController {
 		return documentRepository.findAllDeliverableDocs();
 	}
 
-	@ApiOperation(value = "Get the installation guide info", nickname = "getInstallationGuide")
 	@Cacheable(value = "HitCache", key = "'installationguide-documentation'")
 	@RequestMapping(value = "/installationguide", method = RequestMethod.GET, produces = "application/json")
 	public Document installationGuide() {
@@ -121,7 +111,6 @@ public class DocumentationController {
 		return d;
 	}
 
-	@ApiOperation(value = "Download a document by its path", nickname = "downloadDocumentByPath", hidden = true)
 	@RequestMapping(value = "/downloadDocument", method = RequestMethod.POST)
 	public void downloadDocumentByPath(
 			@ApiParam(value = "the path of the document", required = true) @RequestParam("path") String path,
@@ -145,7 +134,6 @@ public class DocumentationController {
 		}
 	}
 
-	@ApiOperation(value = "Download a collection of resource documents by a specific type (example messages, test packages etc...)", nickname = "downloadResourceDocs", hidden = true)
 	@RequestMapping(value = "/downloadResourceDocs", method = RequestMethod.POST, produces = "application/zip")
 	public void downloadResourceDocs(
 			@ApiParam(value = "the type of the document, example messages, test packages etc...", required = true) @RequestParam("type") DocumentType type,
@@ -166,7 +154,6 @@ public class DocumentationController {
 		}
 	}
 
-	@ApiOperation(value = "Download a document by its file name", nickname = "downloadDocByName")
 	@RequestMapping(value = "/doc", method = RequestMethod.GET)
 	public void downloadDocByName(
 			@ApiParam(value = "the name of the document", required = true) @RequestParam("name") String name,
@@ -181,7 +168,6 @@ public class DocumentationController {
 		}
 	}
 
-	@ApiOperation(value = "Download all context-based test packages", nickname = "downloadTestPackages")
 	@RequestMapping(value = "/testPackages", method = RequestMethod.POST, produces = "application/zip")
 	public void downloadTestPackages(HttpServletRequest request, HttpServletResponse response)
 			throws DownloadDocumentException {
@@ -200,7 +186,6 @@ public class DocumentationController {
 		}
 	}
 
-	@ApiOperation(value = "Download all context-based example messages", nickname = "downloadAllExampleMessages")
 	@RequestMapping(value = "/exampleMessages", method = RequestMethod.POST, produces = "application/zip")
 	public void downloadAllExampleMessages(HttpServletRequest request, HttpServletResponse response)
 			throws DownloadDocumentException {
@@ -218,7 +203,6 @@ public class DocumentationController {
 		}
 	}
 
-	@ApiOperation(value = "Download an artifact by its path", nickname = "downloadArtifactByPath", hidden = true)
 	@RequestMapping(value = "/artifact", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
 	public void downloadArtifactByPath(
 			@ApiParam(value = "the title of the document", required = false) @RequestParam("title") String title,

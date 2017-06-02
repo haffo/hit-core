@@ -33,12 +33,8 @@ import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.MessageValidationReportService;
-import gov.nist.hit.core.service.TestCaseService;
-import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 /**
@@ -46,8 +42,7 @@ import io.swagger.annotations.ApiParam;
  * 
  */
 @RestController
-@RequestMapping("/messageValidationReport")
-@Api(value = "Message validation report api", tags = "Message Validation Report")
+@RequestMapping("/mReport")
 public class MessageValidationReportController {
 
 	static final Logger logger = LoggerFactory.getLogger(MessageValidationReportController.class);
@@ -56,15 +51,8 @@ public class MessageValidationReportController {
 	private MessageValidationReportService validationReportService;
 
 	@Autowired
-	private TestStepService testStepService;
-
-	@Autowired
-	private TestCaseService testCaseService;
-
-	@Autowired
 	private AccountService userService;
 
-	@ApiOperation(value = "Download the message validation report of a test step by its id", nickname = "download", produces = "text/html,application/msword,application/xml,application/pdf")
 	@RequestMapping(value = "/{messageValidationReportId}/download", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
 	public void download(
 			@ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,

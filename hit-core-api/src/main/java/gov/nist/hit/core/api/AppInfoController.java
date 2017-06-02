@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.hit.core.domain.AppInfo;
 import gov.nist.hit.core.service.AppInfoService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 
 /**
  * @author Harold Affo (NIST)
@@ -30,13 +28,11 @@ import io.swagger.annotations.ApiOperation;
  */
 @RestController
 @RequestMapping("/appInfo")
-@Api(value = "App Info", tags = "Application Information")
 public class AppInfoController {
 
 	@Autowired
 	private AppInfoService appInfoService;
 
-	@ApiOperation(value = "Get Application Information", nickname = "getAppInfo")
 	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
 	public AppInfo info(HttpServletRequest request) {
 		AppInfo appInfo = appInfoService.get();

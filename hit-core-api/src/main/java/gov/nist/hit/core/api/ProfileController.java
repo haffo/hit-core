@@ -12,12 +12,6 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.Json;
-import gov.nist.hit.core.repo.ConformanceProfileRepository;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import gov.nist.hit.core.domain.Json;
+import gov.nist.hit.core.repo.ConformanceProfileRepository;
+import io.swagger.annotations.ApiParam;
+
 /**
  * @author Harold Affo (NIST)
  * 
@@ -33,24 +31,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/profile")
 @RestController
-@Api(value = "Conformance profiles api", tags = "Conformance Profiles")
 public class ProfileController {
 
-  Logger logger = LoggerFactory.getLogger(ProfileController.class);
+	Logger logger = LoggerFactory.getLogger(ProfileController.class);
 
-  @Autowired
-  private ConformanceProfileRepository conformanceProfileRepository;
+	@Autowired
+	private ConformanceProfileRepository conformanceProfileRepository;
 
-  @ApiOperation(value = "Get the json representation of a conformance profile by its id",
-      nickname = "getProfileJsonById")
-  @RequestMapping(value = "/{profileId}", method = RequestMethod.GET, produces = "application/json")
-  public Json getProfileJsonById(@ApiParam(value = "the id of the conformance profile",
-      required = true) @PathVariable final long profileId) {
-    logger.info("Fetching conformance profile (json) with id=" + profileId);
-    String value = conformanceProfileRepository.getJson(profileId);
-    return new Json(value);
-  }
-
-
+	@RequestMapping(value = "/{profileId}", method = RequestMethod.GET, produces = "application/json")
+	public Json getProfileJsonById(
+			@ApiParam(value = "the id of the conformance profile", required = true) @PathVariable final long profileId) {
+		logger.info("Fetching conformance profile (json) with id=" + profileId);
+		String value = conformanceProfileRepository.getJson(profileId);
+		return new Json(value);
+	}
 
 }

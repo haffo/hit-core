@@ -38,20 +38,6 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   @Column(nullable = true)
   protected String authorUsername;
 
-  // @Column
-  // private String parentName;
-  //
-  // @Column
-  // private String testCaseName;
-  //
-  // @Column
-  // private String testPlanName;
-  //
-  // @Column
-  // private String testCaseGroupName;
-  //
-  // @Column
-  // private String testStepName;
 
   @ApiModelProperty(required = false, value = "description of the test")
   @Column(columnDefinition = "TEXT")

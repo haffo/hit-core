@@ -26,11 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.service.TestCaseService;
-import gov.nist.hit.core.service.TestCaseValidationReportService;
-import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.TestCaseException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 
 /**
  * @author Harold Affo (NIST)
@@ -38,7 +34,6 @@ import io.swagger.annotations.ApiOperation;
  */
 @RequestMapping("/testcases")
 @RestController
-@Api(value = "testcases", tags = "Test Cases")
 public class TestCaseController {
 
 	Logger logger = LoggerFactory.getLogger(TestCaseController.class);
@@ -46,19 +41,12 @@ public class TestCaseController {
 	@Autowired
 	private TestCaseService testCaseService;
 
-	@Autowired
-	private UserService userService;
-
-	@Autowired
-	private TestCaseValidationReportService testCaseValidationReportService;
-
 	/**
 	 * find a test case by its id
 	 * 
 	 * @param testCaseId
 	 * @return
 	 */
-	@ApiOperation(value = "Get a test case (context-free or context-based) by its id", nickname = "getTestCaseById")
 	@RequestMapping(value = "/{testCaseId}", method = RequestMethod.GET, produces = "application/json")
 	public TestCase testCase(@PathVariable final Long testCaseId) {
 		logger.info("Fetching testCase with id=" + testCaseId);
@@ -74,7 +62,6 @@ public class TestCaseController {
 	 * @param testCaseId
 	 * @return
 	 */
-	@ApiOperation(value = "Get a test case (context-free or context-based) details by its id", nickname = "getTestCaseDetailsById")
 	@RequestMapping(value = "/{testCaseId}/details", method = RequestMethod.GET, produces = "application/json")
 	public Map<String, Object> getTestCaseDetailsById(@PathVariable("testCaseId") final Long testCaseId) {
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -92,7 +79,6 @@ public class TestCaseController {
 	 * @param testCaseId
 	 * @return
 	 */
-	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{testCaseId}/teststory", method = RequestMethod.GET)
 	public TestArtifact tcTestStory(@PathVariable("testCaseId") Long testCaseId) {
 		logger.info("Fetching teststory of testcase/teststep with id=" + testCaseId);

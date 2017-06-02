@@ -27,14 +27,8 @@ import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.repo.TestCaseRepository;
-import gov.nist.hit.core.repo.TestContextRepository;
-import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.service.TestStepService;
-import gov.nist.hit.core.service.TestStepValidationReportService;
-import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.TestCaseException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 /**
@@ -43,16 +37,9 @@ import io.swagger.annotations.ApiParam;
  */
 @RequestMapping("/teststeps")
 @RestController
-@Api(value = "TestSteps", tags = "Test Steps")
 public class TestStepController {
 
 	Logger logger = LoggerFactory.getLogger(TestStepController.class);
-
-	@Autowired
-	private TestContextRepository testContextRepository;
-
-	@Autowired
-	private TestStepRepository testStepRepository;
 
 	@Autowired
 	protected TestCaseRepository testCaseRepository;
@@ -60,19 +47,12 @@ public class TestStepController {
 	@Autowired
 	private TestStepService testStepService;
 
-	@Autowired
-	private UserService userService;
-
-	@Autowired
-	private TestStepValidationReportService validationReportService;
-
 	/**
 	 * find a test step by its id
 	 * 
 	 * @param teststepId
 	 * @return
 	 */
-	@ApiOperation(value = "Get a test step by its id", nickname = "getTestStepById")
 	@RequestMapping(value = "/{teststepId}", method = RequestMethod.GET, produces = "application/json")
 	public TestStep testStep(
 			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long teststepId) {
@@ -90,7 +70,6 @@ public class TestStepController {
 	 * @param testStepId
 	 * @return
 	 */
-	@ApiOperation(value = "Get a test ste's test context by the test step's id", nickname = "getTestStepTestContextByTestStepId")
 	@RequestMapping(value = "/{testStepId}/testcontext", method = RequestMethod.GET, produces = "application/json")
 	public TestContext getTestStepTestContextByTestStepId(
 			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
@@ -101,7 +80,6 @@ public class TestStepController {
 		return testContext;
 	}
 
-	@ApiOperation(value = "Get a test step's details (juror document, test story etc...) by the test step's id", nickname = "getTestStepDetailByTestStepId")
 	@RequestMapping(value = "/{testStepId}/details", method = RequestMethod.GET)
 	public Map<String, Object> getTestStepDetailByTestStepId(
 			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
@@ -117,7 +95,6 @@ public class TestStepController {
 		return result;
 	}
 
-	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{testStepId}/jurordocument", method = RequestMethod.GET)
 	public TestArtifact tcJurordocument(@PathVariable final Long testStepId) {
 		logger.info("Fetching juror document of testcase/teststep with id=" + testStepId);
@@ -126,7 +103,6 @@ public class TestStepController {
 
 	}
 
-	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{testStepId}/messagecontent", method = RequestMethod.GET)
 	public TestArtifact tcMessageContent(@PathVariable final Long testStepId) {
 		logger.info("Fetching messagecontent of testcase/teststep with id=" + testStepId);
@@ -135,7 +111,6 @@ public class TestStepController {
 
 	}
 
-	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{testStepId}/teststory", method = RequestMethod.GET)
 	public TestArtifact tcTestStory(@PathVariable final Long testStepId) {
 		logger.info("Fetching teststory of testcase/teststep with id=" + testStepId);
@@ -144,7 +119,6 @@ public class TestStepController {
 
 	}
 
-	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{testStepId}/tds", method = RequestMethod.GET)
 	public TestArtifact tcTestDataSpecification(@PathVariable final Long testStepId) {
 		logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testStepId);

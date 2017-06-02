@@ -12,12 +12,6 @@
 
 package gov.nist.hit.core.api;
 
-import gov.nist.hit.core.domain.Json;
-import gov.nist.hit.core.repo.VocabularyLibraryRepository;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import gov.nist.hit.core.domain.Json;
+import gov.nist.hit.core.repo.VocabularyLibraryRepository;
+import io.swagger.annotations.ApiParam;
+
 /**
  * @author Harold Affo (NIST)
  * 
@@ -33,22 +31,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/valueSetLibrary")
 @RestController
-@Api(value = "ValueSetLibrary", tags = "ValueSet Library")
 public class ValueSetController {
 
-  Logger logger = LoggerFactory.getLogger(ValueSetController.class);
+	Logger logger = LoggerFactory.getLogger(ValueSetController.class);
 
-  @Autowired
-  private VocabularyLibraryRepository vocabularyLibraryRepository;
+	@Autowired
+	private VocabularyLibraryRepository vocabularyLibraryRepository;
 
-  @ApiOperation(value = "Get the value set library by its id", nickname = "getValueSetLibraryById")
-  @RequestMapping(value = "/{valueSetLibraryId}", produces = "application/json",
-      method = RequestMethod.GET)
-  public Json getValueSetLibraryById(@ApiParam(value = "the id of the value set library",
-      required = true) @PathVariable final long valueSetLibraryId) {
-    logger.info("Fetching value set library (json) with id=" + valueSetLibraryId);
-    String value = vocabularyLibraryRepository.getJson(valueSetLibraryId);
-    return new Json(value);
-  }
+	@RequestMapping(value = "/{valueSetLibraryId}", produces = "application/json", method = RequestMethod.GET)
+	public Json getValueSetLibraryById(
+			@ApiParam(value = "the id of the value set library", required = true) @PathVariable final long valueSetLibraryId) {
+		logger.info("Fetching value set library (json) with id=" + valueSetLibraryId);
+		String value = vocabularyLibraryRepository.getJson(valueSetLibraryId);
+		return new Json(value);
+	}
 
 }

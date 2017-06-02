@@ -39,7 +39,6 @@ import gov.nist.hit.core.service.AppInfoService;
 import gov.nist.hit.core.service.exception.MessageDownloadException;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.MessageUploadException;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 
 /**
@@ -48,7 +47,6 @@ import io.swagger.annotations.ApiParam;
  */
 @RequestMapping("/message")
 @RestController
-@Api(value = "Messages", hidden = true)
 public class MessageController {
 	static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
