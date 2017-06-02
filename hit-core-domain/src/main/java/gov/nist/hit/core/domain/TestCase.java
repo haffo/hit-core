@@ -15,7 +15,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -47,7 +46,7 @@ public class TestCase extends AbstractTestCase implements Serializable {
 
   @ApiModelProperty(required = false, value = "juror document of the test case")
   @JsonIgnore
-  
+
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact jurorDocument;
 

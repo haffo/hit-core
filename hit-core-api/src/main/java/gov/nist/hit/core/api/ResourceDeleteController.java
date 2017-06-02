@@ -15,12 +15,12 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/deleteResources")
-@Api(value = "Delete Resources", tags = "Delete Resources")
+@Api(value = "Delete Resources", tags = "Delete Resources", position = 11)
 public class ResourceDeleteController {
 
 	@Autowired
 	private ResourceLoader resourceLoader;
-	
+
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@ApiOperation(value = "delete TestStep by id", nickname = "deleteTestStep")
@@ -28,7 +28,7 @@ public class ResourceDeleteController {
 	public ResourceUploadStatus deleteTestStep(@PathVariable("id") Long id) {
 		return resourceLoader.deleteTS(id);
 	}
-	
+
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@ApiOperation(value = "delete TestCase by id", nickname = "deleteTestCase")
@@ -36,7 +36,7 @@ public class ResourceDeleteController {
 	public ResourceUploadStatus deleteTestCase(@PathVariable("id") Long id) {
 		return resourceLoader.deleteTC(id);
 	}
-	
+
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@ApiOperation(value = "delete TestCaseGroup by id", nickname = "deleteTestCaseGroup")
@@ -44,7 +44,7 @@ public class ResourceDeleteController {
 	public ResourceUploadStatus deleteTestCaseGroup(@PathVariable("id") Long id) {
 		return resourceLoader.deleteTCG(id);
 	}
-	
+
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@ApiOperation(value = "delete TestPlan by id", nickname = "deleteTestPlan")
@@ -52,7 +52,7 @@ public class ResourceDeleteController {
 	public ResourceUploadStatus deleteTestPlan(@PathVariable("id") Long id) {
 		return resourceLoader.deleteTP(id);
 	}
-	
+
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@ApiOperation(value = "delete CF TestCase by id", nickname = "deleteCFTestCase")

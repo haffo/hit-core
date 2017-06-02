@@ -45,7 +45,7 @@ import io.swagger.annotations.ApiParam;
  */
 @RequestMapping("/cb")
 @RestController
-@Api(value = "Context based test cases api", tags = "Context-based Test cases")
+@Api(value = "Context based Testing", tags = "Context-based Testing", position = 2)
 public class ContextBasedController {
 
 	static final Logger logger = LoggerFactory.getLogger(ContextBasedController.class);
@@ -62,7 +62,7 @@ public class ContextBasedController {
 	@Autowired
 	private AccountService userService;
 
-	@ApiOperation(value = "Get all context-based test cases list by scope", nickname = "getTestPlansByScope")
+	@ApiOperation(value = "Find all context-based test cases list by scope", nickname = "getTestPlansByScope")
 	// @Cacheable(value = "HitCache", key = "'cb-testplans'")
 	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
 	public List<TestPlan> getTestPlansByScope(
@@ -83,7 +83,7 @@ public class ContextBasedController {
 		return null;
 	}
 
-	@ApiOperation(value = "Get a context-based test plan by id", nickname = "getOneTestPlanById")
+	@ApiOperation(value = "Find a context-based test plan by its id", nickname = "getOneTestPlanById")
 	@RequestMapping(value = "/testplans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
 	public TestPlan testPlan(
 			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId,

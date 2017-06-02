@@ -34,9 +34,11 @@ import gov.nist.hit.core.service.exception.MessageParserException;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+@Api(value = "Test Context", tags = "Test Context Controller")
 public abstract class TestContextController {
 
 	Logger logger = LoggerFactory.getLogger(TestContextController.class);

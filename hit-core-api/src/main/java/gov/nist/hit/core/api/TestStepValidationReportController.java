@@ -44,7 +44,6 @@ import gov.nist.hit.core.domain.TestStepValidationReportRequest;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.UserTestStepReportRequest;
 import gov.nist.hit.core.service.AccountService;
-import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
@@ -61,7 +60,7 @@ import io.swagger.annotations.ApiParam;
  */
 @RestController
 @RequestMapping("/tsReport")
-@Api(value = "Test Step validation report api", tags = "Test Step Validation Report")
+@Api(value = "Test Step validation report api", tags = "Test Step Validation Report", position = 5)
 public class TestStepValidationReportController {
 
 	static final Logger logger = LoggerFactory.getLogger(TestStepValidationReportController.class);
@@ -73,14 +72,12 @@ public class TestStepValidationReportController {
 	private TestStepService testStepService;
 
 	@Autowired
-	private TestCaseService testCaseService;
-
-	@Autowired
 	private AccountService userService;
 
 	@Autowired
 	private UserTestStepReportService userTestStepReportService;
 
+	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/downloadPersistentUserTestStepReport", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
 	public void downloadPersistentUserTestStepReport(
 			@ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
@@ -133,7 +130,7 @@ public class TestStepValidationReportController {
 		}
 	}
 
-	@ApiOperation(value = "Download the message validation report of a test step by its id", nickname = "download", produces = "text/html,application/msword,application/xml,application/pdf")
+	@ApiOperation(value = "Download the message validation report of a test step by its id", nickname = "download", produces = "text/html,application/msword,application/xml,application/pdf", hidden = true)
 	@RequestMapping(value = "/{testStepValidationReportId}/download", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
 	public void download(
 			@ApiParam(value = "the targeted format (html,pdf etc...)", required = true) @RequestParam("format") String format,
@@ -255,7 +252,7 @@ public class TestStepValidationReportController {
 		}
 	}
 
-	@ApiOperation(value = "Return the json format of the report by its id", hidden = true)
+	@ApiOperation(value = "Return the json format of the report by its id")
 	@RequestMapping(value = "/json", method = RequestMethod.GET, produces = "application/json")
 	public String getReportJson(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -268,7 +265,7 @@ public class TestStepValidationReportController {
 		}
 	}
 
-	@ApiOperation(value = "Return the html format of the report by its id", hidden = true)
+	@ApiOperation(value = "Return the html format of the report by its id")
 	@RequestMapping(value = "/html", method = RequestMethod.GET, produces = "application/json")
 	public String getReportHtml(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
 			HttpServletRequest request, HttpServletResponse response) {

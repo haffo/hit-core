@@ -58,7 +58,7 @@ import io.swagger.annotations.ApiParam;
  */
 @RestController
 @RequestMapping("/tcReport")
-@Api(value = "Test Step validation report api", tags = "Test Step Validation Report")
+@Api(value = "Test Case validation report api", tags = "Test Case Validation Report", position = 6)
 public class TestCaseValidationReportController {
 
 	static final Logger logger = LoggerFactory.getLogger(TestCaseValidationReportController.class);

@@ -28,8 +28,6 @@ public class CFTestPlan extends AbstractTestCase implements Serializable {
 
   public CFTestPlan() {
     super();
-    this.scope = TestScope.GLOBAL;
-    this.preloaded = true;
     this.type = ObjectType.TestPlan;
     this.stage = TestingStage.CF;
   }

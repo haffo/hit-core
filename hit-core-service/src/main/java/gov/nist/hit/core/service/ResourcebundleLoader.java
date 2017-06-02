@@ -969,6 +969,8 @@ public abstract class ResourcebundleLoader {
     if (!testCaseObj.has("id")) {
       throw new IllegalArgumentException("Missing id for Test Case at " + location);
     }
+    tc.setPreloaded(true);
+    tc.setScope(TestScope.GLOBAL);
     tc.setPersistentId(Long.parseLong(testCaseObj.findValue("id").asText()));
     tc.setDescription(testCaseObj.findValue("description").textValue());
     tc.setVersion(!testCaseObj.has("version") ? 1.0
@@ -1079,6 +1081,8 @@ public abstract class ResourcebundleLoader {
     if (!testStepObj.has("id")) {
       throw new IllegalArgumentException("Missing id for Test Step at " + location);
     }
+    testStep.setPreloaded(true);
+    testStep.setScope(TestScope.GLOBAL);
     testStep.setPersistentId(Long.parseLong(testStepObj.findValue("id").asText()));
     testStep.setDescription(testStepObj.findValue("description").textValue());
     testStep.setVersion(!testStepObj.has("version") ? 1.0
@@ -1190,7 +1194,8 @@ public abstract class ResourcebundleLoader {
       if (!testPlanObj.has("id")) {
         throw new IllegalArgumentException("Missing id for Test Case Group at " + location);
       }
-
+      tcg.setPreloaded(true);
+      tcg.setScope(TestScope.GLOBAL);
       tcg.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       tcg.setDescription(testPlanObj.findValue("description").textValue());
       tcg.setVersion(!testPlanObj.has("version") ? 1.0
@@ -1241,6 +1246,8 @@ public abstract class ResourcebundleLoader {
       if (!testPlanObj.has("id")) {
         throw new IllegalArgumentException("Missing id for Test Plan at " + location);
       }
+      tp.setPreloaded(true);
+      tp.setScope(TestScope.GLOBAL);
       tp.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       tp.setName(testPlanObj.findValue("name").textValue());
       tp.setDescription(testPlanObj.findValue("description").textValue());
@@ -1308,6 +1315,8 @@ public abstract class ResourcebundleLoader {
       if (!testPlanObj.has("id")) {
         throw new IllegalArgumentException("Missing id for Test Object at " + testPlanPath);
       }
+      testPlan.setPreloaded(true);
+      testPlan.setScope(TestScope.GLOBAL);
       testPlan.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       if (testPlanObj.findValue("position") != null) {
         testPlan.setPosition(testPlanObj.findValue("position").intValue());
@@ -1324,7 +1333,7 @@ public abstract class ResourcebundleLoader {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(testPlanPath), fileName.length());
-        CFTestStep testStep = testObject(location);
+        CFTestStep testStep = cfTestStep(location);
         if (testStep != null) {
           checkPersistentId(testStep.getPersistentId(), fileName);
           testPlan.getTestCases().add(testStep);
@@ -1337,7 +1346,7 @@ public abstract class ResourcebundleLoader {
 
 
 
-  protected CFTestStep testObject(String testObjectPath) throws IOException {
+  protected CFTestStep cfTestStep(String testObjectPath) throws IOException {
     logger.info("Processing test object at:" + testObjectPath);
     Resource res = this.getResource(testObjectPath + "TestObject.json");
     if (res == null)
@@ -1346,21 +1355,23 @@ public abstract class ResourcebundleLoader {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
     if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
-      CFTestStep parent = new CFTestStep();
-      parent.setName(testPlanObj.findValue("name").textValue());
+      CFTestStep testStep = new CFTestStep();
+      testStep.setName(testPlanObj.findValue("name").textValue());
       if (!testPlanObj.has("id")) {
         throw new IllegalArgumentException("Missing id for Test Object at " + testObjectPath);
       }
-      parent.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
+      testStep.setPreloaded(true);
+      testStep.setScope(TestScope.GLOBAL);
+      testStep.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       if (testPlanObj.findValue("position") != null) {
-        parent.setPosition(testPlanObj.findValue("position").intValue());
+        testStep.setPosition(testPlanObj.findValue("position").intValue());
       }
-      parent.setDescription(testPlanObj.findValue("description").textValue());
-      parent.setVersion(!testPlanObj.has("version") ? 1.0
+      testStep.setDescription(testPlanObj.findValue("description").textValue());
+      testStep.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
-      parent.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
+      testStep.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
       if (testPlanObj.has("supplements")) {
-        parent.getSupplements()
+        testStep.getSupplements()
             .addAll(testDocuments(testObjectPath, testPlanObj.findValue("supplements")));
       }
 
@@ -1368,13 +1379,13 @@ public abstract class ResourcebundleLoader {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
-        CFTestStep testObject = testObject(location);
+        CFTestStep testObject = cfTestStep(location);
         if (testObject != null) {
           checkPersistentId(testObject.getPersistentId(), fileName);
-          parent.getChildren().add(testObject);
+          testStep.getChildren().add(testObject);
         }
       }
-      return parent;
+      return testStep;
     }
     return null;
   }

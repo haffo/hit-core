@@ -348,7 +348,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     List<Resource> resources = getApiDirectories("*");
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      CFTestStep testObject = testObject(fileName + "/");
+      CFTestStep testObject = cfTestStep(fileName + "/");
       if (testObject != null) {
         tmp.add(testObject);
       }

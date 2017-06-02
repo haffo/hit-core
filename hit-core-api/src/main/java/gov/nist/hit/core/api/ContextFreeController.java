@@ -43,7 +43,7 @@ import io.swagger.annotations.ApiParam;
  */
 @RequestMapping("/cf")
 @RestController
-@Api(value = "Context-free test cases api", tags = "Context-free test cases")
+@Api(value = "Context-free Testing", tags = "Context-free Testing", position = 1)
 public class ContextFreeController {
 
 	static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
@@ -57,7 +57,7 @@ public class ContextFreeController {
 	@Autowired
 	private AccountService userService;
 
-	@ApiOperation(value = "Get all context-free test plans list by scope", nickname = "getTestPlansByScope")
+	@ApiOperation(value = "Find all context-free test plans by scope", nickname = "getTestPlansByScope")
 	// @Cacheable(value = "HitCache", key = "'cb-testplans'")
 	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
 	public List<CFTestPlan> getTestPlansByScope(
@@ -78,7 +78,7 @@ public class ContextFreeController {
 		return null;
 	}
 
-	@ApiOperation(value = "Get a context-free test plan by id", nickname = "getOneTestPlanById")
+	@ApiOperation(value = "Find a context-free test plan by its id", nickname = "getOneTestPlanById")
 	@RequestMapping(value = "/testplans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
 	public CFTestPlan testPlan(
 			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId,

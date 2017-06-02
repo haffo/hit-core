@@ -73,9 +73,10 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
 
   @NotNull
   @Enumerated(EnumType.STRING)
-  protected TestScope scope = TestScope.GLOBAL;
+  @Column(nullable = false)
+  protected TestScope scope;
 
-  protected boolean preloaded = true;
+  protected boolean preloaded = false;
 
   public String getName() {
     return name;
