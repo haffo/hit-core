@@ -2,7 +2,6 @@ package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -25,7 +24,6 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
 
 import gov.nist.auth.hit.core.domain.TestingType;
 import io.swagger.annotations.ApiModel;
@@ -50,19 +48,19 @@ public class TestStep extends AbstractTestCase implements Serializable {
 
   @ApiModelProperty(required = false, value = "juror document of the test step")
   @JsonIgnore
-  
+
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact jurorDocument;
 
   @ApiModelProperty(required = false, value = "message content of the test step")
   @JsonIgnore
-  
+
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact messageContent;
 
   @ApiModelProperty(required = false, value = "test data specification of the test step")
   @JsonIgnore
-  
+
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact testDataSpecification;
 
@@ -90,15 +88,15 @@ public class TestStep extends AbstractTestCase implements Serializable {
 
   @ApiModelProperty(required = false, value = "parent test case of the test step")
   @JsonIgnore
-  
+
 
   @ManyToOne(optional = true, fetch = FetchType.EAGER)
   protected TestCase testCase;
 
   @JsonIgnore
-  
+
   @OneToMany(mappedBy = "testStep", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-  protected List<TestStepValidationReport> reports;
+  protected Set<TestStepValidationReport> reports;
 
 
   public TestStep(String name) {

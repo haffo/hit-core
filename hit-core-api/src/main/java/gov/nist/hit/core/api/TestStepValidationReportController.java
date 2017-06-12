@@ -332,7 +332,7 @@ public class TestStepValidationReportController {
 	 * @throws MessageValidationException
 	 */
 	@ApiOperation(value = "", hidden = true)
-	@RequestMapping(value = "/{testStepId}/clearRecords", method = RequestMethod.POST)
+	@RequestMapping(value = "/{testStepId}/delete", method = RequestMethod.POST)
 	public boolean clearRecords(
 			@ApiParam(value = "the id of the test step", required = true) @PathVariable("testStepId") final Long testStepId,
 			HttpServletRequest request) throws MessageValidationException {

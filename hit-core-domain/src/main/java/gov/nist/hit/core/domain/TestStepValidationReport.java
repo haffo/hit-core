@@ -49,7 +49,7 @@ public class TestStepValidationReport implements Serializable {
   @Enumerated(EnumType.STRING)
   private TestResult result = null;
 
-  @Column(columnDefinition = "TEXT")
+  @Column(columnDefinition = "LONGTEXT")
   private String comments;
 
   @Temporal(TemporalType.TIMESTAMP)

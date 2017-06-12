@@ -1058,7 +1058,7 @@ public abstract class ResourcebundleLoader {
     return 0;
   }
 
-  private TestStep findTestStep(List<TestStep> testStepMap, int position) {
+  private TestStep findTestStep(Set<TestStep> testStepMap, int position) {
     for (TestStep testStep : testStepMap) {
       if (testStep.getPosition() == position) {
         return testStep;
@@ -1439,14 +1439,16 @@ public abstract class ResourcebundleLoader {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
     doc.setId(tp.getId());
     if (tp.getTestCaseGroups() != null && !tp.getTestCaseGroups().isEmpty()) {
-      Collections.sort(tp.getTestCaseGroups());
-      for (TestCaseGroup tcg : tp.getTestCaseGroups()) {
+      List<TestCaseGroup> list = new ArrayList<TestCaseGroup>(tp.getTestCaseGroups());
+      Collections.sort(list);
+      for (TestCaseGroup tcg : list) {
         doc.getChildren().add(generateTestCaseDocument(tcg));
       }
     }
     if (tp.getTestCases() != null && !tp.getTestCases().isEmpty()) {
-      Collections.sort(tp.getTestCases());
-      for (TestCase tc : tp.getTestCases()) {
+      List<TestCase> list = new ArrayList<TestCase>(tp.getTestCases());
+      Collections.sort(list);
+      for (TestCase tc : list) {
         doc.getChildren().add(generateTestCaseDocument(tc));
       }
     }
@@ -1458,15 +1460,17 @@ public abstract class ResourcebundleLoader {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tcg);
     doc.setId(tcg.getId());
     if (tcg.getTestCaseGroups() != null && !tcg.getTestCaseGroups().isEmpty()) {
-      Collections.sort(tcg.getTestCaseGroups());
-      for (TestCaseGroup child : tcg.getTestCaseGroups()) {
+      List<TestCaseGroup> list = new ArrayList<TestCaseGroup>(tcg.getTestCaseGroups());
+      Collections.sort(list);
+      for (TestCaseGroup child : list) {
         doc.getChildren().add(generateTestCaseDocument(child));
       }
     }
 
     if (tcg.getTestCases() != null && !tcg.getTestCases().isEmpty()) {
-      Collections.sort(tcg.getTestCases());
-      for (TestCase tc : tcg.getTestCases()) {
+      List<TestCase> list = new ArrayList<TestCase>(tcg.getTestCases());
+      Collections.sort(list);
+      for (TestCase tc : list) {
         doc.getChildren().add(generateTestCaseDocument(tc));
       }
     }
@@ -1479,8 +1483,9 @@ public abstract class ResourcebundleLoader {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tc);
     doc.setId(tc.getId());
     if (tc.getTestSteps() != null && !tc.getTestSteps().isEmpty()) {
-      Collections.sort(tc.getTestSteps());
-      for (TestStep ts : tc.getTestSteps()) {
+      List<TestStep> list = new ArrayList<TestStep>(tc.getTestSteps());
+      Collections.sort(list);
+      for (TestStep ts : list) {
         doc.getChildren().add(generateTestCaseDocument(ts));
       }
     }
@@ -1516,8 +1521,10 @@ public abstract class ResourcebundleLoader {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
     doc.setId(tp.getId());
     if (tp.getTestCases() != null && !tp.getTestCases().isEmpty()) {
-      Collections.sort(tp.getTestCases());
-      for (CFTestStep tc : tp.getTestCases()) {
+      List<CFTestStep> list = new ArrayList<CFTestStep>(tp.getTestCases());
+      Collections.sort(list);
+
+      for (CFTestStep tc : list) {
         doc.getChildren().add(generateTestCaseDocument(tc));
       }
     }

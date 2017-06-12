@@ -268,7 +268,7 @@ public class TestCaseValidationReportController {
 	 * @throws MessageValidationException
 	 */
 	@ApiOperation(value = "", hidden = true)
-	@RequestMapping(value = "/{testCaseId}/clearRecords", method = RequestMethod.POST)
+	@RequestMapping(value = "/{testCaseId}/delete", method = RequestMethod.POST)
 	public boolean clearRecords(@PathVariable("testCaseId") final Long testCaseId, HttpServletRequest request)
 			throws MessageValidationException {
 		logger.info("Clearing user records for testcase " + testCaseId);

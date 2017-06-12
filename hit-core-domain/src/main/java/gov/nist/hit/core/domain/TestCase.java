@@ -1,9 +1,9 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -37,7 +37,7 @@ public class TestCase extends AbstractTestCase implements Serializable {
   @ApiModelProperty(required = true, value = "test steps of the test case")
   @OneToMany(mappedBy = "testCase", orphanRemoval = true, fetch = FetchType.EAGER,
       cascade = {CascadeType.ALL})
-  private List<TestStep> testSteps = new ArrayList<TestStep>();
+  private Set<TestStep> testSteps = new HashSet<TestStep>();
 
   @ApiModelProperty(required = false, value = "mapping of data of the test case")
   @OneToMany(mappedBy = "testCase", orphanRemoval = true, fetch = FetchType.EAGER,
@@ -59,11 +59,11 @@ public class TestCase extends AbstractTestCase implements Serializable {
     this.id = id;
   }
 
-  public List<TestStep> getTestSteps() {
+  public Set<TestStep> getTestSteps() {
     return testSteps;
   }
 
-  public void setTestSteps(List<TestStep> testSteps) {
+  public void setTestSteps(Set<TestStep> testSteps) {
     this.testSteps = testSteps;
   }
 

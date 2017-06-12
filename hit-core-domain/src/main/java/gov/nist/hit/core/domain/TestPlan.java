@@ -1,8 +1,8 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -48,17 +48,18 @@ public class TestPlan extends AbstractTestCase implements Serializable {
   }
 
   @ApiModelProperty(required = false, value = "list of test cases of the test plan")
-  @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER,
-      cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-  @JoinTable(name = "tp_tc", joinColumns = {@JoinColumn(name = "testplan_id")},
-      inverseJoinColumns = {@JoinColumn(name = "testcase_id")})
-  private List<TestCase> testCases = new ArrayList<TestCase>();
+  @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @JoinTable(name = "tp_tc",
+      joinColumns = {@JoinColumn(name = "testplan_id", referencedColumnName = "id")},
+      inverseJoinColumns = {@JoinColumn(name = "testcase_id", referencedColumnName = "id")})
+  private Set<TestCase> testCases = new HashSet<TestCase>();
 
   @ApiModelProperty(required = false, value = "list of test case groups of the test plan")
   @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
-  @JoinTable(name = "tp_tcg", joinColumns = {@JoinColumn(name = "testplan_id")},
-      inverseJoinColumns = {@JoinColumn(name = "testcasegroup_id")})
-  private List<TestCaseGroup> testCaseGroups = new ArrayList<TestCaseGroup>();
+  @JoinTable(name = "tp_tcg",
+      joinColumns = {@JoinColumn(name = "testplan_id", referencedColumnName = "id")},
+      inverseJoinColumns = {@JoinColumn(name = "testcasegroup_id", referencedColumnName = "id")})
+  private Set<TestCaseGroup> testCaseGroups = new HashSet<TestCaseGroup>();
 
   @ApiModelProperty(required = true, value = "transport support of the test plan")
   private boolean transport;
@@ -94,19 +95,19 @@ public class TestPlan extends AbstractTestCase implements Serializable {
     this.testCases.add(testCase);
   }
 
-  public List<TestCase> getTestCases() {
+  public Set<TestCase> getTestCases() {
     return testCases;
   }
 
-  public void setTestCases(List<TestCase> testCases) {
+  public void setTestCases(Set<TestCase> testCases) {
     this.testCases = testCases;
   }
 
-  public List<TestCaseGroup> getTestCaseGroups() {
+  public Set<TestCaseGroup> getTestCaseGroups() {
     return testCaseGroups;
   }
 
-  public void setTestCaseGroups(List<TestCaseGroup> testCaseGroups) {
+  public void setTestCaseGroups(Set<TestCaseGroup> testCaseGroups) {
     this.testCaseGroups = testCaseGroups;
   }
 

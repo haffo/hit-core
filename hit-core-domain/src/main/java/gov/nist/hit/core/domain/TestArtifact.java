@@ -34,11 +34,11 @@ public class TestArtifact implements Serializable {
   private String html;
   
   @ApiModelProperty(required=false, value="pdf path of the artifact")
-  @Column(columnDefinition = "TEXT")
+  @Column(columnDefinition = "LONGTEXT")
   private String pdfPath;
   
   @ApiModelProperty(required=false, value="json representation of the artifact")
-   @Column(columnDefinition = "TEXT")
+   @Column(columnDefinition = "LONGTEXT")
   private String json;
  
   

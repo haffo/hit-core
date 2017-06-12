@@ -2,8 +2,8 @@ package gov.nist.hit.core.domain;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -47,7 +47,7 @@ public class CFTestPlan extends AbstractTestCase implements Serializable {
       joinColumns = {@JoinColumn(name = "cf_tcg_id", referencedColumnName = "id")},
       inverseJoinColumns = {@JoinColumn(name = "cf_tc_id", referencedColumnName = "id")})
   @JsonProperty("children")
-  private List<CFTestStep> testCases = new ArrayList<CFTestStep>();
+  private Set<CFTestStep> testCases = new HashSet<CFTestStep>();
 
 
   @Override
@@ -70,11 +70,11 @@ public class CFTestPlan extends AbstractTestCase implements Serializable {
     this.description = description;
   }
 
-  public List<CFTestStep> getTestCases() {
+  public Set<CFTestStep> getTestCases() {
     return testCases;
   }
 
-  public void setTestCases(List<CFTestStep> testCases) {
+  public void setTestCases(Set<CFTestStep> testCases) {
     this.testCases = testCases;
   }
 

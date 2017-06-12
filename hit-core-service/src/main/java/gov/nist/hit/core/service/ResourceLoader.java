@@ -2,7 +2,9 @@ package gov.nist.hit.core.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -173,7 +175,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
 
     if (existing != null) {
       Long exId = existing.getId();
-      List<TestStep> merged = this.mergeTS(tc.getTestSteps(), existing.getTestSteps());
+      Set<TestStep> merged = this.mergeTS(tc.getTestSteps(), existing.getTestSteps());
       tc.setId(exId);
       tc.setDataMappings(existing.getDataMappings());
       tc.setTestSteps(merged);
@@ -236,8 +238,8 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
 
     if (existing != null) {
       Long exId = existing.getId();
-      List<TestCase> mergedTc = this.mergeTC(tcg.getTestCases(), existing.getTestCases());
-      List<TestCaseGroup> mergedTcg =
+      Set<TestCase> mergedTc = this.mergeTC(tcg.getTestCases(), existing.getTestCases());
+      Set<TestCaseGroup> mergedTcg =
           this.mergeTCG(tcg.getTestCaseGroups(), existing.getTestCaseGroups());
       tcg.setId(exId);
       tcg.setTestCases(mergedTc);
@@ -263,8 +265,8 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
 
     if (existing != null) {
       Long exId = existing.getId();
-      List<TestCase> mergedTc = this.mergeTC(tp.getTestCases(), existing.getTestCases());
-      List<TestCaseGroup> mergedTcg =
+      Set<TestCase> mergedTc = this.mergeTC(tp.getTestCases(), existing.getTestCases());
+      Set<TestCaseGroup> mergedTcg =
           this.mergeTCG(tp.getTestCaseGroups(), existing.getTestCaseGroups());
       tp.setId(exId);
       tp.setTestCases(mergedTc);
@@ -358,7 +360,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
 
   // Merge Methods
 
-  public List<TestStep> mergeTS(List<TestStep> newL, List<TestStep> oldL) {
+  public Set<TestStep> mergeTS(Set<TestStep> newL, Set<TestStep> oldL) {
     int index = -1;
     List<TestStep> tmp = new ArrayList<TestStep>();
     tmp.addAll(oldL);
@@ -377,10 +379,10 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
 
     }
 
-    return tmp;
+    return new HashSet<TestStep>(tmp);
   }
 
-  public List<TestCase> mergeTC(List<TestCase> newL, List<TestCase> oldL) {
+  public Set<TestCase> mergeTC(Set<TestCase> newL, Set<TestCase> oldL) {
     int index = -1;
     List<TestCase> tmp = new ArrayList<TestCase>();
     tmp.addAll(oldL);
@@ -388,7 +390,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     for (TestCase tcs : newL) {
 
       if ((index = tmp.indexOf(tcs)) != -1) {
-        List<TestStep> newLs = mergeTS(tcs.getTestSteps(), tmp.get(index).getTestSteps());
+        Set<TestStep> newLs = mergeTS(tcs.getTestSteps(), tmp.get(index).getTestSteps());
         tcs.setTestSteps(newLs);
         TestCase existing = tmp.get(index);
         tcs.setDataMappings(existing.getDataMappings());
@@ -399,10 +401,10 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
       }
 
     }
-    return tmp;
+    return new HashSet<TestCase>(tmp);
   }
 
-  public List<TestCaseGroup> mergeTCG(List<TestCaseGroup> newL, List<TestCaseGroup> oldL) {
+  public Set<TestCaseGroup> mergeTCG(Set<TestCaseGroup> newL, Set<TestCaseGroup> oldL) {
     int index = -1;
     List<TestCaseGroup> tmp = new ArrayList<TestCaseGroup>();
     tmp.addAll(oldL);
@@ -410,10 +412,10 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     for (TestCaseGroup tcs : newL) {
 
       if ((index = tmp.indexOf(tcs)) != -1) {
-        List<TestCase> newLs = mergeTC(tcs.getTestCases(), tmp.get(index).getTestCases());
+        Set<TestCase> newLs = mergeTC(tcs.getTestCases(), tmp.get(index).getTestCases());
         tcs.setTestCases(newLs);
         if (tcs.getTestCaseGroups() != null && tcs.getTestCaseGroups().size() > 0) {
-          List<TestCaseGroup> newLsg =
+          Set<TestCaseGroup> newLsg =
               mergeTCG(tcs.getTestCaseGroups(), tmp.get(index).getTestCaseGroups());
           tcs.setTestCaseGroups(newLsg);
         }
@@ -424,7 +426,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
       }
 
     }
-    return tmp;
+    return new HashSet<TestCaseGroup>(tmp);
   }
 
   public List<CFTestStep> mergeCFTC(List<CFTestStep> newL, List<CFTestStep> oldL) {

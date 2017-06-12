@@ -40,7 +40,7 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
 
 
   @ApiModelProperty(required = false, value = "description of the test")
-  @Column(columnDefinition = "TEXT")
+  @Column(columnDefinition = "LONGTEXT")
   protected String description;
 
   @ApiModelProperty(required = true, value = "type of the test")
