@@ -14,7 +14,6 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -50,7 +49,7 @@ public class DataMapping implements Serializable {
   protected Boolean optional;
 
   @JsonIgnore
-  
+
   @ManyToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   protected TestCase testCase;
 

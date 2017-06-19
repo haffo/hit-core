@@ -23,7 +23,6 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
 
 import io.swagger.annotations.ApiModel;
 
@@ -44,25 +43,25 @@ public class ConformanceProfile implements Serializable {
   protected Long id;
 
   @JsonIgnore
-  
+
   @ManyToOne
   IntegrationProfile integrationProfile;
 
   @NotNull
   @JsonIgnore
-  
+
   @Column(nullable = false)
   protected String sourceId;
 
   @NotNull
   @JsonIgnore
-  
+
   @Column(columnDefinition = "LONGTEXT")
   protected String json;
 
 
   @JsonIgnore
-  
+
   @Column(columnDefinition = "LONGTEXT")
   protected String xml;
 

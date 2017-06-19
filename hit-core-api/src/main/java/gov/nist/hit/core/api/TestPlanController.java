@@ -12,8 +12,11 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.hit.core.domain.TestPlan;
 import gov.nist.hit.core.repo.TestPlanRepository;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.exception.TestPlanException;
 import io.swagger.annotations.ApiParam;
 
@@ -42,10 +46,19 @@ public class TestPlanController {
 	@Autowired
 	protected TestPlanRepository testPlanRepository;
 
+	@Autowired
+	private Streamer streamer;
+
 	@RequestMapping(value = "/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
-	public TestPlan getTestPlanById(
-			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId) {
+	public void testPlan(HttpServletResponse response,
+			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId)
+			throws IOException {
 		logger.info("Fetching test plan with id=" + testPlanId);
+		TestPlan testPlan = findTestPlan(testPlanId);
+		streamer.stream(response.getOutputStream(), testPlan);
+	}
+
+	private TestPlan findTestPlan(Long testPlanId) {
 		TestPlan testPlan = testPlanRepository.findOne(testPlanId);
 		if (testPlan == null) {
 			throw new TestPlanException(testPlanId);
@@ -54,15 +67,15 @@ public class TestPlanController {
 	}
 
 	@RequestMapping(value = "/{testPlanId}/details", method = RequestMethod.GET, produces = "application/json")
-	public Map<String, Object> getTestPlanDetailsById(
-			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId) {
+	public void details(HttpServletResponse response,
+			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId)
+			throws IOException {
 		logger.info("Fetching artifacts of testplan with id=" + testPlanId);
-		TestPlan testPlan = getTestPlanById(testPlanId);
+		TestPlan testPlan = findTestPlan(testPlanId);
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("testStory", testPlan.getTestStory());
 		result.put("supplements", testPlan.getSupplements());
-
-		return result;
+		streamer.stream(response.getOutputStream(), result);
 	}
 
 }

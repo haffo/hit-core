@@ -12,6 +12,7 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,7 @@ import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.CFTestPlanService;
 import gov.nist.hit.core.service.CFTestStepService;
+import gov.nist.hit.core.service.Streamer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -57,37 +59,42 @@ public class ContextFreeController {
 	@Autowired
 	private AccountService userService;
 
+	@Autowired
+	private Streamer streamer;
+
 	@ApiOperation(value = "Find all context-free test plans by scope", nickname = "getTestPlansByScope")
 	// @Cacheable(value = "HitCache", key = "'cb-testplans'")
 	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
-	public List<CFTestPlan> getTestPlansByScope(
-			@ApiParam(value = "the scope of the test plans", required = true) @RequestParam final TestScope scope,
-			HttpServletRequest request, HttpServletResponse response) {
+	public void getTestPlansByScope(
+			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = false) TestScope scope,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		logger.info("Fetching context-free testplans of scope=" + scope + "...");
+		List<CFTestPlan> results = null;
+		scope = scope == null ? TestScope.GLOBAL : scope;
 		if (TestScope.USER.equals(scope)) {
 			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 			if (userId != null) {
 				Account account = userService.findOne(userId);
 				if (account != null) {
-					return testPlanService.findShortAllByStageAndAuthor(TestingStage.CF, account.getUsername());
+					results = testPlanService.findShortAllByStageAndAuthor(TestingStage.CF, account.getUsername());
 				}
 			}
 		} else {
-			return testPlanService.findShortAllByStageAndScope(TestingStage.CF, scope);
+			results = testPlanService.findShortAllByStageAndScope(TestingStage.CF, scope);
 		}
-		return null;
+		streamer.stream2(response.getOutputStream(), results);
 	}
 
 	@ApiOperation(value = "Find a context-free test plan by its id", nickname = "getOneTestPlanById")
 	@RequestMapping(value = "/testplans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
-	public CFTestPlan testPlan(
+	public void testPlan(
 			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		logger.info("Fetching  test case...");
 		CFTestPlan testPlan = testPlanService.findOne(testPlanId);
 		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 		recordTestPlan(testPlan, userId);
-		return testPlan;
+		streamer.stream(response.getOutputStream(), testPlan);
 	}
 
 	private void recordTestPlan(CFTestPlan testPlan, Long userId) {

@@ -22,13 +22,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.DataSourceInitializer;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -54,11 +51,9 @@ public class DbConfig {
 
 	@Bean
 	public DataSource dataSource() {
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
-		dataSource.setPassword(env.getProperty("jdbc.password"));
-		dataSource.setUrl(env.getProperty("jdbc.url"));
-		dataSource.setUsername(env.getProperty("jdbc.username"));
+		final JndiDataSourceLookup dsLookup = new JndiDataSourceLookup();
+		dsLookup.setResourceRef(true);
+		DataSource dataSource = dsLookup.getDataSource("jdbc/base_tool_jndi");
 		return dataSource;
 	}
 
@@ -98,7 +93,6 @@ public class DbConfig {
 		properties.put("hibernate.dialect", env.getProperty("jpa.databasePlatform"));
 		properties.put("hibernate.globally_quoted_identifiers",
 				env.getProperty("hibernate.globally_quoted_identifiers"));
-		properties.put("hibernate.connection.url", env.getProperty("jdbc.url"));
 
 		return properties;
 	}
@@ -116,15 +110,17 @@ public class DbConfig {
 		return new PersistenceExceptionTranslationPostProcessor();
 	}
 
-	@Bean
-	public DataSourceInitializer dataSourceInitializer(DataSource authDataSource) {
-		ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
-		resourceDatabasePopulator.addScript(new ClassPathResource("/app-schema.sql"));
-		DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
-		dataSourceInitializer.setDataSource(authDataSource);
-		dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
-		return dataSourceInitializer;
-	}
+	// @Bean
+	// public DataSourceInitializer dataSourceInitializer(DataSource
+	// authDataSource) {
+	// ResourceDatabasePopulator resourceDatabasePopulator = new
+	// ResourceDatabasePopulator();
+	// DataSourceInitializer dataSourceInitializer = new
+	// DataSourceInitializer();
+	// dataSourceInitializer.setDataSource(authDataSource);
+	// dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
+	// return dataSourceInitializer;
+	// }
 
 	//
 	// @Bean

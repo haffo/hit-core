@@ -19,7 +19,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
@@ -64,11 +63,6 @@ public class TestStep extends AbstractTestCase implements Serializable {
   @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
   protected TestArtifact testDataSpecification;
 
-  // @ElementCollection(fetch=FetchType.EAGER)
-  // @CollectionTable(name = "protocol")
-  // @Column(name = "protocols")
-  //
-  //
   @ApiModelProperty(required = false, value = "supported protocols of the test step")
   @Embedded
   @ElementCollection(fetch = FetchType.EAGER)
@@ -88,15 +82,8 @@ public class TestStep extends AbstractTestCase implements Serializable {
 
   @ApiModelProperty(required = false, value = "parent test case of the test step")
   @JsonIgnore
-
-
   @ManyToOne(optional = true, fetch = FetchType.EAGER)
   protected TestCase testCase;
-
-  @JsonIgnore
-
-  @OneToMany(mappedBy = "testStep", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-  protected Set<TestStepValidationReport> reports;
 
 
   public TestStep(String name) {

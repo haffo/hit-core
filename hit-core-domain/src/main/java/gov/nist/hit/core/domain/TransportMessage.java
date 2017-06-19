@@ -28,7 +28,7 @@ import javax.persistence.MapKeyColumn;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
+
 
 /**
  * @(#) TransportMessage.java
@@ -47,7 +47,7 @@ public class TransportMessage implements java.io.Serializable {
   protected Long messageId;
 
   @JsonIgnore
-  
+
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "transport_message_config",
       joinColumns = @JoinColumn(name = "transport_message_id"))

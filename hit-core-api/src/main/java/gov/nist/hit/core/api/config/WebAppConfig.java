@@ -16,13 +16,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -32,14 +32,12 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan({ "gov.nist.hit", "gov.nist.auth.hit" })
+// @ComponentScan({ "gov.nist.hit", "gov.nist.auth.hit" })
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
 	@Override
@@ -53,19 +51,34 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 	 * be added to the HttpMessageConverters of our application
 	 */
 	public MappingJackson2HttpMessageConverter jacksonMessageConverter() {
-		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
 
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(SerializationFeature.INDENT_OUTPUT);
-		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-		// mapper.disable(SerializationFeature.FLUSH_AFTER_WRITE_VALUE);
-		// mapper.enable(SerializationFeature.USE_EQUALITY_FOR_OBJECT_ID);
-		mapper.setSerializationInclusion(Include.NON_NULL);
+		Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(builder.build());
+		ObjectMapper objectMapper = messageConverter.getObjectMapper();
+		// SimpleModule module = new SimpleModule("Stream");
+		// module.addSerializer(Stream.class, new JsonSerializer<Stream>() {
+		// @Override
+		// public void serialize(Stream value, JsonGenerator gen,
+		// SerializerProvider serializers)
+		// throws IOException, JsonProcessingException {
+		// serializers.findValueSerializer(Iterator.class,
+		// null).serialize(value.iterator(), gen, serializers);
+		//
+		// }
+		// });
+		// objectMapper.registerModule(module);
+
+		//
+		// ObjectMapper mapper = new ObjectMapper();
+		// mapper.disable(SerializationFeature.INDENT_OUTPUT);
+		// mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		// // mapper.disable(SerializationFeature.FLUSH_AFTER_WRITE_VALUE);
+		// // mapper.enable(SerializationFeature.USE_EQUALITY_FOR_OBJECT_ID);
+		// mapper.setSerializationInclusion(Include.NON_NULL);
 
 		// Registering Hibernate4Module to support lazy objects
-		mapper.registerModule(new Hibernate4Module());
+		objectMapper.registerModule(new Hibernate5Module());
 
-		messageConverter.setObjectMapper(mapper);
 		return messageConverter;
 
 	}

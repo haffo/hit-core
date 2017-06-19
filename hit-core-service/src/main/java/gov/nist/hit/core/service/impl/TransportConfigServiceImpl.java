@@ -98,7 +98,7 @@ public class TransportConfigServiceImpl implements TransportConfigService {
   private String toInitiatorQuery(Map<String, String> criteria, TestingType type, String protocol) {
     String table =
         type == TestingType.SUT_INITIATOR ? "sut_initiator_config" : "ta_initiator_config";
-    String sql = "SELECT * FROM transportconfig tr";
+    String sql = "SELECT * FROM TransportConfig tr";
     ArrayList<String> conditions = new ArrayList<>();
     Iterator<Entry<String, String>> it = criteria.entrySet().iterator();
     int i = 1;

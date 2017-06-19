@@ -33,6 +33,9 @@ public class AppInfoController {
 	@Autowired
 	private AppInfoService appInfoService;
 
+	// @Autowired
+	// private ApplicationContext applicationContext;
+
 	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
 	public AppInfo info(HttpServletRequest request) {
 		AppInfo appInfo = appInfoService.get();
@@ -50,4 +53,11 @@ public class AppInfoController {
 		String url = scheme + "://" + host + request.getContextPath();
 		return url;
 	}
+
+	// @RequestMapping(value = "/beans", method = RequestMethod.GET)
+	// public String[] beans() {
+	// String[] beanNames = applicationContext.getBeanDefinitionNames();
+	// return beanNames;
+	// }
+
 }

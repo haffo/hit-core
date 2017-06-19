@@ -122,11 +122,14 @@
 		<property name="authenticationManager" ref="authenticationManager" />
 	</bean>
 
-	<bean id="authDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+<!-- 	<bean id="authDataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		p:driverClassName="${auth.jdbc.driverClassName}" p:url="${auth.jdbc.url}"
 		p:username="${auth.jdbc.username}" p:password="${auth.jdbc.password}"
 		p:testWhileIdle="${auth.jdbc.testWhileIdle}" p:testOnBorrow="${auth.jdbc.testOnBorrow}"
-		p:validationQuery="${auth.jdbc.validationQuery}" destroy-method="close" />
+		p:validationQuery="${auth.jdbc.validationQuery}" destroy-method="close" /> -->
+
+	<jee:jndi-lookup id="authDataSource" jndi-name="java:comp/env/jdbc/base_tool_account_jndi" />
+
 
 
 	<bean id="expressionHandler"

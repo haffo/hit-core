@@ -1,8 +1,5 @@
 package gov.nist.hit.core.domain;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -10,38 +7,37 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 
 @Entity
-@ApiModel(value="TestArtifact", description="Data Model representing a test artifact")
+@ApiModel(value = "TestArtifact", description = "Data Model representing a test artifact")
 public class TestArtifact implements Serializable {
- 
+
   private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-  
-  @ApiModelProperty(required=true, value="name of the artifact")
+
+  @ApiModelProperty(required = true, value = "name of the artifact")
   private String name;
-  
-  @ApiModelProperty(required=false, value="html representation of the artifact")
+
+  @ApiModelProperty(required = false, value = "html representation of the artifact")
   @Column(columnDefinition = "LONGTEXT")
   private String html;
-  
-  @ApiModelProperty(required=false, value="pdf path of the artifact")
+
+  @ApiModelProperty(required = false, value = "pdf path of the artifact")
   @Column(columnDefinition = "LONGTEXT")
   private String pdfPath;
-  
-  @ApiModelProperty(required=false, value="json representation of the artifact")
-   @Column(columnDefinition = "LONGTEXT")
+
+  @ApiModelProperty(required = false, value = "json representation of the artifact")
+  @Column(columnDefinition = "LONGTEXT")
   private String json;
- 
-  
+
+
   public TestArtifact() {
     super();
     this.name = null;
@@ -84,5 +80,14 @@ public class TestArtifact implements Serializable {
     this.name = name;
   }
 
- 
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+
+
 }

@@ -91,7 +91,6 @@ public class XmlUtil {
   public static String prettyPrint(String doc) throws IOException, TransformerException {
     Source xmlInput = new StreamSource(new StringReader(doc));
     StringWriter stringWriter = new StringWriter();
-    StreamResult xmlOutput = new StreamResult(stringWriter);
     TransformerFactory tf = TransformerFactory.newInstance();
     Transformer transformer = tf.newTransformer();
     transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");

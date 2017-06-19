@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +43,7 @@ import gov.nist.hit.core.domain.TestStepValidationReportRequest;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.domain.UserTestStepReportRequest;
 import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
@@ -76,6 +76,9 @@ public class TestStepValidationReportController {
 
 	@Autowired
 	private UserTestStepReportService userTestStepReportService;
+
+	@Autowired
+	private Streamer streamer;
 
 	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/downloadPersistentUserTestStepReport", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
@@ -122,7 +125,7 @@ public class TestStepValidationReportController {
 			}
 			title = title.replaceAll(" ", "-");
 			response.setHeader("Content-disposition", "attachment;filename=" + title + "-ValidationReport." + ext);
-			FileCopyUtils.copy(io, response.getOutputStream());
+			streamer.stream(response.getOutputStream(), io);
 		} catch (ValidationReportException | IOException e) {
 			throw new ValidationReportException("Failed to generate the report");
 		} catch (Exception e) {
@@ -176,7 +179,7 @@ public class TestStepValidationReportController {
 			}
 			title = title.replaceAll(" ", "-");
 			response.setHeader("Content-disposition", "attachment;filename=" + title + "-ValidationReport." + ext);
-			FileCopyUtils.copy(io, response.getOutputStream());
+			streamer.stream(response.getOutputStream(), io);
 		} catch (ValidationReportException | IOException e) {
 			throw new ValidationReportException("Failed to generate the report");
 		} catch (Exception e) {
@@ -215,8 +218,8 @@ public class TestStepValidationReportController {
 
 	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/save", method = RequestMethod.POST, produces = "application/json")
-	public TestStepValidationReport saveReport(@RequestBody TestStepValidationReportRequest command,
-			HttpServletRequest request, HttpServletResponse response) {
+	public void saveReport(@RequestBody TestStepValidationReportRequest command, HttpServletRequest request,
+			HttpServletResponse response) {
 		try {
 			logger.info("Saving validation report");
 			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
@@ -246,7 +249,7 @@ public class TestStepValidationReportController {
 			report.setHtml(validationReportService.generateHtml(tmpXml));
 			report.setXml(null);
 			report.setJson(null);
-			return report;
+			streamer.stream(response.getOutputStream(), report);
 		} catch (Exception e) {
 			throw new ValidationReportException("Failed to generate the report");
 		}
@@ -254,12 +257,12 @@ public class TestStepValidationReportController {
 
 	@ApiOperation(value = "Return the json format of the report by its id")
 	@RequestMapping(value = "/json", method = RequestMethod.GET, produces = "application/json")
-	public String getReportJson(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
+	public void getReportJson(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
 			logger.info("Getting validation report json");
 			TestStepValidationReport report = getValidationReport(testStepId, testReportId, request);
-			return report != null ? report.getJson() : null;
+			streamer.stream(response.getOutputStream(), report != null ? report.getJson() : null);
 		} catch (Exception e) {
 			throw new ValidationReportException("Failed to generate the report");
 		}
@@ -267,12 +270,12 @@ public class TestStepValidationReportController {
 
 	@ApiOperation(value = "Return the html format of the report by its id")
 	@RequestMapping(value = "/html", method = RequestMethod.GET, produces = "application/json")
-	public String getReportHtml(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
+	public void getReportHtml(@RequestParam Long testStepId, @RequestParam(required = false) Long testReportId,
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
 			logger.info("Getting validation report html");
 			TestStepValidationReport report = getValidationReport(testStepId, testReportId, request);
-			return report != null ? report.getHtml() : null;
+			streamer.stream(response.getOutputStream(), report != null ? report.getHtml() : null);
 		} catch (Exception e) {
 			throw new ValidationReportException("Failed to generate the report");
 		}
@@ -286,7 +289,7 @@ public class TestStepValidationReportController {
 		if (testStepId == null || ((testStepService.findOne(testStepId)) == null))
 			throw new ValidationReportException("No test step or unknown test step specified");
 		TestStepValidationReport report = findReport(testReportId, testStepId, userId);
-		if (!userId.equals(report.getUserId()))
+		if (userId == null || !userId.equals(report.getUserId()))
 			throw new MessageValidationException("Invalid user credentials");
 		return report;
 	}

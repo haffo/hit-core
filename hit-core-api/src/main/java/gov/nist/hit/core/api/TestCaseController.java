@@ -12,8 +12,11 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCase;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.exception.TestCaseException;
 
@@ -41,15 +45,10 @@ public class TestCaseController {
 	@Autowired
 	private TestCaseService testCaseService;
 
-	/**
-	 * find a test case by its id
-	 * 
-	 * @param testCaseId
-	 * @return
-	 */
-	@RequestMapping(value = "/{testCaseId}", method = RequestMethod.GET, produces = "application/json")
-	public TestCase testCase(@PathVariable final Long testCaseId) {
-		logger.info("Fetching testCase with id=" + testCaseId);
+	@Autowired
+	private Streamer streamer;
+
+	private TestCase findTestCase(Long testCaseId) {
 		TestCase testCase = testCaseService.findOne(testCaseId);
 		if (testCase == null) {
 			throw new TestCaseException(testCaseId);
@@ -58,31 +57,50 @@ public class TestCaseController {
 	}
 
 	/**
+	 * find a test case by its id
 	 * 
 	 * @param testCaseId
 	 * @return
+	 * @throws IOException
 	 */
-	@RequestMapping(value = "/{testCaseId}/details", method = RequestMethod.GET, produces = "application/json")
-	public Map<String, Object> getTestCaseDetailsById(@PathVariable("testCaseId") final Long testCaseId) {
-		Map<String, Object> result = new HashMap<String, Object>();
-		logger.info("Fetching testcase " + testCaseId + " artifacts ");
-		TestCase testCase = testCase(testCaseId);
-		result.put("testStory", testCase.getTestStory());
-		result.put("jurorDocument", testCase.getJurorDocument());
-		result.put("supplements", testCase.getSupplements());
-
-		return result;
+	@RequestMapping(value = "/{testCaseId}", method = RequestMethod.GET, produces = "application/json")
+	public void testCase(HttpServletResponse response, @PathVariable final Long testCaseId) throws IOException {
+		logger.info("Fetching testCase with id=" + testCaseId);
+		TestCase testCase = findTestCase(testCaseId);
+		streamer.stream(response.getOutputStream(), testCase);
 	}
 
 	/**
 	 * 
 	 * @param testCaseId
 	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "/{testCaseId}/details", method = RequestMethod.GET, produces = "application/json")
+	public void details(HttpServletResponse response, @PathVariable("testCaseId") final Long testCaseId)
+			throws IOException {
+		Map<String, Object> result = new HashMap<String, Object>();
+		logger.info("Fetching testcase " + testCaseId + " artifacts ");
+		TestCase testCase = findTestCase(testCaseId);
+		result.put("testStory", testCase.getTestStory());
+		result.put("jurorDocument", testCase.getJurorDocument());
+		result.put("supplements", testCase.getSupplements());
+		streamer.stream(response.getOutputStream(), result);
+	}
+
+	/**
+	 * 
+	 * @param testCaseId
+	 * @return
+	 * @throws IOException
 	 */
 	@RequestMapping(value = "/{testCaseId}/teststory", method = RequestMethod.GET)
-	public TestArtifact tcTestStory(@PathVariable("testCaseId") Long testCaseId) {
+	public void tcTestStory(HttpServletResponse response, @PathVariable("testCaseId") Long testCaseId)
+			throws IOException {
 		logger.info("Fetching teststory of testcase/teststep with id=" + testCaseId);
-		return testCaseService.testStory(testCaseId);
+		TestArtifact artifact = testCaseService.testStory(testCaseId);
+		streamer.stream(response.getOutputStream(), artifact);
+
 	}
 
 }

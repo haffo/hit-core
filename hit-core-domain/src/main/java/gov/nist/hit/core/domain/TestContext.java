@@ -15,7 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
+
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

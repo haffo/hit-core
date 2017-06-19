@@ -75,7 +75,7 @@ public class UserConfigServiceImpl implements UserConfigService {
     }
 
     private String findUserIdQuery(Map<String, String> criteria) {
-        String sql = "SELECT * FROM USERCONFIG uc";
+        String sql = "SELECT * FROM UserConfig uc";
         ArrayList<String> conditions = new ArrayList<>();
         Iterator<Entry<String, String>> it = criteria.entrySet().iterator();
         int i = 1;

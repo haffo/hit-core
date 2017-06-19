@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
 
 import gov.nist.hit.core.domain.constraints.ConformanceStatement;
 
@@ -70,7 +69,7 @@ public class ProfileElement {
   protected boolean hide;
 
   @JsonIgnore
-  
+
   protected ProfileElement parent;
 
 

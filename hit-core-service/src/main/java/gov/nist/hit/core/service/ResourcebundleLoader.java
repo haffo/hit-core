@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -97,9 +98,11 @@ import gov.nist.hit.core.repo.TransportMessageRepository;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.exception.ProfileParserException;
 import gov.nist.hit.core.service.util.FileUtil;
+import gov.nist.hit.core.service.util.GCUtil;
 import gov.nist.hit.core.service.util.ResourcebundleHelper;
 
 @PropertySource(value = {"classpath:app-config.properties"})
+@Transactional(value = "transactionManager")
 public abstract class ResourcebundleLoader {
 
   static final public Logger logger = LoggerFactory.getLogger(ResourcebundleLoader.class);
@@ -275,6 +278,7 @@ public abstract class ResourcebundleLoader {
       logger.info("resource bundle loaded successfully...");
     }
     this.loadDynamicValues();
+    GCUtil.performGC();
   }
 
   public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage)

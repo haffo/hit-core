@@ -12,6 +12,7 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,7 @@ import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestPlanService;
 import gov.nist.hit.core.service.TestStepService;
@@ -62,37 +64,41 @@ public class ContextBasedController {
 	@Autowired
 	private AccountService userService;
 
+	@Autowired
+	private Streamer streamer;
+
 	@ApiOperation(value = "Find all context-based test cases list by scope", nickname = "getTestPlansByScope")
-	// @Cacheable(value = "HitCache", key = "'cb-testplans'")
 	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
-	public List<TestPlan> getTestPlansByScope(
-			@ApiParam(value = "the scope of the test plans", required = true) @RequestParam final TestScope scope,
-			HttpServletRequest request, HttpServletResponse response) {
+	public void getTestPlansByScope(
+			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = false) TestScope scope,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		logger.info("Fetching all testplans of type=" + scope + "...");
+		List<TestPlan> results = null;
+		scope = scope == null ? TestScope.GLOBAL : scope;
 		if (TestScope.USER.equals(scope)) {
 			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 			if (userId != null) {
 				Account account = userService.findOne(userId);
 				if (account != null) {
-					return testPlanService.findShortAllByStageAndAuthor(TestingStage.CB, account.getUsername());
+					results = testPlanService.findShortAllByStageAndAuthor(TestingStage.CB, account.getUsername());
 				}
 			}
 		} else {
-			return testPlanService.findShortAllByStageAndScope(TestingStage.CB, scope);
+			results = testPlanService.findShortAllByStageAndScope(TestingStage.CB, scope);
 		}
-		return null;
+		streamer.stream(response.getOutputStream(), results);
 	}
 
 	@ApiOperation(value = "Find a context-based test plan by its id", nickname = "getOneTestPlanById")
 	@RequestMapping(value = "/testplans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
-	public TestPlan testPlan(
+	public void testPlan(
 			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		logger.info("Fetching  test case...");
 		TestPlan testPlan = testPlanService.findOne(testPlanId);
 		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 		recordTestPlan(testPlan, userId);
-		return testPlan;
+		streamer.stream(response.getOutputStream(), testPlan);
 	}
 
 	private void recordTestPlan(TestPlan testPlan, Long userId) {

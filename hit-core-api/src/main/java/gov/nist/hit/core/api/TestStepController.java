@@ -12,8 +12,11 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +26,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.repo.TestCaseRepository;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import io.swagger.annotations.ApiParam;
@@ -47,16 +50,26 @@ public class TestStepController {
 	@Autowired
 	private TestStepService testStepService;
 
+	@Autowired
+	private Streamer streamer;
+
 	/**
 	 * find a test step by its id
 	 * 
 	 * @param teststepId
 	 * @return
+	 * @throws IOException
 	 */
 	@RequestMapping(value = "/{teststepId}", method = RequestMethod.GET, produces = "application/json")
-	public TestStep testStep(
-			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long teststepId) {
+	public void testStep(HttpServletResponse response,
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long teststepId)
+			throws IOException {
 		logger.info("Fetching test step with id=" + teststepId);
+		TestStep testStep = findTestStep(teststepId);
+		streamer.stream(response.getOutputStream(), testStep);
+	}
+
+	private TestStep findTestStep(Long teststepId) {
 		TestStep testStep = testStepService.findOne(teststepId);
 		if (testStep == null) {
 			throw new TestCaseException(teststepId);
@@ -69,60 +82,57 @@ public class TestStepController {
 	 * 
 	 * @param testStepId
 	 * @return
+	 * @throws IOException
 	 */
 	@RequestMapping(value = "/{testStepId}/testcontext", method = RequestMethod.GET, produces = "application/json")
-	public TestContext getTestStepTestContextByTestStepId(
-			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
+	public void testContext(HttpServletResponse response,
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId)
+			throws IOException {
 		logger.info("Fetching testContext from testStepId=" + testStepId);
-		TestContext testContext = testStep(testStepId).getTestContext();
+		TestContext testContext = findTestStep(testStepId).getTestContext();
 		if (testContext == null)
 			throw new TestCaseException("No testcontext available for teststep id=" + testStepId);
-		return testContext;
+		streamer.stream(response.getOutputStream(), testContext);
 	}
 
 	@RequestMapping(value = "/{testStepId}/details", method = RequestMethod.GET)
-	public Map<String, Object> getTestStepDetailByTestStepId(
-			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId) {
+	public void details(HttpServletResponse response,
+			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId)
+			throws IOException {
 		logger.info("Fetching artifacts of teststep with id=" + testStepId);
-		TestStep testStep = testStep(testStepId);
+		TestStep testStep = findTestStep(testStepId);
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("jurorDocument", testStep.getJurorDocument());
 		result.put("messageContent", testStep.getMessageContent());
 		result.put("testDataSpecification", testStep.getTestDataSpecification());
 		result.put("testStory", testStep.getTestStory());
 		result.put("supplements", testStep.getSupplements());
-
-		return result;
+		streamer.stream(response.getOutputStream(), result);
 	}
 
 	@RequestMapping(value = "/{testStepId}/jurordocument", method = RequestMethod.GET)
-	public TestArtifact tcJurordocument(@PathVariable final Long testStepId) {
+	public void tcJurordocument(HttpServletResponse response, @PathVariable final Long testStepId) throws IOException {
 		logger.info("Fetching juror document of testcase/teststep with id=" + testStepId);
-
-		return testStepService.jurorDocument(testStepId);
-
+		streamer.stream(response.getOutputStream(), testStepService.jurorDocument(testStepId));
 	}
 
 	@RequestMapping(value = "/{testStepId}/messagecontent", method = RequestMethod.GET)
-	public TestArtifact tcMessageContent(@PathVariable final Long testStepId) {
+	public void messageContent(HttpServletResponse response, @PathVariable final Long testStepId) throws IOException {
 		logger.info("Fetching messagecontent of testcase/teststep with id=" + testStepId);
-
-		return testStepService.messageContent(testStepId);
-
+		streamer.stream(response.getOutputStream(), testStepService.messageContent(testStepId));
 	}
 
 	@RequestMapping(value = "/{testStepId}/teststory", method = RequestMethod.GET)
-	public TestArtifact tcTestStory(@PathVariable final Long testStepId) {
+	public void testStory(HttpServletResponse response, @PathVariable final Long testStepId) throws IOException {
 		logger.info("Fetching teststory of testcase/teststep with id=" + testStepId);
-
-		return testStepService.testStory(testStepId);
-
+		streamer.stream(response.getOutputStream(), testStepService.testStory(testStepId));
 	}
 
 	@RequestMapping(value = "/{testStepId}/tds", method = RequestMethod.GET)
-	public TestArtifact tcTestDataSpecification(@PathVariable final Long testStepId) {
+	public void tcTestDataSpecification(HttpServletResponse response, @PathVariable final Long testStepId)
+			throws IOException {
 		logger.info("Fetching testDataSpecification of testcase/teststep with id=" + testStepId);
-		return testStepService.testDataSpecification(testStepId);
+		streamer.stream(response.getOutputStream(), testStepService.testDataSpecification(testStepId));
 	}
 
 }

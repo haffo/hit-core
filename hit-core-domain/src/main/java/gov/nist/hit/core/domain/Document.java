@@ -17,7 +17,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
 
 import io.swagger.annotations.ApiModel;
 
@@ -49,7 +48,7 @@ public class Document implements Serializable {
   private int position;
 
   @JsonIgnore
-  
+
   @Enumerated(EnumType.STRING)
   private DocumentType type;
 

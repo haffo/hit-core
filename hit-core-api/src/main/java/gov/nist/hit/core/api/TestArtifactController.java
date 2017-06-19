@@ -20,12 +20,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.FileCopyUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.exception.MessageException;
 import gov.nist.hit.core.service.exception.TestCaseException;
 import io.swagger.annotations.ApiParam;
@@ -40,6 +41,9 @@ import io.swagger.annotations.ApiParam;
 public class TestArtifactController {
 
 	static final Logger logger = LoggerFactory.getLogger(TestArtifactController.class);
+
+	@Autowired
+	private Streamer streamer;
 
 	@RequestMapping(value = "/download", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
 	public String download(
@@ -61,7 +65,7 @@ public class TestArtifactController {
 						: "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 				response.setContentType(contentType);
 				response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-				FileCopyUtils.copy(content, response.getOutputStream());
+				streamer.stream(response.getOutputStream(), content);
 			}
 			throw new IllegalArgumentException("Invalid Path Provided");
 		} catch (IOException e) {

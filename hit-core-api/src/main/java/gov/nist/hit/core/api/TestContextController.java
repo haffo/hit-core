@@ -26,7 +26,7 @@ import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.MessageParser;
 import gov.nist.hit.core.service.MessageValidator;
-import gov.nist.hit.core.service.Serializer;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.ValidationReportConverter;
@@ -53,7 +53,7 @@ public abstract class TestContextController {
 	private AccountService accountService;
 
 	@Autowired
-	private Serializer serializer;
+	private Streamer streamer;
 
 	public abstract MessageValidator getMessageValidator();
 
@@ -65,34 +65,38 @@ public abstract class TestContextController {
 
 	@ApiOperation(value = "Get a test context by its id", nickname = "getTestContextById")
 	@RequestMapping(value = "/{testContextId}", produces = "application/json", method = RequestMethod.GET)
-	public TestContext getTestContextById(
+	public void getTestContextById(HttpServletResponse response,
 			@ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId) {
-		logger.info("Fetching testContext with id=" + testContextId);
-		TestContext testContext = getTestContext(testContextId);
-		if (testContext == null) {
-			throw new TestCaseException("No test context available with id=" + testContextId);
+		try {
+			logger.info("Fetching testContext with id=" + testContextId);
+			TestContext testContext = getTestContext(testContextId);
+			if (testContext == null) {
+				throw new TestCaseException("No test context available with id=" + testContextId);
+			}
+			streamer.stream(response.getOutputStream(), testContext);
+		} catch (IOException ex) {
+			throw new TestCaseException("Failed to retrieve the test context");
 		}
-		return testContext;
 	}
 
 	@ApiOperation(value = "Parse a message in a test context", nickname = "parseMessageWithTestContext")
 	@RequestMapping(value = "/{testContextId}/parseMessage", method = RequestMethod.POST, produces = "application/json")
-	public MessageModel parseMessageWithTestContext(
+	public void parseMessage(
 			@ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
 			@ApiParam(value = "the request to be parsed", required = true) @RequestBody final MessageParserCommand command,
-			HttpServletRequest request, HttpServletResponse response) throws MessageParserException, IOException {
-		logger.info("Parsing message");
-		MessageModel result = getMessageParser().parse(getTestContext(testContextId), command);
-		// OutputStream out = response.getOutputStream();
-		// return serializer.toByte(result);
-		// out.flush();
-		// out.close();
-		return result;
+			HttpServletRequest request, HttpServletResponse response) throws MessageParserException {
+		try {
+			logger.info("Parsing message");
+			MessageModel result = getMessageParser().parse(getTestContext(testContextId), command);
+			streamer.stream(response.getOutputStream(), result);
+		} catch (IOException ex) {
+			throw new MessageParserException("Failed to parse the message");
+		}
 	}
 
 	@ApiOperation(value = "Validate a message in a test context", nickname = "validateMessageWithTestContext")
 	@RequestMapping(value = "/{testContextId}/validateMessage", method = RequestMethod.POST, produces = "application/json")
-	public MessageValidationResult validateMessageWithTestContext(
+	public void validateMessage(
 			@ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId,
 			@ApiParam(value = "the request to be validated", required = true) @RequestBody final MessageValidationCommand command,
 			HttpServletRequest request, HttpServletResponse response, HttpSession session)
@@ -106,9 +110,9 @@ public abstract class TestContextController {
 			result.setHtml(null);
 			result.setXml(null);
 			result.setReportId(report.getId());
-			// return serializer.toJson(result);
-
-			return result;
+			streamer.stream(response.getOutputStream(), result);
+		} catch (IOException ex) {
+			throw new MessageValidationException("Failed to validate the message");
 		} catch (Exception e) {
 			throw new MessageValidationException(e);
 		}

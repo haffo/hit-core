@@ -3,7 +3,6 @@ package gov.nist.hit.core.domain;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,12 +20,12 @@ public class MessageValidationResult implements Serializable {
   private String json;
 
   @JsonIgnore
-  
+
   @ApiModelProperty(required = false, value = "html validation report")
   private String html;
 
   @JsonIgnore
-  
+
   @ApiModelProperty(required = false, value = "xml validation report")
   private String xml;
 

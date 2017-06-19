@@ -1,9 +1,5 @@
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.hit.core.domain.Transaction;
-import gov.nist.hit.core.repo.TransactionRepository;
-import gov.nist.hit.core.service.TransactionService;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,23 +11,25 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import gov.nist.hit.core.domain.Transaction;
+import gov.nist.hit.core.repo.TransactionRepository;
+import gov.nist.hit.core.service.TransactionService;
+
 @Service
- public class TransactionServiceImpl implements TransactionService {
+public class TransactionServiceImpl implements TransactionService {
 
   private static final long serialVersionUID = 1L;
- 
+
   @Autowired
   protected TransactionRepository transactionRepository;
 
   //
   @Autowired
-  @PersistenceContext(unitName = "base-tool")  
+  @PersistenceContext(unitName = "base-tool")
   protected EntityManager entityManager;
-  
+
 
 
   @Override
@@ -55,7 +53,8 @@ import org.springframework.stereotype.Service;
   }
 
   @Override
-  public Transaction findOneByTestStepIdAndProperties(Map<String, String> criteria, Long testStepId) {
+  public Transaction findOneByTestStepIdAndProperties(Map<String, String> criteria,
+      Long testStepId) {
     String sql = toQuery(criteria);
     sql = sql + " AND tr.testStepId = " + testStepId;
     Query q = entityManager.createNativeQuery(sql, Transaction.class);
@@ -72,7 +71,7 @@ import org.springframework.stereotype.Service;
   }
 
   private String toQuery(Map<String, String> criteria) {
-    String sql = "SELECT * FROM transaction tr";
+    String sql = "SELECT * FROM Transaction tr";
     ArrayList<String> conditions = new ArrayList<>();
     Iterator<Entry<String, String>> it = criteria.entrySet().iterator();
     int i = 1;
@@ -81,21 +80,20 @@ import org.springframework.stereotype.Service;
       String key = pair.getKey();
       String value = pair.getValue();
       String alias = "transaction_config" + i;
-      sql +=
-          " LEFT OUTER JOIN transaction_config " + alias + " ON tr.id = " + alias
-              + ".transaction_id AND " + alias + ".property_key = '" + key + "' AND " + alias
-              + ".property_value = '" + value + "'";
+      sql += " LEFT OUTER JOIN transaction_config " + alias + " ON tr.id = " + alias
+          + ".transaction_id AND " + alias + ".property_key = '" + key + "' AND " + alias
+          + ".property_value = '" + value + "'";
       conditions.add(alias + ".property_key is not null");
       i++;
     }
-    if(conditions.size()>1) {
-        sql += " WHERE ";
-        for (int j = 0; j < conditions.size(); j++) {
-            if (j > 0) {
-                sql += " AND ";
-            }
-            sql += conditions.get(j);
+    if (conditions.size() > 1) {
+      sql += " WHERE ";
+      for (int j = 0; j < conditions.size(); j++) {
+        if (j > 0) {
+          sql += " AND ";
         }
+        sql += conditions.get(j);
+      }
     }
     return sql;
   }

@@ -1,9 +1,5 @@
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.hit.core.domain.TransportMessage;
-import gov.nist.hit.core.repo.TransportMessageRepository;
-import gov.nist.hit.core.service.TransportMessageService;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +13,10 @@ import javax.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gov.nist.hit.core.domain.TransportMessage;
+import gov.nist.hit.core.repo.TransportMessageRepository;
+import gov.nist.hit.core.service.TransportMessageService;
+
 @Service
 public class TransportMessageServiceImpl implements TransportMessageService {
 
@@ -25,7 +25,7 @@ public class TransportMessageServiceImpl implements TransportMessageService {
 
   @Autowired
   @PersistenceContext(unitName = "base-tool")
-   protected EntityManager entityManager;
+  protected EntityManager entityManager;
 
 
   @Override
@@ -37,7 +37,7 @@ public class TransportMessageServiceImpl implements TransportMessageService {
   }
 
   private String findOneQuery(Map<String, String> criteria) {
-    String sql = "SELECT * FROM TRANSPORTMESSAGE tr";
+    String sql = "SELECT * FROM TransportMessage tr";
     ArrayList<String> conditions = new ArrayList<>();
     Iterator<Entry<String, String>> it = criteria.entrySet().iterator();
     int i = 1;
@@ -46,14 +46,13 @@ public class TransportMessageServiceImpl implements TransportMessageService {
       String key = pair.getKey();
       String value = pair.getValue();
       String alias = "transport_message_config" + i;
-      sql +=
-          " LEFT OUTER JOIN transport_message_config " + alias + " ON tr.id = " + alias
-              + ".transport_message_id AND " + alias + ".property_key = '" + key + "' AND " + alias
-              + ".property_value = '" + value + "'";
+      sql += " LEFT OUTER JOIN transport_message_config " + alias + " ON tr.id = " + alias
+          + ".transport_message_id AND " + alias + ".property_key = '" + key + "' AND " + alias
+          + ".property_value = '" + value + "'";
       conditions.add(alias + ".property_key is not null");
       i++;
     }
-    if(conditions.size()>1) {
+    if (conditions.size() > 1) {
       sql += " WHERE ";
       for (int j = 0; j < conditions.size(); j++) {
         if (j > 0) {

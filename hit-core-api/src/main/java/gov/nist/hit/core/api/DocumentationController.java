@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,9 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.DocumentType;
-import gov.nist.hit.core.domain.TestCaseDocumentation;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.DocumentRepository;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestCaseDocumentationService;
 import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
@@ -60,55 +58,56 @@ public class DocumentationController {
 	@Autowired
 	private ZipGenerator zipGenerator;
 
+	@Autowired
+	private Streamer streamer;
+
 	@Cacheable(value = "HitCache", key = "'testcases-documentation'")
 	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
-	public TestCaseDocumentation testCases() {
+	public void testCases(HttpServletResponse response) throws IOException {
 		logger.info("Fetching test case documentation");
-		TestCaseDocumentation doc = testCaseDocumentationService.findOneByStage(TestingStage.CB);
-		return doc;
+		streamer.stream(response.getOutputStream(), testCaseDocumentationService.findOneByStage(TestingStage.CB));
 	}
 
 	@Cacheable(value = "HitCache", key = "'releasenotes'")
 	@RequestMapping(value = "/releasenotes", method = RequestMethod.GET, produces = "application/json")
-	public List<Document> releaseNotes() {
+	public void releaseNotes(HttpServletResponse response) throws IOException {
 		logger.info("Fetching  all release notes");
-		return documentRepository.findAllReleaseNotes();
+		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllReleaseNotes());
 	}
 
 	@Cacheable(value = "HitCache", key = "'userdocs'")
 	@RequestMapping(value = "/userdocs", method = RequestMethod.GET, produces = "application/json")
-	public List<Document> userDocs() {
+	public void userDocs(HttpServletResponse response) throws IOException {
 		logger.info("Fetching  all release notes");
-		return documentRepository.findAllUserDocs();
+		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllUserDocs());
 	}
 
 	@Cacheable(value = "HitCache", key = "'knownissues'")
 	@RequestMapping(value = "/knownissues", method = RequestMethod.GET, produces = "application/json")
-	public List<Document> knownIssues() {
+	public void knownIssues(HttpServletResponse response) throws IOException {
 		logger.info("Fetching  all known issues");
-		return documentRepository.findAllKnownIssues();
+		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllKnownIssues());
 	}
 
 	@Cacheable(value = "HitCache", key = "#type.name() + 'resource-documentation'")
 	@RequestMapping(value = "/resourcedocs", method = RequestMethod.GET, produces = "application/json")
-	public List<Document> resourcedocs(@RequestParam("type") DocumentType type) {
+	public void resourcedocs(@RequestParam("type") DocumentType type, HttpServletResponse response) throws IOException {
 		logger.info("Fetching all resources docs of type=" + type);
-		return documentRepository.findAllResourceDocs(type);
+		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllResourceDocs(type));
 	}
 
 	@Cacheable(value = "HitCache", key = "'deliverables-documentation'")
 	@RequestMapping(value = "/deliverables", method = RequestMethod.GET, produces = "application/json")
-	public List<Document> toolDownloads() {
+	public void toolDownloads(HttpServletResponse response) throws IOException {
 		logger.info("Fetching all tooldownloads");
-		return documentRepository.findAllDeliverableDocs();
+		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllDeliverableDocs());
 	}
 
 	@Cacheable(value = "HitCache", key = "'installationguide-documentation'")
 	@RequestMapping(value = "/installationguide", method = RequestMethod.GET, produces = "application/json")
-	public Document installationGuide() {
+	public void installationGuide(HttpServletResponse response) throws IOException {
 		logger.info("Fetching installation guide");
-		Document d = documentRepository.findInstallationDoc();
-		return d;
+		streamer.stream(response.getOutputStream(), documentRepository.findInstallationDoc());
 	}
 
 	@RequestMapping(value = "/downloadDocument", method = RequestMethod.POST)
@@ -125,7 +124,7 @@ public class DocumentationController {
 					response.setContentType(getContentType(path));
 					fileName = fileName.replaceAll(" ", "-");
 					response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-					FileCopyUtils.copy(content, response.getOutputStream());
+					streamer.stream(response.getOutputStream(), content);
 				}
 			}
 		} catch (IOException e) {
@@ -144,7 +143,7 @@ public class DocumentationController {
 			String name = type.name().toLowerCase();
 			name = name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() + "s";
 			response.setHeader("Content-disposition", "attachment;filename=" + name + ".zip");
-			FileCopyUtils.copy(stream, response.getOutputStream());
+			streamer.stream(response.getOutputStream(), stream);
 		} catch (IOException e) {
 			logger.debug("Failed to download resource documentation of  " + type);
 			throw new DownloadDocumentException("Failed to download resource documentation of  " + type);
@@ -175,8 +174,7 @@ public class DocumentationController {
 			InputStream stream = zipTestPackages(TestingStage.CB);
 			response.setContentType("application/zip");
 			response.setHeader("Content-disposition", "attachment;filename=ContextBasedTestPackages.zip");
-			FileCopyUtils.copy(stream, response.getOutputStream());
-
+			streamer.stream(response.getOutputStream(), stream);
 		} catch (IOException e) {
 			logger.debug("Failed to download the test packages ");
 			throw new DownloadDocumentException("Cannot download the test packages");
@@ -193,7 +191,7 @@ public class DocumentationController {
 			InputStream stream = zipExampleMessages(TestingStage.CB);
 			response.setContentType("application/zip");
 			response.setHeader("Content-disposition", "attachment;filename=" + "ContextBasedExampleMessages.zip");
-			FileCopyUtils.copy(stream, response.getOutputStream());
+			streamer.stream(response.getOutputStream(), stream);
 		} catch (IOException e) {
 			logger.debug("Failed to download the example messages ");
 			throw new DownloadDocumentException("Cannot download the example messages");
@@ -216,7 +214,7 @@ public class DocumentationController {
 				fileName = title + "-" + fileName;
 				fileName = fileName.replaceAll(" ", "-");
 				response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-				FileCopyUtils.copy(content, response.getOutputStream());
+				streamer.stream(response.getOutputStream(), content);
 			} else {
 				throw new DownloadDocumentException("Invalid Path Provided");
 			}

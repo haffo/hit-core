@@ -28,7 +28,7 @@ import javax.persistence.MapKeyColumn;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
+
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

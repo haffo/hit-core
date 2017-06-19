@@ -12,8 +12,11 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,7 @@ import gov.nist.hit.core.domain.TransportFormContent;
 import gov.nist.hit.core.domain.TransportForms;
 import gov.nist.hit.core.domain.TransportMessage;
 import gov.nist.hit.core.repo.TransportFormsRepository;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TransactionService;
 import gov.nist.hit.core.service.TransportConfigService;
 import gov.nist.hit.core.service.TransportMessageService;
@@ -60,6 +64,9 @@ public class TransportController {
 
 	@Autowired
 	private TransportMessageService transportMessageService;
+
+	@Autowired
+	private Streamer streamer;
 
 	@RequestMapping(value = "/config/form", method = RequestMethod.GET)
 	public TransportFormContent getConfigurationForm(@RequestParam("type") TestingType type,
@@ -110,8 +117,8 @@ public class TransportController {
 
 	@ApiOperation(value = "", nickname = "", hidden = true)
 	@RequestMapping(value = "/transaction/{transactionId}", method = RequestMethod.GET)
-	public Transaction getTransaction(@PathVariable Long transactionId) {
-		return transactionService.findOne(transactionId);
+	public void transaction(HttpServletResponse response, @PathVariable Long transactionId) throws IOException {
+		streamer.stream(response.getOutputStream(), transactionService.findOne(transactionId));
 	}
 
 	// @Cacheable(value = "HitCache", key = "'transport-forms'")

@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +40,7 @@ import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.domain.UserTestCaseReportRequest;
 import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
@@ -80,6 +80,9 @@ public class TestCaseValidationReportController {
 
 	@Autowired
 	private UserTestCaseReportService userTestCaseReportService;
+
+	@Autowired
+	private Streamer streamer;
 
 	@PreAuthorize("hasRole('tester')")
 	@ApiOperation(value = "", hidden = true)
@@ -177,7 +180,7 @@ public class TestCaseValidationReportController {
 			}
 			response.setHeader("Content-disposition",
 					"attachment;filename=" + title + "-ValidationReport." + format.toLowerCase());
-			FileCopyUtils.copy(io, response.getOutputStream());
+			streamer.stream(response.getOutputStream(), io);
 		} catch (Exception e) {
 			throw new ValidationReportException("Failed to download the reports");
 		}
@@ -252,7 +255,8 @@ public class TestCaseValidationReportController {
 			}
 			response.setHeader("Content-disposition",
 					"attachment;filename=" + title + "-ValidationReport." + format.toLowerCase());
-			FileCopyUtils.copy(io, response.getOutputStream());
+			streamer.stream(response.getOutputStream(), io);
+
 		} catch (Exception e) {
 			throw new ValidationReportException("Failed to download the reports");
 		}

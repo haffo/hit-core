@@ -12,6 +12,7 @@
 
 package gov.nist.hit.core.repo;
 
+
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,26 +28,32 @@ import gov.nist.hit.core.domain.TestingStage;
 
 public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 
+  @Transactional(value = "transactionManager")
   @Query("select tp from TestPlan tp where tp.stage= :stage")
   public List<TestPlan> findAllByStage(@Param("stage") TestingStage stage);
 
+  @Transactional(value = "transactionManager")
   @Query("select tp from TestPlan tp where tp.stage=:stage and tp.scope=:scope")
   public List<TestPlan> findAllByStageAndScope(@Param("stage") TestingStage stage,
       @Param("scope") TestScope scope);
 
+  @Transactional(value = "transactionManager")
   @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1")
   public List<TestPlan> findShortAllByStage(TestingStage stage);
 
+  @Transactional(value = "transactionManager")
   @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.scope = ?2")
   public List<TestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
 
+  @Transactional(value = "transactionManager")
   @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2")
   public List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
 
-
+  @Transactional(value = "transactionManager")
   @Query("select tp.testPackage from TestPlan tp where tp.stage = :stage")
   public List<TestArtifact> findAllTestPackages(@Param("stage") TestingStage stage);
 
+  @Transactional(value = "transactionManager")
   @Query("select tp.testPlanSummary from TestPlan tp where tp.stage = :stage")
   public List<TestArtifact> findAllTestPlanSummary(@Param("stage") TestingStage stage);
 

@@ -12,8 +12,11 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.repo.TestCaseGroupRepository;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.exception.TestCaseGroupException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,11 +47,20 @@ public class TestCaseGroupController {
 	@Autowired
 	protected TestCaseGroupRepository testCaseGroupRepository;
 
+	@Autowired
+	private Streamer streamer;
+
 	@ApiOperation(value = "Get a test case group by its id", nickname = "getTestCaseGroupById")
 	@RequestMapping(value = "/{testCaseGroupId}")
-	public TestCaseGroup getTestCaseGroupById(
-			@ApiParam(value = "the id of the test case group", required = true) @PathVariable final Long testCaseGroupId) {
+	public void testCaseGroup(HttpServletResponse response,
+			@ApiParam(value = "the id of the test case group", required = true) @PathVariable final Long testCaseGroupId)
+			throws IOException {
 		logger.info("Fetching test case group with id=" + testCaseGroupId);
+		TestCaseGroup testCaseGroup = findTestCaseGroup(testCaseGroupId);
+		streamer.stream(response.getOutputStream(), testCaseGroup);
+	}
+
+	private TestCaseGroup findTestCaseGroup(Long testCaseGroupId) {
 		TestCaseGroup testCaseGroup = testCaseGroupRepository.findOne(testCaseGroupId);
 		if (testCaseGroup == null) {
 			throw new TestCaseGroupException(testCaseGroupId);
@@ -56,15 +69,16 @@ public class TestCaseGroupController {
 	}
 
 	@RequestMapping(value = "/{testCaseGroupId}/details", method = RequestMethod.GET, produces = "application/json")
-	public Map<String, Object> details(
-			@ApiParam(value = "the id of the test case group", required = true) @PathVariable final Long testCaseGroupId) {
+	public void details(HttpServletResponse response,
+			@ApiParam(value = "the id of the test case group", required = true) @PathVariable final Long testCaseGroupId)
+			throws IOException {
 		logger.info("Fetching artifacts of test case group with id=" + testCaseGroupId);
-		TestCaseGroup testCaseGroup = getTestCaseGroupById(testCaseGroupId);
+		TestCaseGroup testCaseGroup = findTestCaseGroup(testCaseGroupId);
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("testStory", testCaseGroup.getTestStory());
 		result.put("supplements", testCaseGroup.getSupplements());
+		streamer.stream(response.getOutputStream(), result);
 
-		return result;
 	}
 
 }

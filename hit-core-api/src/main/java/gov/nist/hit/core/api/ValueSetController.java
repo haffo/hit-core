@@ -12,6 +12,10 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.hit.core.domain.Json;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
+import gov.nist.hit.core.service.Streamer;
 import io.swagger.annotations.ApiParam;
 
 /**
@@ -38,12 +43,17 @@ public class ValueSetController {
 	@Autowired
 	private VocabularyLibraryRepository vocabularyLibraryRepository;
 
+	@Autowired
+	private Streamer streamer;
+
 	@RequestMapping(value = "/{valueSetLibraryId}", produces = "application/json", method = RequestMethod.GET)
-	public Json getValueSetLibraryById(
-			@ApiParam(value = "the id of the value set library", required = true) @PathVariable final long valueSetLibraryId) {
+	public void getValueSetLibraryById(HttpServletResponse response,
+			@ApiParam(value = "the id of the value set library", required = true) @PathVariable final long valueSetLibraryId)
+			throws IOException {
 		logger.info("Fetching value set library (json) with id=" + valueSetLibraryId);
 		String value = vocabularyLibraryRepository.getJson(valueSetLibraryId);
-		return new Json(value);
+		streamer.stream(response.getOutputStream(), new Json(value));
+
 	}
 
 }

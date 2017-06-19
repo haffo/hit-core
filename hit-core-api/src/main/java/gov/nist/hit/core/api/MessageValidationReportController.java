@@ -10,7 +10,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,6 +32,7 @@ import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.MessageValidationReportService;
+import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.ApiParam;
@@ -52,6 +52,9 @@ public class MessageValidationReportController {
 
 	@Autowired
 	private AccountService userService;
+
+	@Autowired
+	private Streamer streamer;
 
 	@RequestMapping(value = "/{messageValidationReportId}/download", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8")
 	public void download(
@@ -94,7 +97,7 @@ public class MessageValidationReportController {
 			}
 			title = title.replaceAll(" ", "-");
 			response.setHeader("Content-disposition", "attachment;filename=" + title + "-ValidationReport." + ext);
-			FileCopyUtils.copy(io, response.getOutputStream());
+			streamer.stream(response.getOutputStream(), io);
 		} catch (ValidationReportException | IOException e) {
 			throw new ValidationReportException("Failed to download the report");
 		} catch (Exception e) {

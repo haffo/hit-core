@@ -16,7 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.Expose;
+
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of

@@ -6,10 +6,12 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import gov.nist.auth.hit.core.domain.TestingType;
 import io.swagger.annotations.ApiModel;
@@ -33,7 +35,8 @@ public class CFTestStep extends TestStep implements Serializable {
     super(name);
   }
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @LazyCollection(LazyCollectionOption.FALSE)
+  @OneToMany(cascade = {CascadeType.ALL})
   @JoinTable(name = "cf_tc", joinColumns = {@JoinColumn(name = "parent_id")},
       inverseJoinColumns = {@JoinColumn(name = "child_id")})
   private List<CFTestStep> children = new ArrayList<CFTestStep>();

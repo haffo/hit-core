@@ -7,12 +7,14 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -34,14 +36,14 @@ public class TestCase extends AbstractTestCase implements Serializable {
     this.type = ObjectType.TestCase;
   }
 
+  @LazyCollection(LazyCollectionOption.FALSE)
   @ApiModelProperty(required = true, value = "test steps of the test case")
-  @OneToMany(mappedBy = "testCase", orphanRemoval = true, fetch = FetchType.EAGER,
-      cascade = {CascadeType.ALL})
+  @OneToMany(mappedBy = "testCase", orphanRemoval = true, cascade = {CascadeType.ALL})
   private Set<TestStep> testSteps = new HashSet<TestStep>();
 
+  @LazyCollection(LazyCollectionOption.FALSE)
   @ApiModelProperty(required = false, value = "mapping of data of the test case")
-  @OneToMany(mappedBy = "testCase", orphanRemoval = true, fetch = FetchType.EAGER,
-      cascade = {CascadeType.ALL})
+  @OneToMany(mappedBy = "testCase", orphanRemoval = true, cascade = {CascadeType.ALL})
   protected Collection<DataMapping> dataMappings;
 
   @ApiModelProperty(required = false, value = "juror document of the test case")
