@@ -50,12 +50,11 @@ public class TestPlanController {
 	private Streamer streamer;
 
 	@RequestMapping(value = "/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
-	public void testPlan(HttpServletResponse response,
+	public TestPlan testPlan(HttpServletResponse response,
 			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId)
 			throws IOException {
 		logger.info("Fetching test plan with id=" + testPlanId);
-		TestPlan testPlan = findTestPlan(testPlanId);
-		streamer.stream(response.getOutputStream(), testPlan);
+		return findTestPlan(testPlanId);
 	}
 
 	private TestPlan findTestPlan(Long testPlanId) {

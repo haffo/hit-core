@@ -64,10 +64,10 @@ public class TestCaseController {
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/{testCaseId}", method = RequestMethod.GET, produces = "application/json")
-	public void testCase(HttpServletResponse response, @PathVariable final Long testCaseId) throws IOException {
+	public TestCase testCase(HttpServletResponse response, @PathVariable final Long testCaseId) throws IOException {
 		logger.info("Fetching testCase with id=" + testCaseId);
 		TestCase testCase = findTestCase(testCaseId);
-		streamer.stream(response.getOutputStream(), testCase);
+		return testCase;
 	}
 
 	/**

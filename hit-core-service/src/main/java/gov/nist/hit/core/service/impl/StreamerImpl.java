@@ -196,16 +196,16 @@ public class StreamerImpl implements Streamer {
     FileCopyUtils.copy(io, os);
   }
 
-  @Override
-  public void stream(OutputStream os, TestPlan testPlan) throws IOException {
-    JsonGenerator jGenerator = createGenerator(os);
-    if (testPlan != null) {
-      write(jGenerator, testPlan);
-    } else {
-      jGenerator.writeNull();
-    }
-    jGenerator.close();
-  }
+  // @Override
+  // public void stream(OutputStream os, TestPlan testPlan) throws IOException {
+  // JsonGenerator jGenerator = createGenerator(os);
+  // if (testPlan != null) {
+  // write(jGenerator, testPlan);
+  // } else {
+  // jGenerator.writeNull();
+  // }
+  // jGenerator.close();
+  // }
 
   @Override
   public void stream(OutputStream os, TestArtifact artifact) throws IOException {
@@ -232,40 +232,40 @@ public class StreamerImpl implements Streamer {
 
 
 
-  @Override
-  public void stream(OutputStream os, TestCase testCase) throws IOException {
-    JsonGenerator jGenerator = createGenerator(os);
-    if (testCase != null) {
-      write(jGenerator, testCase);
-    } else {
-      jGenerator.writeNull();
-    }
-    jGenerator.close();
-  }
+  // @Override
+  // public void stream(OutputStream os, TestCase testCase) throws IOException {
+  // JsonGenerator jGenerator = createGenerator(os);
+  // if (testCase != null) {
+  // write(jGenerator, testCase);
+  // } else {
+  // jGenerator.writeNull();
+  // }
+  // jGenerator.close();
+  // }
 
-  @Override
-  public void stream(OutputStream os, Json json) throws IOException {
-    JsonGenerator jGenerator = createGenerator(os);
-    if (json != null) {
-      write(jGenerator, json);
-    } else {
-      jGenerator.writeNull();
-    }
-    jGenerator.close();
-  }
+  // @Override
+  // public void stream(OutputStream os, Json json) throws IOException {
+  // JsonGenerator jGenerator = createGenerator(os);
+  // if (json != null) {
+  // write(jGenerator, json);
+  // } else {
+  // jGenerator.writeNull();
+  // }
+  // jGenerator.close();
+  // }
 
 
-
-  @Override
-  public void stream(OutputStream os, TestStep testStep) throws IOException {
-    JsonGenerator jGenerator = createGenerator(os);
-    if (testStep != null) {
-      write(jGenerator, testStep, true);
-    } else {
-      jGenerator.writeNull();
-    }
-    jGenerator.close();
-  }
+  //
+  // @Override
+  // public void stream(OutputStream os, TestStep testStep) throws IOException {
+  // JsonGenerator jGenerator = createGenerator(os);
+  // if (testStep != null) {
+  // write(jGenerator, testStep, true);
+  // } else {
+  // jGenerator.writeNull();
+  // }
+  // jGenerator.close();
+  // }
 
   @Override
   public void streamDocs(OutputStream os, List<Document> documents) throws IOException {
@@ -341,16 +341,16 @@ public class StreamerImpl implements Streamer {
   }
 
 
-  @Override
-  public void stream(OutputStream os, CFTestStep testStep) throws IOException {
-    JsonGenerator jGenerator = createGenerator(os);
-    if (testStep != null) {
-      write(jGenerator, testStep);
-    } else {
-      jGenerator.writeNull();
-    }
-    jGenerator.close();
-  }
+  // @Override
+  // public void stream(OutputStream os, CFTestStep testStep) throws IOException {
+  // JsonGenerator jGenerator = createGenerator(os);
+  // if (testStep != null) {
+  // write(jGenerator, testStep);
+  // } else {
+  // jGenerator.writeNull();
+  // }
+  // jGenerator.close();
+  // }
 
 
   @Override
@@ -387,32 +387,32 @@ public class StreamerImpl implements Streamer {
   }
 
 
+  //
+  // @Override
+  // public void stream(OutputStream os, CFTestPlan testPlan) throws IOException {
+  // // TODO Auto-generated method stub
+  // JsonGenerator jGenerator = createGenerator(os);
+  // if (testPlan != null) {
+  // write(jGenerator, testPlan);
+  // } else {
+  // jGenerator.writeNull();
+  // }
+  // jGenerator.close();
+  //
+  // }
 
-  @Override
-  public void stream(OutputStream os, CFTestPlan testPlan) throws IOException {
-    // TODO Auto-generated method stub
-    JsonGenerator jGenerator = createGenerator(os);
-    if (testPlan != null) {
-      write(jGenerator, testPlan);
-    } else {
-      jGenerator.writeNull();
-    }
-    jGenerator.close();
-
-  }
 
 
-
-  @Override
-  public void stream(OutputStream os, TestContext testContext) throws IOException {
-    JsonGenerator jGenerator = createGenerator(os);
-    if (testContext != null) {
-      write(jGenerator, testContext);
-    } else {
-      jGenerator.writeNull();
-    }
-    jGenerator.close();
-  }
+  // @Override
+  // public void stream(OutputStream os, TestContext testContext) throws IOException {
+  // JsonGenerator jGenerator = createGenerator(os);
+  // if (testConte= null) {
+  // write(jGenerator, testContext);
+  // } else {
+  // jGenerator.writeNull();
+  // }
+  // jGenerator.close();
+  // }
 
 
   private void write(JsonGenerator jGenerator, Json json) throws IOException {
