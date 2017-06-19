@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import gov.nist.hit.core.domain.Json;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.Streamer;
 import io.swagger.annotations.ApiParam;
@@ -52,7 +51,7 @@ public class ValueSetController {
 			throws IOException {
 		logger.info("Fetching value set library (json) with id=" + valueSetLibraryId);
 		String value = vocabularyLibraryRepository.getJson(valueSetLibraryId);
-		streamer.stream(response.getOutputStream(), new Json(value));
+		streamer.stream(response.getOutputStream(), value);
 
 	}
 

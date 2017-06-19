@@ -91,14 +91,14 @@ public class ContextBasedController {
 
 	@ApiOperation(value = "Find a context-based test plan by its id", nickname = "getOneTestPlanById")
 	@RequestMapping(value = "/testplans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
-	public void testPlan(
+	public TestPlan testPlan(
 			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId,
 			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		logger.info("Fetching  test case...");
 		TestPlan testPlan = testPlanService.findOne(testPlanId);
 		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 		recordTestPlan(testPlan, userId);
-		streamer.stream(response.getOutputStream(), testPlan);
+		return testPlan;
 	}
 
 	private void recordTestPlan(TestPlan testPlan, Long userId) {

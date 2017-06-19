@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import gov.nist.hit.core.domain.Json;
 import gov.nist.hit.core.repo.ConformanceProfileRepository;
 import gov.nist.hit.core.service.Streamer;
 import io.swagger.annotations.ApiParam;
@@ -52,7 +51,7 @@ public class ProfileController {
 			throws IOException {
 		logger.info("Fetching conformance profile (json) with id=" + profileId);
 		String value = conformanceProfileRepository.getJson(profileId);
-		streamer.stream(response.getOutputStream(), new Json(value));
+		streamer.stream(response.getOutputStream(), value);
 	}
 
 }

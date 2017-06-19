@@ -65,18 +65,14 @@ public abstract class TestContextController {
 
 	@ApiOperation(value = "Get a test context by its id", nickname = "getTestContextById")
 	@RequestMapping(value = "/{testContextId}", produces = "application/json", method = RequestMethod.GET)
-	public void getTestContextById(HttpServletResponse response,
+	public TestContext getTestContextById(HttpServletResponse response,
 			@ApiParam(value = "the id of the test context", required = true) @PathVariable final Long testContextId) {
-		try {
-			logger.info("Fetching testContext with id=" + testContextId);
-			TestContext testContext = getTestContext(testContextId);
-			if (testContext == null) {
-				throw new TestCaseException("No test context available with id=" + testContextId);
-			}
-			streamer.stream(response.getOutputStream(), testContext);
-		} catch (IOException ex) {
-			throw new TestCaseException("Failed to retrieve the test context");
+		logger.info("Fetching testContext with id=" + testContextId);
+		TestContext testContext = getTestContext(testContextId);
+		if (testContext == null) {
+			throw new TestCaseException("No test context available with id=" + testContextId);
 		}
+		return testContext;
 	}
 
 	@ApiOperation(value = "Parse a message in a test context", nickname = "parseMessageWithTestContext")

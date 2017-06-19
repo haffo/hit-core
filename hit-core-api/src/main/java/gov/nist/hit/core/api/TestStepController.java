@@ -61,12 +61,12 @@ public class TestStepController {
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/{teststepId}", method = RequestMethod.GET, produces = "application/json")
-	public void testStep(HttpServletResponse response,
+	public TestStep testStep(HttpServletResponse response,
 			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long teststepId)
 			throws IOException {
 		logger.info("Fetching test step with id=" + teststepId);
 		TestStep testStep = findTestStep(teststepId);
-		streamer.stream(response.getOutputStream(), testStep);
+		return testStep;
 	}
 
 	private TestStep findTestStep(Long teststepId) {
@@ -85,14 +85,14 @@ public class TestStepController {
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/{testStepId}/testcontext", method = RequestMethod.GET, produces = "application/json")
-	public void testContext(HttpServletResponse response,
+	public TestContext testContext(HttpServletResponse response,
 			@ApiParam(value = "the id of the test step", required = true) @PathVariable final Long testStepId)
 			throws IOException {
 		logger.info("Fetching testContext from testStepId=" + testStepId);
 		TestContext testContext = findTestStep(testStepId).getTestContext();
 		if (testContext == null)
 			throw new TestCaseException("No testcontext available for teststep id=" + testStepId);
-		streamer.stream(response.getOutputStream(), testContext);
+		return testContext;
 	}
 
 	@RequestMapping(value = "/{testStepId}/details", method = RequestMethod.GET)
