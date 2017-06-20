@@ -69,7 +69,7 @@ public class Account implements Serializable {
   private String email;
 
   @Length(max = 256)
-  @Column(unique = true)
+  @Column(unique = false)
   private String fullName;
 
 
