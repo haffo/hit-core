@@ -101,7 +101,7 @@ public abstract class TestContextController {
 			logger.info("Validating a message");
 			TestContext testContext = getTestContext(testContextId);
 			MessageValidationResult result = getMessageValidator().validate(testContext, command);
-			TestStepValidationReport report = saveReport(testContextId, result,
+			TestStepValidationReport report = saveReport(testContext, result,
 					SessionContext.getCurrentUserId(request.getSession(false)));
 			result.setHtml(null);
 			result.setXml(null);
@@ -117,8 +117,8 @@ public abstract class TestContextController {
 	/**
 	 * Save the report
 	 * 
-	 * @param testContextId:
-	 *            id of the current context
+	 * @param testContext:
+	 *            the current context
 	 * @param result:
 	 *            validation result
 	 * @param userId:
@@ -126,9 +126,9 @@ public abstract class TestContextController {
 	 * @return: the saved report
 	 * @throws Exception
 	 */
-	private TestStepValidationReport saveReport(Long testContextId, MessageValidationResult result, Long userId)
+	private TestStepValidationReport saveReport(TestContext testContext, MessageValidationResult result, Long userId)
 			throws Exception {
-		TestStep testStep = testStepService.findOneByTestContext(testContextId);
+		TestStep testStep = testContext.getTestStep();
 		Account account = null;
 		if (userId == null || (account = accountService.findOne(userId)) == null) {
 			logger.error("User not found");

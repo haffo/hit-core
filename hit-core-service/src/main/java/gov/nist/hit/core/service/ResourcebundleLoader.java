@@ -281,7 +281,7 @@ public abstract class ResourcebundleLoader {
     GCUtil.performGC();
   }
 
-  public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage)
+  public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage, TestStep testStep)
       throws IOException;
 
   public abstract TestCaseDocument generateTestCaseDocument(TestContext c) throws IOException;
@@ -1110,7 +1110,7 @@ public abstract class ResourcebundleLoader {
     }
 
     if (!testingType.equals(TestingType.SUT_MANUAL) && !testingType.equals(TestingType.TA_MANUAL)) {
-      testStep.setTestContext(testContext(location, testStepObj, stage));
+      testStep.setTestContext(testContext(location, testStepObj, stage,testStep));
     }
 
     if (testStepObj.has("supplements")) {
@@ -1373,7 +1373,7 @@ public abstract class ResourcebundleLoader {
       testStep.setDescription(testPlanObj.findValue("description").textValue());
       testStep.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
-      testStep.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
+      testStep.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF,testStep));
       if (testPlanObj.has("supplements")) {
         testStep.getSupplements()
             .addAll(testDocuments(testObjectPath, testPlanObj.findValue("supplements")));

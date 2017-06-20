@@ -77,7 +77,7 @@ public class TestStep extends AbstractTestCase implements Serializable {
 
   @ApiModelProperty(required = false, value = "test context of the test step")
   @OneToOne(cascade = CascadeType.ALL, optional = true, fetch = FetchType.EAGER,
-      orphanRemoval = true)
+      orphanRemoval = true, mappedBy = "testStep")
   protected TestContext testContext;
 
   @ApiModelProperty(required = false, value = "parent test case of the test step")
