@@ -2,10 +2,20 @@ package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -33,7 +43,7 @@ public class TestContext implements Serializable {
   @ApiModelProperty(required = false, value = "stage of the test context",
       example = "CB,CF, etc...")
   @JsonIgnore
-  
+
   @Enumerated(EnumType.STRING)
   protected TestingStage stage;
 
@@ -42,7 +52,7 @@ public class TestContext implements Serializable {
   protected String type;
 
   @JsonIgnore
-  @OneToOne(fetch = FetchType.EAGER,optional = false)
+  @OneToOne(fetch = FetchType.EAGER, optional = false, mappedBy = "testContext")
   protected TestStep testStep;
 
   public TestContext() {}
