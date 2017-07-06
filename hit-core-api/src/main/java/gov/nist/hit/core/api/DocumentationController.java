@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,49 +60,50 @@ public class DocumentationController {
 	@Autowired
 	private Streamer streamer;
 
-	@Cacheable(value = "HitCache", key = "'testcases-documentation'")
+	// @Cacheable(value = "HitCache", key = "'testcases-documentation'")
 	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
 	public void testCases(HttpServletResponse response) throws IOException {
 		logger.info("Fetching test case documentation");
 		streamer.stream(response.getOutputStream(), testCaseDocumentationService.findOneByStage(TestingStage.CB));
 	}
 
-	@Cacheable(value = "HitCache", key = "'releasenotes'")
+	// @Cacheable(value = "HitCache", key = "'releasenotes'")
 	@RequestMapping(value = "/releasenotes", method = RequestMethod.GET, produces = "application/json")
 	public void releaseNotes(HttpServletResponse response) throws IOException {
 		logger.info("Fetching  all release notes");
 		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllReleaseNotes());
 	}
 
-	@Cacheable(value = "HitCache", key = "'userdocs'")
+	// @Cacheable(value = "HitCache", key = "'userdocs'")
 	@RequestMapping(value = "/userdocs", method = RequestMethod.GET, produces = "application/json")
 	public void userDocs(HttpServletResponse response) throws IOException {
 		logger.info("Fetching  all release notes");
 		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllUserDocs());
 	}
 
-	@Cacheable(value = "HitCache", key = "'knownissues'")
+	// @Cacheable(value = "HitCache", key = "'knownissues'")
 	@RequestMapping(value = "/knownissues", method = RequestMethod.GET, produces = "application/json")
 	public void knownIssues(HttpServletResponse response) throws IOException {
 		logger.info("Fetching  all known issues");
 		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllKnownIssues());
 	}
 
-	@Cacheable(value = "HitCache", key = "#type.name() + 'resource-documentation'")
+	// @Cacheable(value = "HitCache", key = "#type.name() +
+	// 'resource-documentation'")
 	@RequestMapping(value = "/resourcedocs", method = RequestMethod.GET, produces = "application/json")
 	public void resourcedocs(@RequestParam("type") DocumentType type, HttpServletResponse response) throws IOException {
 		logger.info("Fetching all resources docs of type=" + type);
 		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllResourceDocs(type));
 	}
 
-	@Cacheable(value = "HitCache", key = "'deliverables-documentation'")
+	// @Cacheable(value = "HitCache", key = "'deliverables-documentation'")
 	@RequestMapping(value = "/deliverables", method = RequestMethod.GET, produces = "application/json")
 	public void toolDownloads(HttpServletResponse response) throws IOException {
 		logger.info("Fetching all tooldownloads");
 		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllDeliverableDocs());
 	}
 
-	@Cacheable(value = "HitCache", key = "'installationguide-documentation'")
+	// @Cacheable(value = "HitCache", key = "'installationguide-documentation'")
 	@RequestMapping(value = "/installationguide", method = RequestMethod.GET, produces = "application/json")
 	public void installationGuide(HttpServletResponse response) throws IOException {
 		logger.info("Fetching installation guide");
