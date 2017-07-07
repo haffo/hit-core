@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
 
 import gov.nist.auth.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.TestResult;
@@ -23,7 +22,7 @@ public class TestStepValidationReportServiceImplTest {
 
   static final String outputsFolder = "src/test/resources/outputs";
 
-  @Test
+  // @Test
   public void testGenerateTestStepValidationHtml() throws Exception {
     String xmlMessageValidationReport =
         IOUtils.toString(TestStepValidationReportServiceImplTest.class
@@ -50,7 +49,7 @@ public class TestStepValidationReportServiceImplTest {
   }
 
 
-  @Test
+  // @Test
   public void testGenerateTestStepValidationPdf() throws Exception {
     String xmlMessageValidationReport =
         IOUtils.toString(TestStepValidationReportServiceImplTest.class
@@ -77,7 +76,7 @@ public class TestStepValidationReportServiceImplTest {
 
   }
 
-  @Test
+  // @Test
   public void testGenerateManualValidationPdf() throws Exception {
     TestStepValidationReport r3 = new TestStepValidationReport();
     TestStep t3 = new TestStep();
@@ -99,7 +98,7 @@ public class TestStepValidationReportServiceImplTest {
 
   }
 
-  @Test
+  // @Test
   public void testUpdateManualValidationPdf() throws Exception {
     TestStepValidationReport r3 = new TestStepValidationReport();
     TestStep t3 = new TestStep();
@@ -124,7 +123,7 @@ public class TestStepValidationReportServiceImplTest {
     saveToFile(new File(outputsFolder + "/3-TestStepMesssageValidationReport.pdf"), io);
   }
 
-  @Test
+  // @Test
   public void testUpdateMessageValidationPdf() throws Exception {
     String xmlMessageValidationReport =
         IOUtils.toString(TestStepValidationReportServiceImplTest.class

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
 
 import gov.nist.auth.hit.core.domain.TestingType;
 import gov.nist.hit.core.domain.TestCase;
@@ -95,14 +94,14 @@ public class TestCaseValidationReportServiceImplTest {
     return result;
   }
 
-  @Test
+  // @Test
   public void testGenerateXml() throws Exception {
     String xml = service.generateXml(get());
     assertNotNull(xml);
     saveToFile(new File(outputsFolder + "/TestCaseValidationReport.xml"), xml);
   }
 
-  @Test
+  // @Test
   public void testGenerateHtml() throws Exception {
     String html = service.generateHtml(get());
     assertNotNull(html);
@@ -110,7 +109,7 @@ public class TestCaseValidationReportServiceImplTest {
   }
 
 
-  @Test
+  // @Test
   public void testGeneratePdf() throws Exception {
     InputStream io = service.generatePdf(get());
     assertNotNull(io);
