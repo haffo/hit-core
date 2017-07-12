@@ -275,7 +275,8 @@ public class TestStepValidationReportController {
 		try {
 			logger.info("Getting validation report html");
 			TestStepValidationReport report = getValidationReport(testStepId, testReportId, request);
-			streamer.stream(response.getOutputStream(), report != null ? report.getHtml() : null);
+			String html = report != null ? validationReportService.generateHtml(report.getXml()) : null;
+			streamer.stream(response.getOutputStream(), html);
 		} catch (Exception e) {
 			throw new ValidationReportException("Failed to generate the report");
 		}
