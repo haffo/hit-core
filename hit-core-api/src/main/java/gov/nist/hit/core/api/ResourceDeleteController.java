@@ -10,12 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.hit.core.domain.ResourceUploadStatus;
 import gov.nist.hit.core.service.ResourceLoader;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/deleteResources")
-@Api(value = "Delete Resources", tags = "Delete Resources", position = 11)
+// @Api(value = "Delete Resources", tags = "Delete Resources", position = 11)
 public class ResourceDeleteController {
 
 	@Autowired
@@ -23,7 +21,8 @@ public class ResourceDeleteController {
 
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	@ApiOperation(value = "delete TestStep by id", nickname = "deleteTestStep")
+	// // @ApiOperation(value = "delete TestStep by id", nickname =
+	// "deleteTestStep")
 	@RequestMapping(value = "/cb/delete/testStep/{id}", method = RequestMethod.DELETE, produces = "application/json")
 	public ResourceUploadStatus deleteTestStep(@PathVariable("id") Long id) {
 		return resourceLoader.deleteTS(id);
@@ -31,7 +30,8 @@ public class ResourceDeleteController {
 
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	@ApiOperation(value = "delete TestCase by id", nickname = "deleteTestCase")
+	// // @ApiOperation(value = "delete TestCase by id", nickname =
+	// "deleteTestCase")
 	@RequestMapping(value = "/cb/delete/testCase/{id}", method = RequestMethod.DELETE, produces = "application/json")
 	public ResourceUploadStatus deleteTestCase(@PathVariable("id") Long id) {
 		return resourceLoader.deleteTC(id);
@@ -39,7 +39,8 @@ public class ResourceDeleteController {
 
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	@ApiOperation(value = "delete TestCaseGroup by id", nickname = "deleteTestCaseGroup")
+	// @ApiOperation(value = "delete TestCaseGroup by id", nickname =
+	// "deleteTestCaseGroup")
 	@RequestMapping(value = "/cb/delete/testCaseGroup/{id}", method = RequestMethod.DELETE, produces = "application/json")
 	public ResourceUploadStatus deleteTestCaseGroup(@PathVariable("id") Long id) {
 		return resourceLoader.deleteTCG(id);
@@ -47,7 +48,8 @@ public class ResourceDeleteController {
 
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	@ApiOperation(value = "delete TestPlan by id", nickname = "deleteTestPlan")
+	// @ApiOperation(value = "delete TestPlan by id", nickname =
+	// "deleteTestPlan")
 	@RequestMapping(value = "/cb/delete/testPlan/{id}", method = RequestMethod.DELETE, produces = "application/json")
 	public ResourceUploadStatus deleteTestPlan(@PathVariable("id") Long id) {
 		return resourceLoader.deleteTP(id);
@@ -55,7 +57,8 @@ public class ResourceDeleteController {
 
 	@PreAuthorize("hasRole('deployer')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	@ApiOperation(value = "delete CF TestCase by id", nickname = "deleteCFTestCase")
+	// @ApiOperation(value = "delete CF TestCase by id", nickname =
+	// "deleteCFTestCase")
 	@RequestMapping(value = "/cf/delete/testCase/{id}", method = RequestMethod.DELETE, produces = "application/json")
 	public ResourceUploadStatus deleteCFTestCase(@PathVariable("id") Long id) {
 		return resourceLoader.deleteCFTC(id);
