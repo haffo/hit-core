@@ -92,6 +92,7 @@ public class StreamerImpl implements Streamer {
     JsonGenerator jGenerator = createGenerator(os);
     if (report != null) {
       jGenerator.writeStartObject();
+      jGenerator.writeNumberField("id", report.getId());
       jGenerator.writeStringField("html", report.getHtml());
       jGenerator.writeStringField("xml", report.getXml());
       jGenerator.writeStringField("json", report.getJson());
