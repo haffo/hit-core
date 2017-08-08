@@ -832,10 +832,24 @@ public class StreamerImpl implements Streamer {
       writer.writeStringField("usage", data.getUsage());
       writer.writeNumberField("minOccurs", data.getMinOccurs());
       writer.writeStringField("maxOccurs", data.getMaxOccurs());
-      writer.writeNumberField("lineNumber", data.getLineNumber());
-      writer.writeNumberField("startIndex", data.getStartIndex());
-      writer.writeNumberField("endIndex", data.getEndIndex());
+      // writer.writeNumberField("lineNumber", data.getLineNumber());
+
+      writer.writeObjectFieldStart("start");
+      writer.writeNumberField("line", data.getStart().getLine());
+      writer.writeNumberField("index", data.getStart().getIndex());
+      writer.writeEndObject();
+
+      writer.writeObjectFieldStart("end");
+      writer.writeNumberField("line", data.getEnd().getLine());
+      writer.writeNumberField("index", data.getEnd().getIndex());
+      writer.writeEndObject();
+      //
+      //
+      //
+      // writer.writeNumberField("startIndex", data.getStartIndex());
+      // writer.writeNumberField("endIndex", data.getEndIndex());
       writer.writeNumberField("position", data.getPosition());
+      writer.writeNumberField("column", data.getPosition());
       writer.writeNumberField("instanceNumber", data.getInstanceNumber());
       writer.writeStringField("description", data.getDescription());
       writer.writeStringField("value", data.getValue());

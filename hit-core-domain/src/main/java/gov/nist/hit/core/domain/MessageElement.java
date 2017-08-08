@@ -50,7 +50,7 @@ public class MessageElement implements Serializable {
       parent.getChildren().add(this);
     }
     label = data != null ? data.getLabel() : "Unknown";
-   }
+  }
 
   public MessageElement(String type, MessageElementData data, MessageElement parent) {
 
@@ -134,7 +134,7 @@ public class MessageElement implements Serializable {
     List<? extends MessageElement> children = getChildren();
     for (MessageElement node : children) {
       MessageElementData data = node.getData();
-      if (data.getLineNumber() == line) {
+      if (data.getStart() != null && data.getStart().getLine() == line) {
         return node;
       }
     }

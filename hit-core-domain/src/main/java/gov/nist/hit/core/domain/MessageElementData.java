@@ -29,14 +29,17 @@ public class MessageElementData implements Serializable {
   protected String usage;
   protected Integer minOccurs;
   protected String maxOccurs;
-  protected int lineNumber = 0;
-  protected int startIndex;
-  protected int endIndex;
+  // protected int lineNumber = 0;
+  // protected int startIndex;
+  // protected int endIndex;
   protected int position;
   protected int instanceNumber;
   protected String description;
   protected String value;
   protected String type;
+  protected Coordinate start;
+  protected Coordinate end;
+
 
   public MessageElementData() {
     super();
@@ -44,29 +47,47 @@ public class MessageElementData implements Serializable {
   }
 
   public MessageElementData(String path, String name, String usage, Integer minOccurs,
-      String maxOccurs, int lineNumber, int startIndex, int endIndex, int position,
-      int instanceNumber, String description, String value, String type) {
-    init(path, name, usage, minOccurs, maxOccurs, lineNumber, startIndex, endIndex, position,
-        instanceNumber, description, value, type);
+      String maxOccurs, Coordinate start, Coordinate end, int position, int instanceNumber,
+      String description, String value, String type) {
+    init(path, name, usage, minOccurs, maxOccurs, start, end, position, instanceNumber, description,
+        value, type);
   }
 
+  // public void init(String path, String name, String usage, Integer minOccurs, String maxOccurs,
+  // int lineNumber, int startIndex, int endIndex, int position, int instanceNumber,
+  // String description, String value, String type) {
+  // this.path = path;
+  // this.name = name;
+  // this.usage = usage;
+  // this.minOccurs = minOccurs;
+  // this.maxOccurs = maxOccurs;
+  // this.lineNumber = lineNumber;
+  // this.startIndex = startIndex;
+  // this.endIndex = endIndex;
+  // this.position = position;
+  // this.instanceNumber = instanceNumber;
+  // this.description = description;
+  // this.value = value;
+  // this.type = type;
+  // }
+  //
   public void init(String path, String name, String usage, Integer minOccurs, String maxOccurs,
-      int lineNumber, int startIndex, int endIndex, int position, int instanceNumber,
-      String description, String value, String type) {
+      Coordinate start, Coordinate end, int position, int instanceNumber, String description,
+      String value, String type) {
     this.path = path;
     this.name = name;
     this.usage = usage;
     this.minOccurs = minOccurs;
     this.maxOccurs = maxOccurs;
-    this.lineNumber = lineNumber;
-    this.startIndex = startIndex;
-    this.endIndex = endIndex;
+    this.start = start;
+    this.end = end;
     this.position = position;
     this.instanceNumber = instanceNumber;
     this.description = description;
     this.value = value;
     this.type = type;
   }
+
 
   @JsonProperty("data_can_contain_anything")
   protected final boolean dataCanContainAnything = true;
@@ -133,14 +154,8 @@ public class MessageElementData implements Serializable {
       return this.value;
     } else {
       StringBuffer buffer1 = new StringBuffer();
-      buffer1
-          .append(this.path)
-          .append(":".charAt(0))
-          .append(this.name)
-          .append(" ".charAt(0))
-          .append(this.usage)
-          .append("")
-          .append(
+      buffer1.append(this.path).append(":".charAt(0)).append(this.name).append(" ".charAt(0))
+          .append(this.usage).append("").append(
               minOccurs != -1 && maxOccurs != null ? "[" + minOccurs + "," + maxOccurs + "]" : "");
       return buffer1.toString();
     }
@@ -224,15 +239,15 @@ public class MessageElementData implements Serializable {
     return true;
   }
 
-  public int getLineNumber() {
-
-    return this.lineNumber;
-  }
-
-  public void setLineNumber(int lineNumber) {
-
-    this.lineNumber = lineNumber;
-  }
+  // public int getLineNumber() {
+  //
+  // return this.lineNumber;
+  // }
+  //
+  // public void setLineNumber(int lineNumber) {
+  //
+  // this.lineNumber = lineNumber;
+  // }
 
   public int getInstanceNumber() {
 
@@ -251,21 +266,21 @@ public class MessageElementData implements Serializable {
     this.value = value;
   }
 
-  public int getStartIndex() {
-    return startIndex;
-  }
-
-  public void setStartIndex(int startIndex) {
-    this.startIndex = startIndex;
-  }
-
-  public int getEndIndex() {
-    return endIndex;
-  }
-
-  public void setEndIndex(int endIndex) {
-    this.endIndex = endIndex;
-  }
+  // public int getStartIndex() {
+  // return startIndex;
+  // }
+  //
+  // public void setStartIndex(int startIndex) {
+  // this.startIndex = startIndex;
+  // }
+  //
+  // public int getEndIndex() {
+  // return endIndex;
+  // }
+  //
+  // public void setEndIndex(int endIndex) {
+  // this.endIndex = endIndex;
+  // }
 
   public boolean isDataCanContainAnything() {
     return dataCanContainAnything;
@@ -286,5 +301,23 @@ public class MessageElementData implements Serializable {
   public void setPosition(int position) {
     this.position = position;
   }
+
+  public Coordinate getStart() {
+    return start;
+  }
+
+  public void setStart(Coordinate start) {
+    this.start = start;
+  }
+
+  public Coordinate getEnd() {
+    return end;
+  }
+
+  public void setEnd(Coordinate end) {
+    this.end = end;
+  }
+
+
 
 }

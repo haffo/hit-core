@@ -19,11 +19,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.located.Located;
 import org.jdom2.located.LocatedJDOMFactory;
 import org.jdom2.output.XMLOutputter;
-
-import gov.nist.hit.core.domain.XMLCoordinate;
 
 public class XmlUtil {
 
@@ -33,28 +30,7 @@ public class XmlUtil {
 
   public static String prettyFormat(String input, int indent)
       throws TransformerException, JDOMException, IOException {
-
-    // Source xmlInput = new StreamSource(new StringReader(input));
-    // StringWriter stringWriter = new StringWriter();
-    // StreamResult xmlOutput = new StreamResult(stringWriter);
-    // TransformerFactory transformerFactory = TransformerFactory
-    // .newInstance();
-    // Transformer transformer = transformerFactory.newTransformer();
-    // transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    // // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
-    // // "yes");
-    // transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-    // transformer.setOutputProperty(
-    // "{http://xml.apache.org/xslt}indent-amount", "4");
-    // transformer.transform(xmlInput, xmlOutput);
-    // String res = xmlOutput.getWriter().toString();
-    // System.out.println(res);
-    // System.setProperty("javax.xml.parsers.SAXParserFactory",
-    // "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
-    Document doc = toDocument(input);
-    String res = toString(doc.getRootElement());
-
-    return res;
+    return toString(toDocument(input).getRootElement());
   }
 
   public static Document toDocument(String content) throws JDOMException, IOException {
@@ -106,26 +82,5 @@ public class XmlUtil {
     return new XMLOutputter().outputString(document.getRootElement());
   }
 
-  public static XMLCoordinate getStartCoordinate(Element element) {
-    Located locatedElement = (Located) element;
-    return new XMLCoordinate(locatedElement.getLine(), 0);
-  }
 
-  public static XMLCoordinate getEndCoordinate(Element element) {
-    return new XMLCoordinate(getEndLine(element), 1000);
-  }
-
-  private static int getNumberOfLine(Element element) {
-    String content = XmlUtil.toString(element);
-    String[] lines = content.split(System.getProperty("line.separator"));
-    return lines.length;
-  }
-
-  public static int getEndLine(Element element) {
-    return getStartLine(element) + getNumberOfLine(element) - 1;
-  }
-
-  public static int getStartLine(Element element) {
-    return ((Located) element).getLine();
-  }
 }
