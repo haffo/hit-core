@@ -53,4 +53,8 @@ public class TestCaseExecutionServiceImpl implements TestCaseExecutionService {
         return testCaseExecutionRepository.getTestCaseExecutionFromUserId(userId);
     }
 
+    @Override public void clearRecords(Long userId) {
+        testCaseExecutionRepository.deleteTestCaseExecutionFromUserId(userId);
+    }
+
 }

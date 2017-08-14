@@ -38,6 +38,11 @@ public class UserTestStepReport {
         this.comments = comments;
     }
 
+    public UserTestStepReport() {
+    }
+
+
+
     public String getXml() {
         return xml;
     }

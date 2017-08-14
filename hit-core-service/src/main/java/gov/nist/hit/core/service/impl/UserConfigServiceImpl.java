@@ -85,8 +85,8 @@ public class UserConfigServiceImpl implements UserConfigService {
             String value = pair.getValue();
             String alias = "ucp" + i;
             sql +=
-                    " LEFT OUTER JOIN USER_CONFIG_PROPERTIES " + alias + " ON uc.ID = " + alias
-                            + ".USER_CONFIG_PROPERTIES_ID AND " + alias + ".property_key = '" + key + "' AND " + alias
+                    " LEFT OUTER JOIN user_config_properties " + alias + " ON uc.ID = " + alias
+                            + ".user_config_properties_id AND " + alias + ".property_key = '" + key + "' AND " + alias
                             + ".property_value = '" + value + "'";
             conditions.add(alias + ".property_key is not null");
             i++;
