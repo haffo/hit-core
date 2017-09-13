@@ -33,7 +33,7 @@ public class MappingController {
     Logger logger = LoggerFactory.getLogger(MappingController.class);
 
 
-    @RequestMapping(value = "/{testCaseId}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/{testCaseId}", method = RequestMethod.POST, produces = "application/json")
     public void cleanRecords(HttpServletRequest request) throws
         IOException {
         Long userId = SessionContext.getCurrentUserId(request.getSession(false));
