@@ -2,7 +2,7 @@ package gov.nist.hit.core.domain;
 
 public enum ExtensibilityType {
 
-  OPEN("Open"), CLOSED("Closed");
+  OPEN("Open"), CLOSED("Closed"), Undefined("Undefined");
   private final String value;
 
   ExtensibilityType(String v) {

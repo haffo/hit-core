@@ -10,7 +10,7 @@ package gov.nist.hit.core.domain;
 
 public enum StabilityType {
 
-  STATIC("Static"), DYNAMIC("Dynamic");
+  STATIC("Static"), DYNAMIC("Dynamic"), Undefined("Undefined");
   private final String value;
 
   StabilityType(String v) {
