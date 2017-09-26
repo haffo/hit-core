@@ -44,8 +44,8 @@
 	<sec:http pattern="/api/documentation/*" security="none" />
 
 	<sec:http create-session="ifRequired" use-expressions="true">
-
-		<sec:session-management session-fixation-protection="none" invalid-session-url="/SessionTimeout.html">
+ 
+		<sec:session-management  session-fixation-protection="none" invalid-session-url="/SessionTimeout.html">
 			<sec:concurrency-control
 			 expired-url="/SessionTimeout.html"
 			 max-sessions="2" />

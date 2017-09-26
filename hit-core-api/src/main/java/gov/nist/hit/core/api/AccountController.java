@@ -952,13 +952,17 @@ public class AccountController {
 	@RequestMapping(value = "/accounts/login", method = RequestMethod.GET)
 	public ResponseMessage doNothing(HttpSession session) {
 		User u = userService.getCurrentUser();
-		Account a = accountService.findByTheAccountsUsername(u.getUsername());
-		Long guestId = SessionContext.getCurrentUserId(session);
-		if (guestId != null) {
-			accountService.reconcileAccounts(guestId, a.getId());
+		if (u != null) {
+			Account a = accountService.findByTheAccountsUsername(u.getUsername());
+			if (a != null) {
+				// Long guestId = SessionContext.getCurrentUserId(session);
+				// if (guestId != null) {
+				// accountService.reconcileAccounts(guestId, a.getId());
+				// }
+				SessionContext.setCurrentUserId(session, a.getId());
+				recordLastLoggedInDate(a.getId());
+			}
 		}
-		SessionContext.setCurrentUserId(session, a.getId());
-		recordLastLoggedInDate(a.getId());
 		return new ResponseMessage(ResponseMessage.Type.success, "loginSuccess", "succes");
 	}
 
