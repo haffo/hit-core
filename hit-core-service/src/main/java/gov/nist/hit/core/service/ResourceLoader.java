@@ -52,6 +52,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
 
   // ------ Context-Free test Case
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus handleCFTC(Long testCaseId, CFTestStep tc) {
 
     ResourceUploadStatus result = new ResourceUploadStatus();
@@ -94,7 +95,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   }
 
   // ------ Context-Based test Case
-
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus handleTS(Long testCaseId, TestStep ts) {
 
     ResourceUploadStatus result = new ResourceUploadStatus();
@@ -128,6 +129,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
 
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus addTC(Long parentId, TestCase tc, String where) {
 
     ResourceUploadStatus result = new ResourceUploadStatus();
@@ -165,6 +167,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     }
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus updateTC(TestCase tc) {
     ResourceUploadStatus result = new ResourceUploadStatus();
     result.setType(ResourceType.TESTCASE);
@@ -190,6 +193,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
 
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus addTCG(Long parentId, TestCaseGroup tcg, String where) {
 
     ResourceUploadStatus result = new ResourceUploadStatus();
@@ -227,6 +231,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     }
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus updateTCG(TestCaseGroup tcg) {
 
     ResourceUploadStatus result = new ResourceUploadStatus();
@@ -256,6 +261,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     }
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus handleTP(TestPlan tp) {
 
     ResourceUploadStatus result = new ResourceUploadStatus();
@@ -455,6 +461,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   }
 
   // Delete
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus deleteTS(Long id) {
     ResourceUploadStatus result = new ResourceUploadStatus();
     result.setType(ResourceType.TESTSTEP);
@@ -471,6 +478,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return result;
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus deleteTC(Long id) {
     ResourceUploadStatus result = new ResourceUploadStatus();
     result.setType(ResourceType.TESTCASE);
@@ -487,6 +495,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return result;
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus deleteTCG(Long id) {
     ResourceUploadStatus result = new ResourceUploadStatus();
     result.setType(ResourceType.TESTCASEGROUP);
@@ -503,6 +512,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return result;
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus deleteTP(Long id) {
     ResourceUploadStatus result = new ResourceUploadStatus();
     result.setType(ResourceType.TESTPLAN);
@@ -519,6 +529,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return result;
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public ResourceUploadStatus deleteCFTC(Long id) {
     ResourceUploadStatus result = new ResourceUploadStatus();
     result.setType(ResourceType.CFTESTCASE);
@@ -535,6 +546,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return result;
   }
 
+  @org.springframework.transaction.annotation.Transactional("transactionManager")
   public void flush() {
     this.testStepRepository.flush();
     this.testCaseRepository.flush();
