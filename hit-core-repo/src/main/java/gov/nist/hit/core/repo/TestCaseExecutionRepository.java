@@ -24,4 +24,7 @@ public interface TestCaseExecutionRepository extends JpaRepository<TestCaseExecu
   @Query("select tce from TestCaseExecution tce where tce.userId = :id")
   public TestCaseExecution getTestCaseExecutionFromUserId(@Param("id") Long id);
 
+  @Query("delete TestCaseExecution tce where tce.userId = :id")
+  public void deleteTestCaseExecutionFromUserId(@Param("id") Long id);
+
 }

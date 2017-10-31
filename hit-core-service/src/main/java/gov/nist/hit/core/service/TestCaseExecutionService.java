@@ -25,4 +25,6 @@ public interface TestCaseExecutionService {
 
     public TestCaseExecution findOneByUserId(Long userId);
 
+    public void clearRecords(Long userId);
+
 }
