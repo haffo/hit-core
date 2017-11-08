@@ -27,6 +27,19 @@ import gov.nist.hit.core.domain.TestingStage;
 
 public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
 
+  @Query("select tp from CFTestPlan tp where tp.scope = :scope")
+  public List<CFTestPlan> findAllByScope(@Param("scope") TestScope scope);
+
+
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId) from CFTestPlan tp where tp.scope = :scope and tp.authorUsername = :authorUsername")
+  public List<CFTestPlan> findShortAllByScopeAndUsername(@Param("scope") TestScope scope,
+      @Param("authorUsername") String authorUsername);
+
+  @Query("select tp from CFTestPlan tp where tp.scope = :scope and tp.authorUsername = :authorUsername")
+  public List<CFTestPlan> findAllByScopeAndUsername(@Param("scope") TestScope scope,
+      @Param("authorUsername") String authorUsername);
+
+
   @Query("select tp from CFTestPlan tp where tp.stage = :stage and tp.scope = :scope")
   public List<CFTestPlan> findAllByStageAndScope(@Param("stage") TestingStage stage,
       @Param("scope") TestScope scope);
@@ -34,8 +47,9 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
   @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId) from CFTestPlan tp where tp.stage = ?1 and tp.scope = ?2")
   public List<CFTestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
 
-  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position, persistentId) from CFTestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2")
-  public List<CFTestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position, persistentId) from CFTestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3")
+  public List<CFTestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername,
+      TestScope scope);
 
   @Modifying
   @Transactional(value = "transactionManager")

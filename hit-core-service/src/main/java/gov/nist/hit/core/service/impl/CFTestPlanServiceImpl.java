@@ -25,9 +25,10 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
   }
 
   @Override
-  public List<CFTestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername) {
+  public List<CFTestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername,
+      TestScope scope) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findShortAllByStageAndAuthor(stage, authorUsername);
+    return testPlanRepository.findShortAllByStageAndAuthor(stage, authorUsername, scope);
   }
 
   @Override
@@ -40,6 +41,24 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
   public List<CFTestPlan> findAllByStageAndScope(TestingStage stage, TestScope scope) {
     // TODO Auto-generated method stub
     return testPlanRepository.findAllByStageAndScope(stage, scope);
+  }
+
+  @Override
+  public List<CFTestPlan> findAllByScope(TestScope scope) {
+    // TODO Auto-generated method stub
+    return testPlanRepository.findAllByScope(scope);
+  }
+
+  @Override
+  public List<CFTestPlan> findShortAllByScopeAndUsername(TestScope scope, String authorUsername) {
+    // TODO Auto-generated method stub
+    return testPlanRepository.findShortAllByScopeAndUsername(scope, authorUsername);
+
+  }
+
+  @Override
+  public List<CFTestPlan> findAllByScopeAndUsername(TestScope scope, String authorUsername) {
+    return testPlanRepository.findAllByScopeAndUsername(scope, authorUsername);
   }
 
 
