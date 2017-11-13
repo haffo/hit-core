@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +25,7 @@ import gov.nist.hit.core.domain.ResourceUploadStatus;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.service.ResourceLoader;
 import gov.nist.hit.core.service.exception.NotFoundException;
@@ -30,33 +34,48 @@ import gov.nist.hit.core.service.util.ResourcebundleHelper;
 
 @RestController
 @RequestMapping("/editResources")
-// @Api(value = "Add or Update", tags = "Add or Update resources", position =
-// 10)
+//@Api(value = "Add or Update", tags = "Add or Update resources", position = 10)
 public class ResourceController {
 
 	@Autowired
 	private ResourceLoader resourceLoader;
 
 	@ModelAttribute("requestObj")
-	public AddOrUpdateRequest initRequest(@RequestPart("file") MultipartFile file, @RequestPart("id") Long id)
-			throws Exception {
-		AddOrUpdateRequest request = new AddOrUpdateRequest();
+	public AddOrUpdateRequest initRequest(Authentication u, @RequestPart("file") MultipartFile file, @RequestPart("id") Long id, @RequestPart("scope") String scope, HttpServletResponse resp) throws Exception {
+		
+		String zipFolder = "";
+		
 		if (!file.isEmpty()) {
-			String zipFolder = ResourcebundleHelper.getResourcesFromZip(file.getInputStream());
-			request.setZip(zipFolder);
+			zipFolder = ResourcebundleHelper.getResourcesFromZip(file.getInputStream());
 		}
-		request.setId(id);
-		return request;
+		
+		if(scope != null && scope.length() > 0){
+			try {
+				TestScope.valueOf(scope);
+			}
+			catch(Exception e){
+				resp.sendError(500, "Invalid Scope");
+			}
+		}
+		
+		
+		System.out.println("Handling API request DATA");
+		System.out.println("File : "+ zipFolder);
+		System.out.println("ID   : "+ id);
+		System.out.println("Scope: "+ scope);
+		
+		return new AddOrUpdateRequest(id, zipFolder, scope);
 	}
 
-	// Context Based API Methods
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------   Context Based API Methods    ----------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	// Test Step
+//***** TestStep *****
 
-	@PreAuthorize("hasRole('deployer')")
+//	@ApiOperation(value = "Adds Test Step or Update if already exists", nickname = "addOrUpdateTS")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	// @ApiOperation(value = "Adds Test Step or Update if already exists",
-	// nickname = "addOrUpdateTS")
 	@RequestMapping(value = "/cb/addOrUpdate/testStep", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestStep(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
@@ -75,12 +94,11 @@ public class ResourceController {
 		return results;
 	}
 
-	// Test Case
+//***** TestCase *****
 
-	@PreAuthorize("hasRole('deployer')")
-	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	// @ApiOperation(value = "Updates an existing Test Case", nickname =
-	// "updateTC")
+//	@ApiOperation(value = "Updates an existing Test Case", nickname ="updateTC")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
+	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)	
 	@RequestMapping(value = "/cb/update/testCase", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> updateTestCase(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
@@ -98,10 +116,9 @@ public class ResourceController {
 		return results;
 	}
 
-	@PreAuthorize("hasRole('deployer')")
+//	@ApiOperation(value = "Adds a Test Case to a Test Plan", nickname = "addTCtoTP")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	// @ApiOperation(value = "Adds a Test Case to a Test Plan", nickname =
-	// "addTCtoTP")
 	@RequestMapping(value = "/cb/add/testCase/to/testPlan", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestCaseToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
@@ -118,11 +135,10 @@ public class ResourceController {
 		FileUtils.deleteDirectory(new File(request.getZip()));
 		return results;
 	}
-
-	@PreAuthorize("hasRole('deployer')")
+	
+//	@ApiOperation(value = "Adds a Test Case to a Test Case Group", nickname = "addTCtoTCG")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	// @ApiOperation(value = "Adds a Test Case to a Test Case Group", nickname =
-	// "addTCtoTCG")
 	@RequestMapping(value = "/cb/add/testCase/to/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestCaseToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws ProfileParserException, IOException, NotFoundException {
@@ -140,12 +156,11 @@ public class ResourceController {
 		return results;
 	}
 
-	// Test Case Group
-
-	@PreAuthorize("hasRole('deployer')")
+//***** TestCaseGroup *****
+	
+//	@ApiOperation(value = "Updates an existing Test Case Group", nickname ="updateTCG")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	// @ApiOperation(value = "Updates an existing Test Case Group", nickname =
-	// "updateTCG")
 	@RequestMapping(value = "/cb/update/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> updateTestGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws ProfileParserException, IOException, NotFoundException {
@@ -163,10 +178,9 @@ public class ResourceController {
 		return results;
 	}
 
-	@PreAuthorize("hasRole('deployer')")
+//	@ApiOperation(value = "Adds a Test Case Group to a Test Plan", nickname = "addTCGtoTP")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	// @ApiOperation(value = "Adds a Test Case Group to a Test Plan", nickname =
-	// "addTCGtoTP")
 	@RequestMapping(value = "/cb/add/testCaseGroup/to/testPlan", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestGroupToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
@@ -184,10 +198,9 @@ public class ResourceController {
 		return results;
 	}
 
-	@PreAuthorize("hasRole('deployer')")
+//	@ApiOperation(value = "Adds a Test Case Group to a Test Case Group", nickname = "addTCGtoTCG")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	// @ApiOperation(value = "Adds a Test Case Group to a Test Case Group",
-	// nickname = "addTCGtoTCG")
 	@RequestMapping(value = "/cb/add/testCaseGroup/to/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestGroupToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
@@ -205,23 +218,35 @@ public class ResourceController {
 		return results;
 	}
 
-	// Test Plan
+//***** TestPlan *****
 
-	@PreAuthorize("hasRole('deployer')")
+//	@ApiOperation(value = "Adds Test Plan or Update if already exists", nickname = "addOrUpdateTP")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
-	// @ApiOperation(value = "Adds Test Plan or Update if already exists",
-	// nickname = "addOrUpdateTP")
 	@RequestMapping(value = "/cb/addOrUpdate/testPlan", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addOrUpdateTestPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request)
+	public List<ResourceUploadStatus> addOrUpdateTestPlan(Authentication u, @ModelAttribute("requestObj") AddOrUpdateRequest request, HttpServletResponse resp)
 			throws IOException {
 
+		String scope = request.getScope().replaceAll("\"", "");
+		
 		List<ResourceUploadStatus> results = new ArrayList<>();
-		;
 		resourceLoader.setDirectory(request.getZip() + "/");
-
 		List<TestPlan> plans = resourceLoader.createTP();
-
+		
+		if(scope == null){
+			resp.sendError(500,"Scope Argument is required");
+		}
+		
 		for (TestPlan tp : plans) {
+			
+			try{
+				tp.setAuthorUsername(u.getName());
+				tp.setScope(TestScope.valueOf(scope));
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			
 			ResourceUploadStatus tmp = resourceLoader.handleTP(tp);
 			results.add(tmp);
 		}
@@ -230,21 +255,39 @@ public class ResourceController {
 		return results;
 	}
 
-	// Context Free API Methods
+	
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------    Context Free API Methods    ----------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	@PreAuthorize("hasRole('deployer')")
+	
+//	@ApiOperation(value = "Adds Context-Free Test Case or Update if already exists", nickname = "cf_addOrUpdateTC")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cf-testcases'", allEntries = true)
-	// @ApiOperation(value = "Adds Context-Free Test Case or Update if already
-	// exists", nickname = "cf_addOrUpdateTC")
 	@RequestMapping(value = "/cf/addOrUpdate/testCase", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addCFTestCase(@ModelAttribute("requestObj") AddOrUpdateRequest request)
+	public List<ResourceUploadStatus> addCFTestCase(Authentication u, @ModelAttribute("requestObj") AddOrUpdateRequest request, HttpServletResponse resp)
 			throws IOException {
 
+		
 		List<ResourceUploadStatus> results = new ArrayList<>();
 		resourceLoader.setDirectory(request.getZip() + "/");
-
 		List<CFTestStep> cases = resourceLoader.createCFTC();
+		
+		String scope = request.getScope().replaceAll("\"", "");
+		if(scope == null){
+			resp.sendError(500,"Scope Argument is required");
+		}
+		
 		for (CFTestStep tc : cases) {
+			
+			try{
+				tc.setAuthorUsername(u.getName());
+				tc.setScope(TestScope.valueOf(scope));
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			
 			ResourceUploadStatus tmp = resourceLoader.handleCFTC(request.getId(), tc);
 			results.add(tmp);
 		}
@@ -254,11 +297,13 @@ public class ResourceController {
 
 	}
 
-	// Global Resources API Methods
-
-	@PreAuthorize("hasRole('deployer')")
-	// @ApiOperation(value = "Adds Profile or Update if already exists",
-	// nickname = "addOrUpdateProfile")
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------  Global Resources API Methods  ----------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+	
+	
+//	@ApiOperation(value = "Adds Profile or Update if already exists", nickname = "addOrUpdateProfile")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@RequestMapping(value = "/global/addOrUpdate/profile", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addOrUpdateProfile(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
@@ -270,10 +315,9 @@ public class ResourceController {
 		FileUtils.deleteDirectory(new File(request.getZip()));
 		return res;
 	}
-
-	@PreAuthorize("hasRole('deployer')")
-	// @ApiOperation(value = "Adds Constraints or Update if already exists",
-	// nickname = "addOrUpdateConstraints")
+	
+//	@ApiOperation(value = "Adds Constraints or Update if already exists", nickname = "addOrUpdateConstraints")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@RequestMapping(value = "/global/addOrUpdate/constraints", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addOrUpdateConstraints(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
@@ -286,9 +330,8 @@ public class ResourceController {
 		return res;
 	}
 
-	@PreAuthorize("hasRole('deployer')")
-	// @ApiOperation(value = "Adds ValueSet or Update if already exists",
-	// nickname = "addOrUpdateValueSet")
+//	@ApiOperation(value = "Adds ValueSet or Update if already exists",nickname = "addOrUpdateValueSet")
+	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@RequestMapping(value = "/global/addOrUpdate/valueSet", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addOrUpdateValueSet(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
