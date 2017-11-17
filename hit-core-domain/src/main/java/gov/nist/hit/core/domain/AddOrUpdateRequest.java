@@ -1,25 +1,23 @@
 package gov.nist.hit.core.domain;
 
+
 public class AddOrUpdateRequest {
-	private String url;
+
 	private Long id;
 	private String zip;
+	private String dplScope;
 	
 	public AddOrUpdateRequest() {
 		super();
 	}
 	
-	public AddOrUpdateRequest(String url, Long id) {
+	public AddOrUpdateRequest(Long id, String zip, String dplScope) {
 		super();
-		this.url = url;
 		this.id = id;
+		this.zip = zip;
+		this.dplScope = dplScope;
 	}
-	public String getUrl() {
-		return url;
-	}
-	public void setUrl(String url) {
-		this.url = url;
-	}
+
 	public Long getId() {
 		return id;
 	}
@@ -34,5 +32,13 @@ public class AddOrUpdateRequest {
 	public void setZip(String zip) {
 		this.zip = zip;
 	}
-	
+
+	public String getScope() {
+		return dplScope;
+	}
+
+	public void setScope(String scope) {
+		this.dplScope = scope;
+	}
+
 }
