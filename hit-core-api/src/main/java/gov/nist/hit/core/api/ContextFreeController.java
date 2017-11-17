@@ -12,8 +12,12 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,6 +54,10 @@ import io.swagger.annotations.ApiParam;
 public class ContextFreeController {
 
 	static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
+
+	private final String tmpDir = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + "/gvt";
+
+	Set<String> GLOBAL_AUTHORITIES = new HashSet<>(Arrays.asList("supervisor", "admin"));
 
 	@Autowired
 	private CFTestStepService testStepService;
@@ -96,6 +105,25 @@ public class ContextFreeController {
 		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 		recordTestPlan(testPlan, userId);
 		return testPlan;
+	}
+
+	@PreAuthorize("hasRole('tester')")
+	@RequestMapping(value = "/profileGroups", method = RequestMethod.GET, produces = "application/json")
+	public void getGroupsByScope(
+			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = true) TestScope scope,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
+		List<CFTestPlan> results = null;
+		scope = scope == null ? TestScope.GLOBAL : scope;
+		String username = null;
+		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+		if (userId != null) {
+			Account account = userService.findOne(userId);
+			if (account != null) {
+				username = account.getUsername();
+			}
+		}
+		results = testPlanService.findShortAllByScopeAndUsername(scope, username);
+		streamer.stream2(response.getOutputStream(), results);
 	}
 
 	private void recordTestPlan(CFTestPlan testPlan, Long userId) {

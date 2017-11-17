@@ -13,9 +13,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.swagger.annotations.ApiModel;
@@ -67,6 +69,13 @@ public class TestPlan extends AbstractTestCase implements Serializable {
   @ApiModelProperty(required = true, value = "domain of the test plan", example = "iz, erx, etc...")
   @Column(nullable = true)
   private String domain;
+
+
+
+  @ApiModelProperty(required = false, value = "parent test plan category of the test plan")
+  @JsonIgnore
+  @ManyToOne(optional = true, fetch = FetchType.EAGER)
+  protected TestPlanCategory testPlanCategory;
 
 
 
@@ -141,6 +150,14 @@ public class TestPlan extends AbstractTestCase implements Serializable {
 
   public void setDomain(String domain) {
     this.domain = domain;
+  }
+
+  public TestPlanCategory getTestPlanCategory() {
+    return testPlanCategory;
+  }
+
+  public void setTestPlanCategory(TestPlanCategory testPlanCategory) {
+    this.testPlanCategory = testPlanCategory;
   }
 
 
