@@ -148,6 +148,8 @@ public abstract class ResourcebundleLoader {
   public static final String TRANSPORT_CONF_PATTERN = "Transport.json";
   public static final String REGISTRATION = "Registration.json";
   protected String directory;
+  public static final String DEFAULT_CATEGORY = "Default";
+
 
   @Autowired
   protected IntegrationProfileRepository integrationProfileRepository;
@@ -1255,6 +1257,8 @@ public abstract class ResourcebundleLoader {
       tp.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       tp.setName(testPlanObj.findValue("name").textValue());
       tp.setDescription(testPlanObj.findValue("description").textValue());
+      tp.setCategory(testPlanObj.findValue("category") != null
+          ? testPlanObj.findValue("category").textValue() : DEFAULT_CATEGORY);
       tp.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
       tp.setTestStory(testStory(location));
@@ -1283,6 +1287,7 @@ public abstract class ResourcebundleLoader {
       if (testPlanObj.has("supplements")) {
         tp.getSupplements().addAll((testDocuments(location, testPlanObj.findValue("supplements"))));
       }
+
       List<Resource> resources = this.getDirectories(location + "*/");
       for (Resource resource : resources) {
         String fileName = fileName(resource);
@@ -1321,6 +1326,8 @@ public abstract class ResourcebundleLoader {
       }
       testPlan.setPreloaded(true);
       testPlan.setScope(TestScope.GLOBAL);
+      testPlan.setCategory(testPlanObj.findValue("category") != null
+          ? testPlanObj.findValue("category").textValue() : DEFAULT_CATEGORY);
       testPlan.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       if (testPlanObj.findValue("position") != null) {
         testPlan.setPosition(testPlanObj.findValue("position").intValue());

@@ -126,6 +126,28 @@ public class ContextFreeController {
 		streamer.stream2(response.getOutputStream(), results);
 	}
 
+	@RequestMapping(value = "/categories", method = RequestMethod.GET, produces = "application/json")
+	public Set<String> getTestPlanCategories(
+			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = true) TestScope scope,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
+		Set<String> results = null;
+		scope = scope == null ? TestScope.GLOBAL : scope;
+		String username = null;
+		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+		if (userId != null) {
+			Account account = userService.findOne(userId);
+			if (account != null) {
+				username = account.getUsername();
+			}
+		}
+		if (scope.equals(TestScope.GLOBAL)) {
+			results = testPlanService.findAllCategoriesByScope(scope);
+		} else {
+			results = testPlanService.findAllCategoriesByScopeAndUser(scope, username);
+		}
+		return results;
+	}
+
 	private void recordTestPlan(CFTestPlan testPlan, Long userId) {
 		if (testPlan != null && userId != null) {
 			userService.recordLastCFTestPlan(userId, testPlan.getPersistentId());

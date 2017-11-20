@@ -14,6 +14,7 @@ package gov.nist.hit.core.repo;
 
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -38,15 +39,15 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
       @Param("scope") TestScope scope);
 
   @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1")
   public List<TestPlan> findShortAllByStage(TestingStage stage);
 
   @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.scope = ?2")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.scope = ?2")
   public List<TestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
 
   @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2")
   public List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
 
   @Transactional(value = "transactionManager")
@@ -75,6 +76,17 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
   @Transactional(value = "transactionManager")
   @Query("delete from TestPlan to where to.preloaded = false")
   public void deleteNonPreloaded();
+
+  @Transactional(value = "transactionManager")
+  @Query("select tp.category from TestPlan tp where tp.stage = :stage and tp.scope=:scope")
+  public Set<String> findAllCategoriesByStageAndScope(@Param("stage") TestingStage stage,
+      @Param("scope") TestScope scope);
+
+  @Transactional(value = "transactionManager")
+  @Query("select tp.category from TestPlan tp where tp.stage = :stage and tp.scope=:scope and tp.authorUsername = :username")
+  public Set<String> findAllCategoriesByStageAndScopeAndUser(@Param("stage") TestingStage stage,
+      @Param("scope") TestScope scope, @Param("username") String username);
+
 
 
 }

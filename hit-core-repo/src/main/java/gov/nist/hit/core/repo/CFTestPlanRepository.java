@@ -14,6 +14,7 @@ package gov.nist.hit.core.repo;
 
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,7 +32,7 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
   public List<CFTestPlan> findAllByScope(@Param("scope") TestScope scope);
 
 
-  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId) from CFTestPlan tp where tp.scope = :scope and tp.authorUsername = :authorUsername")
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId,category) from CFTestPlan tp where tp.scope = :scope and tp.authorUsername = :authorUsername")
   public List<CFTestPlan> findShortAllByScopeAndUsername(@Param("scope") TestScope scope,
       @Param("authorUsername") String authorUsername);
 
@@ -44,10 +45,10 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
   public List<CFTestPlan> findAllByStageAndScope(@Param("stage") TestingStage stage,
       @Param("scope") TestScope scope);
 
-  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId) from CFTestPlan tp where tp.stage = ?1 and tp.scope = ?2")
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId,category) from CFTestPlan tp where tp.stage = ?1 and tp.scope = ?2")
   public List<CFTestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
 
-  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position, persistentId) from CFTestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3")
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position, persistentId,category) from CFTestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3")
   public List<CFTestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername,
       TestScope scope);
 
@@ -60,6 +61,16 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
   @Transactional(value = "transactionManager")
   @Query("delete from CFTestPlan to where to.preloaded = false")
   public void deleteNonPreloaded();
+
+  @Transactional(value = "transactionManager")
+  @Query("select tp.category from CFTestPlan tp where tp.scope=:scope")
+  public Set<String> findAllCategoriesByScope(@Param("scope") TestScope scope);
+
+
+  @Transactional(value = "transactionManager")
+  @Query("select tp.category from CFTestPlan tp where tp.scope=:scope and tp.authorUsername = :username")
+  public Set<String> findAllCategoriesByScopeAndUser(@Param("scope") TestScope scope,
+      @Param("username") String username);
 
 
 }

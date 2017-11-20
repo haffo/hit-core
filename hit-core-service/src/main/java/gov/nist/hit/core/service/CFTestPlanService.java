@@ -14,6 +14,7 @@ package gov.nist.hit.core.service;
 
 
 import java.util.List;
+import java.util.Set;
 
 import gov.nist.hit.core.domain.CFTestPlan;
 import gov.nist.hit.core.domain.TestScope;
@@ -35,8 +36,11 @@ public interface CFTestPlanService {
 
   List<CFTestPlan> findAllByScopeAndUsername(TestScope scope, String authorUsername);
 
-
   List<CFTestPlan> findAllByScope(TestScope scope);
+
+  Set<String> findAllCategoriesByScope(TestScope scope);
+
+  Set<String> findAllCategoriesByScopeAndUser(TestScope scope, String username);
 
 
 

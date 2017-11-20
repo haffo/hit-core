@@ -14,6 +14,7 @@ package gov.nist.hit.core.api;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -135,6 +136,28 @@ public class ContextBasedController {
 		logger.info("Fetching  test step...");
 		TestStep testStep = testStepService.findOne(testStepId);
 		return testStep;
+	}
+
+	@RequestMapping(value = "/categories", method = RequestMethod.GET, produces = "application/json")
+	public Set<String> getTestPlanCategories(
+			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = true) TestScope scope,
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
+		Set<String> results = null;
+		scope = scope == null ? TestScope.GLOBAL : scope;
+		String username = null;
+		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+		if (userId != null) {
+			Account account = userService.findOne(userId);
+			if (account != null) {
+				username = account.getUsername();
+			}
+		}
+		if (scope.equals(TestScope.GLOBAL)) {
+			results = testPlanService.findAllCategoriesByStageAndScope(TestingStage.CB, scope);
+		} else {
+			results = testPlanService.findAllCategoriesByStageAndScopeAndUser(TestingStage.CB, scope, username);
+		}
+		return results;
 	}
 
 }

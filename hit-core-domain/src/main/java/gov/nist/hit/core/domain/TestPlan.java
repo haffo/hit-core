@@ -13,11 +13,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.swagger.annotations.ApiModel;
@@ -71,16 +69,14 @@ public class TestPlan extends AbstractTestCase implements Serializable {
   private String domain;
 
 
-
-  @ApiModelProperty(required = false, value = "parent test plan category of the test plan")
-  @JsonIgnore
-  @ManyToOne(optional = true, fetch = FetchType.EAGER)
-  protected TestPlanCategory testPlanCategory;
-
+  @ApiModelProperty(required = true, value = "category of the test plan",
+      example = "CDC, AIRA etc...")
+  @Column(nullable = false)
+  private String category;
 
 
   public TestPlan(Long id, String name, String description, int position, boolean transport,
-      String domain, Long persistentId) {
+      String domain, Long persistentId, String category) {
     super();
     this.id = id;
     this.name = name;
@@ -89,8 +85,21 @@ public class TestPlan extends AbstractTestCase implements Serializable {
     this.transport = transport;
     this.domain = domain;
     this.persistentId = persistentId;
-
+    this.category = category;
   }
+
+  public TestPlan(String category) {
+    super();
+    this.id = null;
+    this.name = null;
+    this.description = null;
+    this.position = 0;
+    this.transport = false;
+    this.domain = null;
+    this.persistentId = null;
+    this.category = category;
+  }
+
 
   public Long getId() {
     return id;
@@ -152,12 +161,12 @@ public class TestPlan extends AbstractTestCase implements Serializable {
     this.domain = domain;
   }
 
-  public TestPlanCategory getTestPlanCategory() {
-    return testPlanCategory;
+  public String getCategory() {
+    return category;
   }
 
-  public void setTestPlanCategory(TestPlanCategory testPlanCategory) {
-    this.testPlanCategory = testPlanCategory;
+  public void setCategory(String category) {
+    this.category = category;
   }
 
 

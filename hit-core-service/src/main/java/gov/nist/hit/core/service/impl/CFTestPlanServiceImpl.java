@@ -1,6 +1,7 @@
 package gov.nist.hit.core.service.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,18 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
   @Override
   public List<CFTestPlan> findAllByScopeAndUsername(TestScope scope, String authorUsername) {
     return testPlanRepository.findAllByScopeAndUsername(scope, authorUsername);
+  }
+
+  @Override
+  public Set<String> findAllCategoriesByScope(TestScope scope) {
+    // TODO Auto-generated method stub
+    return testPlanRepository.findAllCategoriesByScope(scope);
+  }
+
+  @Override
+  public Set<String> findAllCategoriesByScopeAndUser(TestScope scope, String username) {
+    // TODO Auto-generated method stub
+    return testPlanRepository.findAllCategoriesByScopeAndUser(scope, username);
   }
 
 
