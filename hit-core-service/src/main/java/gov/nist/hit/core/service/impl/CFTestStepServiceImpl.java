@@ -11,11 +11,16 @@ import gov.nist.hit.core.service.CFTestStepService;
 public class CFTestStepServiceImpl implements CFTestStepService {
 
   @Autowired
-  private CFTestStepRepository testObjectRepository;
+  private CFTestStepRepository testStepRepository;
 
   @Override
   public CFTestStep findOne(Long id) {
-    return testObjectRepository.findOne(id);
+    return testStepRepository.findOne(id);
+  }
+
+  @Override
+  public void delete(Long id) {
+    testStepRepository.delete(id);
   }
 
 

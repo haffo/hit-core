@@ -13,7 +13,10 @@ package gov.nist.hit.core.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,7 @@ import org.springframework.stereotype.Service;
 import gov.nist.auth.hit.core.domain.util.UserUtil;
 import gov.nist.hit.core.service.CustomJdbcUserDetailsManager;
 import gov.nist.hit.core.service.UserService;
+import gov.nist.hit.core.service.exception.NoUserFoundException;
 
 /**
  * @author fdevaulx
@@ -47,6 +51,11 @@ public class UserServiceImpl implements UserService {
   private final String TESTER_AUTHORITY = "tester";
   private final String ADMIN_AUTHORITY = "admin";
   private final String DEPLOYER_AUTHORITY = "deployer";
+  private final String SUPERVISOR_AUTHORITY = "supervisor";
+
+  Set<String> PUBLIC_AUTHORITIES =
+      new HashSet<>(Arrays.asList(SUPERVISOR_AUTHORITY, ADMIN_AUTHORITY));
+
 
 
   @Autowired
@@ -256,6 +265,21 @@ public class UserServiceImpl implements UserService {
             "update users set credentialsNonExpired = 1 where username = ?", u.getUsername());
       }
     }
+  }
+
+  @Override
+  public boolean hasGlobalAuthorities(String username) throws NoUserFoundException {
+    User user = this.retrieveUserByUsername(username);
+    if (user == null) {
+      throw new NoUserFoundException("User could not be found");
+    }
+    Collection<GrantedAuthority> authorit = user.getAuthorities();
+    for (GrantedAuthority auth : authorit) {
+      if (PUBLIC_AUTHORITIES.contains(auth.getAuthority())) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }

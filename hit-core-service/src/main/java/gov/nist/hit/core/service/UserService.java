@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.security.authentication.BadCredentialsException;
 
+import gov.nist.hit.core.service.exception.NoUserFoundException;
+
 
 public interface UserService {
 
@@ -120,5 +122,7 @@ public interface UserService {
    */
   public void changeAccountTypeForUser(String newAccountType, String username)
       throws BadCredentialsException;
+
+  public boolean hasGlobalAuthorities(String username) throws NoUserFoundException;
 
 }

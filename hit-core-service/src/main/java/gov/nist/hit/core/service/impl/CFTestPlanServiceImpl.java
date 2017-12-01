@@ -50,6 +50,15 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
     return testPlanRepository.findAllByScope(scope);
   }
 
+
+  @Override
+  public List<CFTestPlan> findByIds(Set<Long> ids) {
+    // TODO Auto-generated method stub
+    return testPlanRepository.findByIds(ids);
+  }
+
+
+
   @Override
   public List<CFTestPlan> findShortAllByScopeAndUsername(TestScope scope, String authorUsername) {
     // TODO Auto-generated method stub
@@ -72,6 +81,16 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
   public Set<String> findAllCategoriesByScopeAndUser(TestScope scope, String username) {
     // TODO Auto-generated method stub
     return testPlanRepository.findAllCategoriesByScopeAndUser(scope, username);
+  }
+
+  @Override
+  public CFTestPlan save(CFTestPlan testPlan) {
+    return testPlanRepository.saveAndFlush(testPlan);
+  }
+
+  @Override
+  public void updateCategory(Set<Long> ids, String cat) {
+    testPlanRepository.updateCategory(ids, cat);
   }
 
 

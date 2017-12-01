@@ -22,6 +22,7 @@ import gov.nist.hit.core.domain.TestingStage;
 
 public interface CFTestPlanService {
 
+  CFTestPlan save(CFTestPlan testPlan);
 
   CFTestPlan findOne(Long testPlanId);
 
@@ -41,6 +42,10 @@ public interface CFTestPlanService {
   Set<String> findAllCategoriesByScope(TestScope scope);
 
   Set<String> findAllCategoriesByScopeAndUser(TestScope scope, String username);
+
+  List<CFTestPlan> findByIds(Set<Long> ids);
+
+  void updateCategory(Set<Long> ids, String cat);
 
 
 

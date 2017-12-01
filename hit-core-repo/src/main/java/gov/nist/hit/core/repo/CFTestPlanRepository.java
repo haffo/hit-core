@@ -73,4 +73,12 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
       @Param("username") String username);
 
 
+  @Query("select tp from CFTestPlan tp where tp.id IN (:ids)")
+  public List<CFTestPlan> findByIds(@Param("ids") Set<Long> ids);
+
+  @Query("update CFTestPlan tp set tp.category = :cat where tp.id IN (:ids)")
+  public void updateCategory(@Param("ids") Set<Long> ids, @Param("cat") String cat);
+
+
+
 }

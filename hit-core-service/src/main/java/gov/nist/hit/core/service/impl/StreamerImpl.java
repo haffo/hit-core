@@ -471,6 +471,7 @@ public class StreamerImpl implements Streamer {
       jGenerator.writeStartObject();
       writeAbstractTest(jGenerator, testCaseGroup);
       writeLongField(jGenerator, "id", testCaseGroup.getId());
+      writeLongField(jGenerator, "persistentId", testCaseGroup.getPersistentId());
       if (testCaseGroup.getTestCases() != null) {
         jGenerator.writeArrayFieldStart("testCases");
         for (TestCase child : testCaseGroup.getTestCases()) {
@@ -500,6 +501,8 @@ public class StreamerImpl implements Streamer {
       jGenerator.writeStartObject();
       writeAbstractTest(jGenerator, testPlan);
       writeLongField(jGenerator, "id", testPlan.getId());
+      writeLongField(jGenerator, "persistentId", testPlan.getPersistentId());
+      jGenerator.writeStringField("category", testPlan.getCategory());
       if (testPlan.getTestCases() != null) {
         jGenerator.writeArrayFieldStart("children");
         for (CFTestStep child : testPlan.getTestCases()) {
@@ -520,6 +523,8 @@ public class StreamerImpl implements Streamer {
       writeAbstractTest(jGenerator, testPlan);
       jGenerator.writeBooleanField("transport", testPlan.isTransport());
       jGenerator.writeStringField("domain", testPlan.getDomain());
+      jGenerator.writeStringField("category", testPlan.getCategory());
+
       writeLongField(jGenerator, "id", testPlan.getId());
 
       if (testPlan.getTestPackage() != null) {
@@ -897,6 +902,16 @@ public class StreamerImpl implements Streamer {
       jGenerator.writeNullField(key);
     } else {
       jGenerator.writeNumberField(key, value);
+    }
+
+  }
+
+  private void writeStringField(JsonGenerator jGenerator, String key, String value)
+      throws IOException {
+    if (value == null) {
+      jGenerator.writeNullField(key);
+    } else {
+      jGenerator.writeStringField(key, value);
     }
 
   }

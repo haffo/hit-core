@@ -1332,6 +1332,7 @@ public abstract class ResourcebundleLoader {
       if (testPlanObj.findValue("position") != null) {
         testPlan.setPosition(testPlanObj.findValue("position").intValue());
       }
+      testPlan.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       testPlan.setDescription(testPlanObj.findValue("description").textValue());
       testPlan.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));

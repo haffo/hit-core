@@ -6,5 +6,7 @@ public interface CFTestStepService {
 
   public CFTestStep findOne(Long id);
 
+  public void delete(Long id);
+
 
 }
