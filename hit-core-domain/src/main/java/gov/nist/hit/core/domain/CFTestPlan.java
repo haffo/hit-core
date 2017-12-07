@@ -72,7 +72,7 @@ public class CFTestPlan extends AbstractTestCase implements Serializable {
 
 
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
   @JoinTable(name = "cf_tcg_tc",
       joinColumns = {@JoinColumn(name = "cf_tcg_id", referencedColumnName = "id")},
       inverseJoinColumns = {@JoinColumn(name = "cf_tc_id", referencedColumnName = "id")})

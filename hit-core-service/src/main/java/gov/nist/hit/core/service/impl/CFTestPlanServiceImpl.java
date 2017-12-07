@@ -3,6 +3,9 @@ package gov.nist.hit.core.service.impl;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,10 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
 
   @Autowired
   private CFTestPlanRepository testPlanRepository;
+
+  @Autowired
+  @PersistenceContext(unitName = "base-tool")
+  protected EntityManager entityManager;
 
 
   @Override
@@ -90,7 +97,21 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
 
   @Override
   public void updateCategory(Set<Long> ids, String cat) {
-    testPlanRepository.updateCategory(ids, cat);
+    String sql = "update CFTestPlan tp set tp.category = ? where tp.id IN ?";
+    entityManager.createNativeQuery(sql, CFTestPlan.class).setParameter(1, cat).setParameter(2, ids)
+        .executeUpdate();
+  }
+
+  @Override
+  public List<CFTestPlan> findShortAllByScope(TestScope scope) {
+    // TODO Auto-generated method stub
+    return testPlanRepository.findShortAllByScope(scope);
+  }
+
+  @Override
+  public void delete(CFTestPlan testPlan) {
+    testPlanRepository.delete(testPlan);
+
   }
 
 

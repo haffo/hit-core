@@ -40,6 +40,9 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
   public List<CFTestPlan> findAllByScopeAndUsername(@Param("scope") TestScope scope,
       @Param("authorUsername") String authorUsername);
 
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId,category) from CFTestPlan tp where tp.scope = :scope")
+  public List<CFTestPlan> findShortAllByScope(@Param("scope") TestScope scope);
+
 
   @Query("select tp from CFTestPlan tp where tp.stage = :stage and tp.scope = :scope")
   public List<CFTestPlan> findAllByStageAndScope(@Param("stage") TestingStage stage,
@@ -75,9 +78,6 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
 
   @Query("select tp from CFTestPlan tp where tp.id IN (:ids)")
   public List<CFTestPlan> findByIds(@Param("ids") Set<Long> ids);
-
-  @Query("update CFTestPlan tp set tp.category = :cat where tp.id IN (:ids)")
-  public void updateCategory(@Param("ids") Set<Long> ids, @Param("cat") String cat);
 
 
 

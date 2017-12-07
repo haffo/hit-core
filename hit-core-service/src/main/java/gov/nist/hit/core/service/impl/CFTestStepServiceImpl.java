@@ -23,5 +23,15 @@ public class CFTestStepServiceImpl implements CFTestStepService {
     testStepRepository.delete(id);
   }
 
+  @Override
+  public void save(CFTestStep testStep) {
+    testStepRepository.saveAndFlush(testStep);
+  }
+
+  @Override
+  public void delete(CFTestStep testStep) {
+    testStepRepository.delete(testStep);
+  }
+
 
 }

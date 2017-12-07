@@ -8,5 +8,9 @@ public interface CFTestStepService {
 
   public void delete(Long id);
 
+  public void delete(CFTestStep testStep);
+
+  public void save(CFTestStep testStep);
+
 
 }

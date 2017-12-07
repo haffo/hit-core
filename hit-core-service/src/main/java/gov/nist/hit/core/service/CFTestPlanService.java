@@ -35,6 +35,8 @@ public interface CFTestPlanService {
 
   List<CFTestPlan> findShortAllByScopeAndUsername(TestScope scope, String authorUsername);
 
+  List<CFTestPlan> findShortAllByScope(TestScope scope);
+
   List<CFTestPlan> findAllByScopeAndUsername(TestScope scope, String authorUsername);
 
   List<CFTestPlan> findAllByScope(TestScope scope);
@@ -46,6 +48,8 @@ public interface CFTestPlanService {
   List<CFTestPlan> findByIds(Set<Long> ids);
 
   void updateCategory(Set<Long> ids, String cat);
+
+  void delete(CFTestPlan testPlan);
 
 
 
