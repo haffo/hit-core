@@ -66,6 +66,19 @@ public class TestPlanServiceImpl implements TestPlanService {
     return testPlanRepository.findAllCategoriesByStageAndScopeAndUser(stage, scope, username);
   }
 
+  @Override
+  public List<TestPlan> findShortAllByStageAndScopeAndAuthor(TestingStage stage, TestScope scope,
+      String authorUsername) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  @Transactional(value = "transactionManager")
+  public void delete(TestPlan testPlan) {
+    testPlanRepository.delete(testPlan);
+  }
+
 
 
 }

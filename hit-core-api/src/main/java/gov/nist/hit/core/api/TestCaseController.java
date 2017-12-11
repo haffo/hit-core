@@ -30,6 +30,7 @@ import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestCaseService;
+import gov.nist.hit.core.service.UserIdService;
 import gov.nist.hit.core.service.exception.TestCaseException;
 
 /**
@@ -44,6 +45,9 @@ public class TestCaseController {
 
 	@Autowired
 	private TestCaseService testCaseService;
+
+	@Autowired
+	private UserIdService userIdService;
 
 	@Autowired
 	private Streamer streamer;

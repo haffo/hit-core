@@ -20,10 +20,16 @@ public interface TestPlanService {
 
   List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
 
+  List<TestPlan> findShortAllByStageAndScopeAndAuthor(TestingStage stage, TestScope scope,
+      String authorUsername);
+
   Set<String> findAllCategoriesByStageAndScope(TestingStage stage, TestScope scope);
 
   Set<String> findAllCategoriesByStageAndScopeAndUser(TestingStage stage, TestScope scope,
       String username);
+
+  void delete(TestPlan testPlan);
+
 
 
 }

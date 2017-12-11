@@ -12,7 +12,6 @@ public interface TestStepService {
 
   public TestStep findOne(Long id);
 
-
   public TestStep findOneByTestContext(Long testContextId);
 
   public List<TestStep> findAllByStage(@Param("stage") TestingStage stage);
@@ -24,6 +23,11 @@ public interface TestStepService {
   public TestArtifact messageContent(Long id);
 
   public TestArtifact testDataSpecification(Long id);
+
+  public void delete(TestStep testStep);
+
+  void save(TestStep testStep);
+
 
 
 }

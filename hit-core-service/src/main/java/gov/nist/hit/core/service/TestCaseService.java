@@ -9,6 +9,9 @@ public interface TestCaseService {
 
   public TestArtifact testStory(Long id);
 
+  public void delete(TestCase testCase);
+
+  void save(TestCase testCase);
 
 
 }

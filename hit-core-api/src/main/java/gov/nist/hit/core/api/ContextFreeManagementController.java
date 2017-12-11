@@ -48,7 +48,6 @@ import gov.nist.hit.core.domain.ResourceType;
 import gov.nist.hit.core.domain.ResourceUploadAction;
 import gov.nist.hit.core.domain.ResourceUploadResult;
 import gov.nist.hit.core.domain.ResourceUploadStatus;
-import gov.nist.hit.core.domain.TestCaseWrapper;
 import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.UploadStatus;
 import gov.nist.hit.core.domain.UploadedProfileModel;
@@ -56,8 +55,6 @@ import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.AppInfoService;
 import gov.nist.hit.core.service.CFTestPlanService;
 import gov.nist.hit.core.service.CFTestStepService;
-import gov.nist.hit.core.service.ResourceLoader;
-import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.UserIdService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.NoUserFoundException;
@@ -91,12 +88,6 @@ public class ContextFreeManagementController {
 
 	@Autowired
 	private UserIdService userIdService;
-
-	@Autowired
-	private ResourceLoader resouceLoader;
-
-	@Autowired
-	private Streamer streamer;
 
 	@Autowired
 	private MailSender mailSender;
@@ -281,20 +272,16 @@ public class ContextFreeManagementController {
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@RequestMapping(value = "/groups/info", method = RequestMethod.POST)
-	@ResponseBody
-	public UploadStatus saveInfo(HttpServletRequest request, @RequestBody TestCaseWrapper wrapper, Principal p) {
+	@RequestMapping(value = "/categories/{category}/addGroup", method = RequestMethod.POST, produces = "application/json")
+	public UploadStatus updateCategory(@PathVariable("category") String category, @RequestBody Long groupId,
+			HttpServletRequest request, HttpServletResponse response, Principal p)
+			throws IOException, NoUserFoundException {
 		try {
 			String username = userIdService.getCurrentUserName(p);
 			if (username == null)
 				throw new NoUserFoundException("User could not be found");
-			if (wrapper.getScope() == null)
-				throw new NoUserFoundException("Scope not be found");
-			TestScope scope = TestScope.valueOf(wrapper.getScope().toUpperCase());
-			if (scope.equals(TestScope.GLOBAL) && !userService.hasGlobalAuthorities(username)) {
-				throw new NoUserFoundException("You do not have the permission to perform this task");
-			}
-			CFTestPlan testPlan = testPlanService.findOne(wrapper.getGroupId());
+
+			CFTestPlan testPlan = testPlanService.findOne(groupId);
 			if (testPlan == null)
 				throw new Exception("Test Plan not found");
 
@@ -302,28 +289,26 @@ public class ContextFreeManagementController {
 				throw new NoUserFoundException("You do not have the permission to perform this task");
 			}
 
-			if (wrapper.getCategory() != null)
-				testPlan.setCategory(wrapper.getCategory());
-
-			if (wrapper.getPosition() != -1) {
-				testPlan.setPosition(wrapper.getPosition());
-			}
-			if (wrapper.getTestcasename() != null) {
-				testPlan.setName(wrapper.getTestcasename());
+			TestScope scope = testPlan.getScope();
+			if (scope.equals(TestScope.GLOBAL) && !userService.hasGlobalAuthorities(username)) {
+				throw new NoUserFoundException("You do not have the permission to perform this task");
 			}
 
-			if (wrapper.getTestcasedescription() != null) {
-				testPlan.setName(wrapper.getTestcasedescription());
+			if (category != null) {
+				testPlan.setCategory(category);
 			}
+
+			testPlanService.save(testPlan);
+
 		} catch (IOException e) {
-			return new UploadStatus(ResourceUploadResult.FAILURE, "IO Error could not read files", e.getMessage());
+			return new UploadStatus(ResourceUploadResult.FAILURE, "Failed to save the group", e.getMessage());
 		} catch (NoUserFoundException e) {
 			return new UploadStatus(ResourceUploadResult.FAILURE, "User could not be found", e.getMessage());
 		} catch (Exception e) {
 			return new UploadStatus(ResourceUploadResult.FAILURE, "An error occured while adding profiles",
 					e.getMessage());
 		}
-		return null;
+		return new UploadStatus(ResourceUploadResult.SUCCESS, "Saved");
 	}
 
 	@PreAuthorize("hasRole('tester')")
@@ -348,22 +333,11 @@ public class ContextFreeManagementController {
 
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/categories/{category}", method = RequestMethod.POST, produces = "application/json")
-	public boolean updateCategory(@PathVariable("category") String category, @RequestBody Set<Long> groups,
+	public boolean updateCategories(@PathVariable("category") String category, @RequestBody Set<Long> groups,
 			HttpServletRequest request, HttpServletResponse response, Principal p)
 			throws IOException, NoUserFoundException {
 		for (Long id : groups) {
-			CFTestPlan testPlan = testPlanService.findOne(id);
-
-			String username = userIdService.getCurrentUserName(p);
-			if (username == null)
-				throw new NoUserFoundException("User could not be found");
-
-			if (!username.equals(testPlan.getAuthorUsername())) {
-				throw new NoUserFoundException("You do not have the permission to perform this task");
-			}
-
-			testPlan.setCategory(category);
-			testPlanService.save(testPlan);
+			updateCategory(category, id, request, response, p);
 		}
 		return true;
 	}

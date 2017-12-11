@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestStep;
@@ -51,6 +52,18 @@ public class TestStepServiceImpl implements TestStepService {
   @Override
   public TestStep findOneByTestContext(Long testContextId) {
     return testStepRepository.findOneByTestContextId(testContextId);
+  }
+
+  @Override
+  @Transactional(value = "transactionManager")
+  public void delete(TestStep testStep) {
+    testStepRepository.delete(testStep);
+  }
+
+  @Override
+  @Transactional(value = "transactionManager")
+  public void save(TestStep testStep) {
+    testStepRepository.saveAndFlush(testStep);
   }
 
 
