@@ -34,6 +34,13 @@ public class TestPlanServiceImpl implements TestPlanService {
     return testPlanRepository.findShortAllByStageAndScope(stage, scope);
   }
 
+  @Override
+  @Transactional(value = "transactionManager")
+  public List<TestPlan> findAllShortByStageAndUsernameAndScope(TestingStage stage,
+      String authorUsername, TestScope scope) {
+    return testPlanRepository.findAllShortByStageAndUsernameAndScope(stage, authorUsername, scope);
+  }
+
 
   @Override
   @Transactional(value = "transactionManager")
@@ -77,6 +84,12 @@ public class TestPlanServiceImpl implements TestPlanService {
   @Transactional(value = "transactionManager")
   public void delete(TestPlan testPlan) {
     testPlanRepository.delete(testPlan);
+  }
+
+  @Override
+  public TestPlan save(TestPlan testPlan) {
+    // TODO Auto-generated method stub
+    return testPlanRepository.save(testPlan);
   }
 
 

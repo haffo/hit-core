@@ -34,11 +34,12 @@ public class TestStepValidationReportServiceImplTest {
     ts.setName("Record an adverse reaction");
     ts.setTestingType(TestingType.SUT_INITIATOR);
     ts.setPosition(3);
-    report.setTestStep(ts);
+    report.setTestStepId(ts.getId());
     report.setComments("TestStep1 comments");
     report.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
 
-    String xml = service.generateXmlTestStepValidationReport(xmlMessageValidationReport, report);
+    String xml =
+        service.generateXmlTestStepValidationReport(xmlMessageValidationReport, report, ts);
     assertNotNull(xml);
     saveToFile(new File(outputsFolder + "/5-TestStepMessageValidationReport.xml"), xml);
 
@@ -61,11 +62,12 @@ public class TestStepValidationReportServiceImplTest {
     ts.setName("Record an adverse reaction");
     ts.setTestingType(TestingType.SUT_INITIATOR);
     ts.setPosition(3);
-    report.setTestStep(ts);
+    report.setTestStepId(ts.getId());
     report.setComments("TestStep1 comments");
     report.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
 
-    String xml = service.generateXmlTestStepValidationReport(xmlMessageValidationReport, report);
+    String xml =
+        service.generateXmlTestStepValidationReport(xmlMessageValidationReport, report, ts);
     assertNotNull(xml);
     saveToFile(new File(outputsFolder + "/1-TestStepMessageValidationReport.xml"), xml);
 
@@ -83,10 +85,10 @@ public class TestStepValidationReportServiceImplTest {
     t3.setName("Record an adverse reaction");
     t3.setTestingType(TestingType.SUT_MANUAL);
     t3.setPosition(3);
-    r3.setTestStep(t3);
+    r3.setTestStepId(t3.getId());
     r3.setComments("TestStep3 comments");
     r3.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
-    String xml = service.generateXmlTestStepValidationReport(null, r3);
+    String xml = service.generateXmlTestStepValidationReport(null, r3, t3);
 
     assertNotNull(xml);
     saveToFile(new File(outputsFolder + "/2-TestStepManualValidationReport.xml"), xml);
@@ -105,10 +107,10 @@ public class TestStepValidationReportServiceImplTest {
     t3.setName("Record an adverse reaction");
     t3.setTestingType(TestingType.SUT_MANUAL);
     t3.setPosition(3);
-    r3.setTestStep(t3);
+    r3.setTestStepId(t3.getId());
     r3.setComments("TestStep3 comments");
     r3.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
-    String xml = service.generateXmlTestStepValidationReport(null, r3);
+    String xml = service.generateXmlTestStepValidationReport(null, r3, t3);
     assertNotNull(xml);
     saveToFile(new File(outputsFolder + "/3-TestStepMesssageValidationReport.xml"), xml);
     r3.setXml(xml);
@@ -134,10 +136,10 @@ public class TestStepValidationReportServiceImplTest {
     t3.setName("Record an adverse reaction");
     t3.setTestingType(TestingType.SUT_INITIATOR);
     t3.setPosition(3);
-    r3.setTestStep(t3);
+    r3.setTestStepId(t3.getId());
     r3.setComments("TestStep3 comments");
     r3.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
-    String xml = service.generateXmlTestStepValidationReport(xmlMessageValidationReport, r3);
+    String xml = service.generateXmlTestStepValidationReport(xmlMessageValidationReport, r3, t3);
     assertNotNull(xml);
     saveToFile(new File(outputsFolder + "/4-TestStepMesssageValidationReport.xml"), xml);
     r3.setXml(xml);

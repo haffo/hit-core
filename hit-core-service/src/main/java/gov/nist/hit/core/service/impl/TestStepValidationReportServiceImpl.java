@@ -27,6 +27,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import com.ibm.icu.util.Calendar;
 
 import gov.nist.hit.core.domain.ManualValidationResult;
+import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.repo.TestStepValidationReportRepository;
 import gov.nist.hit.core.service.TestStepValidationReportService;
@@ -105,11 +106,6 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   @Override
   public TestStepValidationReport findOneByTestStepAndUser(Long testStepId, Long userId) {
     return validationReportRepository.findOneByTestStepAndUser(userId, testStepId);
-  }
-
-  @Override
-  public List<TestStepValidationReport> findAllByTestCaseAndUser(Long testCaseId, Long userId) {
-    return validationReportRepository.findAllByTestCaseAndUser(userId, testCaseId);
   }
 
   @Override
@@ -296,6 +292,12 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
   }
 
   @Override
+  public List<TestStepValidationReport> findAllByTestStep(Long testStepId) {
+    return validationReportRepository.findAllByTestStep(testStepId);
+  }
+
+
+  @Override
   public String generateManualXml(ManualValidationResult validationResult)
       throws ValidationReportException {
     try {
@@ -377,10 +379,10 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
 
   @Override
   public String generateXmlTestStepValidationReport(String xmlMessageValidationReport,
-      TestStepValidationReport report) throws ValidationReportException {
+      TestStepValidationReport report, TestStep testStep) throws ValidationReportException {
     try {
-      String xml =
-          ReportUtil.generateXmlTestStepValidationReport(xmlMessageValidationReport, report);
+      String xml = ReportUtil.generateXmlTestStepValidationReport(xmlMessageValidationReport,
+          report, testStep);
       return xml;
     } catch (RuntimeException e) {
       throw new ValidationReportException(e);

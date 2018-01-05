@@ -33,6 +33,7 @@ import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.MessageValidationReportService;
 import gov.nist.hit.core.service.Streamer;
+import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.exception.MessageValidationException;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import io.swagger.annotations.ApiParam;
@@ -49,6 +50,9 @@ public class MessageValidationReportController {
 
 	@Autowired
 	private MessageValidationReportService validationReportService;
+
+	@Autowired
+	private TestStepService testStepService;
 
 	@Autowired
 	private AccountService userService;
@@ -77,7 +81,12 @@ public class MessageValidationReportController {
 				throw new MessageValidationException("Forbidden access");
 			}
 
-			TestStep testStep = report.getTestStep();
+			Long testStepId = report.getTestStepId();
+			TestStep testStep = null;
+			if (testStepId != null) {
+				testStep = testStepService.findOne(testStepId);
+			}
+
 			if (testStep == null)
 				throw new ValidationReportException("No associated test step found");
 			String title = testStep.getName();

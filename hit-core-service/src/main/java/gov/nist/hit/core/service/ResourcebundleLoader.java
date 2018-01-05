@@ -793,12 +793,11 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  protected Constraints additionalConstraints(String location) throws IOException {
-    Resource resource = getResource(location);
-    if (resource == null) {
+  protected Constraints additionalConstraints(String content) throws IOException {
+    if (content == null) {
       return null;
     }
-    return constraint(FileUtil.getContent(resource));
+    return constraint(content);
 
   }
 
@@ -1293,15 +1292,17 @@ public abstract class ResourcebundleLoader {
         String fileName = fileName(resource);
         String loca = fileName.substring(fileName.indexOf(location), fileName.length());
         Resource descriptorResource = getDescriptorResource(loca);
-        String filename = descriptorResource.getFilename();
-        if (filename.endsWith("TestCaseGroup.json")) {
-          TestCaseGroup testCaseGroup = testCaseGroup(loca, stage, tp.isTransport());
-          checkPersistentId(testCaseGroup.getPersistentId(), fileName);
-          tp.getTestCaseGroups().add(testCaseGroup);
-        } else if (filename.endsWith("TestCase.json")) {
-          TestCase testCase = testCase(loca, stage, tp.isTransport());
-          checkPersistentId(testCase.getPersistentId(), fileName);
-          tp.getTestCases().add(testCase);
+        if (descriptorResource != null) {
+          String filename = descriptorResource.getFilename();
+          if (filename.endsWith("TestCaseGroup.json")) {
+            TestCaseGroup testCaseGroup = testCaseGroup(loca, stage, tp.isTransport());
+            checkPersistentId(testCaseGroup.getPersistentId(), fileName);
+            tp.getTestCaseGroups().add(testCaseGroup);
+          } else if (filename.endsWith("TestCase.json")) {
+            TestCase testCase = testCase(loca, stage, tp.isTransport());
+            checkPersistentId(testCase.getPersistentId(), fileName);
+            tp.getTestCases().add(testCase);
+          }
         }
       }
       return tp;

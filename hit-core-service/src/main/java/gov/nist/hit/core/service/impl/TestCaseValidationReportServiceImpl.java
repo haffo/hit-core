@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -28,11 +30,14 @@ import com.ibm.icu.util.Calendar;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseValidationResult;
 import gov.nist.hit.core.domain.TestResult;
+import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.repo.TestCaseValidationReportRepository;
 import gov.nist.hit.core.repo.TestStepValidationReportRepository;
 import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
+import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.exception.ValidationReportException;
 import gov.nist.hit.core.service.util.HtmlUtil;
@@ -53,6 +58,14 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
 
   @Autowired
   private TestStepValidationReportService testStepValidationReportService;
+
+  @Autowired
+  private TestStepService testStepService;
+
+
+  @Autowired
+  private TestCaseService testCaseService;
+
 
   @Autowired
   private TestCaseValidationReportRepository testCaseValidationReportRepository;
@@ -160,9 +173,10 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
 
       for (int i = 1; i <= result.getTestStepReports().size(); i++) {
         for (TestStepValidationReport testStepReport : result.getTestStepReports()) {
-          if (testStepReport.getTestStep().getPosition() == i) {
-            String xml = testStepValidationReportService
-                .generateXmlTestStepValidationReport(testStepReport.getXml(), testStepReport);
+          TestStep testStep = testStepService.findOne(testStepReport.getTestStepId());
+          if (testStep != null && testStep.getPosition() == i) {
+            String xml = testStepValidationReportService.generateXmlTestStepValidationReport(
+                testStepReport.getXml(), testStepReport, testStep);
             testCaseReportContent.appendChild(ReportUtil.getXmlElement(xml));
           }
         }
@@ -273,7 +287,22 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
 
   private List<TestStepValidationReport> findTestStepReportsByTestCaseAndUser(Long userId,
       Long testCaseId) {
-    return testCaseValidationReportRepository.findAllByTestCaseAndUser(testCaseId, userId);
+    TestCase testCase = testCaseService.findOne(testCaseId);
+    List<TestStepValidationReport> reports = null;
+    if (testCase != null) {
+      Set<TestStep> testSteps = testCase.getTestSteps();
+      if (testSteps != null) {
+        reports = new ArrayList<TestStepValidationReport>();
+        for (TestStep testStep : testSteps) {
+          List<TestStepValidationReport> tmp =
+              testStepValidationReportService.findAllByTestStepAndUser(testStep.getId(), userId);
+          if (tmp != null && !tmp.isEmpty())
+            reports.addAll(tmp);
+
+        }
+      }
+    }
+    return reports;
   }
 
 

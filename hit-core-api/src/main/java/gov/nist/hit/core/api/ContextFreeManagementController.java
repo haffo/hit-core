@@ -212,25 +212,26 @@ public class ContextFreeManagementController {
 		TestScope scope = testPlan.getScope();
 		if (scope.equals(TestScope.GLOBAL)) {
 			throw new IllegalArgumentException("This Group is not already publicly available ");
-		} else {
-			if (!userService.hasGlobalAuthorities(username)) {
-				throw new IllegalArgumentException("You do not have the permission to perform this task");
-			} else {
-				testPlan.setScope(TestScope.GLOBAL);
-				Set<CFTestStep> testSteps = testPlan.getTestCases();
-				if (testSteps != null) {
-					for (CFTestStep step : testSteps) {
-						step.setScope(TestScope.GLOBAL);
-					}
-				}
-				testPlanService.save(testPlan);
-			}
+		} else if (!userService.hasGlobalAuthorities(username)) {
+			throw new IllegalArgumentException("You do not have the permission to perform this task");
 		}
+		publish(testPlan);
+		testPlanService.save(testPlan);
 		ResourceUploadStatus result = new ResourceUploadStatus();
 		result.setType(ResourceType.TESTPLAN);
 		result.setAction(ResourceUploadAction.UPDATE);
 		result.setStatus(ResourceUploadResult.SUCCESS);
 		return result;
+	}
+
+	private void publish(CFTestPlan testPlan) {
+		testPlan.setScope(TestScope.GLOBAL);
+		Set<CFTestStep> testSteps = testPlan.getTestCases();
+		if (testSteps != null) {
+			for (CFTestStep step : testSteps) {
+				step.setScope(TestScope.GLOBAL);
+			}
+		}
 	}
 
 	@PreAuthorize("hasRole('tester')")
@@ -382,12 +383,6 @@ public class ContextFreeManagementController {
 		} catch (MailException ex) {
 			logger.error(ex.getMessage(), ex);
 		}
-	}
-
-	private String getUrl(HttpServletRequest request) {
-		String scheme = request.getScheme();
-		String host = request.getHeader("Host");
-		return scheme + "://" + host + "/" + request.getContextPath();
 	}
 
 	public CFTestStepService getTestStepService() {

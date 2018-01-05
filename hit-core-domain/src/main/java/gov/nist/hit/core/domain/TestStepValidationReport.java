@@ -10,7 +10,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
@@ -28,15 +27,12 @@ public class TestStepValidationReport implements Serializable {
   private Long id;
 
   @JsonIgnore
-
-  @ManyToOne(optional = false)
-  private TestStep testStep;
+  private Long testStepId;
 
   @JsonIgnore
   private Long userId;
 
   @JsonIgnore
-
   @Column(columnDefinition = "LONGTEXT")
   private String xml;
 
@@ -58,7 +54,7 @@ public class TestStepValidationReport implements Serializable {
   public TestStepValidationReport(String content, TestStep testStep, Long accountId) {
     super();
     this.xml = content;
-    this.testStep = testStep;
+    this.testStepId = testStep != null ? testStep.getId() : null;
     this.userId = accountId;
   }
 
@@ -94,16 +90,6 @@ public class TestStepValidationReport implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
-
-  public TestStep getTestStep() {
-    return testStep;
-  }
-
-  public void setTestStep(TestStep testStep) {
-    this.testStep = testStep;
-  }
-
-
 
   public Long getUserId() {
     return userId;
@@ -160,6 +146,14 @@ public class TestStepValidationReport implements Serializable {
 
   public void setJson(String json) {
     this.json = json;
+  }
+
+  public Long getTestStepId() {
+    return testStepId;
+  }
+
+  public void setTestStepId(Long testStepId) {
+    this.testStepId = testStepId;
   }
 
 

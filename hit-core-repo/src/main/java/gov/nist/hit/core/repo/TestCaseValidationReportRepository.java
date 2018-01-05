@@ -12,20 +12,16 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.TestStepValidationReport;
-
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface TestCaseValidationReportRepository extends
-    JpaRepository<TestStepValidationReport, Long> {
+import gov.nist.hit.core.domain.TestStepValidationReport;
 
-  @Query("select report from TestStepValidationReport report where report.userId = :userId and report.testStep.testCase.id = :testCaseId")
-  List<TestStepValidationReport> findAllByTestCaseAndUser(@Param("userId") Long userId,
-      @Param("testCaseId") Long testCaseId);
+public interface TestCaseValidationReportRepository
+    extends JpaRepository<TestStepValidationReport, Long> {
 
   @Query("select report from TestStepValidationReport report where report.userId = :userId")
   List<TestStepValidationReport> findAllByUser(@Param("userId") Long userId);

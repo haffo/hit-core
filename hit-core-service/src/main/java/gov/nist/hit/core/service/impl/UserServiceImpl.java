@@ -57,6 +57,9 @@ public class UserServiceImpl implements UserService {
       new HashSet<>(Arrays.asList(SUPERVISOR_AUTHORITY, ADMIN_AUTHORITY));
 
 
+  Set<String> ADMIN_AUTHORITIES = new HashSet<>(Arrays.asList(ADMIN_AUTHORITY));
+
+
 
   @Autowired
   private CustomJdbcUserDetailsManager jdbcUserDetailsManager;
@@ -281,5 +284,22 @@ public class UserServiceImpl implements UserService {
     }
     return false;
   }
+
+  @Override
+  public boolean isAdmin(String username) throws NoUserFoundException {
+    User user = this.retrieveUserByUsername(username);
+    if (user == null) {
+      throw new NoUserFoundException("User could not be found");
+    }
+    Collection<GrantedAuthority> authorit = user.getAuthorities();
+    for (GrantedAuthority auth : authorit) {
+      if (ADMIN_AUTHORITIES.contains(auth.getAuthority())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+
 
 }

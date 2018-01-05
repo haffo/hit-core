@@ -36,7 +36,7 @@ public class TestContext implements Serializable {
   protected String format;
 
   @ApiModelProperty(required = false, value = "example message of the test context")
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(unique = true, nullable = true, insertable = true, updatable = true)
   protected Message message;
 

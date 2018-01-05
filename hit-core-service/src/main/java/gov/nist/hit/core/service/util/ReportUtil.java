@@ -1,9 +1,5 @@
 package gov.nist.hit.core.service.util;
 
-import gov.nist.hit.core.domain.TestResult;
-import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.service.exception.ValidationReportException;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -12,16 +8,20 @@ import java.util.Date;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import nu.xom.Attribute;
-import nu.xom.Builder;
-import nu.xom.ParsingException;
-import nu.xom.ValidityException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 
 import com.ibm.icu.util.Calendar;
+
+import gov.nist.hit.core.domain.TestResult;
+import gov.nist.hit.core.domain.TestStep;
+import gov.nist.hit.core.domain.TestStepValidationReport;
+import gov.nist.hit.core.service.exception.ValidationReportException;
+import nu.xom.Attribute;
+import nu.xom.Builder;
+import nu.xom.ParsingException;
+import nu.xom.ValidityException;
 
 public class ReportUtil {
   public static String dateOfTest(Date date) throws ParseException, DatatypeConfigurationException {
@@ -43,9 +43,10 @@ public class ReportUtil {
   }
 
   public static nu.xom.Element generateTestStepValidationReportElement(
-      String xmlMessageOrManualValidationReport, TestStepValidationReport result)
+      String xmlMessageOrManualValidationReport, TestStepValidationReport result, TestStep testStep)
       throws ValidationReportException {
     try {
+
       nu.xom.Element report =
           new nu.xom.Element("teststepvalidationreport:TestStepValidationReport",
               "http://www.nist.gov/healthcare/validation/teststep/report");
@@ -53,36 +54,29 @@ public class ReportUtil {
           new nu.xom.Element("teststepvalidationreport:TestStepValidationReportHeader",
               "http://www.nist.gov/healthcare/validation/teststep/report");
       report.appendChild(headerReport);
-      nu.xom.Element type =
-          new nu.xom.Element("teststepvalidationreport:Type",
-              "http://www.nist.gov/healthcare/validation/teststep/report");
-      type.appendChild(result.getTestStep() != null
-          && result.getTestStep().getTestingType() != null ? result.getTestStep().getTestingType()
-          .toString() : "");
+      nu.xom.Element type = new nu.xom.Element("teststepvalidationreport:Type",
+          "http://www.nist.gov/healthcare/validation/teststep/report");
+      type.appendChild(testStep != null && testStep.getTestingType() != null
+          ? testStep.getTestingType().toString() : "");
       headerReport.appendChild(type);
 
-      nu.xom.Element comments =
-          new nu.xom.Element("teststepvalidationreport:Comments",
-              "http://www.nist.gov/healthcare/validation/teststep/report");
+      nu.xom.Element comments = new nu.xom.Element("teststepvalidationreport:Comments",
+          "http://www.nist.gov/healthcare/validation/teststep/report");
       comments.appendChild(result.getComments());
       headerReport.appendChild(comments);
       headerReport.addAttribute(new Attribute("Result", getTestCaseResult(result.getResult())));
-      nu.xom.Element name =
-          new nu.xom.Element("teststepvalidationreport:Name",
-              "http://www.nist.gov/healthcare/validation/teststep/report");
-      name.appendChild(result.getTestStep() != null ? result.getTestStep().getName() : "");
+      nu.xom.Element name = new nu.xom.Element("teststepvalidationreport:Name",
+          "http://www.nist.gov/healthcare/validation/teststep/report");
+      name.appendChild(testStep != null ? testStep.getName() : "");
       headerReport.appendChild(name);
 
-      nu.xom.Element position =
-          new nu.xom.Element("teststepvalidationreport:Position",
-              "http://www.nist.gov/healthcare/validation/teststep/report");
-      position.appendChild(result.getTestStep() != null ? result.getTestStep().getPosition() + ""
-          : "");
+      nu.xom.Element position = new nu.xom.Element("teststepvalidationreport:Position",
+          "http://www.nist.gov/healthcare/validation/teststep/report");
+      position.appendChild(testStep != null ? testStep.getPosition() + "" : "");
       headerReport.appendChild(position);
 
-      nu.xom.Element dateOfTest =
-          new nu.xom.Element("teststepvalidationreport:DateOfTest",
-              "http://www.nist.gov/healthcare/validation/teststep/report");
+      nu.xom.Element dateOfTest = new nu.xom.Element("teststepvalidationreport:DateOfTest",
+          "http://www.nist.gov/healthcare/validation/teststep/report");
       dateOfTest.appendChild(ReportUtil.dateOfTest(Calendar.getInstance().getTime()));
       headerReport.appendChild(dateOfTest);
 
@@ -91,7 +85,8 @@ public class ReportUtil {
               "http://www.nist.gov/healthcare/validation/teststep/report");
       report.appendChild(reportContent);
       if (StringUtils.isNotEmpty(xmlMessageOrManualValidationReport)) {
-        xmlMessageOrManualValidationReport = removeNonPrintableCharacters(xmlMessageOrManualValidationReport,false);
+        xmlMessageOrManualValidationReport =
+            removeNonPrintableCharacters(xmlMessageOrManualValidationReport, false);
         reportContent.appendChild(ReportUtil.getXmlElement(xmlMessageOrManualValidationReport));
       }
       return report;
@@ -102,35 +97,34 @@ public class ReportUtil {
     }
   }
 
-    public static String removeNonPrintableCharacters(String message, boolean showHex){
-        StringBuilder cleanedMessage = new StringBuilder();
-        for(char c : message.toCharArray()){
-            if(isPrintable(c))
-                cleanedMessage.append(c);
-            else {
-                if(showHex){
-                    String hex = String.format("%04x", (int) c);
-                    cleanedMessage.append("[x");
-                    cleanedMessage.append(hex);
-                    cleanedMessage.append("]");
-                }
-            }
+  public static String removeNonPrintableCharacters(String message, boolean showHex) {
+    StringBuilder cleanedMessage = new StringBuilder();
+    for (char c : message.toCharArray()) {
+      if (isPrintable(c))
+        cleanedMessage.append(c);
+      else {
+        if (showHex) {
+          String hex = String.format("%04x", (int) c);
+          cleanedMessage.append("[x");
+          cleanedMessage.append(hex);
+          cleanedMessage.append("]");
         }
-        return cleanedMessage.toString();
+      }
     }
+    return cleanedMessage.toString();
+  }
 
-    public static boolean isPrintable(char c){
-        int i = (int) c;
-        return i == 10 || i < 0 || i > 31;
-    }
+  public static boolean isPrintable(char c) {
+    int i = c;
+    return i == 10 || i < 0 || i > 31;
+  }
 
   public static String generateXmlTestStepValidationReport(
-      String xmlMessageOrManualValidationReport, TestStepValidationReport report)
+      String xmlMessageOrManualValidationReport, TestStepValidationReport report, TestStep testStep)
       throws ValidationReportException {
     try {
-      nu.xom.Element element =
-          ReportUtil.generateTestStepValidationReportElement(xmlMessageOrManualValidationReport,
-              report);
+      nu.xom.Element element = ReportUtil.generateTestStepValidationReportElement(
+          xmlMessageOrManualValidationReport, report, testStep);
       return element.toXML();
     } catch (RuntimeException e) {
       throw new ValidationReportException(e);
@@ -144,8 +138,6 @@ public class ReportUtil {
   public static String getTestCaseResult(TestResult result) throws ValidationReportException {
     return result != null ? result.getTitle() : "";
   }
-
-
 
 
 

@@ -125,4 +125,6 @@ public interface UserService {
 
   public boolean hasGlobalAuthorities(String username) throws NoUserFoundException;
 
+  public boolean isAdmin(String username) throws NoUserFoundException;
+
 }

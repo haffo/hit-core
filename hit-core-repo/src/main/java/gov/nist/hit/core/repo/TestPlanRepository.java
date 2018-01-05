@@ -51,6 +51,12 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
   public List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
 
   @Transactional(value = "transactionManager")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3")
+  public List<TestPlan> findAllShortByStageAndUsernameAndScope(TestingStage stage,
+      String authorUsername, TestScope scope);
+
+
+  @Transactional(value = "transactionManager")
   @Query("select tp.testPackage from TestPlan tp where tp.stage = :stage")
   public List<TestArtifact> findAllTestPackages(@Param("stage") TestingStage stage);
 

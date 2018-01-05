@@ -1,10 +1,10 @@
 package gov.nist.hit.core.service;
 
-import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.service.exception.ValidationReportException;
-
 import java.io.InputStream;
 import java.util.List;
+
+import gov.nist.hit.core.domain.TestStepValidationReport;
+import gov.nist.hit.core.service.exception.ValidationReportException;
 
 public interface MessageValidationReportService {
 
@@ -23,8 +23,6 @@ public interface MessageValidationReportService {
   TestStepValidationReport findOneByTestStepAndUser(Long testStepId, Long userId);
 
   List<TestStepValidationReport> findAllByTestStepAndUser(Long testStepId, Long userId);
-
-  List<TestStepValidationReport> findAllByTestCaseAndUser(Long testCaseId, Long userId);
 
   List<TestStepValidationReport> findAllByUser(Long userId);
 

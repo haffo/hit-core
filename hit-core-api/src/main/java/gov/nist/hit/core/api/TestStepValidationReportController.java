@@ -156,12 +156,16 @@ public class TestStepValidationReportController {
 				throw new MessageValidationException("Forbidden access");
 			}
 
-			TestStep testStep = report.getTestStep();
+			Long testStepId = report.getTestStepId();
+			TestStep testStep = null;
+
+			if (testStepId != null)
+				testStep = testStepService.findOne(testStepId);
 
 			if (testStep == null)
 				throw new ValidationReportException("No associated test step found");
 
-			String xmlReport = generateXml(report, testStep.getStage());
+			String xmlReport = generateXml(report, testStep.getStage(), testStep);
 			String title = testStep.getName();
 			String ext = format.toLowerCase();
 			InputStream io = null;
@@ -236,7 +240,7 @@ public class TestStepValidationReportController {
 			TestStepValidationReport report = findReport(testReportId, testStepId, userId);
 			if (report == null) {
 				report = new TestStepValidationReport();
-				report.setTestStep(testStep);
+				report.setTestStepId(testStepId);
 				report.setUserId(userId);
 			}
 
@@ -245,7 +249,7 @@ public class TestStepValidationReportController {
 			report.setComments(comments);
 			report.setResult(StringUtils.isNotEmpty(result) && result != null ? TestResult.valueOf(result) : null);
 			validationReportService.save(report);
-			String tmpXml = generateXml(report, testStep.getStage());
+			String tmpXml = generateXml(report, testStep.getStage(), testStep);
 			report.setHtml(validationReportService.generateHtml(tmpXml));
 			report.setXml(null);
 			report.setJson(null);
@@ -319,11 +323,11 @@ public class TestStepValidationReportController {
 		return null;
 	}
 
-	private String generateXml(TestStepValidationReport report, TestingStage stage) {
+	private String generateXml(TestStepValidationReport report, TestingStage stage, TestStep testStep) {
 		if (TestingStage.CF.equals(stage)) {
 			return validationReportService.updateXmlTestValidationReportElement(report);
 		} else {
-			return validationReportService.generateXmlTestStepValidationReport(report.getXml(), report);
+			return validationReportService.generateXmlTestStepValidationReport(report.getXml(), report, testStep);
 		}
 	}
 

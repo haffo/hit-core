@@ -27,7 +27,6 @@ import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.MessageParser;
 import gov.nist.hit.core.service.MessageValidator;
 import gov.nist.hit.core.service.Streamer;
-import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TestStepValidationReportService;
 import gov.nist.hit.core.service.ValidationReportConverter;
 import gov.nist.hit.core.service.exception.MessageParserException;
@@ -45,9 +44,6 @@ public abstract class TestContextController {
 
 	@Autowired
 	private TestStepValidationReportService validationReportService;
-
-	@Autowired
-	private TestStepService testStepService;
 
 	@Autowired
 	private AccountService accountService;
@@ -137,7 +133,7 @@ public abstract class TestContextController {
 		TestStepValidationReport report = findUserTestStepValidationReportByTestStep(testStep.getId(), account.getId());
 		if (report == null) {
 			report = new TestStepValidationReport();
-			report.setTestStep(testStep);
+			report.setTestStepId(testStep.getId());
 			report.setUserId(account.getId());
 		}
 		report.setXml((getValidatioReportConverter().toXML(result.getJson())));

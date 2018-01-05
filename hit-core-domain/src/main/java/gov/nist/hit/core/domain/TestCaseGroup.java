@@ -46,13 +46,13 @@ public class TestCaseGroup extends AbstractTestCase implements Serializable {
   }
 
   @ApiModelProperty(required = false, value = "children test case groups of the test case group")
-  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
   @JoinTable(name = "tcg_tcg", joinColumns = {@JoinColumn(name = "parent_id")},
       inverseJoinColumns = {@JoinColumn(name = "child_id")})
   private Set<TestCaseGroup> testCaseGroups = new HashSet<TestCaseGroup>();
 
   @ApiModelProperty(required = false, value = "children test cases of the test case group")
-  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
   @JoinTable(name = "tcg_tc", joinColumns = {@JoinColumn(name = "testcasegroup_id")},
       inverseJoinColumns = {@JoinColumn(name = "testcase_id")})
   private Set<TestCase> testCases = new HashSet<TestCase>();

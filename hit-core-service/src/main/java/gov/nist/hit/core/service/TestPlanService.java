@@ -10,25 +10,30 @@ import gov.nist.hit.core.domain.TestingStage;
 
 public interface TestPlanService {
 
-  TestPlan findOne(Long testPlanId);
+  public TestPlan findOne(Long testPlanId);
 
-  List<TestArtifact> findAllTestPackages(TestingStage stage);
+  public List<TestArtifact> findAllTestPackages(TestingStage stage);
 
-  List<TestPlan> findShortAllByStage(TestingStage stage);
+  public List<TestPlan> findShortAllByStage(TestingStage stage);
 
-  List<TestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
+  public List<TestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
 
-  List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
+  public List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
 
-  List<TestPlan> findShortAllByStageAndScopeAndAuthor(TestingStage stage, TestScope scope,
+  public List<TestPlan> findShortAllByStageAndScopeAndAuthor(TestingStage stage, TestScope scope,
       String authorUsername);
 
-  Set<String> findAllCategoriesByStageAndScope(TestingStage stage, TestScope scope);
+  public Set<String> findAllCategoriesByStageAndScope(TestingStage stage, TestScope scope);
 
-  Set<String> findAllCategoriesByStageAndScopeAndUser(TestingStage stage, TestScope scope,
+  public Set<String> findAllCategoriesByStageAndScopeAndUser(TestingStage stage, TestScope scope,
       String username);
 
   void delete(TestPlan testPlan);
+
+  public TestPlan save(TestPlan testPlan);
+
+  public List<TestPlan> findAllShortByStageAndUsernameAndScope(TestingStage stage,
+      String authorUsername, TestScope scope);
 
 
 

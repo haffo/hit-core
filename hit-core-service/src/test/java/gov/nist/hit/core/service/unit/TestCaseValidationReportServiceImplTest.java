@@ -49,12 +49,12 @@ public class TestCaseValidationReportServiceImplTest {
     TestStep t1 = new TestStep();
     t1.setName("Transmit the immunization report to the Immunization Registry");
     t1.setPosition(1);
-    r1.setTestStep(t1);
+    r1.setTestStepId(t1.getId());
     t1.setTestingType(TestingType.SUT_INITIATOR);
     r1.setComments("TestStep1 comments");
     r1.setResult(TestResult.FAILED);
     String xml =
-        testStepService.generateXmlTestStepValidationReport(xmlMessageValidationReport, r1);
+        testStepService.generateXmlTestStepValidationReport(xmlMessageValidationReport, r1, t1);
     r1.setXml(xml);
 
     testStepReports.add(r1);
@@ -66,11 +66,11 @@ public class TestCaseValidationReportServiceImplTest {
     t2.setName("Receive Acknowledgement");
     t2.setTestingType(TestingType.TA_RESPONDER);
     t2.setPosition(2);
-    r2.setTestStep(t2);
+    r2.setTestStepId(t2.getId());
     r2.setComments("TestStep2 comments");
     r2.setResult(TestResult.FAILED_NOT_SUPPORTED);
 
-    xml = testStepService.generateXmlTestStepValidationReport(xmlMessageValidationReport, r2);
+    xml = testStepService.generateXmlTestStepValidationReport(xmlMessageValidationReport, r2, t2);
     r2.setXml(xml);
 
     testStepReports.add(r2);
@@ -82,10 +82,10 @@ public class TestCaseValidationReportServiceImplTest {
     t3.setName("Record an adverse reaction");
     t3.setTestingType(TestingType.TA_RESPONDER);
     t3.setPosition(3);
-    r3.setTestStep(t3);
+    r3.setTestStepId(t3.getId());
     r3.setComments("TestStep3 comments");
     r3.setResult(TestResult.PASSED_NOTABLE_EXCEPTION);
-    xml = testStepService.generateXmlTestStepValidationReport(xmlMessageValidationReport, r3);
+    xml = testStepService.generateXmlTestStepValidationReport(xmlMessageValidationReport, r3, t3);
     r3.setXml(xml);
 
     testStepReports.add(r3);

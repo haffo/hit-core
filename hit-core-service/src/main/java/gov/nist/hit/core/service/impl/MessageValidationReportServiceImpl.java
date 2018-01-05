@@ -1,11 +1,5 @@
 package gov.nist.hit.core.service.impl;
 
-import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.repo.TestStepValidationReportRepository;
-import gov.nist.hit.core.service.MessageValidationReportService;
-import gov.nist.hit.core.service.exception.ValidationReportException;
-import gov.nist.hit.core.service.util.HtmlUtil;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +21,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+
+import gov.nist.hit.core.domain.TestStepValidationReport;
+import gov.nist.hit.core.repo.TestStepValidationReportRepository;
+import gov.nist.hit.core.service.MessageValidationReportService;
+import gov.nist.hit.core.service.exception.ValidationReportException;
+import gov.nist.hit.core.service.util.HtmlUtil;
 
 @Service
 public class MessageValidationReportServiceImpl implements MessageValidationReportService {
@@ -93,10 +93,6 @@ public class MessageValidationReportServiceImpl implements MessageValidationRepo
     return validationReportRepository.findOneByTestStepAndUser(userId, testStepId);
   }
 
-  @Override
-  public List<TestStepValidationReport> findAllByTestCaseAndUser(Long testCaseId, Long userId) {
-    return validationReportRepository.findAllByTestCaseAndUser(userId, testCaseId);
-  }
 
   @Override
   public List<TestStepValidationReport> findAllByUser(Long userId) {
