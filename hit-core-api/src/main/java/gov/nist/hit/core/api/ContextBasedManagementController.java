@@ -81,8 +81,11 @@ public class ContextBasedManagementController {
 
 	static final Logger logger = LoggerFactory.getLogger(ContextBasedManagementController.class);
 
-	public static final String CB_RESOURCE_BUNDLE_DIR = new File(System.getProperty("UPLOADED_RESOURCE_BUNDLE"))
-			.getAbsolutePath() + "/cb";
+	public static final String CB_UPLOAD_DIR = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + "/cb";
+
+	// public static final String CB_RESOURCE_BUNDLE_DIR = new
+	// File(System.getProperty("UPLOADED_RESOURCE_BUNDLE"))
+	// .getAbsolutePath() + "/cb";
 
 	@Autowired
 	private TestStepService testStepService;
@@ -599,8 +602,7 @@ public class ContextBasedManagementController {
 			String token = UUID.randomUUID().toString();
 			String filename = part.getOriginalFilename().substring(0, part.getOriginalFilename().lastIndexOf(".zip"));
 
-			String directory = bundleHandler.unzip(part.getBytes(),
-					CB_RESOURCE_BUNDLE_DIR + "/" + token + "/" + filename);
+			String directory = bundleHandler.unzip(part.getBytes(), CB_UPLOAD_DIR + "/" + token + "/" + filename);
 
 			resourceLoader.setDirectory(directory.substring(0, directory.lastIndexOf("/")) + "/");
 			List<TestPlan> plans = resourceLoader.createTP();
