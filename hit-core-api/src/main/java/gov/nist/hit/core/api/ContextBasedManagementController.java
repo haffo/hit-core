@@ -602,8 +602,7 @@ public class ContextBasedManagementController {
 			String token = UUID.randomUUID().toString();
 			String filename = part.getOriginalFilename().substring(0, part.getOriginalFilename().lastIndexOf(".zip"));
 
-			String directory = bundleHandler.unzip(part.getBytes(),
-					CB_UPLOAD_DIR + "/" + username + "/" + token + "/" + filename);
+			String directory = bundleHandler.unzip(part.getBytes(), CB_UPLOAD_DIR + "/" + token + "/" + filename);
 
 			resourceLoader.setDirectory(directory.substring(0, directory.lastIndexOf("/")) + "/");
 			List<TestPlan> plans = resourceLoader.createTP();

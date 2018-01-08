@@ -992,150 +992,175 @@ public class AccountController {
 	}
 
 	private void sendApplicationConfirmationNotification(Account acc) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-		msg.setSubject("NIST  Application Received");
-		msg.setTo(acc.getEmail());
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Thank you for submitting an application for use of the "
-				+ TOOL_NAME + "\n\n" + "Please refer to the user guide for the detailed steps. " + "\n\n"
-				+ "Sincerely, " + "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n"
-				+ "P.S: If you need help, contact us at '" + appInfoService.get().getAdminEmails().get(0) + "'");
 		try {
+			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+			msg.setSubject("NIST  Application Received");
+			msg.setTo(acc.getEmail());
+			msg.setText("Dear " + acc.getUsername() + " \n\n"
+					+ "Thank you for submitting an application for use of the " + TOOL_NAME + "\n\n"
+					+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n"
+					+ "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
+					+ appInfoService.get().getAdminEmails().get(0) + "'");
+
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 
 	private void sendAccountRegistrationNotification(Account acc) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-
-		msg.setSubject("Welcome! You are successfully registered on " + TOOL_NAME + "");
-		msg.setTo(acc.getEmail());
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "You've successfully registered on the " + TOOL_NAME
-				+ " Site." + " \n" + "Your username is: " + acc.getUsername() + " \n\n"
-				+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n" + "The "
-				+ TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
-				+ appInfoService.get().getAdminEmails().get(0) + "'");
-
 		try {
+			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+
+			msg.setSubject("Welcome! You are successfully registered on " + TOOL_NAME + "");
+			msg.setTo(acc.getEmail());
+			msg.setText("Dear " + acc.getUsername() + " \n\n" + "You've successfully registered on the " + TOOL_NAME
+					+ " Site." + " \n" + "Your username is: " + acc.getUsername() + " \n\n"
+					+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n"
+					+ "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
+					+ appInfoService.get().getAdminEmails().get(0) + "'");
+
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 
 	private void sendRegistrationNotificationToAdmin(Account acc) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-		msg.setSubject("New Registration Application on " + TOOL_NAME);
-		msg.setTo(appInfoService.get().getAdminEmails().get(0));
-		msg.setText(
-				"Hello Admin,  \n A new application has been submitted and is waiting for approval. The user information are as follow: \n\n"
-						+ "Name: " + acc.getFullName() + "\n" + "Email: " + acc.getEmail() + "\n" + "Username: "
-						+ acc.getUsername() + "\n" + " \n\n" + "Sincerely, " + "\n\n" + "The " + TOOL_NAME + " Team"
-						+ "\n\n");
 		try {
+			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+			msg.setSubject("New Registration Application on " + TOOL_NAME);
+			msg.setTo(appInfoService.get().getAdminEmails().get(0));
+			msg.setText(
+					"Hello Admin,  \n A new application has been submitted and is waiting for approval. The user information are as follow: \n\n"
+							+ "Name: " + acc.getFullName() + "\n" + "Email: " + acc.getEmail() + "\n" + "Username: "
+							+ acc.getUsername() + "\n" + " \n\n" + "Sincerely, " + "\n\n" + "The " + TOOL_NAME + " Team"
+							+ "\n\n");
+
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 
 	private void sendAccountApproveNotification(Account acc) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-
-		msg.setTo(acc.getEmail());
-		msg.setSubject("" + TOOL_NAME + " Account Approval Notification ");
-		msg.setText("Dear " + acc.getUsername() + " \n\n"
-				+ "**** If you have not requested a new account, please disregard this email **** \n\n\n"
-				+ "Your account has been approved and you can proceed " + "to login .\n" + "\n\n" + "Sincerely, "
-				+ "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
-				+ appInfoService.get().getAdminEmails().get(0) + "'");
 		try {
+			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+
+			msg.setTo(acc.getEmail());
+			msg.setSubject("" + TOOL_NAME + " Account Approval Notification ");
+			msg.setText("Dear " + acc.getUsername() + " \n\n"
+					+ "**** If you have not requested a new account, please disregard this email **** \n\n\n"
+					+ "Your account has been approved and you can proceed " + "to login .\n" + "\n\n" + "Sincerely, "
+					+ "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
+					+ appInfoService.get().getAdminEmails().get(0) + "'");
+
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 
 	private void sendAccountRegistrationPasswordResetNotification(Account acc, String url) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-
-		msg.setTo(acc.getEmail());
-		msg.setSubject("" + TOOL_NAME + " Registration Notification ");
-		msg.setText("Dear " + acc.getUsername() + " \n\n"
-				+ "**** If you have not requested a new account, please disregard this email **** \n\n\n"
-				+ "Your account request has been processed and you can proceed " + "to login .\n"
-				+ "You need to change your password in order to login.\n"
-				+ "Copy and paste the following url to your browser to initiate the password change:\n" + url + " \n\n"
-				+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n" + "The "
-				+ TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
-				+ appInfoService.get().getAdminEmails().get(0) + "'");
-
 		try {
+			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+
+			msg.setTo(acc.getEmail());
+			msg.setSubject("" + TOOL_NAME + " Registration Notification ");
+			msg.setText("Dear " + acc.getUsername() + " \n\n"
+					+ "**** If you have not requested a new account, please disregard this email **** \n\n\n"
+					+ "Your account request has been processed and you can proceed " + "to login .\n"
+					+ "You need to change your password in order to login.\n"
+					+ "Copy and paste the following url to your browser to initiate the password change:\n" + url
+					+ " \n\n" + "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, "
+					+ "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
+					+ appInfoService.get().getAdminEmails().get(0) + "'");
+
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 
 	private void sendAccountPasswordResetRequestNotification(Account acc, String url) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-
-		msg.setTo(acc.getEmail());
-		msg.setSubject("" + TOOL_NAME + " Password Reset Request Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n"
-				+ "**** If you have not requested a password reset, please disregard this email **** \n\n\n"
-				+ "You password reset request has been processed.\n"
-				+ "Copy and paste the following url to your browser to initiate the password change:\n" + url + " \n\n"
-				+ "Sincerely, " + "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n"
-				+ "P.S: If you need help, contact us at '" + appInfoService.get().getAdminEmails().get(0) + "'");
-
 		try {
+			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+
+			msg.setTo(acc.getEmail());
+			msg.setSubject("" + TOOL_NAME + " Password Reset Request Notification");
+			msg.setText("Dear " + acc.getUsername() + " \n\n"
+					+ "**** If you have not requested a password reset, please disregard this email **** \n\n\n"
+					+ "You password reset request has been processed.\n"
+					+ "Copy and paste the following url to your browser to initiate the password change:\n" + url
+					+ " \n\n" + "Sincerely, " + "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n"
+					+ "P.S: If you need help, contact us at '" + appInfoService.get().getAdminEmails().get(0) + "'");
+
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 
 	private void sendChangeAccountPasswordNotification(Account acc) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-
-		msg.setTo(acc.getEmail());
-		msg.setSubject("" + TOOL_NAME + " Password Change Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully changed." + " \n\n"
-				+ "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
-
 		try {
+			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+
+			msg.setTo(acc.getEmail());
+			msg.setSubject("" + TOOL_NAME + " Password Change Notification");
+			msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully changed." + " \n\n"
+					+ "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
+
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 
 	private void sendChangeAccountPasswordNotification(Account acc, String newPassword) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-		msg.setTo(acc.getEmail());
-		msg.setSubject("" + TOOL_NAME + " Password Change Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully changed." + " \n\n"
-				+ "Your new temporary password is ." + newPassword + " \n\n"
-				+ "Please update your password once logged in. \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
-
 		try {
+			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+			msg.setTo(acc.getEmail());
+			msg.setSubject("" + TOOL_NAME + " Password Change Notification");
+			msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully changed." + " \n\n"
+					+ "Your new temporary password is ." + newPassword + " \n\n"
+					+ "Please update your password once logged in. \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME
+					+ " Team");
+
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
 
 	private void sendChangeAccountTypeNotification(Account acc, String newAccountType) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-		msg.setTo(acc.getEmail());
-		msg.setSubject("" + TOOL_NAME + " Account Type Change Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your account type has been successfully changed." + " \n\n"
-				+ "Your are now a " + newAccountType + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 		try {
+			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
+			msg.setTo(acc.getEmail());
+			msg.setSubject("" + TOOL_NAME + " Account Type Change Notification");
+			msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your account type has been successfully changed."
+					+ " \n\n" + "Your are now a " + newAccountType + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME
+					+ " Team");
+
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
@@ -1151,6 +1176,8 @@ public class AccountController {
 		try {
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
@@ -1168,6 +1195,8 @@ public class AccountController {
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
 			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 		}
 	}
 
@@ -1182,6 +1211,8 @@ public class AccountController {
 		try {
 			this.mailSender.send(msg);
 		} catch (MailException ex) {
+			logger.error(ex.getMessage(), ex);
+		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 		}
 	}
