@@ -46,6 +46,8 @@ public class AppInfo implements Serializable {
 
   private String name;
 
+  private String organization;
+
   private String domain;
 
   private String header;
@@ -368,6 +370,18 @@ public class AppInfo implements Serializable {
 
   public void setUploadContentTypes(String uploadContentTypes) {
     this.uploadContentTypes = uploadContentTypes;
+  }
+
+
+
+  public String getOrganization() {
+    return organization;
+  }
+
+
+
+  public void setOrganization(String organization) {
+    this.organization = organization;
   }
 
 

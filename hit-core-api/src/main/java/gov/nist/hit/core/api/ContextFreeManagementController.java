@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.CFTestPlan;
 import gov.nist.hit.core.domain.CFTestStep;
+import gov.nist.hit.core.domain.Message;
 import gov.nist.hit.core.domain.ResourceType;
 import gov.nist.hit.core.domain.ResourceUploadAction;
 import gov.nist.hit.core.domain.ResourceUploadResult;
@@ -325,6 +326,12 @@ public class ContextFreeManagementController {
 				model.setDescription(step.getDescription());
 				model.setName(step.getName());
 				model.setId(step.getId() + "");
+				if (step.getTestContext() != null) {
+					Message message = step.getTestContext().getMessage();
+					if (message != null) {
+						model.setExampleMessage(message.getContent());
+					}
+				}
 				models.add(model);
 			}
 			return models;

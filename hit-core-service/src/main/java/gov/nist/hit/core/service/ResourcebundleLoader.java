@@ -303,6 +303,8 @@ public abstract class ResourcebundleLoader {
     appInfo.setRsbVersion(rsbVersion);
     appInfo.setDomain(metaData.get("domain").textValue());
     appInfo.setHeader(metaData.get("header").textValue());
+    if (metaData.get("organization") != null)
+      appInfo.setOrganization(metaData.get("organization").textValue());
     appInfo.setHomeTitle(
         metaData.get("homeTitle") != null ? metaData.get("homeTitle").textValue() : null);
     appInfo.setHomeContent(
