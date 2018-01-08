@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,11 +82,13 @@ public class ContextBasedManagementController {
 
 	static final Logger logger = LoggerFactory.getLogger(ContextBasedManagementController.class);
 
-	public static final String CB_UPLOAD_DIR = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + "/cb";
+	// public static final String CB_UPLOAD_DIR = new
+	// File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + "/cb";
 
-	// public static final String CB_RESOURCE_BUNDLE_DIR = new
-	// File(System.getProperty("UPLOADED_RESOURCE_BUNDLE"))
-	// .getAbsolutePath() + "/cb";
+	@Value("${UPLOADED_RESOURCE_BUNDLE}")
+	private String UPLOADED_RESOURCE_BUNDLE;
+
+	public String CB_RESOURCE_BUNDLE_DIR;
 
 	@Autowired
 	private TestStepService testStepService;
@@ -125,6 +128,11 @@ public class ContextBasedManagementController {
 
 	@Autowired
 	private TestStepValidationReportService reportService;
+
+	@PostConstruct
+	public void init() {
+		CB_RESOURCE_BUNDLE_DIR = UPLOADED_RESOURCE_BUNDLE + "/cb";
+	}
 
 	@RequestMapping(value = "/testPlans", method = RequestMethod.GET, produces = "application/json")
 	public List<TestPlan> getTestPlans(
@@ -602,7 +610,8 @@ public class ContextBasedManagementController {
 			String token = UUID.randomUUID().toString();
 			String filename = part.getOriginalFilename().substring(0, part.getOriginalFilename().lastIndexOf(".zip"));
 
-			String directory = bundleHandler.unzip(part.getBytes(), CB_UPLOAD_DIR + "/" + token + "/" + filename);
+			String directory = bundleHandler.unzip(part.getBytes(),
+					CB_RESOURCE_BUNDLE_DIR + "/" + token + "/" + filename);
 
 			resourceLoader.setDirectory(directory.substring(0, directory.lastIndexOf("/")) + "/");
 			List<TestPlan> plans = resourceLoader.createTP();
