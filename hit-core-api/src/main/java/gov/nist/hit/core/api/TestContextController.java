@@ -139,6 +139,7 @@ public abstract class TestContextController {
 		report.setXml((getValidatioReportConverter().toXML(result.getJson())));
 		report.setJson(result.getJson());
 		report.setHtml(null);
+		report.setTestStepId(testStep.getId());
 		return validationReportService.save(report);
 	}
 

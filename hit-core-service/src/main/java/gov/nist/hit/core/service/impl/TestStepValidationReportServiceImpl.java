@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -288,12 +289,24 @@ public class TestStepValidationReportServiceImpl implements TestStepValidationRe
 
   @Override
   public List<TestStepValidationReport> findAllByTestStepAndUser(Long testStepId, Long userId) {
-    return validationReportRepository.findAllByTestStepAndUser(userId, testStepId);
+    try {
+      return validationReportRepository.findAllByTestStepAndUser(userId, testStepId);
+    } catch (RuntimeException e) {
+      return new ArrayList<TestStepValidationReport>(0);
+    } catch (Exception e) {
+      return new ArrayList<TestStepValidationReport>(0);
+    }
   }
 
   @Override
   public List<TestStepValidationReport> findAllByTestStep(Long testStepId) {
-    return validationReportRepository.findAllByTestStep(testStepId);
+    try {
+      return validationReportRepository.findAllByTestStep(testStepId);
+    } catch (RuntimeException e) {
+      return new ArrayList<TestStepValidationReport>(0);
+    } catch (Exception e) {
+      return new ArrayList<TestStepValidationReport>(0);
+    }
   }
 
 
