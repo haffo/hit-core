@@ -247,6 +247,7 @@ public class TestStepValidationReportController {
 			if (!userId.equals(report.getUserId()))
 				throw new MessageValidationException("Invalid user credentials");
 			report.setComments(comments);
+			report.setTestStepId(testStepId);
 			report.setResult(StringUtils.isNotEmpty(result) && result != null ? TestResult.valueOf(result) : null);
 			validationReportService.save(report);
 			String tmpXml = generateXml(report, testStep.getStage(), testStep);
