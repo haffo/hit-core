@@ -28,6 +28,7 @@ public class UploadedProfileModel {
   private String structID;
   private boolean used;
   private String exampleMessage;
+  private int position;
 
 
 
@@ -122,6 +123,14 @@ public class UploadedProfileModel {
 
   public void setExampleMessage(String exampleMessage) {
     this.exampleMessage = exampleMessage;
+  }
+
+  public int getPosition() {
+    return position;
+  }
+
+  public void setPosition(int position) {
+    this.position = position;
   }
 
 

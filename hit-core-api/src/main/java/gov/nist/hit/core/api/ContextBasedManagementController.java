@@ -85,7 +85,7 @@ public class ContextBasedManagementController {
 	// public static final String CB_UPLOAD_DIR = new
 	// File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + "/cb";
 
-	@Value("${UPLOADED_RESOURCE_BUNDLE}")
+	@Value("${UPLOADED_RESOURCE_BUNDLE:/sites/data/uploaded_resource_bundles}")
 	private String UPLOADED_RESOURCE_BUNDLE;
 
 	public String CB_RESOURCE_BUNDLE_DIR;
