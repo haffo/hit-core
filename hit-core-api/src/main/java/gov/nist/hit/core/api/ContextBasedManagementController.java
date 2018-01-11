@@ -280,7 +280,6 @@ public class ContextBasedManagementController {
 	}
 
 	private ResourceUploadStatus deleteTestCase(TestCase tp) throws Exception {
-		Set<TestStep> testSteps = tp.getTestSteps();
 		testCaseService.delete(tp);
 		// if (testSteps != null) {
 		// for (TestStep testStep : testSteps) {

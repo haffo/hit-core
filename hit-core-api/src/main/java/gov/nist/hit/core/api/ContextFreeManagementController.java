@@ -326,6 +326,7 @@ public class ContextFreeManagementController {
 				model.setDescription(step.getDescription());
 				model.setName(step.getName());
 				model.setId(step.getId() + "");
+				model.setPosition(step.getPosition());
 				if (step.getTestContext() != null) {
 					Message message = step.getTestContext().getMessage();
 					if (message != null) {

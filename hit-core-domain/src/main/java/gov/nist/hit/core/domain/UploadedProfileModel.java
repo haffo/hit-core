@@ -29,9 +29,6 @@ public class UploadedProfileModel {
   private boolean used;
   private String exampleMessage;
   private int position;
-
-
-
   private boolean activated;
 
   public UploadedProfileModel() {
