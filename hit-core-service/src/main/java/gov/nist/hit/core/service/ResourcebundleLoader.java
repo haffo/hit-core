@@ -147,7 +147,6 @@ public abstract class ResourcebundleLoader {
   public static final String TRANSPORT_PATTERN = "Global/Transport/";
   public static final String TRANSPORT_CONF_PATTERN = "Transport.json";
   public static final String REGISTRATION = "Registration.json";
-  protected String directory;
   public static final String DEFAULT_CATEGORY = "Default";
 
 
@@ -224,16 +223,15 @@ public abstract class ResourcebundleLoader {
     idLocationMap = new HashMap<>();
     obm = new com.fasterxml.jackson.databind.ObjectMapper();
     obm.setSerializationInclusion(Include.NON_NULL);
-    this.directory = "";
   }
 
-  public String getDirectory() {
-    return directory;
-  }
-
-  public void setDirectory(String directory) {
-    this.directory = directory;
-  }
+  // public String getDirectory() {
+  // return directory;
+  // }
+  //
+  // public void setDirectory(String directory) {
+  // this.directory = directory;
+  // }
 
   public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
     String rsbVersion = getRsbleVersion();
@@ -256,24 +254,25 @@ public abstract class ResourcebundleLoader {
     transactionRepository.deleteAll();
   }
 
-  public void load() throws JsonProcessingException, IOException, ProfileParserException {
+  public void load(String directory)
+      throws JsonProcessingException, IOException, ProfileParserException {
     if (isNewResourcebundle()) {
       logger.info("clearing tables...");
       clearDB();
       this.idLocationMap = new HashMap<>();
-      this.loadAppInfo();
-      this.loadConstraints();
-      this.loadVocabularyLibraries();
-      this.loadIntegrationProfiles();
-      this.loadContextFreeTestCases();
-      this.loadContextBasedTestCases();
+      this.loadAppInfo(directory);
+      this.loadConstraints(directory);
+      this.loadVocabularyLibraries(directory);
+      this.loadIntegrationProfiles(directory);
+      this.loadContextFreeTestCases(directory);
+      this.loadContextBasedTestCases(directory);
       this.loadTestCasesDocumentation();
-      this.loadUserDocs();
-      this.loadKownIssues();
-      this.loadReleaseNotes();
-      this.loadResourcesDocs();
-      this.loadToolDownloads();
-      this.loadTransport();
+      this.loadUserDocs(directory);
+      this.loadKownIssues(directory);
+      this.loadReleaseNotes(directory);
+      this.loadResourcesDocs(directory);
+      this.loadToolDownloads(directory);
+      this.loadTransport(directory);
       cachedRepository.getCachedProfiles().clear();
       cachedRepository.getCachedVocabLibraries().clear();
       cachedRepository.getCachedConstraints().clear();
@@ -283,8 +282,12 @@ public abstract class ResourcebundleLoader {
     GCUtil.performGC();
   }
 
-  public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage)
-      throws IOException;
+  public void load() throws JsonProcessingException, IOException, ProfileParserException {
+    load("");
+  }
+
+  public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage,
+      String rootPath) throws IOException;
 
   public abstract TestCaseDocument generateTestCaseDocument(TestContext c) throws IOException;
 
@@ -295,7 +298,7 @@ public abstract class ResourcebundleLoader {
   public abstract VocabularyLibrary vocabLibrary(String content) throws JsonGenerationException,
       JsonMappingException, IOException, UnsupportedOperationException;
 
-  public void loadAppInfo() throws JsonProcessingException, IOException {
+  public void loadAppInfo(String rootPath) throws JsonProcessingException, IOException {
     logger.info("loading app info...");
     AppInfo appInfo = new AppInfo();
     JsonNode metaData = getMetaData();
@@ -314,53 +317,57 @@ public abstract class ResourcebundleLoader {
     appInfo.setVersion(metaData.get("version").textValue());
     appInfo.setDate(new Date().getTime() + "");
     Resource resource =
-        this.getResource(ResourcebundleLoader.PROFILE_PATTERN + PROFILE_INFO_PATTERN);
+        this.getResource(ResourcebundleLoader.PROFILE_PATTERN + PROFILE_INFO_PATTERN, rootPath);
     if (resource != null) {
       appInfo.setProfileInfo(FileUtil.getContent(resource));
     }
 
     resource = this.getResource(
-        ResourcebundleLoader.VALUESET_PATTERN + ResourcebundleLoader.VALUE_SET_COPYRIGHT_PATTERN);
+        ResourcebundleLoader.VALUESET_PATTERN + ResourcebundleLoader.VALUE_SET_COPYRIGHT_PATTERN,
+        rootPath);
     if (resource != null) {
       appInfo.setValueSetCopyright(FileUtil.getContent(resource));
     }
     resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.CONFIDENTIALITY_PATTERN);
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.CONFIDENTIALITY_PATTERN,
+        rootPath);
     if (resource != null) {
       appInfo.setConfidentiality(FileUtil.getContent(resource));
     }
 
-    resource = this
-        .getResource(ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.DISCLAIMER_PATTERN);
+    resource = this.getResource(
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.DISCLAIMER_PATTERN, rootPath);
     if (resource != null) {
       appInfo.setDisclaimer(FileUtil.getContent(resource));
     }
 
     resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.VALIDATIONRESULT_INFO_PATTERN);
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.VALIDATIONRESULT_INFO_PATTERN,
+        rootPath);
     if (resource != null) {
       appInfo.setValidationResultInfo(FileUtil.getContent(resource));
     }
 
     resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.ACKNOWLEDGMENT_PATTERN);
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.ACKNOWLEDGMENT_PATTERN, rootPath);
     if (resource != null) {
       appInfo.setAcknowledgment(FileUtil.getContent(resource));
     }
 
-    resource =
-        this.getResource(ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.HOME_PATTERN);
+    resource = this.getResource(
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.HOME_PATTERN, rootPath);
     if (resource != null) {
       appInfo.setHomeContent(FileUtil.getContent(resource));
     }
 
     resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN);
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN,
+        rootPath);
     if (resource != null) {
       appInfo.setMessageContentInfo(FileUtil.getContent(resource));
     }
 
-    loadRegistration(appInfo);
+    loadRegistration(appInfo, rootPath);
 
     appInfo.setApiDocsPath("/apidocs");
 
@@ -378,9 +385,10 @@ public abstract class ResourcebundleLoader {
     logger.info("loading app info...DONE");
   }
 
-  public void loadRegistration(AppInfo appInfo) throws JsonProcessingException, IOException {
-    Resource resource =
-        this.getResource(ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.REGISTRATION);
+  public void loadRegistration(AppInfo appInfo, String rootPath)
+      throws JsonProcessingException, IOException {
+    Resource resource = this.getResource(
+        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.REGISTRATION, rootPath);
     if (resource != null) {
       String content = FileUtil.getContent(resource);
       ObjectMapper mapper = new ObjectMapper();
@@ -398,9 +406,9 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  public void loadUserDocs() throws IOException {
+  public void loadUserDocs(String rootPath) throws IOException {
     logger.info("loading user documents...");
-    Resource resource = getResource(USERDOCS_PATTERN + USERDOCS_FILE_PATTERN);
+    Resource resource = getResource(USERDOCS_PATTERN + USERDOCS_FILE_PATTERN, rootPath);
     if (resource != null) {
       String descriptorContent = FileUtil.getContent(resource);
       ObjectMapper mapper = new ObjectMapper();
@@ -420,8 +428,8 @@ public abstract class ResourcebundleLoader {
             if (node.findValue("name") != null) {
               String path = node.findValue("name").textValue();
               if (path.endsWith("*")) {
-                Resource rs =
-                    getLatestResource(USERDOCS_PATTERN + node.findValue("name").textValue());
+                Resource rs = getLatestResource(
+                    USERDOCS_PATTERN + node.findValue("name").textValue(), rootPath);
                 path = rs.getFilename();
               }
               document.setName(path);
@@ -444,9 +452,9 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  public void loadTransport() throws IOException {
+  public void loadTransport(String rootPath) throws IOException {
     logger.info("loading protocols info...");
-    JsonNode json = toJsonObj(TRANSPORT_PATTERN + TRANSPORT_CONF_PATTERN);
+    JsonNode json = toJsonObj(TRANSPORT_PATTERN + TRANSPORT_CONF_PATTERN, rootPath);
     if (json != null) {
       List<TransportForms> transportForms = new ArrayList<TransportForms>();
       if (json.isArray()) {
@@ -466,9 +474,9 @@ public abstract class ResourcebundleLoader {
                   "Transport.json TA_INITIATOR or SUT_INITIATOR form is missing");
             }
             tForms.setTaInitiatorForm(FileUtil.getContent(
-                getResource(TRANSPORT_PATTERN + forms.get("TA_INITIATOR").textValue())));
+                getResource(TRANSPORT_PATTERN + forms.get("TA_INITIATOR").textValue(), rootPath)));
             tForms.setSutInitiatorForm(FileUtil.getContent(
-                getResource(TRANSPORT_PATTERN + forms.get("SUT_INITIATOR").textValue())));
+                getResource(TRANSPORT_PATTERN + forms.get("SUT_INITIATOR").textValue(), rootPath)));
             transportForms.add(tForms);
           } else {
             throw new RuntimeException(
@@ -484,11 +492,12 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private List<gov.nist.hit.core.domain.Document> getProfilesDocs() throws IOException {
+  private List<gov.nist.hit.core.domain.Document> getProfilesDocs(String rootPath)
+      throws IOException {
     logger.info("loading integration profiles...");
     List<gov.nist.hit.core.domain.Document> resourceDocs =
         new ArrayList<gov.nist.hit.core.domain.Document>();
-    JsonNode conf = toJsonObj(PROFILE_PATTERN + PROFILES_CONF_FILE_PATTERN);
+    JsonNode conf = toJsonObj(PROFILE_PATTERN + PROFILES_CONF_FILE_PATTERN, rootPath);
     Set<String> skipped = null;
     JsonNode ordersObj = null;
     if (conf != null) {
@@ -496,7 +505,7 @@ public abstract class ResourcebundleLoader {
       ordersObj = conf.findValue("orders");
 
     }
-    List<Resource> resources = getResources(PROFILE_PATTERN + "*.xml");
+    List<Resource> resources = getResources(PROFILE_PATTERN + "*.xml", rootPath);
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = resource.getFilename();
@@ -516,18 +525,19 @@ public abstract class ResourcebundleLoader {
     return resourceDocs;
   }
 
-  private List<gov.nist.hit.core.domain.Document> getConstraintsDocs() throws IOException {
+  private List<gov.nist.hit.core.domain.Document> getConstraintsDocs(String rootPath)
+      throws IOException {
     logger.info("loading constraints...");
     List<gov.nist.hit.core.domain.Document> resourceDocs =
         new ArrayList<gov.nist.hit.core.domain.Document>();
-    JsonNode conf = toJsonObj(CONSTRAINT_PATTERN + CONSTRAINTS_CONF_FILE_PATTERN);
+    JsonNode conf = toJsonObj(CONSTRAINT_PATTERN + CONSTRAINTS_CONF_FILE_PATTERN, rootPath);
     Set<String> skipped = null;
     JsonNode ordersObj = null;
     if (conf != null) {
       skipped = skippedAsList(conf.findValue("skip"));
       ordersObj = conf.findValue("orders");
     }
-    List<Resource> resources = getResources(CONSTRAINT_PATTERN + "*.xml");
+    List<Resource> resources = getResources(CONSTRAINT_PATTERN + "*.xml", rootPath);
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = resource.getFilename();
@@ -547,11 +557,12 @@ public abstract class ResourcebundleLoader {
     return resourceDocs;
   }
 
-  private List<gov.nist.hit.core.domain.Document> getValueSetsDocs() throws IOException {
+  private List<gov.nist.hit.core.domain.Document> getValueSetsDocs(String rootPath)
+      throws IOException {
     logger.info("loading constraints...");
     List<gov.nist.hit.core.domain.Document> resourceDocs =
         new ArrayList<gov.nist.hit.core.domain.Document>();
-    JsonNode conf = toJsonObj(VALUESET_PATTERN + TABLES_CONF_FILE_PATTERN);
+    JsonNode conf = toJsonObj(VALUESET_PATTERN + TABLES_CONF_FILE_PATTERN, rootPath);
     Set<String> skipped = null;
     JsonNode ordersObj = null;
     logger.info("loading value sets...");
@@ -561,7 +572,7 @@ public abstract class ResourcebundleLoader {
       skipped = skippedAsList(conf.findValue("skip"));
       ordersObj = conf.findValue("orders");
     }
-    List<Resource> resources = getResources(VALUESET_PATTERN + "*.xml");
+    List<Resource> resources = getResources(VALUESET_PATTERN + "*.xml", rootPath);
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = resource.getFilename();
@@ -581,21 +592,21 @@ public abstract class ResourcebundleLoader {
     return resourceDocs;
   }
 
-  public void loadResourcesDocs() throws IOException {
+  public void loadResourcesDocs(String rootPath) throws IOException {
     logger.info("loading resource documents...");
     List<gov.nist.hit.core.domain.Document> resourceDocs =
         new ArrayList<gov.nist.hit.core.domain.Document>();
-    resourceDocs.addAll(getProfilesDocs());
-    resourceDocs.addAll(getConstraintsDocs());
-    resourceDocs.addAll(getValueSetsDocs());
+    resourceDocs.addAll(getProfilesDocs(rootPath));
+    resourceDocs.addAll(getConstraintsDocs(rootPath));
+    resourceDocs.addAll(getValueSetsDocs(rootPath));
     if (!resourceDocs.isEmpty()) {
       documentRepository.save(resourceDocs);
     }
   }
 
-  public void loadKownIssues() throws IOException {
+  public void loadKownIssues(String rootPath) throws IOException {
     logger.info("loading known issues...");
-    Resource resource = getResource(KNOWNISSUE_PATTERN + KNOWNISSUE_FILE_PATTERN);
+    Resource resource = getResource(KNOWNISSUE_PATTERN + KNOWNISSUE_FILE_PATTERN, rootPath);
     if (resource != null) {
       String descriptorContent = FileUtil.getContent(resource);
       ObjectMapper mapper = new ObjectMapper();
@@ -631,9 +642,9 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  public void loadReleaseNotes() throws IOException {
+  public void loadReleaseNotes(String rootPath) throws IOException {
     logger.info("loading release notes...");
-    Resource resource = getResource(RELEASENOTE_PATTERN + RELEASENOTE_FILE_PATTERN);
+    Resource resource = getResource(RELEASENOTE_PATTERN + RELEASENOTE_FILE_PATTERN, rootPath);
     if (resource != null) {
       String descriptorContent = FileUtil.getContent(resource);
       ObjectMapper mapper = new ObjectMapper();
@@ -669,9 +680,9 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  public void loadToolDownloads() throws IOException {
+  public void loadToolDownloads(String rootPath) throws IOException {
     logger.info("loading tool downloads...");
-    JsonNode confObj = toJsonObj(TOOL_DOWNLOADS_PATTERN + TOOL_DOWNLOADS_CONF_PATTERN);
+    JsonNode confObj = toJsonObj(TOOL_DOWNLOADS_PATTERN + TOOL_DOWNLOADS_CONF_PATTERN, rootPath);
     if (confObj != null) {
       if (confObj.findValue("installationGuide") != null) {
         gov.nist.hit.core.domain.Document installation = new gov.nist.hit.core.domain.Document();
@@ -720,8 +731,8 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private Resource getLatestResource(String pathWithWilcard) throws IOException {
-    List<Resource> resources = getResources(pathWithWilcard);
+  private Resource getLatestResource(String pathWithWilcard, String rootPath) throws IOException {
+    List<Resource> resources = getResources(pathWithWilcard, rootPath);
     if (resources != null && !resources.isEmpty()) {
       Collections.sort(resources, new Comparator<Resource>() {
         @Override
@@ -735,9 +746,9 @@ public abstract class ResourcebundleLoader {
         "Could not determine the most recent file matching " + pathWithWilcard);
   }
 
-  public void loadConstraints() throws IOException {
+  public void loadConstraints(String rootPath) throws IOException {
     logger.info("loading constraints...");
-    List<Resource> resources = getResources(domainPath(CONSTRAINT_PATTERN) + "*.xml");
+    List<Resource> resources = getResources(domainPath(CONSTRAINT_PATTERN) + "*.xml", rootPath);
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String content = FileUtil.getContent(resource);
@@ -748,8 +759,8 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private JsonNode toJsonObj(String path) throws IOException {
-    Resource resource = getResource(path);
+  private JsonNode toJsonObj(String path, String rootPath) throws IOException {
+    Resource resource = getResource(path, rootPath);
     String content = FileUtil.getContent(resource);
     return content != null ? new ObjectMapper().readTree(content) : null;
   }
@@ -767,9 +778,9 @@ public abstract class ResourcebundleLoader {
     return skipped;
   }
 
-  public void loadIntegrationProfiles() throws IOException {
+  public void loadIntegrationProfiles(String rootPath) throws IOException {
     logger.info("loading integration profiles...");
-    List<Resource> resources = getResources(domainPath(PROFILE_PATTERN) + "*.xml");
+    List<Resource> resources = getResources(domainPath(PROFILE_PATTERN) + "*.xml", rootPath);
     if (resources != null && !resources.isEmpty()) {
 
       for (Resource resource : resources) {
@@ -779,9 +790,9 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  public void loadVocabularyLibraries() throws IOException {
+  public void loadVocabularyLibraries(String rootPath) throws IOException {
     logger.info("loading value set libraries...");
-    List<Resource> resources = getResources(domainPath(VALUESET_PATTERN) + "*.xml");
+    List<Resource> resources = getResources(domainPath(VALUESET_PATTERN) + "*.xml", rootPath);
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String content = FileUtil.getContent(resource);
@@ -930,14 +941,15 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  public void loadContextBasedTestCases() throws IOException {
-    List<Resource> resources = this.getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/");
+  public void loadContextBasedTestCases(String rootPath) throws IOException {
+    List<Resource> resources =
+        this.getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/", rootPath);
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(domainPath(CONTEXTBASED_PATTERN)),
             fileName.length());
-        TestPlan testPlan = testPlan(location, TestingStage.CB);
+        TestPlan testPlan = testPlan(location, TestingStage.CB, rootPath);
         if (testPlan != null) {
           checkPersistentId(testPlan.getPersistentId(), location);
           testPlanRepository.save(testPlan);
@@ -946,14 +958,15 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  public void loadContextFreeTestCases() throws IOException, ProfileParserException {
-    List<Resource> resources = this.getDirectories(domainPath(CONTEXTFREE_PATTERN) + "*/");
+  public void loadContextFreeTestCases(String rootPath) throws IOException, ProfileParserException {
+    List<Resource> resources =
+        this.getDirectories(domainPath(CONTEXTFREE_PATTERN) + "*/", rootPath);
     if (resources != null && !resources.isEmpty()) {
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)),
             fileName.length());
-        CFTestPlan testPlan = cfTestPlan(location);
+        CFTestPlan testPlan = cfTestPlan(location, rootPath);
         if (testPlan != null) {
           checkPersistentId(testPlan.getPersistentId(), fileName);
           cfTestPlanRepository.save(testPlan);
@@ -962,11 +975,11 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  protected TestCase testCase(String location, TestingStage stage, boolean transportSupported)
-      throws IOException {
+  protected TestCase testCase(String location, TestingStage stage, boolean transportSupported,
+      String rootPath) throws IOException {
     logger.info("Processing test case located at:" + location);
     TestCase tc = new TestCase();
-    Resource res = this.getResource(location + "TestCase.json");
+    Resource res = this.getResource(location + "TestCase.json", rootPath);
     if (res == null)
       throw new IllegalArgumentException("No TestCase.json found at " + location);
     String descriptorContent = FileUtil.getContent(res);
@@ -983,19 +996,19 @@ public abstract class ResourcebundleLoader {
     tc.setVersion(!testCaseObj.has("version") ? 1.0
         : Double.parseDouble(testCaseObj.findValue("version").asText()));
 
-    tc.setTestStory(testStory(location));
-    tc.setJurorDocument(jurorDocument(location));
+    tc.setTestStory(testStory(location, rootPath));
+    tc.setJurorDocument(jurorDocument(location, rootPath));
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").intValue());
     }
     if (testCaseObj.has("supplements")) {
       tc.getSupplements().addAll((testDocuments(location, testCaseObj.findValue("supplements"))));
     }
-    List<Resource> resources = this.getDirectories(location + "*");
+    List<Resource> resources = this.getDirectories(location + "*", rootPath);
     for (Resource resource : resources) {
       String fileName = fileName(resource);
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
-      TestStep testStep = testStep(tcLocation, stage, transportSupported);
+      TestStep testStep = testStep(tcLocation, stage, transportSupported, rootPath);
       checkPersistentId(testStep.getPersistentId(), fileName);
       tc.addTestStep(testStep);
     }
@@ -1074,11 +1087,11 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  protected TestStep testStep(String location, TestingStage stage, boolean transportSupported)
-      throws IOException {
+  protected TestStep testStep(String location, TestingStage stage, boolean transportSupported,
+      String rootPath) throws IOException {
     logger.info("Processing test step at:" + location);
     TestStep testStep = new TestStep();
-    Resource res = this.getResource(location + "TestStep.json");
+    Resource res = this.getResource(location + "TestStep.json", rootPath);
     if (res == null)
       throw new IllegalArgumentException("No TestStep.json found at " + location);
     String descriptorContent = FileUtil.getContent(res);
@@ -1113,17 +1126,17 @@ public abstract class ResourcebundleLoader {
     }
 
     if (!testingType.equals(TestingType.SUT_MANUAL) && !testingType.equals(TestingType.TA_MANUAL)) {
-      testStep.setTestContext(testContext(location, testStepObj, stage));
+      testStep.setTestContext(testContext(location, testStepObj, stage, rootPath));
     }
 
     if (testStepObj.has("supplements")) {
       testStep.getSupplements()
           .addAll((testDocuments(location, testStepObj.findValue("supplements"))));
     }
-    testStep.setTestStory(testStory(location));
-    testStep.setJurorDocument(jurorDocument(location));
-    testStep.setMessageContent(messageContent(location));
-    testStep.setTestDataSpecification(testDataSpecification(location));
+    testStep.setTestStory(testStory(location, rootPath));
+    testStep.setJurorDocument(jurorDocument(location, rootPath));
+    testStep.setMessageContent(messageContent(location, rootPath));
+    testStep.setTestDataSpecification(testDataSpecification(location, rootPath));
     if (testStepObj.findValue("position") != null) {
       testStep.setPosition(testStepObj.findValue("position").intValue());
     }
@@ -1131,26 +1144,26 @@ public abstract class ResourcebundleLoader {
     return testStep;
   }
 
-  private TestArtifact testStory(String location) throws IOException {
-    return artifact(location, "TestStory");
+  private TestArtifact testStory(String location, String rootPath) throws IOException {
+    return artifact(location, "TestStory", rootPath);
   }
 
-  private TestArtifact jurorDocument(String location) throws IOException {
-    return artifact(location, "JurorDocument");
+  private TestArtifact jurorDocument(String location, String rootPath) throws IOException {
+    return artifact(location, "JurorDocument", rootPath);
   }
 
-  private TestArtifact artifact(String location, String type) throws IOException {
+  private TestArtifact artifact(String location, String type, String rootPath) throws IOException {
     TestArtifact doc = null;
 
     String path = location + type + ".html";
-    Resource resource = this.getResource(path);
+    Resource resource = this.getResource(path, rootPath);
     if (resource != null) {
       doc = doc == null ? new TestArtifact(type) : doc;
       doc.setHtml(FileUtil.getContent(resource));
     }
 
     path = location + type + ".pdf";
-    resource = this.getResource(path);
+    resource = this.getResource(path, rootPath);
     if (resource != null) {
       doc = doc == null ? new TestArtifact(type) : doc;
       doc.setPdfPath(path);
@@ -1158,7 +1171,7 @@ public abstract class ResourcebundleLoader {
 
     if (type.equals("TestStory")) { // TODO: Temporary hack
       path = location + type + ".json";
-      resource = this.getResource(path);
+      resource = this.getResource(path, rootPath);
       if (resource != null) {
         doc = doc == null ? new TestArtifact(type) : doc;
         doc.setJson(FileUtil.getContent(resource));
@@ -1168,27 +1181,27 @@ public abstract class ResourcebundleLoader {
     return doc;
   }
 
-  private TestArtifact messageContent(String location) throws IOException {
-    return artifact(location, "MessageContent");
+  private TestArtifact messageContent(String location, String rootPath) throws IOException {
+    return artifact(location, "MessageContent", rootPath);
   }
 
-  private TestArtifact testDataSpecification(String location) throws IOException {
-    return artifact(location, "TestDataSpecification");
+  private TestArtifact testDataSpecification(String location, String rootPath) throws IOException {
+    return artifact(location, "TestDataSpecification", rootPath);
   }
 
-  private TestArtifact testPackage(String location) throws IOException {
-    return artifact(location, "TestPackage");
+  private TestArtifact testPackage(String location, String rootPath) throws IOException {
+    return artifact(location, "TestPackage", rootPath);
   }
 
-  private TestArtifact testPlanSummary(String location) throws IOException {
+  private TestArtifact testPlanSummary(String location, String rootPath) throws IOException {
     // return artifact(location, "QuickTestCaseReferenceGuide");
-    return artifact(location, "TestPlanSummary");
+    return artifact(location, "TestPlanSummary", rootPath);
   }
 
   protected TestCaseGroup testCaseGroup(String location, TestingStage stage,
-      boolean transportEnabled) throws IOException {
+      boolean transportEnabled, String rootPath) throws IOException {
     logger.info("Processing test case group at:" + location);
-    Resource descriptorRsrce = this.getResource(location + "TestCaseGroup.json");
+    Resource descriptorRsrce = this.getResource(location + "TestCaseGroup.json", rootPath);
     if (descriptorRsrce == null)
       throw new IllegalArgumentException("No TestCaseGroup.json found at " + location);
     String descriptorContent = FileUtil.getContent(descriptorRsrce);
@@ -1207,7 +1220,7 @@ public abstract class ResourcebundleLoader {
       tcg.setDescription(testPlanObj.findValue("description").textValue());
       tcg.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
-      tcg.setTestStory(testStory(location));
+      tcg.setTestStory(testStory(location, rootPath));
       if (testPlanObj.findValue("position") != null) {
         tcg.setPosition(testPlanObj.findValue("position").intValue());
       } else {
@@ -1216,19 +1229,20 @@ public abstract class ResourcebundleLoader {
       if (testPlanObj.has("supplements")) {
         tcg.getSupplements().addAll(testDocuments(location, testPlanObj.findValue("supplements")));
       }
-      List<Resource> resources = this.getDirectories(location + "*/");
+      List<Resource> resources = this.getDirectories(location + "*/", rootPath);
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
-        Resource descriptorResource = getDescriptorResource(tcLocation);
+        Resource descriptorResource = getDescriptorResource(tcLocation, rootPath);
         if (descriptorResource != null) {
           String filename = descriptorResource.getFilename();
           if (filename.endsWith("TestCaseGroup.json")) {
-            TestCaseGroup testCaseGroup = testCaseGroup(tcLocation, stage, transportEnabled);
+            TestCaseGroup testCaseGroup =
+                testCaseGroup(tcLocation, stage, transportEnabled, rootPath);
             checkPersistentId(testCaseGroup.getPersistentId(), location);
             tcg.getTestCaseGroups().add(testCaseGroup);
           } else if (filename.endsWith("TestCase.json")) {
-            TestCase testCase = testCase(tcLocation, stage, transportEnabled);
+            TestCase testCase = testCase(tcLocation, stage, transportEnabled, rootPath);
             checkPersistentId(testCase.getPersistentId(), location);
             tcg.getTestCases().add(testCase);
           }
@@ -1239,10 +1253,11 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  protected TestPlan testPlan(String location, TestingStage stage) throws IOException {
+  protected TestPlan testPlan(String location, TestingStage stage, String rootPath)
+      throws IOException {
     logger.info("Processing test plan  at:" + location);
 
-    Resource res = this.getResource(location + "TestPlan.json");
+    Resource res = this.getResource(location + "TestPlan.json", rootPath);
     if (res == null)
       throw new IllegalArgumentException("No TestPlan.json found at " + location);
     String descriptorContent = FileUtil.getContent(res);
@@ -1262,7 +1277,7 @@ public abstract class ResourcebundleLoader {
           ? testPlanObj.findValue("category").textValue() : DEFAULT_CATEGORY);
       tp.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
-      tp.setTestStory(testStory(location));
+      tp.setTestStory(testStory(location, rootPath));
       tp.setStage(stage);
 
       if (testPlanObj.findValue("transport") != null
@@ -1283,25 +1298,25 @@ public abstract class ResourcebundleLoader {
       } else {
         tp.setPosition(1);
       }
-      tp.setTestPackage(testPackage(location));
-      tp.setTestPlanSummary(testPlanSummary(location));
+      tp.setTestPackage(testPackage(location, rootPath));
+      tp.setTestPlanSummary(testPlanSummary(location, rootPath));
       if (testPlanObj.has("supplements")) {
         tp.getSupplements().addAll((testDocuments(location, testPlanObj.findValue("supplements"))));
       }
 
-      List<Resource> resources = this.getDirectories(location + "*/");
+      List<Resource> resources = this.getDirectories(location + "*/", rootPath);
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String loca = fileName.substring(fileName.indexOf(location), fileName.length());
-        Resource descriptorResource = getDescriptorResource(loca);
+        Resource descriptorResource = getDescriptorResource(loca, rootPath);
         if (descriptorResource != null) {
           String filename = descriptorResource.getFilename();
           if (filename.endsWith("TestCaseGroup.json")) {
-            TestCaseGroup testCaseGroup = testCaseGroup(loca, stage, tp.isTransport());
+            TestCaseGroup testCaseGroup = testCaseGroup(loca, stage, tp.isTransport(), rootPath);
             checkPersistentId(testCaseGroup.getPersistentId(), fileName);
             tp.getTestCaseGroups().add(testCaseGroup);
           } else if (filename.endsWith("TestCase.json")) {
-            TestCase testCase = testCase(loca, stage, tp.isTransport());
+            TestCase testCase = testCase(loca, stage, tp.isTransport(), rootPath);
             checkPersistentId(testCase.getPersistentId(), fileName);
             tp.getTestCases().add(testCase);
           }
@@ -1313,9 +1328,9 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  protected CFTestPlan cfTestPlan(String testPlanPath) throws IOException {
+  protected CFTestPlan cfTestPlan(String testPlanPath, String rootPath) throws IOException {
     logger.info("Processing test plan at:" + testPlanPath);
-    Resource res = this.getResource(testPlanPath + "TestObject.json");
+    Resource res = this.getResource(testPlanPath + "TestObject.json", rootPath);
     if (res == null)
       throw new IllegalArgumentException("No TestObject.json found at " + testPlanPath);
     String descriptorContent = FileUtil.getContent(res);
@@ -1344,11 +1359,11 @@ public abstract class ResourcebundleLoader {
             .addAll(testDocuments(testPlanPath, testPlanObj.findValue("supplements")));
       }
 
-      List<Resource> resources = this.getDirectories(testPlanPath + "*/");
+      List<Resource> resources = this.getDirectories(testPlanPath + "*/", rootPath);
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(testPlanPath), fileName.length());
-        CFTestStep testStep = cfTestStep(location);
+        CFTestStep testStep = cfTestStep(location, rootPath);
         if (testStep != null) {
           checkPersistentId(testStep.getPersistentId(), fileName);
           testPlan.getTestCases().add(testStep);
@@ -1361,9 +1376,9 @@ public abstract class ResourcebundleLoader {
 
 
 
-  protected CFTestStep cfTestStep(String testObjectPath) throws IOException {
+  protected CFTestStep cfTestStep(String testObjectPath, String rootPath) throws IOException {
     logger.info("Processing test object at:" + testObjectPath);
-    Resource res = this.getResource(testObjectPath + "TestObject.json");
+    Resource res = this.getResource(testObjectPath + "TestObject.json", rootPath);
     if (res == null)
       throw new IllegalArgumentException("No TestObject.json found at " + testObjectPath);
     String descriptorContent = FileUtil.getContent(res);
@@ -1384,17 +1399,17 @@ public abstract class ResourcebundleLoader {
       testStep.setDescription(testPlanObj.findValue("description").textValue());
       testStep.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
-      testStep.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF));
+      testStep.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF, rootPath));
       if (testPlanObj.has("supplements")) {
         testStep.getSupplements()
             .addAll(testDocuments(testObjectPath, testPlanObj.findValue("supplements")));
       }
 
-      List<Resource> resources = this.getDirectories(testObjectPath + "*/");
+      List<Resource> resources = this.getDirectories(testObjectPath + "*/", rootPath);
       for (Resource resource : resources) {
         String fileName = fileName(resource);
         String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
-        CFTestStep testObject = cfTestStep(location);
+        CFTestStep testObject = cfTestStep(location, rootPath);
         if (testObject != null) {
           checkPersistentId(testObject.getPersistentId(), fileName);
           testStep.getChildren().add(testObject);
@@ -1574,11 +1589,12 @@ public abstract class ResourcebundleLoader {
     return doc;
   }
 
-  protected Resource getDescriptorResource(String location) throws IOException {
-    Resource resource = this.getResource(location + "TestPlan.json");
-    resource = resource == null ? this.getResource(location + "TestCaseGroup.json") : resource;
-    resource = resource == null ? this.getResource(location + "TestCase.json") : resource;
-    resource = resource == null ? this.getResource(location + "TestStep.json") : resource;
+  protected Resource getDescriptorResource(String location, String rootPath) throws IOException {
+    Resource resource = this.getResource(location + "TestPlan.json", rootPath);
+    resource =
+        resource == null ? this.getResource(location + "TestCaseGroup.json", rootPath) : resource;
+    resource = resource == null ? this.getResource(location + "TestCase.json", rootPath) : resource;
+    resource = resource == null ? this.getResource(location + "TestStep.json", rootPath) : resource;
     resource = resource == null ? null : resource;
     return resource;
   }
@@ -1783,25 +1799,25 @@ public abstract class ResourcebundleLoader {
     this.obm = obm;
   }
 
-  public List<Resource> getDirectories(String pattern) throws IOException {
-    if (this.directory.isEmpty())
+  public List<Resource> getDirectories(String pattern, String rootPath) throws IOException {
+    if (rootPath.isEmpty())
       return ResourcebundleHelper.getDirectories(pattern);
     else
-      return ResourcebundleHelper.getDirectoriesFile(this.directory + pattern);
+      return ResourcebundleHelper.getDirectoriesFile(rootPath + pattern);
   }
 
-  public Resource getResource(String pattern) throws IOException {
-    if (this.directory.isEmpty())
+  public Resource getResource(String pattern, String rootPath) throws IOException {
+    if (rootPath.isEmpty())
       return ResourcebundleHelper.getResource(pattern);
     else
-      return ResourcebundleHelper.getResourceFile(this.directory + pattern);
+      return ResourcebundleHelper.getResourceFile(rootPath + pattern);
   }
 
-  public List<Resource> getResources(String pattern) throws IOException {
-    if (this.directory.isEmpty())
-      return ResourcebundleHelper.getResources(this.directory + pattern);
+  public List<Resource> getResources(String pattern, String rootPath) throws IOException {
+    if (rootPath.isEmpty())
+      return ResourcebundleHelper.getResources(rootPath + pattern);
     else
-      return ResourcebundleHelper.getResourcesFile(this.directory + pattern);
+      return ResourcebundleHelper.getResourcesFile(rootPath + pattern);
   }
 
   public IntegrationProfileRepository getIntegrationProfileRepository() {

@@ -35,19 +35,16 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   @Autowired
   private TestStepRepository testStepRepository;
 
-  public List<Resource> getApiDirectories(String pattern) throws IOException {
-    String lookup = this.getDirectory() + pattern;
-    return ResourcebundleHelper.getDirectoriesFile(lookup);
+  public List<Resource> getApiDirectories(String pattern, String rootPath) throws IOException {
+    return ResourcebundleHelper.getDirectoriesFile(rootPath + pattern);
   }
 
-  public Resource getApiResource(String pattern) throws IOException {
-    String lookup = this.getDirectory() + pattern;
-    return ResourcebundleHelper.getResourceFile(lookup);
+  public Resource getApiResource(String pattern, String rootPath) throws IOException {
+    return ResourcebundleHelper.getResourceFile(rootPath + pattern);
   }
 
-  public List<Resource> getApiResources(String pattern) throws IOException {
-    String lookup = this.getDirectory() + pattern;
-    return ResourcebundleHelper.getResourcesFile(lookup);
+  public List<Resource> getApiResources(String pattern, String rootPath) throws IOException {
+    return ResourcebundleHelper.getResourcesFile(rootPath + pattern);
   }
 
   // ------ Context-Free test Case
@@ -290,13 +287,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   // ---- Helper Functions
   // Creation Methods
 
-  public List<TestStep> createTS() throws IOException {
+  public List<TestStep> createTS(String rootPath) throws IOException {
 
     List<TestStep> tmp = new ArrayList<TestStep>();
-    List<Resource> resources = getApiDirectories("*");
+    List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      TestStep testStep = testStep(fileName + "/", null, false);
+      TestStep testStep = testStep(fileName + "/", null, false, rootPath);
       if (testStep != null) {
         tmp.add(testStep);
       }
@@ -304,12 +301,12 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<TestCase> createTC() throws IOException {
+  public List<TestCase> createTC(String rootPath) throws IOException {
     List<TestCase> tmp = new ArrayList<TestCase>();
-    List<Resource> resources = getApiDirectories("*");
+    List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      TestCase testCase = testCase(fileName + "/", null, false);
+      TestCase testCase = testCase(fileName + "/", null, false, rootPath);
       if (testCase != null) {
         tmp.add(testCase);
       }
@@ -317,12 +314,12 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<TestCaseGroup> createTCG() throws IOException {
+  public List<TestCaseGroup> createTCG(String rootPath) throws IOException {
     List<TestCaseGroup> tmp = new ArrayList<TestCaseGroup>();
-    List<Resource> resources = getApiDirectories("*");
+    List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      TestCaseGroup testCaseGroup = testCaseGroup(fileName + "/", null, false);
+      TestCaseGroup testCaseGroup = testCaseGroup(fileName + "/", null, false, rootPath);
       if (testCaseGroup != null) {
         tmp.add(testCaseGroup);
       }
@@ -330,14 +327,14 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<TestPlan> createTP() {
+  public List<TestPlan> createTP(String rootPath) {
     List<TestPlan> tmp = new ArrayList<TestPlan>();
     List<Resource> resources;
     try {
-      resources = getApiDirectories("*");
+      resources = getApiDirectories("*", rootPath);
       for (Resource resource : resources) {
         String fileName = resource.getFilename();
-        TestPlan testPlan = testPlan(fileName + "/", TestingStage.CB);
+        TestPlan testPlan = testPlan(fileName + "/", TestingStage.CB, rootPath);
         if (testPlan != null) {
           tmp.add(testPlan);
         }
@@ -350,13 +347,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<CFTestStep> createCFTC() throws IOException {
+  public List<CFTestStep> createCFTC(String rootPath) throws IOException {
 
     List<CFTestStep> tmp = new ArrayList<CFTestStep>();
-    List<Resource> resources = getApiDirectories("*");
+    List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      CFTestStep testObject = cfTestStep(fileName + "/");
+      CFTestStep testObject = cfTestStep(fileName + "/", rootPath);
       if (testObject != null) {
         tmp.add(testObject);
       }
@@ -554,10 +551,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     this.testPlanRepository.flush();
   }
 
-  public abstract List<ResourceUploadStatus> addOrReplaceValueSet() throws IOException;
+  public abstract List<ResourceUploadStatus> addOrReplaceValueSet(String rootPath)
+      throws IOException;
 
-  public abstract List<ResourceUploadStatus> addOrReplaceConstraints() throws IOException;
+  public abstract List<ResourceUploadStatus> addOrReplaceConstraints(String rootPath)
+      throws IOException;
 
-  public abstract List<ResourceUploadStatus> addOrReplaceIntegrationProfile() throws IOException;
+  public abstract List<ResourceUploadStatus> addOrReplaceIntegrationProfile(String rootPath)
+      throws IOException;
 
 }

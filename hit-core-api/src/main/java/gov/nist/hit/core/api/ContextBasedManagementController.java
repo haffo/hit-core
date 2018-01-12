@@ -612,8 +612,7 @@ public class ContextBasedManagementController {
 			String directory = bundleHandler.unzip(part.getBytes(),
 					CB_RESOURCE_BUNDLE_DIR + "/" + token + "/" + filename);
 
-			resourceLoader.setDirectory(directory.substring(0, directory.lastIndexOf("/")) + "/");
-			List<TestPlan> plans = resourceLoader.createTP();
+			List<TestPlan> plans = resourceLoader.createTP(directory.substring(0, directory.lastIndexOf("/")) + "/");
 			TestPlan tp = plans.get(0);
 			updateToUser(tp, TestScope.USER, username);
 			ResourceUploadStatus result = resourceLoader.handleTP(tp);
