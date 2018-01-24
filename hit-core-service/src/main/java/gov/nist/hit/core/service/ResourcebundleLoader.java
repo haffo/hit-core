@@ -230,29 +230,23 @@ public abstract class ResourcebundleLoader {
   @Value("${employer.required:false}")
   private boolean employerRequired;
 
-  @Value("${organization.logo:null}")
-  private String organizationLogo;
+  @Value("${app.organization.logo:null}")
+  private String appOrganizationLogo;
 
-  @Value("${organization.name: 'NIST'}")
+  @Value("${app.organization.name:'NIST'}")
   private String organizationName;
 
-  @Value("${website.privacy:null}")
-  private String privacyLink;
+  @Value("${app.organization.link:null}")
+  private String appOrganizationLink;
 
-  @Value("${website.disclaimer:null}")
-  private String disclaimerLink;
+  @Value("${app.division.link:null}")
+  private String appDivisionLink;
 
-  @Value("${organization.website:null}")
-  private String organizationWebsite;
+  @Value("${app.division.logo:null}")
+  private String appDivisionLogo;
 
-  @Value("${division.website:null}")
-  private String divisionWebsite;
-
-  @Value("${division.logo:null}")
-  private String divisionLogo;
-
-  @Value("${division.name:null}")
-  private String divisionName;
+  @Value("${app.division.name:null}")
+  private String appDivisionName;
 
   @Value("${app.name}")
   private String appName;
@@ -263,10 +257,10 @@ public abstract class ResourcebundleLoader {
   @Value("${app.domain}")
   private String appDomain;
 
-  @Value("${app.homeTitle}")
+  @Value("${app.home.title}")
   private String appHomeTitle;
 
-  @Value("${app.homeContent}")
+  @Value("${app.home.content}")
   private String appHomeContent;
 
   @Value("${app.resourceBundleVersion}")
@@ -289,26 +283,39 @@ public abstract class ResourcebundleLoader {
   @Value("${app.upload.maxSize:'100MB'}")
   private String appUploadMaxSize;
 
-  @Value("${app.acknowledgment:null}")
+  @Value("${app.acknowledgment.content:null}")
   private String appAcknowledgment;
 
-  @Value("${app.diclaimer:null}")
-  private String appDisclaimer;
+  @Value("${app.privacy.content:null}")
+  private String appPrivacyContent;
 
-  @Value("${app.confidentiality:null}")
-  private String appConfidentiality;
+  @Value("${app.privacy.link:null}")
+  private String appPrivacyLink;
 
-  @Value("${app.messageContentInfo:null}")
-  private String appMessageContentInfo;
+  @Value("${app.diclaimer.content:null}")
+  private String appDisclaimerContent;
 
-  @Value("${app.validationResultInfo:null}")
-  private String appValidationResultInfo;
+  @Value("${app.diclaimer.link:null}")
+  private String appDisclaimerLink;
 
-  @Value("${app.valueSetCopyRight:null}")
-  private String appValueSetCopyRight;
+  @Value("${app.confidentiality.content:null}")
+  private String appConfidentialityContent;
 
-  @Value("${app.profileInfo:null}")
-  private String appProfileInfo;
+  @Value("${app.confidentiality.link:null}")
+  private String appConfidentialityLink;
+
+
+  @Value("${app.messageContentInfo.content:null}")
+  private String appMessageContentInfoContent;
+
+  @Value("${app.validationResultInfo.content:null}")
+  private String appValidationResultInfoContent;
+
+  @Value("${app.valueSetCopyRight.content:null}")
+  private String appValueSetCopyRightContent;
+
+  @Value("${app.profileInfo.content:null}")
+  private String appProfileInfoContent;
 
 
   @Value("${app.registration.title}")
@@ -362,7 +369,7 @@ public abstract class ResourcebundleLoader {
       logger.info("clearing tables...");
       clearDB();
       this.idLocationMap = new HashMap<>();
-      this.loadAppInfo(directory);
+      this.loadAppInfo();
       this.loadConstraints(directory);
       this.loadVocabularyLibraries(directory);
       this.loadIntegrationProfiles(directory);
@@ -400,39 +407,9 @@ public abstract class ResourcebundleLoader {
   public abstract VocabularyLibrary vocabLibrary(String content) throws JsonGenerationException,
       JsonMappingException, IOException, UnsupportedOperationException;
 
-  public void loadAppInfo(String rootPath) throws JsonProcessingException, IOException {
+  public void loadAppInfo() throws JsonProcessingException, IOException {
     logger.info("loading app info...");
     AppInfo appInfo = new AppInfo();
-    appInfo.setRsbVersion(appResourceBundleVersion);
-    appInfo.setDomain(appDomain);
-    appInfo.setHeader(appHeader);
-    appInfo.setOrganization(organizationName);
-    appInfo.setHomeTitle(appHomeTitle);
-    appInfo.setHomeContent(appHomeContent); // compatibility
-    appInfo.setName(appName);
-    appInfo.setVersion(appVersion);
-    appInfo.setDate(new Date().getTime() + "");
-
-
-    appInfo.setDisclaimer(appDisclaimer);
-    appInfo.setHomeContent(appHomeContent);
-    appInfo.setMessageContentInfo(appMessageContentInfo);
-    appInfo.setValidationResultInfo(appValidationResultInfo);
-    appInfo.setAcknowledgment(appAcknowledgment);
-    appInfo.setProfileInfo(appProfileInfo);
-    appInfo.setValueSetCopyright(appValueSetCopyRight);
-    appInfo.setConfidentiality(appConfidentiality);
-
-    appInfo.setRegistrationTitle(appRegistrationTitle);
-    appInfo.setRegistrationAgreement(appRegistrationAgreement);
-    appInfo.setRegistrationSubmittedContent(appRegistrationSubmittedContent);
-    appInfo.setRegistrationSubmittedTitle(appRegistrationSubmittedTitle);
-    appInfo.setRegistrationAcceptanceTitle(appRegistrationAcceptanceTitle);
-    appInfo.setApiDocsPath("/apidocs");
-
-    appInfo.setUploadContentTypes(appUploadContentTypes);
-    appInfo.setUploadMaxSize(appUploadMaxSize);
-
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");
   }
@@ -1691,14 +1668,51 @@ public abstract class ResourcebundleLoader {
     appInfo.setCfManagementSupported(cfManagementSupported);
     appInfo.setAuthenticationRequired(authenticationRequired);
     appInfo.setEmployerRequired(employerRequired);
-    appInfo.setOrganizationLogo(organizationLogo);
-    appInfo.setOrganizationWebsite(organizationWebsite);
-    appInfo.setDivisionLogo(divisionLogo);
-    appInfo.setDivisionWebsite(divisionWebsite);
-    appInfo.setDisclaimerLink(disclaimerLink);
-    appInfo.setPrivacyLink(privacyLink);
-    appInfo.setDivisionName(divisionName);
+
     appInfo.setOrganization(organizationName);
+    appInfo.setOrganizationLogo(appOrganizationLogo);
+    appInfo.setOrganizationLink(appOrganizationLink);
+
+    appInfo.setRsbVersion(appResourceBundleVersion);
+    appInfo.setDomain(appDomain);
+    appInfo.setHeader(appHeader);
+    appInfo.setOrganization(organizationName);
+    appInfo.setHomeTitle(appHomeTitle);
+    appInfo.setHomeContent(appHomeContent); // compatibility
+    appInfo.setName(appName);
+    appInfo.setVersion(appVersion);
+    appInfo.setDate(new Date().getTime() + "");
+
+
+    appInfo.setDisclaimer(appDisclaimerContent);
+    appInfo.setDisclaimerLink(appDisclaimerLink);
+
+    appInfo.setHomeContent(appHomeContent);
+
+    appInfo.setMessageContentInfo(appMessageContentInfoContent);
+    appInfo.setValidationResultInfo(appValidationResultInfoContent);
+    appInfo.setAcknowledgment(appAcknowledgment);
+    appInfo.setProfileInfo(appProfileInfoContent);
+    appInfo.setValueSetCopyright(appValueSetCopyRightContent);
+    appInfo.setConfidentiality(appConfidentialityContent);
+    appInfo.setConfidentialityLink(appConfidentialityLink);
+    appInfo.setPrivacy(appPrivacyContent);
+    appInfo.setPrivacyLink(appPrivacyLink);
+    appInfo.setRegistrationTitle(appRegistrationTitle);
+    appInfo.setRegistrationAgreement(appRegistrationAgreement);
+    appInfo.setRegistrationSubmittedContent(appRegistrationSubmittedContent);
+    appInfo.setRegistrationSubmittedTitle(appRegistrationSubmittedTitle);
+    appInfo.setRegistrationAcceptanceTitle(appRegistrationAcceptanceTitle);
+    appInfo.setApiDocsPath("/apidocs");
+
+    appInfo.setDivisionLogo(appDivisionLogo);
+    appInfo.setDivisionLink(appDivisionLink);
+    appInfo.setDivisionName(appDivisionName);
+
+    appInfo.setUploadContentTypes(appUploadContentTypes);
+    appInfo.setUploadMaxSize(appUploadMaxSize);
+
+
 
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");

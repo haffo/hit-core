@@ -30,9 +30,9 @@ public class Constant {
 
   public static final String PRIVACY_LINK = "PRIVACY_LINK";
 
-  public static final String ORGANIZATION_WEBSITE = "ORGANIZATION_WEBSITE";
+  public static final String ORGANIZATION_LINK = "ORGANIZATION_LINK";
 
-  public static final String DIVISION_WEBSITE = "DIVISION_WEBSITE";
+  public static final String DIVISION_LINK = "DIVISION_LINK";
 
   public static final String ORGANIZATION_LOGO = "ORGANIZATION_LOGO";
 

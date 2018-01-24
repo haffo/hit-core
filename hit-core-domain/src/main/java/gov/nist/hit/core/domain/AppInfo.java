@@ -82,16 +82,29 @@ public class AppInfo implements Serializable {
   @Column(columnDefinition = "TEXT")
   private String disclaimer;
 
+  @Column
+  private String disclaimerLink;
+
 
   @Column(columnDefinition = "TEXT")
   private String confidentiality;
 
+  @Column
+  private String confidentialityLink;
 
   @Column(columnDefinition = "TEXT")
   private String validationResultInfo;
 
+
   @Column(columnDefinition = "TEXT")
   private String acknowledgment;
+
+
+  @Column(columnDefinition = "TEXT")
+  private String privacy;
+
+  @Column
+  private String privacyLink;
 
   private String csrfToken;
 
@@ -119,7 +132,7 @@ public class AppInfo implements Serializable {
   private String uploadMaxSize;
   private String uploadContentTypes; // comma separated supported mime-types and extensions
 
-  @ElementCollection( fetch = FetchType.EAGER)
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "APP_OPTIONS")
   @MapKeyColumn(name = "OPTION_TYPE")
   @Column(name = "OPTION_VALUE")
@@ -403,15 +416,18 @@ public class AppInfo implements Serializable {
     }
     return options;
   }
+
   @Transient
   public void setEmployerRequired(boolean required) {
     this.getOptions().put(Constant.EMPLOYER_REQUIRED, Boolean.toString(required));
   }
+
   @Transient
   public Boolean isEmployerRequired() {
     return this.getOptions().get(Constant.EMPLOYER_REQUIRED) != null
         && Boolean.valueOf(this.getOptions().get(Constant.EMPLOYER_REQUIRED));
   }
+
   @Transient
   public Boolean isAuthenticationRequired() {
     return this.getOptions().get(Constant.AUTHENTICATION_REQUIRED) != null
@@ -423,6 +439,7 @@ public class AppInfo implements Serializable {
     return this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED) != null
         && Boolean.valueOf(this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED));
   }
+
   @Transient
   public Boolean isCbManagementSupported() {
     return this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED) != null
@@ -433,6 +450,7 @@ public class AppInfo implements Serializable {
   public void setAuthenticationRequired(boolean required) {
     this.getOptions().put(Constant.AUTHENTICATION_REQUIRED, Boolean.toString(required));
   }
+
   @Transient
   public void setCbManagementSupported(boolean supported) {
     this.getOptions().put(Constant.CB_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
@@ -442,37 +460,83 @@ public class AppInfo implements Serializable {
   public void setCfManagementSupported(boolean supported) {
     this.getOptions().put(Constant.CF_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
   }
+
   @Transient
   public void setDisclaimerLink(String disclaimerLink) {
     this.getOptions().put(Constant.DISCLAIMER_LINK, disclaimerLink);
   }
+
   @Transient
   public void setPrivacyLink(String privacyLink) {
     this.getOptions().put(Constant.PRIVACY_LINK, privacyLink);
   }
+
   @Transient
-  public void setOrganizationWebsite(String website) {
-    this.getOptions().put(Constant.ORGANIZATION_WEBSITE, website);
+  public void setOrganizationLink(String website) {
+    this.getOptions().put(Constant.ORGANIZATION_LINK, website);
   }
+
   @Transient
   public void setOrganizationLogo(String logo) {
     this.getOptions().put(Constant.ORGANIZATION_LOGO, logo);
   }
+
   @Transient
   public void setDivisionLogo(String logo) {
     this.getOptions().put(Constant.DIVISION_LOGO, logo);
   }
+
   @Transient
-  public void setDivisionWebsite(String site) {
-    this.getOptions().put(Constant.DIVISION_WEBSITE, site);
+  public void setDivisionLink(String site) {
+    this.getOptions().put(Constant.DIVISION_LINK, site);
   }
+
   @Transient
   public void setDivisionName(String name) {
     this.getOptions().put(Constant.DIVISION_NAME, name);
   }
+
   @Transient
   public void setOrganizationName(String name) {
     this.getOptions().put(Constant.ORGANIZATION_NAME, name);
   }
+
+
+
+  public String getPrivacy() {
+    return privacy;
+  }
+
+
+
+  public void setPrivacy(String privacy) {
+    this.privacy = privacy;
+  }
+
+
+
+  public String getConfidentialityLink() {
+    return confidentialityLink;
+  }
+
+
+
+  public void setConfidentialityLink(String confidentialityLink) {
+    this.confidentialityLink = confidentialityLink;
+  }
+
+
+
+  public String getDisclaimerLink() {
+    return disclaimerLink;
+  }
+
+
+
+  public String getPrivacyLink() {
+    return privacyLink;
+  }
+
+
 
 }
