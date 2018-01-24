@@ -113,10 +113,11 @@ public class AppInfo implements Serializable {
   @Column(columnDefinition = "TEXT")
   private String registrationAcceptanceTitle;
 
-
   private String uploadMaxSize;
   private String uploadContentTypes; // comma separated supported mime-types and extensions
 
+  @ElementCollection
+  @Column(name = "OPTIONS")
   private Map<String, Object> options = new HashMap<String, Object>();
 
   public AppInfo() {
