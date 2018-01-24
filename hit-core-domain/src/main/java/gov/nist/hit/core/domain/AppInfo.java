@@ -27,6 +27,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.Transient;
 
 import gov.nist.hit.core.Constant;
 
@@ -118,7 +119,7 @@ public class AppInfo implements Serializable {
   private String uploadMaxSize;
   private String uploadContentTypes; // comma separated supported mime-types and extensions
 
-  @ElementCollection
+  @ElementCollection( fetch = FetchType.EAGER)
   @CollectionTable(name = "APP_OPTIONS")
   @MapKeyColumn(name = "OPTION_TYPE")
   @Column(name = "OPTION_VALUE")
@@ -402,73 +403,74 @@ public class AppInfo implements Serializable {
     }
     return options;
   }
-
+  @Transient
   public void setEmployerRequired(boolean required) {
     this.getOptions().put(Constant.EMPLOYER_REQUIRED, Boolean.toString(required));
   }
-
+  @Transient
   public Boolean isEmployerRequired() {
     return this.getOptions().get(Constant.EMPLOYER_REQUIRED) != null
-        && Boolean.getBoolean(this.getOptions().get(Constant.EMPLOYER_REQUIRED));
+        && Boolean.valueOf(this.getOptions().get(Constant.EMPLOYER_REQUIRED));
   }
-
+  @Transient
   public Boolean isAuthenticationRequired() {
     return this.getOptions().get(Constant.AUTHENTICATION_REQUIRED) != null
-        && Boolean.getBoolean(this.getOptions().get(Constant.AUTHENTICATION_REQUIRED));
+        && Boolean.valueOf(this.getOptions().get(Constant.AUTHENTICATION_REQUIRED));
   }
 
+  @Transient
   public Boolean isCfManagementSupported() {
     return this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED) != null
-        && Boolean.getBoolean(this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED));
+        && Boolean.valueOf(this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED));
   }
-
+  @Transient
   public Boolean isCbManagementSupported() {
     return this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED) != null
-        && Boolean.getBoolean(this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED));
+        && Boolean.valueOf(this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED));
   }
 
-
+  @Transient
   public void setAuthenticationRequired(boolean required) {
     this.getOptions().put(Constant.AUTHENTICATION_REQUIRED, Boolean.toString(required));
   }
-
+  @Transient
   public void setCbManagementSupported(boolean supported) {
     this.getOptions().put(Constant.CB_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
   }
 
-
+  @Transient
   public void setCfManagementSupported(boolean supported) {
     this.getOptions().put(Constant.CF_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
   }
-
+  @Transient
   public void setDisclaimerLink(String disclaimerLink) {
     this.getOptions().put(Constant.DISCLAIMER_LINK, disclaimerLink);
   }
-
+  @Transient
   public void setPrivacyLink(String privacyLink) {
     this.getOptions().put(Constant.PRIVACY_LINK, privacyLink);
   }
-
+  @Transient
   public void setOrganizationWebsite(String website) {
     this.getOptions().put(Constant.ORGANIZATION_WEBSITE, website);
   }
-
+  @Transient
   public void setOrganizationLogo(String logo) {
     this.getOptions().put(Constant.ORGANIZATION_LOGO, logo);
   }
-
+  @Transient
   public void setDivisionLogo(String logo) {
     this.getOptions().put(Constant.DIVISION_LOGO, logo);
   }
-
+  @Transient
   public void setDivisionWebsite(String site) {
     this.getOptions().put(Constant.DIVISION_WEBSITE, site);
   }
-
+  @Transient
   public void setDivisionName(String name) {
     this.getOptions().put(Constant.DIVISION_NAME, name);
   }
-
+  @Transient
   public void setOrganizationName(String name) {
     this.getOptions().put(Constant.ORGANIZATION_NAME, name);
   }
