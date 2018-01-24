@@ -20,6 +20,8 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import gov.nist.hit.core.service.ResourcebundleLoader;
+
 public class WebAppInitializer implements WebApplicationInitializer
 
 {
@@ -67,7 +69,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 
 		try {
 			servletContext.setInitParameter("spring.profiles.default", "development");
-			servletContext.setInitParameter("rsbVersion", System.getProperty("app.resourceBundleVersion"));
+			servletContext.setInitParameter("rsbVersion", ResourcebundleLoader.getRsbVersion());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

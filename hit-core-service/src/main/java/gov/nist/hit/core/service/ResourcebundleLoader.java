@@ -1917,6 +1917,10 @@ public abstract class ResourcebundleLoader {
     this.dataMappingRepository = dataMappingRepository;
   }
 
+  public static String getRsbVersion() {
+    return System.getProperty("app.resourceBundleVersion");
+  }
+
 
 
 }
