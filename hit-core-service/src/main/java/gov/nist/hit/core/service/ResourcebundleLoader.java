@@ -233,8 +233,7 @@ public abstract class ResourcebundleLoader {
   @Value("${organization.logo:null}")
   private String organizationLogo;
 
-
-  @Value("${organization.name:null}")
+  @Value("${organization.name: 'NIST'}")
   private String organizationName;
 
   @Value("${website.privacy:null}")
@@ -255,6 +254,79 @@ public abstract class ResourcebundleLoader {
   @Value("${division.name:null}")
   private String divisionName;
 
+  @Value("${app.name}")
+  private String appName;
+
+  @Value("${app.version}")
+  private String appVersion;
+
+  @Value("${app.domain}")
+  private String appDomain;
+
+  @Value("${app.homeTitle}")
+  private String appHomeTitle;
+
+  @Value("${app.homeContent}")
+  private String appHomeContent;
+
+  @Value("${app.resourceBundleVersion}")
+  private String appResourceBundleVersion;
+
+
+  @Value("${app.igVersion:null}")
+  private String appIgVersion;
+
+  @Value("${app.description}")
+  private String appDescription;
+
+
+  @Value("${app.header}")
+  private String appHeader;
+
+  @Value("${app.upload.contentTypes:'application/xml,text/xml,text/plain'}")
+  private String appUploadContentTypes;
+
+  @Value("${app.upload.maxSize:'100MB'}")
+  private String appUploadMaxSize;
+
+  @Value("${app.acknowledgment:null}")
+  private String appAcknowledgment;
+
+  @Value("${app.diclaimer:null}")
+  private String appDisclaimer;
+
+  @Value("${app.confidentiality:null}")
+  private String appConfidentiality;
+
+  @Value("${app.messageContentInfo:null}")
+  private String appMessageContentInfo;
+
+  @Value("${app.validationResultInfo:null}")
+  private String appValidationResultInfo;
+
+  @Value("${app.valueSetCopyRight:null}")
+  private String appValueSetCopyRight;
+
+  @Value("${app.profileInfo:null}")
+  private String appProfileInfo;
+
+
+  @Value("${app.registration.title}")
+  private String appRegistrationTitle;
+
+  @Value("${app.registration.agreement}")
+  private String appRegistrationAgreement;
+
+
+  @Value("${app.registration.submittedContent}")
+  private String appRegistrationSubmittedContent;
+
+  @Value("${app.registration.submittedTitle}")
+  private String appRegistrationSubmittedTitle;
+
+  @Value("${app.registration.acceptanceTitle}")
+  private String appRegistrationAcceptanceTitle;
+
 
 
   public ResourcebundleLoader() {
@@ -263,18 +335,10 @@ public abstract class ResourcebundleLoader {
     obm.setSerializationInclusion(Include.NON_NULL);
   }
 
-  // public String getDirectory() {
-  // return directory;
-  // }
-  //
-  // public void setDirectory(String directory) {
-  // this.directory = directory;
-  // }
 
   public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
-    String rsbVersion = getRsbleVersion();
     String oldRsbVersion = appInfoService.getRsbVersion();
-    return oldRsbVersion == null || !rsbVersion.equals(oldRsbVersion);
+    return oldRsbVersion == null || !appResourceBundleVersion.equals(oldRsbVersion);
   }
 
   public void clearDB() {
@@ -339,110 +403,40 @@ public abstract class ResourcebundleLoader {
   public void loadAppInfo(String rootPath) throws JsonProcessingException, IOException {
     logger.info("loading app info...");
     AppInfo appInfo = new AppInfo();
-    JsonNode metaData = getMetaData();
-    String rsbVersion = getRsbleVersion();
-    appInfo.setRsbVersion(rsbVersion);
-    appInfo.setDomain(metaData.get("domain").textValue());
-    appInfo.setHeader(metaData.get("header").textValue());
-    if (metaData.get("organization") != null)
-      appInfo.setOrganization(metaData.get("organization").textValue());
-    appInfo.setHomeTitle(
-        metaData.get("homeTitle") != null ? metaData.get("homeTitle").textValue() : null);
-    appInfo.setHomeContent(
-        metaData.get("homeContent") != null ? metaData.get("homeContent").textValue() : null); // backward
-                                                                                               // compatibility
-    appInfo.setName(metaData.get("name").textValue());
-    appInfo.setVersion(metaData.get("version").textValue());
+    appInfo.setRsbVersion(appResourceBundleVersion);
+    appInfo.setDomain(appDomain);
+    appInfo.setHeader(appHeader);
+    appInfo.setOrganization(organizationName);
+    appInfo.setHomeTitle(appHomeTitle);
+    appInfo.setHomeContent(appHomeContent); // compatibility
+    appInfo.setName(appName);
+    appInfo.setVersion(appVersion);
     appInfo.setDate(new Date().getTime() + "");
-    Resource resource =
-        this.getResource(ResourcebundleLoader.PROFILE_PATTERN + PROFILE_INFO_PATTERN, rootPath);
-    if (resource != null) {
-      appInfo.setProfileInfo(FileUtil.getContent(resource));
-    }
 
-    resource = this.getResource(
-        ResourcebundleLoader.VALUESET_PATTERN + ResourcebundleLoader.VALUE_SET_COPYRIGHT_PATTERN,
-        rootPath);
-    if (resource != null) {
-      appInfo.setValueSetCopyright(FileUtil.getContent(resource));
-    }
-    resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.CONFIDENTIALITY_PATTERN,
-        rootPath);
-    if (resource != null) {
-      appInfo.setConfidentiality(FileUtil.getContent(resource));
-    }
 
-    resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.DISCLAIMER_PATTERN, rootPath);
-    if (resource != null) {
-      appInfo.setDisclaimer(FileUtil.getContent(resource));
-    }
+    appInfo.setDisclaimer(appDisclaimer);
+    appInfo.setHomeContent(appHomeContent);
+    appInfo.setMessageContentInfo(appMessageContentInfo);
+    appInfo.setValidationResultInfo(appValidationResultInfo);
+    appInfo.setAcknowledgment(appAcknowledgment);
+    appInfo.setProfileInfo(appProfileInfo);
+    appInfo.setValueSetCopyright(appValueSetCopyRight);
+    appInfo.setConfidentiality(appConfidentiality);
 
-    resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.VALIDATIONRESULT_INFO_PATTERN,
-        rootPath);
-    if (resource != null) {
-      appInfo.setValidationResultInfo(FileUtil.getContent(resource));
-    }
-
-    resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.ACKNOWLEDGMENT_PATTERN, rootPath);
-    if (resource != null) {
-      appInfo.setAcknowledgment(FileUtil.getContent(resource));
-    }
-
-    resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.HOME_PATTERN, rootPath);
-    if (resource != null) {
-      appInfo.setHomeContent(FileUtil.getContent(resource));
-    }
-
-    resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN,
-        rootPath);
-    if (resource != null) {
-      appInfo.setMessageContentInfo(FileUtil.getContent(resource));
-    }
-
-    loadRegistration(appInfo, rootPath);
-
+    appInfo.setRegistrationTitle(appRegistrationTitle);
+    appInfo.setRegistrationAgreement(appRegistrationAgreement);
+    appInfo.setRegistrationSubmittedContent(appRegistrationSubmittedContent);
+    appInfo.setRegistrationSubmittedTitle(appRegistrationSubmittedTitle);
+    appInfo.setRegistrationAcceptanceTitle(appRegistrationAcceptanceTitle);
     appInfo.setApiDocsPath("/apidocs");
 
-    if (metaData.get("fileUpload") != null) {
-      JsonNode fileUpload = metaData.get("fileUpload");
-      if (fileUpload.get("contentTypes") != null) {
-        appInfo.setUploadContentTypes(fileUpload.get("contentTypes").textValue());
-      }
-      if (fileUpload.get("maxSize") != null) {
-        appInfo.setUploadMaxSize(fileUpload.get("maxSize").textValue());
-      }
-    }
+    appInfo.setUploadContentTypes(appUploadContentTypes);
+    appInfo.setUploadMaxSize(appUploadMaxSize);
 
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");
   }
 
-  public void loadRegistration(AppInfo appInfo, String rootPath)
-      throws JsonProcessingException, IOException {
-    Resource resource = this.getResource(
-        ResourcebundleLoader.ABOUT_PATTERN + ResourcebundleLoader.REGISTRATION, rootPath);
-    if (resource != null) {
-      String content = FileUtil.getContent(resource);
-      ObjectMapper mapper = new ObjectMapper();
-      JsonNode node = mapper.readTree(content);
-      appInfo.setRegistrationTitle(
-          node.findValue("title") != null ? node.findValue("title").textValue() : null);
-      appInfo.setRegistrationAgreement(
-          node.findValue("agreement") != null ? node.findValue("agreement").textValue() : null);
-      appInfo.setRegistrationSubmittedContent(node.findValue("submittedContent") != null
-          ? node.findValue("submittedContent").textValue() : null);
-      appInfo.setRegistrationSubmittedTitle(node.findValue("submittedTitle") != null
-          ? node.findValue("submittedTitle").textValue() : null);
-      appInfo.setRegistrationAcceptanceTitle(node.findValue("acceptanceTitle") != null
-          ? node.findValue("acceptanceTitle").textValue() : null);
-    }
-  }
 
   public void loadUserDocs(String rootPath) throws IOException {
     logger.info("loading user documents...");
@@ -1642,21 +1636,6 @@ public abstract class ResourcebundleLoader {
     return location.replaceAll("%20", " ");
   }
 
-  public static String getRsbleVersion() throws JsonProcessingException, IOException {
-    JsonNode metaData = getMetaData();
-    if (metaData.get("rsbVersion") == null || "".equals(metaData.get("rsbVersion").textValue()))
-      throw new RuntimeException("rsbVersion not set or found in MetaData.json");
-    return metaData.get("rsbVersion").textValue();
-  }
-
-  public static JsonNode getMetaData() throws JsonProcessingException, IOException {
-    Resource resource =
-        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN + "MetaData.json");
-    if (resource == null)
-      throw new RuntimeException("No MetaData.json found in the resource bundle");
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.readTree(FileUtil.getContent(resource));
-  }
 
   private Set<gov.nist.hit.core.domain.Document> testDocuments(String testPath, JsonNode nodeObj) {
     Set<gov.nist.hit.core.domain.Document> documents =
