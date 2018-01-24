@@ -25,7 +25,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+
+import gov.nist.hit.core.Constant;
 
 
 /**
@@ -55,17 +56,6 @@ public class AppInfo implements Serializable {
 
   private String header;
 
-  @Transient
-  private static final String AUTHENTICATION_REQUIRED = "AUTHENTICATION_REQUIRED";
-
-  @Transient
-  private static final String EMPLOYER_REQUIRED = "EMPLOYER_REQUIRED";
-
-  @Transient
-  private static final String CB_MANAGEMENT_SUPPORTED = "CB_MANAGEMENT_SUPPORTED";
-
-  @Transient
-  private static final String CF_MANAGEMENT_SUPPORTED = "CF_MANAGEMENT_SUPPORTED";
 
 
   @ElementCollection(fetch = FetchType.EAGER)
@@ -402,59 +392,80 @@ public class AppInfo implements Serializable {
 
 
   public Map<String, Object> getOptions() {
+    if (this.options == null) {
+      this.options = new HashMap<String, Object>();
+    }
     return options;
   }
 
   public void setEmployerRequired(Boolean required) {
-    if (this.options == null) {
-      this.options = new HashMap<String, Object>();
-    }
-    this.options.put(EMPLOYER_REQUIRED, required);
+    this.getOptions().put(Constant.EMPLOYER_REQUIRED, required);
   }
 
   public Boolean isEmployerRequired() {
-    return this.options.get(EMPLOYER_REQUIRED) != null
-        && ((Boolean) this.options.get(EMPLOYER_REQUIRED)) == true;
+    return this.getOptions().get(Constant.EMPLOYER_REQUIRED) != null
+        && ((Boolean) this.getOptions().get(Constant.EMPLOYER_REQUIRED)) == true;
   }
 
   public Boolean isAuthenticationRequired() {
-    return this.options.get(AUTHENTICATION_REQUIRED) != null
-        && ((Boolean) this.options.get(AUTHENTICATION_REQUIRED)) == true;
+    return this.getOptions().get(Constant.AUTHENTICATION_REQUIRED) != null
+        && ((Boolean) this.getOptions().get(Constant.AUTHENTICATION_REQUIRED)) == true;
   }
 
   public Boolean isCfManagementSupported() {
-    return this.options.get(CF_MANAGEMENT_SUPPORTED) != null
-        && ((Boolean) this.options.get(CF_MANAGEMENT_SUPPORTED)) == true;
+    return this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED) != null
+        && ((Boolean) this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED)) == true;
   }
 
   public Boolean isCbManagementSupported() {
-    return this.options.get(CB_MANAGEMENT_SUPPORTED) != null
-        && ((Boolean) this.options.get(CB_MANAGEMENT_SUPPORTED)) == true;
+    return this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED) != null
+        && ((Boolean) this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED)) == true;
   }
 
 
   public void setAuthenticationRequired(Boolean required) {
-    if (this.options == null) {
-      this.options = new HashMap<String, Object>();
-    }
-    this.options.put(AUTHENTICATION_REQUIRED, required);
+    this.getOptions().put(Constant.AUTHENTICATION_REQUIRED, required);
   }
 
   public void setCbManagementSupported(Boolean supported) {
-    if (this.options == null) {
-      this.options = new HashMap<String, Object>();
-    }
-    this.options.put(CB_MANAGEMENT_SUPPORTED, supported);
+    this.getOptions().put(Constant.CB_MANAGEMENT_SUPPORTED, supported);
   }
 
 
   public void setCfManagementSupported(Boolean supported) {
-    if (this.options == null) {
-      this.options = new HashMap<String, Object>();
-    }
-    this.options.put(CF_MANAGEMENT_SUPPORTED, supported);
+    this.getOptions().put(Constant.CF_MANAGEMENT_SUPPORTED, supported);
   }
 
+  public void setDisclaimerLink(String disclaimerLink) {
+    this.getOptions().put(Constant.DISCLAIMER_LINK, disclaimerLink);
+  }
 
+  public void setPrivacyLink(String privacyLink) {
+    this.getOptions().put(Constant.PRIVACY_LINK, privacyLink);
+  }
+
+  public void setOrganizationWebsite(String website) {
+    this.getOptions().put(Constant.ORGANIZATION_WEBSITE, website);
+  }
+
+  public void setOrganizationLogo(String logo) {
+    this.getOptions().put(Constant.ORGANIZATION_LOGO, logo);
+  }
+
+  public void setDivisionLogo(String logo) {
+    this.getOptions().put(Constant.DIVISION_LOGO, logo);
+  }
+
+  public void setDivisionWebsite(String site) {
+    this.getOptions().put(Constant.DIVISION_WEBSITE, site);
+  }
+
+  public void setDivisionName(String name) {
+    this.getOptions().put(Constant.DIVISION_NAME, name);
+  }
+
+  public void setOrganizationName(String name) {
+    this.getOptions().put(Constant.ORGANIZATION_NAME, name);
+  }
 
 }

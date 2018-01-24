@@ -10,13 +10,37 @@
  * that they have been modified.
  */
 
-package gov.nist.hit.core.api.config;
+package gov.nist.hit.core;
 
 /**
  * @author Harold Affo (NIST)
  * 
  */
 public class Constant {
+
+  public static final String AUTHENTICATION_REQUIRED = "AUTHENTICATION_REQUIRED";
+
+  public static final String EMPLOYER_REQUIRED = "EMPLOYER_REQUIRED";
+
+  public static final String CB_MANAGEMENT_SUPPORTED = "CB_MANAGEMENT_SUPPORTED";
+
+  public static final String CF_MANAGEMENT_SUPPORTED = "CF_MANAGEMENT_SUPPORTED";
+
+  public static final String DISCLAIMER_LINK = "DISCLAIMER_LINK";
+
+  public static final String PRIVACY_LINK = "PRIVACY_LINK";
+
+  public static final String ORGANIZATION_WEBSITE = "ORGANIZATION_WEBSITE";
+
+  public static final String DIVISION_WEBSITE = "DIVISION_WEBSITE";
+
+  public static final String ORGANIZATION_LOGO = "ORGANIZATION_LOGO";
+
+  public static final String DIVISION_LOGO = "DIVISION_LOGO";
+
+  public static final String DIVISION_NAME = "DIVISION_NAME";
+
+  public static final String ORGANIZATION_NAME = "ORGANIZATION_NAME";
 
 
 }

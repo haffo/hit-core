@@ -230,6 +230,32 @@ public abstract class ResourcebundleLoader {
   @Value("${employer.required:false}")
   private boolean employerRequired;
 
+  @Value("${organization.logo:null}")
+  private String organizationLogo;
+
+
+  @Value("${organization.name:null}")
+  private String organizationName;
+
+  @Value("${website.privacy:null}")
+  private String privacyLink;
+
+  @Value("${website.disclaimer:null}")
+  private String disclaimerLink;
+
+  @Value("${organization.website:null}")
+  private String organizationWebsite;
+
+  @Value("${division.website:null}")
+  private String divisionWebsite;
+
+  @Value("${division.logo:null}")
+  private String divisionLogo;
+
+  @Value("${division.name:null}")
+  private String divisionName;
+
+
 
   public ResourcebundleLoader() {
     idLocationMap = new HashMap<>();
@@ -1686,6 +1712,14 @@ public abstract class ResourcebundleLoader {
     appInfo.setCfManagementSupported(cfManagementSupported);
     appInfo.setAuthenticationRequired(authenticationRequired);
     appInfo.setEmployerRequired(employerRequired);
+    appInfo.setOrganizationLogo(organizationLogo);
+    appInfo.setOrganizationWebsite(organizationWebsite);
+    appInfo.setDivisionLogo(divisionLogo);
+    appInfo.setDivisionWebsite(divisionWebsite);
+    appInfo.setDisclaimerLink(disclaimerLink);
+    appInfo.setPrivacyLink(privacyLink);
+    appInfo.setDivisionName(divisionName);
+    appInfo.setOrganization(organizationName);
 
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");
