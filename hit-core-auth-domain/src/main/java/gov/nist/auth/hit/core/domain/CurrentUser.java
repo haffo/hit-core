@@ -30,6 +30,7 @@ public class CurrentUser {
   private String fullName;
   private boolean guestAccount = false;
   private Long lastTestPlanPersistenceId;
+  private String employer;
 
 
   /**
@@ -126,6 +127,14 @@ public class CurrentUser {
 
   public void setLastTestPlanPersistenceId(Long lastTestPlanPersistenceId) {
     this.lastTestPlanPersistenceId = lastTestPlanPersistenceId;
+  }
+
+  public String getEmployer() {
+    return employer;
+  }
+
+  public void setEmployer(String employer) {
+    this.employer = employer;
   }
 
 

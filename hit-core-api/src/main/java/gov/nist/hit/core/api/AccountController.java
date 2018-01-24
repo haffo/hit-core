@@ -144,6 +144,7 @@ public class AccountController {
 					sacc.setEmail(acc.getEmail());
 					sacc.setFullName(acc.getFullName());
 					sacc.setUsername(acc.getUsername());
+					sacc.setEmployer(acc.getEmployer());
 					saccs.add(sacc);
 				}
 			}
@@ -226,7 +227,7 @@ public class AccountController {
 					sacc.setUsername(acc.getUsername());
 					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
 					sacc.setAccountType(acc.getAccountType());
-
+					sacc.setEmployer(acc.getEmployer());
 					saccs.add(sacc);
 				}
 			}
@@ -278,6 +279,7 @@ public class AccountController {
 					sacc.setUsername(acc.getUsername());
 					sacc.setAccountType(acc.getAccountType());
 					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
+					sacc.setEmployer(acc.getEmployer());
 					saccs.add(sacc);
 				}
 			}
@@ -311,13 +313,20 @@ public class AccountController {
 			if (account.getEmail() == null || account.getEmail().isEmpty()) {
 				return new ResponseMessage(ResponseMessage.Type.danger, "emptyEmail", account.getEmail());
 			}
+
 			if (!acc.getEmail().equalsIgnoreCase(account.getEmail())
 					&& accountService.findByTheAccountsEmail(account.getEmail()) != null) {
 				return new ResponseMessage(ResponseMessage.Type.danger, "duplicateEmail", account.getEmail());
 			}
 
+			if ((account.getEmployer() == null || account.getEmployer().isEmpty())
+					&& appInfoService.get().isEmployerRequired()) {
+				return new ResponseMessage(ResponseMessage.Type.danger, "emptyEmployer", account.getEmployer());
+			}
+
 			acc.setFullName(account.getFullName());
 			acc.setEmail(account.getEmail());
+			acc.setEmployer(account.getEmployer());
 
 			accountService.save(acc);
 
@@ -377,6 +386,12 @@ public class AccountController {
 		if (account.getAccountType() == null || account.getAccountType().isEmpty()) {
 			return new ResponseMessage(ResponseMessage.Type.danger, "accountTypeMissing", null);
 		}
+
+		if ((account.getEmployer() == null || account.getEmployer().isEmpty())
+				&& appInfoService.get().isEmployerRequired()) {
+			return new ResponseMessage(ResponseMessage.Type.danger, "emptyEmployer", account.getEmployer());
+		}
+
 		boolean validAccountType = false;
 		for (String acct : UserUtil.ACCOUNT_TYPE_LIST) {
 			if (acct.equals(account.getAccountType())) {
@@ -412,6 +427,7 @@ public class AccountController {
 			registeredAccount.setEmail(account.getEmail());
 			registeredAccount.setPending(false);
 			registeredAccount.setGuestAccount(false);
+			registeredAccount.setEmployer(account.getEmployer());
 			accountService.save(registeredAccount);
 		} catch (Exception e) {
 			return new ResponseMessage(ResponseMessage.Type.danger, "errorWithAccount", null);
@@ -558,6 +574,11 @@ public class AccountController {
 			return new ResponseMessage(ResponseMessage.Type.danger, "accountTypeNotValid", null);
 		}
 
+		if ((account.getEmployer() == null || account.getEmployer().isEmpty())
+				&& appInfoService.get().isEmployerRequired()) {
+			return new ResponseMessage(ResponseMessage.Type.danger, "emptyEmployer", account.getEmployer());
+		}
+
 		// create new user with provider role
 		try {
 			userService.createUserWithAuthorities(account.getUsername(), account.getPassword(),
@@ -578,6 +599,7 @@ public class AccountController {
 			registeredAccount.setEmail(account.getEmail());
 			registeredAccount.setSignedConfidentialityAgreement(account.getSignedConfidentialityAgreement());
 			registeredAccount.setGuestAccount(false);
+			registeredAccount.setEmployer(account.getEmployer());
 
 			accountService.save(registeredAccount);
 		} catch (Exception e) {
@@ -985,6 +1007,7 @@ public class AccountController {
 				cu.setPending(a.isPending());
 				cu.setFullName(a.getFullName());
 				cu.setGuestAccount(false);
+				cu.setEmployer(a.getEmployer());
 				cu.setLastTestPlanPersistenceId(a.getLastTestPlanPersistenceId());
 			}
 		}

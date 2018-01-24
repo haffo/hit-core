@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -105,11 +104,18 @@ public class ContextFreeManagementController {
 	@Value("${mail.tool}")
 	private String TOOL_NAME;
 
+	private void checkManagementSupport() throws Exception {
+		if (!appInfoService.get().isCfManagementSupported()) {
+			throw new Exception("This operation is not supported by this tool");
+		}
+	}
+
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/groups", method = RequestMethod.GET, produces = "application/json")
 	public List<CFTestPlan> getGroupsByScope(
 			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = true) TestScope scope,
-			HttpServletRequest request, HttpServletResponse response) throws IOException, NoUserFoundException {
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		checkManagementSupport();
 		scope = scope == null ? TestScope.GLOBAL : scope;
 		String username = null;
 		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
@@ -127,7 +133,8 @@ public class ContextFreeManagementController {
 			"application/x-www-form-urlencoded;" })
 	public CFTestPlan createGroup(HttpServletRequest request, @RequestParam("category") String category,
 			@RequestParam("scope") TestScope scope, Principal p, @RequestParam("position") Integer position)
-			throws NoUserFoundException {
+			throws Exception {
+		checkManagementSupport();
 		// String username = null;
 		String username = userIdService.getCurrentUserName(p);
 		if (username == null)
@@ -159,6 +166,7 @@ public class ContextFreeManagementController {
 	@RequestMapping(value = "/groups/{groupId}/delete", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus deleteGroup(HttpServletRequest request, @PathVariable("groupId") Long groupId,
 			Principal p) throws Exception {
+		checkManagementSupport();
 		// String username = null;
 		String username = userIdService.getCurrentUserName(p);
 		if (username == null)
@@ -188,6 +196,7 @@ public class ContextFreeManagementController {
 	@RequestMapping(value = "/groups/{groupId}/publish", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus approvePublishing(HttpServletRequest request, @PathVariable("groupId") Long groupId,
 			Principal p) throws Exception {
+		checkManagementSupport();
 		// String username = null;
 
 		String username = null;
@@ -239,6 +248,7 @@ public class ContextFreeManagementController {
 	@RequestMapping(value = "/groups/delete", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> createGroup(HttpServletRequest request, @RequestBody Set<Long> groupIds,
 			Principal p) throws Exception {
+		checkManagementSupport();
 		List<ResourceUploadStatus> status = new ArrayList<ResourceUploadStatus>();
 		// String username = null;
 		String username = userIdService.getCurrentUserName(p);
@@ -254,7 +264,8 @@ public class ContextFreeManagementController {
 	@RequestMapping(value = "/categories", method = RequestMethod.GET, produces = "application/json")
 	public Set<String> getTestPlanCategories(
 			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = true) TestScope scope,
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		checkManagementSupport();
 		Set<String> results = null;
 		scope = scope == null ? TestScope.GLOBAL : scope;
 		String username = null;
@@ -279,6 +290,7 @@ public class ContextFreeManagementController {
 			HttpServletRequest request, HttpServletResponse response, Principal p)
 			throws IOException, NoUserFoundException {
 		try {
+			checkManagementSupport();
 			String username = userIdService.getCurrentUserName(p);
 			if (username == null)
 				throw new NoUserFoundException("User could not be found");
@@ -316,7 +328,8 @@ public class ContextFreeManagementController {
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/groups/{groupId}/profiles", method = RequestMethod.GET, produces = "application/json")
 	public List<UploadedProfileModel> getGroupProfiles(@PathVariable("groupId") Long groupId,
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		checkManagementSupport();
 		CFTestPlan testPlan = testPlanService.findOne(groupId);
 		if (testPlan != null) {
 			Set<CFTestStep> steps = testPlan.getTestCases();
@@ -343,8 +356,8 @@ public class ContextFreeManagementController {
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/categories/{category}", method = RequestMethod.POST, produces = "application/json")
 	public boolean updateCategories(@PathVariable("category") String category, @RequestBody Set<Long> groups,
-			HttpServletRequest request, HttpServletResponse response, Principal p)
-			throws IOException, NoUserFoundException {
+			HttpServletRequest request, HttpServletResponse response, Principal p) throws Exception {
+		checkManagementSupport();
 		for (Long id : groups) {
 			updateCategory(category, id, request, response, p);
 		}
@@ -361,36 +374,19 @@ public class ContextFreeManagementController {
 	 * @param p
 	 *            Principal
 	 * @return True/False as success indicator
-	 * @throws NoUserFoundException
-	 * @throws IOException
+	 * @throws Exception
 	 */
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/tokens/{token}/delete", method = RequestMethod.POST)
 	@ResponseBody
 	public boolean clearFiles(ServletRequest request, @PathVariable("token") String token, Principal p)
-			throws NoUserFoundException, IOException {
+			throws Exception {
+		checkManagementSupport();
 		Long userId = userIdService.getCurrentUserId(p);
 		if (userId == null)
 			throw new NoUserFoundException("User could not be found");
 		FileUtils.deleteDirectory(new File(CF_UPLOAD_DIR + "/" + userId + "/" + token));
 		return true;
-	}
-
-	private void sendAcceptanceApprovalNotification(Account acc, String comment, CFTestPlan testPlan) {
-		SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-		msg.setTo(acc.getEmail());
-		msg.setSubject("" + TOOL_NAME + " Publication Notice");
-		msg.setText("Congratulations, " + acc.getFullName() + " \n\n"
-				+ "The following profile group is now made publicly available \n" + "Name:" + testPlan.getName() + "\n"
-				+ "Description:" + testPlan.getDescription() + "\n" + "Comment: " + comment + "\n" + "Sincerely, "
-				+ "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n"
-				+ "P.S: If you have any question, please contact us at '" + appInfoService.get().getAdminEmails().get(0)
-				+ "'");
-		try {
-			this.mailSender.send(msg);
-		} catch (MailException ex) {
-			logger.error(ex.getMessage(), ex);
-		}
 	}
 
 	public CFTestStepService getTestStepService() {

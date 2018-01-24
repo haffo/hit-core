@@ -13,7 +13,6 @@
 package gov.nist.hit.core.api;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +54,7 @@ import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.AppInfoService;
 import gov.nist.hit.core.service.BundleHandler;
 import gov.nist.hit.core.service.ResourceLoader;
 import gov.nist.hit.core.service.TestArtifactService;
@@ -129,6 +129,9 @@ public class ContextBasedManagementController {
 	@Autowired
 	private TestStepValidationReportService reportService;
 
+	@Autowired
+	private AppInfoService appInfoService;
+
 	@PostConstruct
 	public void init() {
 		CB_RESOURCE_BUNDLE_DIR = UPLOADED_RESOURCE_BUNDLE + "/cb";
@@ -137,7 +140,8 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/testPlans", method = RequestMethod.GET, produces = "application/json")
 	public List<TestPlan> getTestPlans(
 			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = false) TestScope scope,
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		checkManagementSupport();
 		logger.info("Fetching all testplans of type=" + scope + "...");
 		scope = scope == null ? TestScope.GLOBAL : scope;
 		String username = null;
@@ -155,8 +159,9 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/testPlans/{testPlanId}", method = RequestMethod.GET, produces = "application/json")
 	public TestPlan testPlan(
 			@ApiParam(value = "the id of the test plan", required = true) @PathVariable final Long testPlanId,
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("Fetching  test case...");
+		checkManagementSupport();
 		TestPlan testPlan = testPlanService.findOne(testPlanId);
 		return testPlan;
 	}
@@ -165,11 +170,12 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/testPlans/{testPlanId}/testCases/{testCaseId}/delete", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus deleteTestCase(HttpServletRequest request, @PathVariable("testCaseId") Long testCaseId,
 			@PathVariable("testPlanId") Long testPlanId, Principal p) throws Exception {
+		checkManagementSupport();
 		TestPlan tp = testPlanService.findOne(testPlanId);
 		if (tp != null) {
 			TestCase testCase = testCaseService.findOne(testCaseId);
 			if (testCase != null) {
-				checkRight(testCaseId, testCase, p);
+				checkPermission(testCaseId, testCase, p);
 				TestCase found = findTestCase(tp.getTestCases(), testCaseId);
 				tp.getTestCases().remove(found);
 				testPlanService.save(tp);
@@ -200,11 +206,12 @@ public class ContextBasedManagementController {
 	public ResourceUploadStatus deleteTestCaseGroupTestCase(HttpServletRequest request,
 			@PathVariable("testCaseId") Long testCaseId, @PathVariable("testCaseGroupId") Long testCaseGroupId,
 			Principal p) throws Exception {
+		checkManagementSupport();
 		TestCaseGroup tp = testCaseGroupService.findOne(testCaseGroupId);
 		if (tp != null) {
 			TestCase testCase = testCaseService.findOne(testCaseId);
 			if (testCase != null) {
-				checkRight(testCaseId, testCase, p);
+				checkPermission(testCaseId, testCase, p);
 				TestCase found = findTestCase(tp.getTestCases(), testCaseId);
 				tp.getTestCases().remove(found);
 				testCaseGroupService.save(tp);
@@ -235,11 +242,12 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/testCases/{testCaseId}/testSteps/{testStepId}/delete", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus deleteTestStep(HttpServletRequest request, @PathVariable("testStepId") Long testStepId,
 			@PathVariable("testCaseId") Long testCaseId, Principal p) throws Exception {
+		checkManagementSupport();
 		TestCase tp = testCaseService.findOne(testCaseId);
 		if (tp != null) {
 			TestStep testStep = testStepService.findOne(testStepId);
 			if (testStep != null) {
-				checkRight(testStepId, testStep, p);
+				checkPermission(testStepId, testStep, p);
 				TestStep found = findTestStep(tp.getTestSteps(), testStepId);
 				tp.getTestSteps().remove(found);
 				testCaseService.save(tp);
@@ -268,8 +276,9 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/testPlans/{testPlanId}/delete", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus deleteTestPlan(HttpServletRequest request, @PathVariable("testPlanId") Long testPlanId,
 			Principal p) throws Exception {
+		checkManagementSupport();
 		TestPlan testPlan = testPlanService.findOne(testPlanId);
-		checkRight(testPlanId, testPlan, p);
+		checkPermission(testPlanId, testPlan, p);
 		testPlanService.delete(testPlan);
 		ResourceUploadStatus result = new ResourceUploadStatus();
 		result.setType(ResourceType.TESTPLAN);
@@ -280,6 +289,7 @@ public class ContextBasedManagementController {
 	}
 
 	private ResourceUploadStatus deleteTestCase(TestCase tp) throws Exception {
+		checkManagementSupport();
 		testCaseService.delete(tp);
 		// if (testSteps != null) {
 		// for (TestStep testStep : testSteps) {
@@ -295,6 +305,7 @@ public class ContextBasedManagementController {
 	}
 
 	private ResourceUploadStatus deleteTestStep(TestStep testStep) throws Exception {
+		checkManagementSupport();
 		List<TestStepValidationReport> reports = reportService.findAllByTestStep(testStep.getId());
 		if (reports != null) {
 			reportService.delete(reports);
@@ -312,8 +323,9 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/testSteps/{testStepId}/name", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus deleteTestStep(HttpServletRequest request, @PathVariable("testStepId") Long testStepId,
 			Principal p, @RequestBody String name) throws Exception {
+		checkManagementSupport();
 		TestStep testStep = testStepService.findOne(testStepId);
-		checkRight(testStepId, testStep, p);
+		checkPermission(testStepId, testStep, p);
 		testStep.setName(name);
 		testStepService.save(testStep);
 		ResourceUploadStatus result = new ResourceUploadStatus();
@@ -328,8 +340,9 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/testCases/{testCaseId}/name", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus updateTestCaseName(HttpServletRequest request,
 			@PathVariable("testCaseId") Long testCaseId, Principal p, @RequestBody String name) throws Exception {
+		checkManagementSupport();
 		TestCase testCase = testCaseService.findOne(testCaseId);
-		checkRight(testCaseId, testCase, p);
+		checkPermission(testCaseId, testCase, p);
 		testCase.setName(name);
 		testCaseService.save(testCase);
 		ResourceUploadStatus result = new ResourceUploadStatus();
@@ -343,8 +356,9 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/testPlans/{testPlanId}/name", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus updateTestPlanName(HttpServletRequest request,
 			@PathVariable("testPlanId") Long testPlanId, Principal p, @RequestBody String name) throws Exception {
+		checkManagementSupport();
 		TestPlan testPlan = testPlanService.findOne(testPlanId);
-		checkRight(testPlanId, testPlan, p);
+		checkPermission(testPlanId, testPlan, p);
 		testPlan.setName(name);
 		testPlanService.save(testPlan);
 		ResourceUploadStatus result = new ResourceUploadStatus();
@@ -358,8 +372,9 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/testPlans/{testPlanId}/publish", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus publishTestPlan(HttpServletRequest request, @PathVariable("testPlanId") Long testPlanId,
 			Principal p) throws Exception {
+		checkManagementSupport();
 		TestPlan testPlan = testPlanService.findOne(testPlanId);
-		checkRight(testPlanId, testPlan, p);
+		checkPermission(testPlanId, testPlan, p);
 		TestScope scope = testPlan.getScope();
 		if (scope.equals(TestScope.GLOBAL)) {
 			throw new IllegalArgumentException("This Test Plan is not already publicly available ");
@@ -412,6 +427,7 @@ public class ContextBasedManagementController {
 	}
 
 	public ResourceUploadStatus deleteTestCaseGroup(TestCaseGroup testCaseGroup) throws Exception {
+		checkManagementSupport();
 		testCaseGroupService.delete(testCaseGroup);
 		ResourceUploadStatus result = new ResourceUploadStatus();
 		result.setType(ResourceType.TESTCASEGROUP);
@@ -425,11 +441,12 @@ public class ContextBasedManagementController {
 	public ResourceUploadStatus deleteTestCaseGroup(HttpServletRequest request,
 			@PathVariable("testCaseGroupId") Long testCaseGroupId, Principal p,
 			@PathVariable("testPlanId") Long testPlanId) throws Exception {
+		checkManagementSupport();
 		TestPlan tp = testPlanService.findOne(testPlanId);
 		if (tp != null) {
 			TestCaseGroup testCaseGroup = testCaseGroupService.findOne(testCaseGroupId);
 			if (testCaseGroup != null) {
-				checkRight(testCaseGroupId, testCaseGroup, p);
+				checkPermission(testCaseGroupId, testCaseGroup, p);
 				TestCaseGroup found = findTestCaseGroup(tp.getTestCaseGroups(), testCaseGroupId);
 				tp.getTestCaseGroups().remove(found);
 				testPlanService.save(tp);
@@ -460,11 +477,12 @@ public class ContextBasedManagementController {
 	public ResourceUploadStatus deleteTestCaseGroup2(HttpServletRequest request,
 			@PathVariable("testCaseGroupId") Long testCaseGroupId, Principal p,
 			@PathVariable("parentTestCaseGroupId") Long parentTestCaseGroupId) throws Exception {
+		checkManagementSupport();
 		TestCaseGroup tp = testCaseGroupService.findOne(parentTestCaseGroupId);
 		if (tp != null) {
 			TestCaseGroup testCaseGroup = testCaseGroupService.findOne(testCaseGroupId);
 			if (testCaseGroup != null) {
-				checkRight(testCaseGroupId, testCaseGroup, p);
+				checkPermission(testCaseGroupId, testCaseGroup, p);
 				TestCaseGroup found = findTestCaseGroup(tp.getTestCaseGroups(), testCaseGroupId);
 				tp.getTestCaseGroups().remove(found);
 				testCaseGroupService.save(tp);
@@ -522,8 +540,9 @@ public class ContextBasedManagementController {
 	public ResourceUploadStatus deleteTestCaseGroup(HttpServletRequest request,
 			@PathVariable("testCaseGroupId") Long testCaseGroupId, Principal p, @RequestBody String name)
 			throws Exception {
+		checkManagementSupport();
 		TestCaseGroup testCaseGroup = testCaseGroupService.findOne(testCaseGroupId);
-		checkRight(testCaseGroupId, testCaseGroup, p);
+		checkPermission(testCaseGroupId, testCaseGroup, p);
 		testCaseGroup.setName(name);
 		testCaseGroupService.save(testCaseGroup);
 		ResourceUploadStatus result = new ResourceUploadStatus();
@@ -566,6 +585,7 @@ public class ContextBasedManagementController {
 	@RequestMapping(value = "/artifacts/{artifactId}/delete", method = RequestMethod.POST, produces = "application/json")
 	public ResourceUploadStatus deleteArtifact(HttpServletRequest request, @PathVariable("artifactId") Long artifactId,
 			Principal p) throws Exception {
+		checkManagementSupport();
 		// String username = null;
 		String username = userIdService.getCurrentUserName(p);
 		if (username == null)
@@ -601,6 +621,7 @@ public class ContextBasedManagementController {
 	public ResourceUploadStatus uploadZip(ServletRequest request, @RequestPart("file") MultipartFile part, Principal p)
 			throws MessageUploadException {
 		try {
+			checkManagementSupport();
 			if (!part.getContentType().equalsIgnoreCase("application/zip"))
 				throw new MessageUploadException("Unsupported content type. Supported content types are: '.zip' ");
 			String username = userIdService.getCurrentUserName(p);
@@ -643,7 +664,7 @@ public class ContextBasedManagementController {
 		}
 	}
 
-	private void checkRight(Long id, AbstractTestCase testObject, Principal p) throws Exception {
+	private void checkPermission(Long id, AbstractTestCase testObject, Principal p) throws Exception {
 		String username = userIdService.getCurrentUserName(p);
 		if (username == null)
 			throw new NoUserFoundException("User could not be found");
@@ -653,9 +674,14 @@ public class ContextBasedManagementController {
 		if (scope.equals(TestScope.GLOBAL) && !userService.hasGlobalAuthorities(username)) {
 			throw new NoUserFoundException("You do not have the permission to perform this task");
 		}
-
 		if (!username.equals(testObject.getAuthorUsername()) && !userService.isAdmin(username)) {
 			throw new NoUserFoundException("You do not have the permission to perform this task");
+		}
+	}
+
+	private void checkManagementSupport() throws Exception {
+		if (!appInfoService.get().isCbManagementSupported()) {
+			throw new Exception("This operation is not supported by this tool");
 		}
 	}
 

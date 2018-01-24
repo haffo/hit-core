@@ -72,6 +72,9 @@ public class Account implements Serializable {
   @Column(unique = false)
   private String fullName;
 
+  @Column(unique = false, nullable = true)
+  private String employer;
+
 
   @JsonIgnore
 
@@ -263,6 +266,14 @@ public class Account implements Serializable {
 
   public void setLastCFTestPlanPersistenceId(Long lastCFTestPlanPersistenceId) {
     this.lastCFTestPlanPersistenceId = lastCFTestPlanPersistenceId;
+  }
+
+  public String getEmployer() {
+    return employer;
+  }
+
+  public void setEmployer(String employer) {
+    this.employer = employer;
   }
 
 

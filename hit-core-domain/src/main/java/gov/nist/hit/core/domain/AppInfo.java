@@ -14,7 +14,9 @@ package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -23,6 +25,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 
 /**
@@ -51,6 +54,19 @@ public class AppInfo implements Serializable {
   private String domain;
 
   private String header;
+
+  @Transient
+  private static final String AUTHENTICATION_REQUIRED = "AUTHENTICATION_REQUIRED";
+
+  @Transient
+  private static final String EMPLOYER_REQUIRED = "EMPLOYER_REQUIRED";
+
+  @Transient
+  private static final String CB_MANAGEMENT_SUPPORTED = "CB_MANAGEMENT_SUPPORTED";
+
+  @Transient
+  private static final String CF_MANAGEMENT_SUPPORTED = "CF_MANAGEMENT_SUPPORTED";
+
 
   @ElementCollection(fetch = FetchType.EAGER)
   private List<String> adminEmails = new ArrayList<String>();
@@ -111,6 +127,7 @@ public class AppInfo implements Serializable {
   private String uploadMaxSize;
   private String uploadContentTypes; // comma separated supported mime-types and extensions
 
+  private Map<String, Object> options = new HashMap<String, Object>();
 
   public AppInfo() {
     uploadMaxSize = "10MB";
@@ -379,9 +396,63 @@ public class AppInfo implements Serializable {
   }
 
 
-
   public void setOrganization(String organization) {
     this.organization = organization;
+  }
+
+
+  public Map<String, Object> getOptions() {
+    return options;
+  }
+
+  public void setEmployerRequired(Boolean required) {
+    if (this.options == null) {
+      this.options = new HashMap<String, Object>();
+    }
+    this.options.put(EMPLOYER_REQUIRED, required);
+  }
+
+  public Boolean isEmployerRequired() {
+    return this.options.get(EMPLOYER_REQUIRED) != null
+        && ((Boolean) this.options.get(EMPLOYER_REQUIRED)) == true;
+  }
+
+  public Boolean isAuthenticationRequired() {
+    return this.options.get(AUTHENTICATION_REQUIRED) != null
+        && ((Boolean) this.options.get(AUTHENTICATION_REQUIRED)) == true;
+  }
+
+  public Boolean isCfManagementSupported() {
+    return this.options.get(CF_MANAGEMENT_SUPPORTED) != null
+        && ((Boolean) this.options.get(CF_MANAGEMENT_SUPPORTED)) == true;
+  }
+
+  public Boolean isCbManagementSupported() {
+    return this.options.get(CB_MANAGEMENT_SUPPORTED) != null
+        && ((Boolean) this.options.get(CB_MANAGEMENT_SUPPORTED)) == true;
+  }
+
+
+  public void setAuthenticationRequired(Boolean required) {
+    if (this.options == null) {
+      this.options = new HashMap<String, Object>();
+    }
+    this.options.put(AUTHENTICATION_REQUIRED, required);
+  }
+
+  public void setCbManagementSupported(Boolean supported) {
+    if (this.options == null) {
+      this.options = new HashMap<String, Object>();
+    }
+    this.options.put(CB_MANAGEMENT_SUPPORTED, supported);
+  }
+
+
+  public void setCfManagementSupported(Boolean supported) {
+    if (this.options == null) {
+      this.options = new HashMap<String, Object>();
+    }
+    this.options.put(CF_MANAGEMENT_SUPPORTED, supported);
   }
 
 

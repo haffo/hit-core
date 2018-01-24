@@ -218,6 +218,18 @@ public abstract class ResourcebundleLoader {
   @Value("${admin.emails}")
   private List<String> adminEmails;
 
+  @Value("${cf.management.supported:false}")
+  private boolean cfManagementSupported;
+
+  @Value("${cb.management.supported:false}")
+  private boolean cbManagementSupported;
+
+  @Value("${authentication.required:false}")
+  private boolean authenticationRequired;
+
+  @Value("${employer.required:false}")
+  private boolean employerRequired;
+
 
   public ResourcebundleLoader() {
     idLocationMap = new HashMap<>();
@@ -1670,6 +1682,10 @@ public abstract class ResourcebundleLoader {
       throw new RuntimeException("Administrator emails address are missing");
     }
     appInfo.setAdminEmails(adminEmails);
+    appInfo.setCbManagementSupported(cbManagementSupported);
+    appInfo.setCfManagementSupported(cfManagementSupported);
+    appInfo.setAuthenticationRequired(authenticationRequired);
+    appInfo.setEmployerRequired(employerRequired);
 
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");
