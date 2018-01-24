@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -35,7 +36,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1917,8 +1920,10 @@ public abstract class ResourcebundleLoader {
     this.dataMappingRepository = dataMappingRepository;
   }
 
-  public static String getRsbVersion() {
-    return System.getProperty("app.resourceBundleVersion");
+  public static String getRsbVersion() throws IOException {
+    Resource resource = new ClassPathResource("/app-config.properties");
+    Properties props = PropertiesLoaderUtils.loadProperties(resource);
+    return props.getProperty("app.resourceBundleVersion");
   }
 
 
