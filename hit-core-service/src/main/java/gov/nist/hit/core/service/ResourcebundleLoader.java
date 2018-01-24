@@ -277,6 +277,11 @@ public abstract class ResourcebundleLoader {
   @Value("${app.header}")
   private String appHeader;
 
+
+  @Value("${app.contactEmail}")
+  private String appContactEmail;
+
+
   @Value("${app.upload.contentTypes:'application/xml,text/xml,text/plain'}")
   private String appUploadContentTypes;
 
@@ -1682,7 +1687,7 @@ public abstract class ResourcebundleLoader {
     appInfo.setName(appName);
     appInfo.setVersion(appVersion);
     appInfo.setDate(new Date().getTime() + "");
-
+    appInfo.setContactEmail(appContactEmail);
 
     appInfo.setDisclaimer(appDisclaimerContent);
     appInfo.setDisclaimerLink(appDisclaimerLink);

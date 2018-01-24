@@ -59,6 +59,7 @@ public class AppInfo implements Serializable {
 
   private String header;
 
+  private String contactEmail;
 
 
   @ElementCollection(fetch = FetchType.EAGER)
@@ -535,6 +536,18 @@ public class AppInfo implements Serializable {
 
   public String getPrivacyLink() {
     return privacyLink;
+  }
+
+
+
+  public String getContactEmail() {
+    return contactEmail;
+  }
+
+
+
+  public void setContactEmail(String contactEmail) {
+    this.contactEmail = contactEmail;
   }
 
 
