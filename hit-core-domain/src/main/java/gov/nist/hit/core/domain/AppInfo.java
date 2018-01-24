@@ -122,7 +122,7 @@ public class AppInfo implements Serializable {
   @CollectionTable(name = "APP_OPTIONS")
   @MapKeyColumn(name = "OPTION_TYPE")
   @Column(name = "OPTION_VALUE")
-  private Map<String, Object> options = new HashMap<String, Object>();
+  private Map<String, String> options = new HashMap<String, String>();
 
   public AppInfo() {
     uploadMaxSize = "10MB";
@@ -396,49 +396,49 @@ public class AppInfo implements Serializable {
   }
 
 
-  public Map<String, Object> getOptions() {
+  public Map<String, String> getOptions() {
     if (this.options == null) {
-      this.options = new HashMap<String, Object>();
+      this.options = new HashMap<String, String>();
     }
     return options;
   }
 
-  public void setEmployerRequired(Boolean required) {
-    this.getOptions().put(Constant.EMPLOYER_REQUIRED, required);
+  public void setEmployerRequired(boolean required) {
+    this.getOptions().put(Constant.EMPLOYER_REQUIRED, Boolean.toString(required));
   }
 
   public Boolean isEmployerRequired() {
     return this.getOptions().get(Constant.EMPLOYER_REQUIRED) != null
-        && ((Boolean) this.getOptions().get(Constant.EMPLOYER_REQUIRED)) == true;
+        && Boolean.getBoolean(this.getOptions().get(Constant.EMPLOYER_REQUIRED));
   }
 
   public Boolean isAuthenticationRequired() {
     return this.getOptions().get(Constant.AUTHENTICATION_REQUIRED) != null
-        && ((Boolean) this.getOptions().get(Constant.AUTHENTICATION_REQUIRED)) == true;
+        && Boolean.getBoolean(this.getOptions().get(Constant.AUTHENTICATION_REQUIRED));
   }
 
   public Boolean isCfManagementSupported() {
     return this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED) != null
-        && ((Boolean) this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED)) == true;
+        && Boolean.getBoolean(this.getOptions().get(Constant.CF_MANAGEMENT_SUPPORTED));
   }
 
   public Boolean isCbManagementSupported() {
     return this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED) != null
-        && ((Boolean) this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED)) == true;
+        && Boolean.getBoolean(this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED));
   }
 
 
-  public void setAuthenticationRequired(Boolean required) {
-    this.getOptions().put(Constant.AUTHENTICATION_REQUIRED, required);
+  public void setAuthenticationRequired(boolean required) {
+    this.getOptions().put(Constant.AUTHENTICATION_REQUIRED, Boolean.toString(required));
   }
 
-  public void setCbManagementSupported(Boolean supported) {
-    this.getOptions().put(Constant.CB_MANAGEMENT_SUPPORTED, supported);
+  public void setCbManagementSupported(boolean supported) {
+    this.getOptions().put(Constant.CB_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
   }
 
 
-  public void setCfManagementSupported(Boolean supported) {
-    this.getOptions().put(Constant.CF_MANAGEMENT_SUPPORTED, supported);
+  public void setCfManagementSupported(boolean supported) {
+    this.getOptions().put(Constant.CF_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
   }
 
   public void setDisclaimerLink(String disclaimerLink) {
