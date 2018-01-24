@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -25,6 +26,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MapKeyColumn;
 
 import gov.nist.hit.core.Constant;
 
@@ -117,7 +119,9 @@ public class AppInfo implements Serializable {
   private String uploadContentTypes; // comma separated supported mime-types and extensions
 
   @ElementCollection
-  @Column(name = "OPTIONS")
+  @CollectionTable(name = "APP_OPTIONS")
+  @MapKeyColumn(name = "OPTION_TYPE")
+  @Column(name = "OPTION_VALUE")
   private Map<String, Object> options = new HashMap<String, Object>();
 
   public AppInfo() {
