@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -39,6 +40,7 @@ import gov.nist.hit.core.service.util.ResourcebundleHelper;
 public class ResourceController {
 
 	@Autowired
+	@Qualifier("resourceLoader")
 	private ResourceLoader resourceLoader;
 
 	@ModelAttribute("requestObj")

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -76,6 +77,7 @@ public class ContextFreeController {
 	private UserIdService userIdService;
 
 	@Autowired
+	@Qualifier("resourceLoader")
 	private ResourceLoader resouceLoader;
 
 	@Autowired

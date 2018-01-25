@@ -1,6 +1,7 @@
 package gov.nist.hit.core.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import gov.nist.hit.core.service.ResourceLoader;
 public class ResourceDeleteController {
 
 	@Autowired
+	@Qualifier("resourceLoader")
 	private ResourceLoader resourceLoader;
 
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
