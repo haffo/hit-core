@@ -342,7 +342,7 @@ public abstract class ResourcebundleLoader {
   @Value("${app.registration.acceptanceTitle}")
   private String appRegistrationAcceptanceTitle;
 
-  @Value("${app.download.war.disabled:false}")
+  @Value("${download.war.disabled:false}")
   private boolean appDownloadWarDisabled;
 
 
