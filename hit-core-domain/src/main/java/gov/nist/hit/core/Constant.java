@@ -42,5 +42,7 @@ public class Constant {
 
   public static final String ORGANIZATION_NAME = "ORGANIZATION_NAME";
 
+  public static final String DOWNLOAD_WAR_DISABLED = "DOWNLOAD_WAR_DISABLED";
+
 
 }

@@ -502,6 +502,17 @@ public class AppInfo implements Serializable {
     this.getOptions().put(Constant.ORGANIZATION_NAME, name);
   }
 
+  @Transient
+  public void setDownloadWarDisabled(boolean disabled) {
+    this.getOptions().put(Constant.DOWNLOAD_WAR_DISABLED, Boolean.toString(disabled));
+  }
+
+  @Transient
+  public Boolean isDownloadWarDisabled() {
+    return this.getOptions().get(Constant.DOWNLOAD_WAR_DISABLED) != null
+        && Boolean.valueOf(this.getOptions().get(Constant.DOWNLOAD_WAR_DISABLED));
+  }
+
 
 
   public String getPrivacy() {

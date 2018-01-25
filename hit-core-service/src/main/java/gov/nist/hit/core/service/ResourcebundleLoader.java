@@ -342,6 +342,9 @@ public abstract class ResourcebundleLoader {
   @Value("${app.registration.acceptanceTitle}")
   private String appRegistrationAcceptanceTitle;
 
+  @Value("${app.download.war.disabled:false}")
+  private boolean appDownloadWarDisabled;
+
 
 
   public ResourcebundleLoader() {
@@ -698,49 +701,53 @@ public abstract class ResourcebundleLoader {
   }
 
   public void loadToolDownloads(String rootPath) throws IOException {
-    logger.info("loading tool downloads...");
-    JsonNode confObj = toJsonObj(TOOL_DOWNLOADS_PATTERN + TOOL_DOWNLOADS_CONF_PATTERN, rootPath);
-    if (confObj != null) {
-      if (confObj.findValue("installationGuide") != null) {
-        gov.nist.hit.core.domain.Document installation = new gov.nist.hit.core.domain.Document();
-        JsonNode instructionObj = confObj.findValue("installationGuide");
-        if (instructionObj.findValue("title") == null || instructionObj.findValue("name") == null
-            || instructionObj.findValue("date") == null) {
-          throw new IllegalArgumentException(
-              "The Download installation field is missing one of those: title, link, date");
+    if (!appInfoService.get().isDownloadWarDisabled()) {
+      logger.info("loading tool downloads...");
+      JsonNode confObj = toJsonObj(TOOL_DOWNLOADS_PATTERN + TOOL_DOWNLOADS_CONF_PATTERN, rootPath);
+      if (confObj != null) {
+        if (confObj.findValue("installationGuide") != null) {
+          gov.nist.hit.core.domain.Document installation = new gov.nist.hit.core.domain.Document();
+          JsonNode instructionObj = confObj.findValue("installationGuide");
+          if (instructionObj.findValue("title") == null || instructionObj.findValue("name") == null
+              || instructionObj.findValue("date") == null) {
+            throw new IllegalArgumentException(
+                "The Download installation field is missing one of those: title, link, date");
+          }
+
+          installation.setTitle(instructionObj.findValue("title").textValue());
+          installation.setName(instructionObj.findValue("name").textValue());
+          installation
+              .setPath(TOOL_DOWNLOADS_PATTERN + instructionObj.findValue("name").textValue());
+          installation.setDate(instructionObj.findValue("date").textValue());
+          installation.setType(DocumentType.INSTALLATION);
+          documentRepository.save(installation);
         }
 
-        installation.setTitle(instructionObj.findValue("title").textValue());
-        installation.setName(instructionObj.findValue("name").textValue());
-        installation.setPath(TOOL_DOWNLOADS_PATTERN + instructionObj.findValue("name").textValue());
-        installation.setDate(instructionObj.findValue("date").textValue());
-        installation.setType(DocumentType.INSTALLATION);
-        documentRepository.save(installation);
-      }
-
-      if (confObj.findValue("downloads") != null) {
-        JsonNode warFilesObj = confObj.findValue("downloads");
-        if (warFilesObj.isArray()) {
-          List<gov.nist.hit.core.domain.Document> docs =
-              new ArrayList<gov.nist.hit.core.domain.Document>();
-          Iterator<JsonNode> it = warFilesObj.elements();
-          if (it != null) {
-            while (it.hasNext()) {
-              JsonNode node = it.next();
-              gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-              if (node.findValue("title") == null || node.findValue("link") == null
-                  || node.findValue("date") == null) {
-                throw new IllegalArgumentException(
-                    "The Download 'downloads' field is missing one of those: title, link, date");
+        if (confObj.findValue("downloads") != null) {
+          JsonNode warFilesObj = confObj.findValue("downloads");
+          if (warFilesObj.isArray()) {
+            List<gov.nist.hit.core.domain.Document> docs =
+                new ArrayList<gov.nist.hit.core.domain.Document>();
+            Iterator<JsonNode> it = warFilesObj.elements();
+            if (it != null) {
+              while (it.hasNext()) {
+                JsonNode node = it.next();
+                gov.nist.hit.core.domain.Document document =
+                    new gov.nist.hit.core.domain.Document();
+                if (node.findValue("title") == null || node.findValue("link") == null
+                    || node.findValue("date") == null) {
+                  throw new IllegalArgumentException(
+                      "The Download 'downloads' field is missing one of those: title, link, date");
+                }
+                document.setTitle(node.findValue("title").textValue());
+                document.setPath(node.findValue("link").textValue());
+                document.setDate(node.findValue("date").textValue());
+                document.setType(DocumentType.DELIVERABLE);
+                docs.add(document);
               }
-              document.setTitle(node.findValue("title").textValue());
-              document.setPath(node.findValue("link").textValue());
-              document.setDate(node.findValue("date").textValue());
-              document.setType(DocumentType.DELIVERABLE);
-              docs.add(document);
-            }
-            if (!docs.isEmpty()) {
-              documentRepository.save(docs);
+              if (!docs.isEmpty()) {
+                documentRepository.save(docs);
+              }
             }
           }
         }
@@ -1719,7 +1726,7 @@ public abstract class ResourcebundleLoader {
 
     appInfo.setUploadContentTypes(appUploadContentTypes);
     appInfo.setUploadMaxSize(appUploadMaxSize);
-
+    appInfo.setDownloadWarDisabled(appDownloadWarDisabled);
 
 
     appInfoRepository.save(appInfo);
