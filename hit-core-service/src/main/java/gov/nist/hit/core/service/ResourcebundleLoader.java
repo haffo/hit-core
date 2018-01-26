@@ -300,10 +300,10 @@ public abstract class ResourcebundleLoader {
   @Value("${app.privacy.link:null}")
   private String appPrivacyLink;
 
-  @Value("${app.diclaimer.content:null}")
+  @Value("${app.disclaimer.content:null}")
   private String appDisclaimerContent;
 
-  @Value("${app.diclaimer.link:null}")
+  @Value("${app.disclaimer.link:null}")
   private String appDisclaimerLink;
 
   @Value("${app.confidentiality.content:null}")
