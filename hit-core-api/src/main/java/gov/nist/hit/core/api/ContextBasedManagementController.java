@@ -27,6 +27,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -97,6 +98,7 @@ public class ContextBasedManagementController {
 	private TestPlanService testPlanService;
 
 	@Autowired
+	@Qualifier("resourceLoader")
 	private ResourceLoader resourceLoader;
 
 	@Autowired
