@@ -28,6 +28,16 @@ public interface MessageValidator {
   public MessageValidationResult validate(TestContext testContext, MessageValidationCommand command)
       throws MessageValidationException;
 
-  public String getOrganizationName();
+  /**
+   * 
+   * @return
+   */
+  public String getValidationServiceName();
+
+  /**
+   * 
+   * @return
+   */
+  public String getProviderName();
 
 }
