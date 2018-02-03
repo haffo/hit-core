@@ -1685,13 +1685,13 @@ public abstract class ResourcebundleLoader {
     appInfo.setEmployerRequired(employerRequired);
 
     appInfo.setOrganization(organizationName);
+    appInfo.setOrganizationName(organizationName);
     appInfo.setOrganizationLogo(appOrganizationLogo);
     appInfo.setOrganizationLink(appOrganizationLink);
 
     appInfo.setRsbVersion(appResourceBundleVersion);
     appInfo.setDomain(appDomain);
     appInfo.setHeader(appHeader);
-    appInfo.setOrganization(organizationName);
     appInfo.setHomeTitle(appHomeTitle);
     appInfo.setHomeContent(appHomeContent); // compatibility
     appInfo.setName(appName);

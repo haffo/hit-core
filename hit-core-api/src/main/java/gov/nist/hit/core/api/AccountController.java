@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -53,6 +54,7 @@ import gov.nist.auth.hit.core.domain.CurrentUser;
 import gov.nist.auth.hit.core.domain.ShortAccount;
 import gov.nist.auth.hit.core.domain.util.UserUtil;
 import gov.nist.auth.hit.core.repo.util.AccountSpecsHelper;
+import gov.nist.hit.core.Constant;
 import gov.nist.hit.core.domain.ResponseMessage;
 import gov.nist.hit.core.service.AccountPasswordResetService;
 import gov.nist.hit.core.service.AccountService;
@@ -100,6 +102,13 @@ public class AccountController {
 
 	@Value("${mail.tool}")
 	private String TOOL_NAME;
+
+	private String organizationName;
+
+	@PostConstruct
+	public void init() {
+		organizationName = appInfoService.get().getOptions().get(Constant.ORGANIZATION_NAME);
+	}
 
 	@Autowired
 	TestCaseValidationReportService testCaseValidationService;
@@ -1017,7 +1026,7 @@ public class AccountController {
 	private void sendApplicationConfirmationNotification(Account acc) {
 		try {
 			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-			msg.setSubject("NIST  Application Received");
+			msg.setSubject(organizationName + " Application Received");
 			msg.setTo(acc.getEmail());
 			msg.setText("Dear " + acc.getUsername() + " \n\n"
 					+ "Thank you for submitting an application for use of the " + TOOL_NAME + "\n\n"
