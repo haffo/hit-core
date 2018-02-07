@@ -1,6 +1,7 @@
 <xsl:stylesheet exclude-result-prefixes="map" version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:map="urn:internal"
 	xmlns:teststepvalidationreport="http://www.nist.gov/healthcare/validation/teststep/report"
+	xmlns:message="http://www.nist.gov/healthcare/validation/message"
 	xmlns:manualvalidationreport="http://www.nist.gov/healthcare/validation/manual/report"
 	xmlns:report="http://www.nist.gov/healthcare/validation/message/hl7/v2/report">
 
@@ -32,6 +33,9 @@
 <!-- 		<xsl:if test="$withHeader = boolean('true')">
  -->			
   
+  		<xsl:variable name="stepType"
+			select="teststepvalidationreport:Type"></xsl:variable>
+			
  <div class="report-section">
 				<table class="forumline title-background" width="100%"
 					cellspacing="1" cellpadding="10">
@@ -88,7 +92,7 @@
 					cellpadding="2">
 					<tbody class="cf-tbody">
 						<tr>
-							<td class="row1 border_right">Type</td>
+							<td class="row1 border_right">Test Step Type</td>
 							<td class="row2">
 								<center>
 									<xsl:value-of select="teststepvalidationreport:Type" />
@@ -99,12 +103,41 @@
 				</table>
 			</div>
 			
+			
+			<xsl:if
+			test="$stepType != 'SUT_MANUAL' and $stepType != 'TA_MANUAL'">
+			<div class="report-section">
+				<table class="forumline" width="100%" cellspacing="1"
+					cellpadding="2">
+					<tbody class="cf-tbody">
+						<tr>
+							<td class="row1 border_right">
+								Message Validation Result</td>
+							<td class="row2">
+								<center>
+									<xsl:variable name="errorCount"
+										select="../teststepvalidationreport:TestStepValidationReportBody/report:HL7V2MessageValidationReport/report:HeaderReport/message:ErrorCount"></xsl:variable>
+									<xsl:if test="$errorCount = 0">
+										PASSED
+									</xsl:if>
+									<xsl:if test="$errorCount > 0">
+										FAILED
+									</xsl:if>
+								</center>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</xsl:if>
+		
+			
 			<div class="report-section">
 			<table class="forumline" width="100%" cellspacing="1"
 				cellpadding="2">
 				<tbody class="cf-tbody">
 					<tr>
-						<td class="row1 border_right">Result</td>
+						<td class="row1 border_right">Test Step Outcome</td>
 						<td class="row2">
 							<center>
 								<xsl:value-of select="@Result" />

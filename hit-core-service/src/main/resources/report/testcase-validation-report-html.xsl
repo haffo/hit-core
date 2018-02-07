@@ -36,7 +36,7 @@
 				<tbody class="cf-tbody">
 					<tr>
 						<td class="row1 border_right">
-							<span class="maintitle">TestCase Validation Report</span>
+							<span class="maintitle">Test Case Validation Report</span>
 						</td>
 						<td class="row2" style="font-weight:bold">
 							<center>
@@ -68,7 +68,7 @@
 				cellpadding="2">
 				<tbody class="cf-tbody">
 					<tr>
-						<td class="row1 border_right">Result</td>
+						<td class="row1 border_right">Test Case Outcome</td>
 						<td class="row2">
 							<center>
 								<xsl:value-of select="@Result" />
