@@ -118,10 +118,10 @@
 									<xsl:variable name="errorCount"
 										select="../teststepvalidationreport:TestStepValidationReportBody/report:HL7V2MessageValidationReport/report:HeaderReport/message:ErrorCount"></xsl:variable>
 									<xsl:if test="$errorCount = 0">
-										PASSED
+										Passed
 									</xsl:if>
 									<xsl:if test="$errorCount > 0">
-										FAILED
+										Failed
 									</xsl:if>
 								</center>
 							</td>

@@ -76,7 +76,7 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
   @Override
   public void deleteByTestCaseAndUser(Long userId, Long testCaseId) {
     List<TestStepValidationReport> results =
-        findTestStepReportsByTestCaseAndUser(testCaseId, userId);
+        findTestStepReportsByTestCaseAndUser(userId, testCaseId);
     if (results != null && !results.isEmpty()) {
       testStepValidationReportRepository.delete(results);
     }
@@ -330,7 +330,7 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
       throws ValidationReportException {
     try {
       List<TestStepValidationReport> testStepReports =
-          findTestStepReportsByTestCaseAndUser(testCase.getId(), userId);
+          findTestStepReportsByTestCaseAndUser(userId, testCase.getId());
       TestCaseValidationResult result = new TestCaseValidationResult(testCase, testStepReports);
       result.setResult(res != null ? TestResult.valueOf(res) : null);
       result.setComments(comments);

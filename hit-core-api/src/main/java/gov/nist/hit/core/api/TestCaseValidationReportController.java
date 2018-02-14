@@ -258,6 +258,7 @@ public class TestCaseValidationReportController {
 			streamer.stream(response.getOutputStream(), io);
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new ValidationReportException("Failed to download the reports");
 		}
 		return true;
