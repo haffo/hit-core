@@ -356,7 +356,8 @@ public abstract class ResourcebundleLoader {
 
   public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
     String oldRsbVersion = appInfoService.getRsbVersion();
-    return oldRsbVersion == null || !appResourceBundleVersion.equals(oldRsbVersion);
+    return oldRsbVersion == null || appResourceBundleVersion == null
+        || !appResourceBundleVersion.equals(oldRsbVersion);
   }
 
   public void clearDB() {
@@ -376,6 +377,9 @@ public abstract class ResourcebundleLoader {
 
   public void load(String directory)
       throws JsonProcessingException, IOException, ProfileParserException {
+    if (appResourceBundleVersion == null) {
+      appResourceBundleVersion = getRsbleVersion();
+    }
     if (isNewResourcebundle()) {
       logger.info("clearing tables...");
       clearDB();
@@ -1688,10 +1692,6 @@ public abstract class ResourcebundleLoader {
     appInfo.setOrganizationName(organizationName);
     appInfo.setOrganizationLogo(appOrganizationLogo);
     appInfo.setOrganizationLink(appOrganizationLink);
-
-    if (appResourceBundleVersion == null) {
-      appResourceBundleVersion = getRsbleVersion();
-    }
 
     appInfo.setRsbVersion(appResourceBundleVersion);
 
