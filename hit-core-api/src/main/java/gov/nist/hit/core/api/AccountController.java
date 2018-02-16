@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,9 +75,10 @@ import gov.nist.hit.core.service.UserService;
 public class AccountController {
 
 	static final Logger logger = LoggerFactory.getLogger(AccountController.class);
+	private static Log statLog = LogFactory.getLog("StatLog");
 
 	public final String DEFAULT_PAGE_SIZE = "0";
-	public final String REGISTRATION_LOG_TEMPLATE = "Fullname=%s, Company=%s, RegistrationDate=%tD";
+	public final String REGISTRATION_LOG_TEMPLATE = "[Registration] fullname=%s date=%tD";
 
 	public AccountController() {
 	}
@@ -482,7 +485,8 @@ public class AccountController {
 		Formatter fmt = new Formatter(sbuf);
 		fmt.format(REGISTRATION_LOG_TEMPLATE, registeredAccount.getFullName(), registeredAccount.getEmployer(),
 				registeredAccount.getRegistrationDate());
-		logger.info(sbuf.toString());
+		String lo = sbuf.toString();
+		statLog.info(lo);
 	}
 
 	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
