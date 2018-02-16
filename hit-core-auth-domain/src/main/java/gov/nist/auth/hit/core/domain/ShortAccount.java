@@ -43,6 +43,7 @@ public class ShortAccount implements Serializable {
   private boolean pending;
   private boolean entityDisabled;
   private Date lastLoggedInDate;
+  private Date registrationDate;
 
   /**
    * @return the email
@@ -176,6 +177,15 @@ public class ShortAccount implements Serializable {
 
   public void setLastLoggedInDate(Date lastLoggedInDate) {
     this.lastLoggedInDate = lastLoggedInDate;
+  }
+
+
+  public Date getRegistrationDate() {
+    return registrationDate;
+  }
+
+  public void setRegistrationDate(Date registrationDate) {
+    this.registrationDate = registrationDate;
   }
 
 

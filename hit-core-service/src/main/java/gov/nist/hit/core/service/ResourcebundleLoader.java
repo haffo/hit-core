@@ -1689,7 +1689,12 @@ public abstract class ResourcebundleLoader {
     appInfo.setOrganizationLogo(appOrganizationLogo);
     appInfo.setOrganizationLink(appOrganizationLink);
 
+    if (appResourceBundleVersion == null) {
+      appResourceBundleVersion = getRsbleVersion();
+    }
+
     appInfo.setRsbVersion(appResourceBundleVersion);
+
     appInfo.setDomain(appDomain);
     appInfo.setHeader(appHeader);
     appInfo.setHomeTitle(appHomeTitle);
@@ -1732,6 +1737,23 @@ public abstract class ResourcebundleLoader {
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");
   }
+
+
+  private String getRsbleVersion() throws JsonProcessingException, IOException {
+    Resource resource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN + "MetaData.json");
+    if (resource == null)
+      throw new RuntimeException("No MetaData.json found in the resource bundle");
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode metaData = mapper.readTree(FileUtil.getContent(resource));
+    if (metaData != null) {
+      if (metaData.get("rsbVersion") == null || "".equals(metaData.get("rsbVersion").textValue()))
+        throw new RuntimeException("rsbVersion not set or found in MetaData.json");
+      return metaData.get("rsbVersion").textValue();
+    }
+    return null;
+  }
+
 
   public TestPlanRepository getTestPlanRepository() {
     return testPlanRepository;

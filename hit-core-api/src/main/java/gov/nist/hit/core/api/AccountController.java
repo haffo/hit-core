@@ -14,6 +14,7 @@ package gov.nist.hit.core.api;
 import static org.springframework.data.jpa.domain.Specifications.where;
 
 import java.util.Date;
+import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -74,6 +75,7 @@ public class AccountController {
 	static final Logger logger = LoggerFactory.getLogger(AccountController.class);
 
 	public final String DEFAULT_PAGE_SIZE = "0";
+	public final String REGISTRATION_LOG_TEMPLATE = "Fullname=%s, Company=%s, RegistrationDate=%tD";
 
 	public AccountController() {
 	}
@@ -148,6 +150,8 @@ public class AccountController {
 					sacc.setFullName(acc.getFullName());
 					sacc.setUsername(acc.getUsername());
 					sacc.setEmployer(acc.getEmployer());
+					sacc.setRegistrationDate(acc.getRegistrationDate());
+					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
 					saccs.add(sacc);
 				}
 			}
@@ -229,6 +233,7 @@ public class AccountController {
 					sacc.setAccountType(acc.getAccountType());
 					sacc.setUsername(acc.getUsername());
 					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
+					sacc.setRegistrationDate(acc.getRegistrationDate());
 					sacc.setAccountType(acc.getAccountType());
 					sacc.setEmployer(acc.getEmployer());
 					saccs.add(sacc);
@@ -282,6 +287,7 @@ public class AccountController {
 					sacc.setUsername(acc.getUsername());
 					sacc.setAccountType(acc.getAccountType());
 					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
+					sacc.setRegistrationDate(acc.getRegistrationDate());
 					sacc.setEmployer(acc.getEmployer());
 					saccs.add(sacc);
 				}
@@ -431,7 +437,10 @@ public class AccountController {
 			registeredAccount.setPending(false);
 			registeredAccount.setGuestAccount(false);
 			registeredAccount.setEmployer(account.getEmployer());
+			registeredAccount.setRegistrationDate(new Date());
 			accountService.save(registeredAccount);
+
+			logger.info("FirstName=");
 		} catch (Exception e) {
 			return new ResponseMessage(ResponseMessage.Type.danger, "errorWithAccount", null);
 		}
@@ -466,6 +475,14 @@ public class AccountController {
 
 		return new ResponseMessage(ResponseMessage.Type.success, "userAdded", account.getUsername());
 
+	}
+
+	private void logRegistration(Account registeredAccount) {
+		StringBuilder sbuf = new StringBuilder();
+		Formatter fmt = new Formatter(sbuf);
+		fmt.format(REGISTRATION_LOG_TEMPLATE, registeredAccount.getFullName(), registeredAccount.getEmployer(),
+				registeredAccount.getRegistrationDate());
+		logger.info(sbuf.toString());
 	}
 
 	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
@@ -603,18 +620,17 @@ public class AccountController {
 			registeredAccount.setSignedConfidentialityAgreement(account.getSignedConfidentialityAgreement());
 			registeredAccount.setGuestAccount(false);
 			registeredAccount.setEmployer(account.getEmployer());
-
+			registeredAccount.setRegistrationDate(new Date());
 			accountService.save(registeredAccount);
+			this.logRegistration(registeredAccount);
 		} catch (Exception e) {
 			userService.deleteUser(account.getUsername());
 			logger.error(e.getMessage(), e);
 			return new ResponseMessage(ResponseMessage.Type.danger, "errorWithAccount", null);
 		}
-
 		// generate and send email
 		this.sendRegistrationNotificationToAdmin(account);
 		this.sendApplicationConfirmationNotification(account);
-
 		return new ResponseMessage(ResponseMessage.Type.success, "userAdded", registeredAccount.getId().toString(),
 				"true");
 	}
