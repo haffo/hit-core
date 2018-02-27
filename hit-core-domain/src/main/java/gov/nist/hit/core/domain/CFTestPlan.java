@@ -71,13 +71,22 @@ public class CFTestPlan extends AbstractTestCase implements Serializable {
   }
 
 
-
+  @ApiModelProperty(required = false, value = "list of test steps of the test plan")
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
   @JoinTable(name = "cf_tcg_tc",
       joinColumns = {@JoinColumn(name = "cf_tcg_id", referencedColumnName = "id")},
       inverseJoinColumns = {@JoinColumn(name = "cf_tc_id", referencedColumnName = "id")})
   @JsonProperty("children")
-  private Set<CFTestStep> testCases = new HashSet<CFTestStep>();
+  private Set<CFTestStep> testSteps = new HashSet<CFTestStep>();
+
+
+  @ApiModelProperty(required = false, value = "list of test steps groups of the test plan")
+  @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+  @JoinTable(name = "tp_tcg",
+      joinColumns = {@JoinColumn(name = "testplan_id", referencedColumnName = "id")},
+      inverseJoinColumns = {@JoinColumn(name = "teststepgroup_id", referencedColumnName = "id")})
+  private Set<CFTestStepGroup> testStepGroups = new HashSet<CFTestStepGroup>();
+
 
 
   @Override
@@ -100,13 +109,7 @@ public class CFTestPlan extends AbstractTestCase implements Serializable {
     this.description = description;
   }
 
-  public Set<CFTestStep> getTestCases() {
-    return testCases;
-  }
 
-  public void setTestCases(Set<CFTestStep> testCases) {
-    this.testCases = testCases;
-  }
 
   public Long getId() {
     return id;
@@ -122,6 +125,27 @@ public class CFTestPlan extends AbstractTestCase implements Serializable {
 
   public void setCategory(String category) {
     this.category = category;
+  }
+
+
+
+  public Set<CFTestStep> getTestSteps() {
+    return this.testSteps;
+  }
+
+
+  public Set<CFTestStepGroup> getTestStepGroups() {
+    return this.testStepGroups;
+  }
+
+
+  public void setTestSteps(Set<CFTestStep> testSteps) {
+    this.testSteps = testSteps;
+  }
+
+
+  public void setTestStepGroups(Set<CFTestStepGroup> testStepGroups) {
+    this.testStepGroups = testStepGroups;
   }
 
 
