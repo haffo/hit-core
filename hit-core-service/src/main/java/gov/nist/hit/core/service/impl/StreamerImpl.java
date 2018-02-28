@@ -687,15 +687,6 @@ public class StreamerImpl implements Streamer {
   private void write(JsonGenerator jGenerator, CFTestStep testStep) throws IOException {
     if (testStep != null) {
       write(jGenerator, testStep, false);
-      if (testStep.getChildren() != null) {
-        jGenerator.writeArrayFieldStart("children");
-        for (CFTestStep child : testStep.getChildren()) {
-          write(jGenerator, child);
-        }
-        jGenerator.writeEndArray();
-      } else {
-        jGenerator.writeNullField("children");
-      }
       jGenerator.writeEndObject();
     }
   }

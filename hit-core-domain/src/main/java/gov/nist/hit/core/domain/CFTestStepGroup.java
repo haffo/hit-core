@@ -42,19 +42,21 @@ public class CFTestStepGroup extends AbstractTestCase implements Serializable {
 
   public CFTestStepGroup() {
     super();
-    this.type = ObjectType.TestCaseGroup;
+    this.type = ObjectType.TestStepGroup;
   }
 
-  @ApiModelProperty(required = false, value = "children test case groups of the test case group")
+  @ApiModelProperty(required = false, value = "test steps groups of the test step group")
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
-  @JoinTable(name = "tsg_tcs", joinColumns = {@JoinColumn(name = "parent_id")},
-      inverseJoinColumns = {@JoinColumn(name = "child_id")})
+  @JoinTable(name = "teststepgroup_teststepgroupchildren",
+      joinColumns = {@JoinColumn(name = "parent_teststepgroup_id")},
+      inverseJoinColumns = {@JoinColumn(name = "teststepgroup_id")})
   private Set<CFTestStepGroup> testStepGroups = new HashSet<CFTestStepGroup>();
 
-  @ApiModelProperty(required = false, value = "children test cases of the test case group")
+  @ApiModelProperty(required = false, value = "test steps of the test step group")
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
-  @JoinTable(name = "tsg_ts", joinColumns = {@JoinColumn(name = "teststepgroup_id")},
-      inverseJoinColumns = {@JoinColumn(name = "testcase_id")})
+  @JoinTable(name = "teststepgroup_teststeps",
+      joinColumns = {@JoinColumn(name = "teststepgroup_id")},
+      inverseJoinColumns = {@JoinColumn(name = "teststep_id")})
   private Set<CFTestStep> testSteps = new HashSet<CFTestStep>();
 
 
