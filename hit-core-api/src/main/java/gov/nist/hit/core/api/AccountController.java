@@ -78,7 +78,7 @@ public class AccountController {
 	private static Log statLog = LogFactory.getLog("StatLog");
 
 	public final String DEFAULT_PAGE_SIZE = "0";
-	public final String REGISTRATION_LOG_TEMPLATE = "[Registration] fullname=%s date=%tD";
+	public final String REGISTRATION_LOG_TEMPLATE = "[Registration] fullname=%s, company=%s, date=%tD";
 
 	public AccountController() {
 	}
