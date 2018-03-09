@@ -15,6 +15,8 @@ package gov.nist.hit.core.api;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +30,11 @@ import gov.nist.hit.core.service.AppInfoService;
  */
 @RestController
 @RequestMapping("/appInfo")
+@PropertySource(value = { "classpath:app-config.properties" })
 public class AppInfoController {
+
+	@Value("${app.baseUrl:null}")
+	private String baseUrl;
 
 	@Autowired
 	private AppInfoService appInfoService;
@@ -42,7 +48,8 @@ public class AppInfoController {
 		if (appInfo == null) {
 			appInfo = new AppInfo();
 		}
-		appInfo.setUrl(getUrl(request));
+		String url = baseUrl != null ? baseUrl : getUrl(request);
+		appInfo.setUrl(url);
 		return appInfo;
 	}
 
