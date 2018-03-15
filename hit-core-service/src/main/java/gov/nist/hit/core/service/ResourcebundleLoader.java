@@ -266,7 +266,7 @@ public abstract class ResourcebundleLoader {
   @Value("${app.home.content}")
   private String appHomeContent;
 
-  @Value("${app.resourceBundleVersion}")
+  @Value("${app.resourceBundleVersion:null}")
   private String appResourceBundleVersion;
 
 
