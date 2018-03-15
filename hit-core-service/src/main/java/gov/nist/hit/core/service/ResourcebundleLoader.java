@@ -1952,7 +1952,11 @@ public abstract class ResourcebundleLoader {
   public static String getRsbVersion() throws IOException {
     Resource resource = new ClassPathResource("/app-config.properties");
     Properties props = PropertiesLoaderUtils.loadProperties(resource);
-    return props.getProperty("app.resourceBundleVersion");
+    if(props != null) {
+      return props.getProperty("app.resourceBundleVersion");
+    } else {
+      return null;
+    }
   }
 
 
