@@ -1739,7 +1739,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private String getRsbleVersion() throws JsonProcessingException, IOException {
+  public static String getRsbleVersion() throws JsonProcessingException, IOException {
     Resource resource =
         ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN + "MetaData.json");
     if (resource == null)
@@ -1952,7 +1952,11 @@ public abstract class ResourcebundleLoader {
   public static String getRsbVersion() throws IOException {
     Resource resource = new ClassPathResource("/app-config.properties");
     Properties props = PropertiesLoaderUtils.loadProperties(resource);
-    return props.getProperty("app.resourceBundleVersion");
+    if(props != null) {
+      return props.getProperty("app.resourceBundleVersion");
+    } else {
+      return getRsbleVersion();
+    }
   }
 
 
