@@ -1739,7 +1739,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private String getRsbleVersion() throws JsonProcessingException, IOException {
+  public static String getRsbleVersion() throws JsonProcessingException, IOException {
     Resource resource =
         ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN + "MetaData.json");
     if (resource == null)
@@ -1955,7 +1955,7 @@ public abstract class ResourcebundleLoader {
     if(props != null) {
       return props.getProperty("app.resourceBundleVersion");
     } else {
-      return null;
+      return getRsbleVersion();
     }
   }
 
