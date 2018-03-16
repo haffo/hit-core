@@ -234,22 +234,22 @@ public abstract class ResourcebundleLoader {
   @Value("${employer.required:false}")
   private boolean employerRequired;
 
-  @Value("${app.organization.logo:null}")
+  @Value("${app.organization.logo:@null}")
   private String appOrganizationLogo;
 
   @Value("${app.organization.name:'NIST'}")
   private String organizationName;
 
-  @Value("${app.organization.link:null}")
+  @Value("${app.organization.link:@null}")
   private String appOrganizationLink;
 
-  @Value("${app.division.link:null}")
+  @Value("${app.division.link:@null}")
   private String appDivisionLink;
 
-  @Value("${app.division.logo:null}")
+  @Value("${app.division.logo:@null}")
   private String appDivisionLogo;
 
-  @Value("${app.division.name:null}")
+  @Value("${app.division.name:@null}")
   private String appDivisionName;
 
   @Value("${app.name}")
@@ -267,11 +267,11 @@ public abstract class ResourcebundleLoader {
   @Value("${app.home.content}")
   private String appHomeContent;
 
-  @Value("${app.resourceBundleVersion:null}")
+  @Value("${app.resourceBundleVersion:@null}")
   private String appResourceBundleVersion;
 
 
-  @Value("${app.igVersion:null}")
+  @Value("${app.igVersion:@null}")
   private String appIgVersion;
 
   @Value("${app.description}")
@@ -292,38 +292,38 @@ public abstract class ResourcebundleLoader {
   @Value("${app.upload.maxSize:'100MB'}")
   private String appUploadMaxSize;
 
-  @Value("${app.acknowledgment.content:null}")
+  @Value("${app.acknowledgment.content:@null}")
   private String appAcknowledgment;
 
-  @Value("${app.privacy.content:null}")
+  @Value("${app.privacy.content:@null}")
   private String appPrivacyContent;
 
-  @Value("${app.privacy.link:null}")
+  @Value("${app.privacy.link:@null}")
   private String appPrivacyLink;
 
-  @Value("${app.disclaimer.content:null}")
+  @Value("${app.disclaimer.content:@null}")
   private String appDisclaimerContent;
 
-  @Value("${app.disclaimer.link:null}")
+  @Value("${app.disclaimer.link:@null}")
   private String appDisclaimerLink;
 
-  @Value("${app.confidentiality.content:null}")
+  @Value("${app.confidentiality.content:@null}")
   private String appConfidentialityContent;
 
-  @Value("${app.confidentiality.link:null}")
+  @Value("${app.confidentiality.link:@null}")
   private String appConfidentialityLink;
 
 
-  @Value("${app.messageContentInfo.content:null}")
+  @Value("${app.messageContentInfo.content:@null}")
   private String appMessageContentInfoContent;
 
-  @Value("${app.validationResultInfo.content:null}")
+  @Value("${app.validationResultInfo.content:@null}")
   private String appValidationResultInfoContent;
 
-  @Value("${app.valueSetCopyRight.content:null}")
+  @Value("${app.valueSetCopyRight.content:@null}")
   private String appValueSetCopyRightContent;
 
-  @Value("${app.profileInfo.content:null}")
+  @Value("${app.profileInfo.content:@null}")
   private String appProfileInfoContent;
 
 
@@ -357,7 +357,7 @@ public abstract class ResourcebundleLoader {
 
   public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
     String oldRsbVersion = appInfoService.getRsbVersion();
-    if(oldRsbVersion == null){
+    if (oldRsbVersion == null) {
       oldRsbVersion = getRsbleVersion();
     }
     return oldRsbVersion == null || appResourceBundleVersion == null
@@ -1786,7 +1786,7 @@ public abstract class ResourcebundleLoader {
     appInfo.setOrganizationLogo(appOrganizationLogo);
     appInfo.setOrganizationLink(appOrganizationLink);
 
-    if(appResourceBundleVersion.equals("null")){
+    if (appResourceBundleVersion == null) {
       appResourceBundleVersion = getRsbleVersion();
     }
     appInfo.setRsbVersion(appResourceBundleVersion);
@@ -2049,10 +2049,10 @@ public abstract class ResourcebundleLoader {
     String rsbVersion = null;
     Resource resource = new ClassPathResource("/app-config.properties");
     Properties props = PropertiesLoaderUtils.loadProperties(resource);
-    if(props != null) {
+    if (props != null) {
       rsbVersion = props.getProperty("app.resourceBundleVersion");
     }
-    if(rsbVersion == null) {
+    if (rsbVersion == null) {
       return getRsbleVersion();
     } else {
       return rsbVersion;
