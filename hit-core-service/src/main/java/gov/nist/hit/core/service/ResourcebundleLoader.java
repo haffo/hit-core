@@ -356,6 +356,9 @@ public abstract class ResourcebundleLoader {
 
   public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
     String oldRsbVersion = appInfoService.getRsbVersion();
+    if(oldRsbVersion == null){
+      oldRsbVersion = getRsbleVersion();
+    }
     return oldRsbVersion == null || appResourceBundleVersion == null
         || !appResourceBundleVersion.equals(oldRsbVersion);
   }
@@ -1693,6 +1696,9 @@ public abstract class ResourcebundleLoader {
     appInfo.setOrganizationLogo(appOrganizationLogo);
     appInfo.setOrganizationLink(appOrganizationLink);
 
+    if(appResourceBundleVersion == null){
+      appResourceBundleVersion = getRsbleVersion();
+    }
     appInfo.setRsbVersion(appResourceBundleVersion);
 
     appInfo.setDomain(appDomain);
@@ -1950,12 +1956,16 @@ public abstract class ResourcebundleLoader {
   }
 
   public static String getRsbVersion() throws IOException {
+    String rsbVersion = null;
     Resource resource = new ClassPathResource("/app-config.properties");
     Properties props = PropertiesLoaderUtils.loadProperties(resource);
     if(props != null) {
-      return props.getProperty("app.resourceBundleVersion");
-    } else {
+      rsbVersion = props.getProperty("app.resourceBundleVersion");
+    }
+    if(rsbVersion == null) {
       return getRsbleVersion();
+    } else {
+      return rsbVersion;
     }
   }
 
