@@ -159,4 +159,13 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 		return new DefaultConversionService();
 	}
 
+	// @Bean
+	// public static PropertyPlaceholderConfigurer ppc() throws IOException {
+	// PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
+	// Properties properties = new Properties();
+	// properties.setProperty("nullValue", "@null");
+	// ppc.setProperties(properties);
+	// return ppc;
+	// }
+
 }
