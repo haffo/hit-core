@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.CFTestPlan;
 import gov.nist.hit.core.domain.CFTestStep;
+import gov.nist.hit.core.domain.CFTestStepGroup;
 import gov.nist.hit.core.domain.Message;
 import gov.nist.hit.core.domain.ResourceType;
 import gov.nist.hit.core.domain.ResourceUploadAction;
@@ -236,10 +237,33 @@ public class ContextFreeManagementController {
 
 	private void publish(CFTestPlan testPlan) {
 		testPlan.setScope(TestScope.GLOBAL);
-		Set<CFTestStep> testSteps = testPlan.getTestCases();
+		Set<CFTestStep> testSteps = testPlan.getTestSteps();
 		if (testSteps != null) {
 			for (CFTestStep step : testSteps) {
 				step.setScope(TestScope.GLOBAL);
+			}
+		}
+		Set<CFTestStepGroup> testStepGroups = testPlan.getTestStepGroups();
+		if (testStepGroups != null) {
+			for (CFTestStepGroup testStepGroup : testStepGroups) {
+				publish(testStepGroup);
+			}
+		}
+	}
+
+	private void publish(CFTestStepGroup testStepGroup) {
+		testStepGroup.setScope(TestScope.GLOBAL);
+		Set<CFTestStep> testSteps = testStepGroup.getTestSteps();
+		if (testSteps != null) {
+			for (CFTestStep step : testSteps) {
+				step.setScope(TestScope.GLOBAL);
+			}
+		}
+		Set<CFTestStepGroup> testStepGroups = testStepGroup.getTestStepGroups();
+
+		if (testStepGroups != null) {
+			for (CFTestStepGroup testStepGr : testStepGroups) {
+				publish(testStepGr);
 			}
 		}
 	}
@@ -332,7 +356,7 @@ public class ContextFreeManagementController {
 		checkManagementSupport();
 		CFTestPlan testPlan = testPlanService.findOne(groupId);
 		if (testPlan != null) {
-			Set<CFTestStep> steps = testPlan.getTestCases();
+			Set<CFTestStep> steps = testPlan.getTestSteps();
 			List<UploadedProfileModel> models = new ArrayList<UploadedProfileModel>();
 			for (CFTestStep step : steps) {
 				UploadedProfileModel model = new UploadedProfileModel();

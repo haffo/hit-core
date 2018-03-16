@@ -62,8 +62,6 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
       result.setAction(ResourceUploadAction.UPDATE);
       Long exId = existing.getId();
       tc.setId(exId);
-      List<CFTestStep> merged = this.mergeCFTC(tc.getChildren(), existing.getChildren());
-      tc.setChildren(merged);
       this.cfTestStepRepository.saveAndFlush(tc);
       result.setStatus(ResourceUploadResult.SUCCESS);
       return result;
@@ -76,7 +74,6 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
           result.setMessage("CF TestCase(" + testCaseId + ") not found");
           return result;
         } else {
-          parent.getChildren().add(tc);
           this.cfTestStepRepository.saveAndFlush(parent);
           result.setStatus(ResourceUploadResult.SUCCESS);
           return result;
@@ -440,15 +437,6 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     for (CFTestStep tcs : newL) {
 
       if ((index = tmp.indexOf(tcs)) != -1) {
-        CFTestStep existing = tmp.get(index);
-        if (existing.getChildren() != null && existing.getChildren().size() > 0) {
-          if (tcs.getChildren() != null && tcs.getChildren().size() > 0) {
-            List<CFTestStep> children = mergeCFTC(tcs.getChildren(), existing.getChildren());
-            tcs.setChildren(children);
-          } else {
-            tcs.setChildren(existing.getChildren());
-          }
-        }
         tcs.setId(tmp.get(index).getId());
         tmp.set(index, tcs);
       } else

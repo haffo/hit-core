@@ -59,6 +59,7 @@ import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.AppInfo;
 import gov.nist.hit.core.domain.CFTestPlan;
 import gov.nist.hit.core.domain.CFTestStep;
+import gov.nist.hit.core.domain.CFTestStepGroup;
 import gov.nist.hit.core.domain.Constraints;
 import gov.nist.hit.core.domain.DataMapping;
 import gov.nist.hit.core.domain.DocumentType;
@@ -1281,6 +1282,65 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
+
+  protected CFTestStepGroup cfTestStepGroup(String location, String rootPath) throws IOException {
+    logger.info("Processing test case group at:" + location);
+    Resource descriptorRsrce = this.getResource(location + "TestStepGroup.json", rootPath);
+    if (descriptorRsrce == null)
+      throw new IllegalArgumentException("No TestStepGroup.json found at " + location);
+    String descriptorContent = FileUtil.getContent(descriptorRsrce);
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode testPlanObj = mapper.readTree(descriptorContent);
+    if (testPlanObj.findValue("skip") == null || !testPlanObj.findValue("skip").booleanValue()) {
+      CFTestStepGroup tcg = new CFTestStepGroup();
+      tcg.setName(testPlanObj.findValue("name").textValue());
+
+      if (!testPlanObj.has("id")) {
+        throw new IllegalArgumentException("Missing id for Test Step Group at " + location);
+      }
+      tcg.setPreloaded(true);
+      tcg.setScope(TestScope.GLOBAL);
+      tcg.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
+      tcg.setDescription(testPlanObj.findValue("description").textValue());
+      tcg.setVersion(!testPlanObj.has("version") ? 1.0
+          : Double.parseDouble(testPlanObj.findValue("version").asText()));
+      tcg.setTestStory(testStory(location, rootPath));
+      if (testPlanObj.findValue("position") != null) {
+        tcg.setPosition(testPlanObj.findValue("position").intValue());
+      } else {
+        tcg.setPosition(1);
+      }
+      if (testPlanObj.has("supplements")) {
+        tcg.getSupplements().addAll(testDocuments(location, testPlanObj.findValue("supplements")));
+      }
+      List<Resource> resources = this.getDirectories(location + "*/", rootPath);
+      for (Resource resource : resources) {
+        String fileName = fileName(resource);
+        String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
+        Resource descriptorResource = getDescriptorResource(tcLocation, rootPath);
+        if (descriptorResource != null) {
+          String filename = descriptorResource.getFilename();
+          if (filename.endsWith("TestStepGroup.json")) {
+            CFTestStepGroup testStepGroup = cfTestStepGroup(tcLocation, rootPath);
+            if (testStepGroup != null) {
+              checkPersistentId(testStepGroup.getPersistentId(), filename);
+              tcg.getTestStepGroups().add(testStepGroup);
+            }
+          } else if (filename.endsWith("TestObject.json")) {
+            CFTestStep testStep = cfTestStep(tcLocation, rootPath);
+            if (testStep != null) {
+              checkPersistentId(testStep.getPersistentId(), filename);
+              tcg.getTestSteps().add(testStep);
+            }
+          }
+        }
+      }
+      return tcg;
+    }
+    return null;
+  }
+
+
   protected TestPlan testPlan(String location, TestingStage stage, String rootPath)
       throws IOException {
     logger.info("Processing test plan  at:" + location);
@@ -1358,9 +1418,9 @@ public abstract class ResourcebundleLoader {
 
   protected CFTestPlan cfTestPlan(String testPlanPath, String rootPath) throws IOException {
     logger.info("Processing test plan at:" + testPlanPath);
-    Resource res = this.getResource(testPlanPath + "TestObject.json", rootPath);
+    Resource res = this.getResource(testPlanPath + "TestPlan.json", rootPath);
     if (res == null)
-      throw new IllegalArgumentException("No TestObject.json found at " + testPlanPath);
+      throw new IllegalArgumentException("No TestPlan.json found at " + testPlanPath);
     String descriptorContent = FileUtil.getContent(res);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode testPlanObj = mapper.readTree(descriptorContent);
@@ -1387,14 +1447,27 @@ public abstract class ResourcebundleLoader {
             .addAll(testDocuments(testPlanPath, testPlanObj.findValue("supplements")));
       }
 
+
       List<Resource> resources = this.getDirectories(testPlanPath + "*/", rootPath);
       for (Resource resource : resources) {
         String fileName = fileName(resource);
-        String location = fileName.substring(fileName.indexOf(testPlanPath), fileName.length());
-        CFTestStep testStep = cfTestStep(location, rootPath);
-        if (testStep != null) {
-          checkPersistentId(testStep.getPersistentId(), fileName);
-          testPlan.getTestCases().add(testStep);
+        String tcLocation = fileName.substring(fileName.indexOf(testPlanPath), fileName.length());
+        Resource descriptorResource = getDescriptorResource(tcLocation, rootPath);
+        if (descriptorResource != null) {
+          String filename = descriptorResource.getFilename();
+          if (filename.endsWith("TestStepGroup.json")) {
+            CFTestStepGroup testStepeGroup = cfTestStepGroup(tcLocation, rootPath);
+            if (testStepeGroup != null) {
+              checkPersistentId(testStepeGroup.getPersistentId(), filename);
+              testPlan.getTestStepGroups().add(testStepeGroup);
+            }
+          } else if (filename.endsWith("TestObject.json")) {
+            CFTestStep testStep = cfTestStep(tcLocation, rootPath);
+            if (testStep != null) {
+              checkPersistentId(testStep.getPersistentId(), filename);
+              testPlan.getTestSteps().add(testStep);
+            }
+          }
         }
       }
       return testPlan;
@@ -1432,30 +1505,19 @@ public abstract class ResourcebundleLoader {
         testStep.getSupplements()
             .addAll(testDocuments(testObjectPath, testPlanObj.findValue("supplements")));
       }
-
-      List<Resource> resources = this.getDirectories(testObjectPath + "*/", rootPath);
-      for (Resource resource : resources) {
-        String fileName = fileName(resource);
-        String location = fileName.substring(fileName.indexOf(testObjectPath), fileName.length());
-        CFTestStep testObject = cfTestStep(location, rootPath);
-        if (testObject != null) {
-          checkPersistentId(testObject.getPersistentId(), fileName);
-          testStep.getChildren().add(testObject);
-        }
-      }
       return testStep;
     }
     return null;
   }
 
   public void loadTestCasesDocumentation() throws IOException {
-    TestCaseDocumentation doc = generateTestObjectDocumentation("Context-free", TestingStage.CF,
+    TestCaseDocumentation doc = generateCFTestPlanDocumentation("Context-free", TestingStage.CF,
         cfTestPlanRepository.findAllByStageAndScope(TestingStage.CF, TestScope.GLOBAL));
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
       testCaseDocumentationRepository.save(doc);
     }
-    doc = generateTestCaseDocumentation("Context-based", TestingStage.CB,
+    doc = generateCBTestPlansDocumentation("Context-based", TestingStage.CB,
         testPlanRepository.findAllByStageAndScope(TestingStage.CB, TestScope.GLOBAL));
     if (doc != null) {
       doc.setJson(obm.writeValueAsString(doc));
@@ -1463,7 +1525,7 @@ public abstract class ResourcebundleLoader {
     }
   }
 
-  private TestCaseDocumentation generateTestCaseDocumentation(String title, TestingStage stage,
+  private TestCaseDocumentation generateCBTestPlansDocumentation(String title, TestingStage stage,
       List<TestPlan> tps) throws IOException {
     if (tps != null && !tps.isEmpty()) {
       TestCaseDocumentation documentation = new TestCaseDocumentation();
@@ -1477,7 +1539,7 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  private TestCaseDocumentation generateTestObjectDocumentation(String title, TestingStage stage,
+  private TestCaseDocumentation generateCFTestPlanDocumentation(String title, TestingStage stage,
       List<CFTestPlan> tos) throws IOException {
     if (tos != null && !tos.isEmpty()) {
       TestCaseDocumentation documentation = new TestCaseDocumentation();
@@ -1536,6 +1598,29 @@ public abstract class ResourcebundleLoader {
     return doc;
   }
 
+
+  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(CFTestStepGroup tcg)
+      throws IOException {
+    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tcg);
+    doc.setId(tcg.getId());
+    if (tcg.getTestStepGroups() != null && !tcg.getTestStepGroups().isEmpty()) {
+      List<CFTestStepGroup> list = new ArrayList<CFTestStepGroup>(tcg.getTestStepGroups());
+      Collections.sort(list);
+      for (CFTestStepGroup child : list) {
+        doc.getChildren().add(generateTestCaseDocument(child));
+      }
+    }
+    if (tcg.getTestSteps() != null && !tcg.getTestSteps().isEmpty()) {
+      List<CFTestStep> list = new ArrayList<CFTestStep>(tcg.getTestSteps());
+      Collections.sort(list);
+      for (CFTestStep tc : list) {
+        doc.getChildren().add(generateTestCaseDocument(tc));
+      }
+    }
+    return doc;
+  }
+
+
   private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestCase tc)
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tc);
@@ -1565,12 +1650,6 @@ public abstract class ResourcebundleLoader {
     gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(to.getTestContext());
     doc = initTestCaseDocument(to, doc);
     doc.setId(to.getId());
-    if (to.getChildren() != null && !to.getChildren().isEmpty()) {
-      Collections.sort(to.getChildren());
-      for (CFTestStep child : to.getChildren()) {
-        doc.getChildren().add(generateTestCaseDocument(child));
-      }
-    }
     return doc;
   }
 
@@ -1578,14 +1657,21 @@ public abstract class ResourcebundleLoader {
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
     doc.setId(tp.getId());
-    if (tp.getTestCases() != null && !tp.getTestCases().isEmpty()) {
-      List<CFTestStep> list = new ArrayList<CFTestStep>(tp.getTestCases());
+    if (tp.getTestStepGroups() != null && !tp.getTestStepGroups().isEmpty()) {
+      List<CFTestStepGroup> list = new ArrayList<CFTestStepGroup>(tp.getTestStepGroups());
       Collections.sort(list);
-
+      for (CFTestStepGroup tcg : list) {
+        doc.getChildren().add(generateTestCaseDocument(tcg));
+      }
+    }
+    if (tp.getTestSteps() != null && !tp.getTestSteps().isEmpty()) {
+      List<CFTestStep> list = new ArrayList<CFTestStep>(tp.getTestSteps());
+      Collections.sort(list);
       for (CFTestStep tc : list) {
         doc.getChildren().add(generateTestCaseDocument(tc));
       }
     }
+
     return doc;
   }
 
@@ -1621,8 +1707,12 @@ public abstract class ResourcebundleLoader {
     Resource resource = this.getResource(location + "TestPlan.json", rootPath);
     resource =
         resource == null ? this.getResource(location + "TestCaseGroup.json", rootPath) : resource;
+    resource =
+        resource == null ? this.getResource(location + "TestStepGroup.json", rootPath) : resource;
     resource = resource == null ? this.getResource(location + "TestCase.json", rootPath) : resource;
     resource = resource == null ? this.getResource(location + "TestStep.json", rootPath) : resource;
+    resource =
+        resource == null ? this.getResource(location + "TestObject.json", rootPath) : resource;
     resource = resource == null ? null : resource;
     return resource;
   }
