@@ -33,7 +33,7 @@ import gov.nist.hit.core.service.AppInfoService;
 @PropertySource(value = { "classpath:app-config.properties" })
 public class AppInfoController {
 
-	@Value("${app.baseUrl:@null}")
+	@Value("${app.baseUrl:#{null}}")
 	private String baseUrl;
 
 	@Autowired
