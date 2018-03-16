@@ -1723,7 +1723,7 @@ public abstract class ResourcebundleLoader {
     appInfo.setRegistrationSubmittedContent(appRegistrationSubmittedContent);
     appInfo.setRegistrationSubmittedTitle(appRegistrationSubmittedTitle);
     appInfo.setRegistrationAcceptanceTitle(appRegistrationAcceptanceTitle);
-    appInfo.setApiDocsPath("/apidocs");
+    appInfo.setApiDocsPath("/apidocs/swagger-ui.html");
 
     appInfo.setDivisionLogo(appDivisionLogo);
     appInfo.setDivisionLink(appDivisionLink);
