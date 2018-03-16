@@ -1696,7 +1696,7 @@ public abstract class ResourcebundleLoader {
     appInfo.setOrganizationLogo(appOrganizationLogo);
     appInfo.setOrganizationLink(appOrganizationLink);
 
-    if(appResourceBundleVersion == "null"){
+    if(appResourceBundleVersion.equals("null")){
       appResourceBundleVersion = getRsbleVersion();
     }
     appInfo.setRsbVersion(appResourceBundleVersion);
