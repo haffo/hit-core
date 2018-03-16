@@ -381,6 +381,11 @@ public abstract class ResourcebundleLoader {
 
   public void load(String directory)
       throws JsonProcessingException, IOException, ProfileParserException {
+    AppInfo appInfo = appInfoService.get();
+    if(appInfo == null){
+      appInfo = new AppInfo();
+      appInfoRepository.save(appInfo);
+    }
     if (appResourceBundleVersion == null) {
       appResourceBundleVersion = getRsbleVersion();
     }
