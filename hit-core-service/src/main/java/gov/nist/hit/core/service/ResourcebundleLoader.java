@@ -357,9 +357,6 @@ public abstract class ResourcebundleLoader {
 
   public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
     String oldRsbVersion = appInfoService.getRsbVersion();
-    if (oldRsbVersion == null) {
-      oldRsbVersion = getRsbleVersion();
-    }
     return oldRsbVersion == null || appResourceBundleVersion == null
         || !appResourceBundleVersion.equals(oldRsbVersion);
   }
@@ -381,6 +378,11 @@ public abstract class ResourcebundleLoader {
 
   public void load(String directory)
       throws JsonProcessingException, IOException, ProfileParserException {
+    AppInfo appInfo = appInfoService.get();
+    if(appInfo == null){
+      appInfo = new AppInfo();
+      appInfoRepository.save(appInfo);
+    }
     if (appResourceBundleVersion == null) {
       appResourceBundleVersion = getRsbleVersion();
     }
