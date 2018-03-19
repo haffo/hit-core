@@ -357,9 +357,6 @@ public abstract class ResourcebundleLoader {
 
   public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
     String oldRsbVersion = appInfoService.getRsbVersion();
-    if (oldRsbVersion == null) {
-      oldRsbVersion = getRsbleVersion();
-    }
     return oldRsbVersion == null || appResourceBundleVersion == null
         || !appResourceBundleVersion.equals(oldRsbVersion);
   }
