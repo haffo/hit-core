@@ -356,10 +356,22 @@ public abstract class ResourcebundleLoader {
 
 
   public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
-    String oldRsbVersion = appInfoService.getRsbVersion();
-    return oldRsbVersion == null || appResourceBundleVersion == null
-        || !appResourceBundleVersion.equals(oldRsbVersion);
+    if (reloadDb()) {
+      return true;
+    } else {
+      String oldRsbVersion = appInfoService.getRsbVersion();
+      return oldRsbVersion == null || appResourceBundleVersion == null
+          || !appResourceBundleVersion.equals(oldRsbVersion);
+    }
   }
+
+
+  public boolean reloadDb() throws IOException {
+    String create = System.getenv("RELOAD_DB");
+    return create != null && (Boolean.valueOf(create) == true);
+  }
+
+
 
   public void clearDB() {
     appInfoRepository.deleteAll();
@@ -379,7 +391,7 @@ public abstract class ResourcebundleLoader {
   public void load(String directory)
       throws JsonProcessingException, IOException, ProfileParserException {
     AppInfo appInfo = appInfoService.get();
-    if(appInfo == null){
+    if (appInfo == null) {
       appInfo = new AppInfo();
       appInfoRepository.save(appInfo);
     }
