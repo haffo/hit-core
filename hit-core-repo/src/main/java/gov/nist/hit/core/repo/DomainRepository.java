@@ -12,18 +12,24 @@
 
 package gov.nist.hit.core.repo;
 
+
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import gov.nist.hit.core.domain.TestCaseDocumentation;
-import gov.nist.hit.core.domain.TestingStage;
+import gov.nist.hit.core.domain.Domain;
 
-public interface TestCaseDocumentationRepository
-    extends JpaRepository<TestCaseDocumentation, Long> {
+public interface DomainRepository extends JpaRepository<Domain, Long> {
 
-  @Query("select docu from TestCaseDocumentation docu where docu.stage = :stage and docu.domain = :domain")
-  public TestCaseDocumentation findOneByStageAndDomain(@Param("stage") TestingStage stage,
-      @Param("domain") String domain);
+  @Query("select dom from Domain dom  where dom.value = :key")
+  public Domain findOneByKey(@Param("key") String key);
+
+
+  @Query("select new gov.nist.hit.core.domain.Domain(name, value) from Domain d")
+  public List<Domain> findShortAll();
+
+
 
 }

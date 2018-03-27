@@ -1,7 +1,5 @@
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @ApiModel(value = "TestArtifact", description = "Data Model representing a test artifact")
-public class TestArtifact implements Serializable {
+public class TestArtifact extends DomainBased {
 
   private static final long serialVersionUID = 1L;
 
@@ -36,6 +34,7 @@ public class TestArtifact implements Serializable {
   @ApiModelProperty(required = false, value = "json representation of the artifact")
   @Column(columnDefinition = "LONGTEXT")
   private String json;
+
 
 
   public TestArtifact() {

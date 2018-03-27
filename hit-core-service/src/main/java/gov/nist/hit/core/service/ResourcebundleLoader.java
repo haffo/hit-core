@@ -63,6 +63,7 @@ import gov.nist.hit.core.domain.CFTestStepGroup;
 import gov.nist.hit.core.domain.Constraints;
 import gov.nist.hit.core.domain.DataMapping;
 import gov.nist.hit.core.domain.DocumentType;
+import gov.nist.hit.core.domain.Domain;
 import gov.nist.hit.core.domain.IntegrationProfile;
 import gov.nist.hit.core.domain.MappingSource;
 import gov.nist.hit.core.domain.MappingSourceConstant;
@@ -86,10 +87,12 @@ import gov.nist.hit.core.domain.TransportForms;
 import gov.nist.hit.core.domain.VocabularyLibrary;
 import gov.nist.hit.core.repo.AppInfoRepository;
 import gov.nist.hit.core.repo.CFTestPlanRepository;
+import gov.nist.hit.core.repo.CFTestStepGroupRepository;
 import gov.nist.hit.core.repo.CFTestStepRepository;
 import gov.nist.hit.core.repo.ConstraintsRepository;
 import gov.nist.hit.core.repo.DataMappingRepository;
 import gov.nist.hit.core.repo.DocumentRepository;
+import gov.nist.hit.core.repo.DomainRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.MessageRepository;
 import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
@@ -152,6 +155,7 @@ public abstract class ResourcebundleLoader {
   public static final String TRANSPORT_CONF_PATTERN = "Transport.json";
   public static final String REGISTRATION = "Registration.json";
   public static final String DEFAULT_CATEGORY = "Default";
+  public static final String ALL_DOMAINS = "ALL";
 
 
   @Autowired
@@ -174,6 +178,9 @@ public abstract class ResourcebundleLoader {
 
   @Autowired
   protected CFTestStepRepository cfTestStepRepository;
+
+  @Autowired
+  protected CFTestStepGroupRepository cfTestSteGroupRepository;
 
   @Autowired
   protected CFTestPlanRepository cfTestPlanRepository;
@@ -213,6 +220,15 @@ public abstract class ResourcebundleLoader {
 
   @Autowired
   protected AppInfoService appInfoService;
+
+  @Autowired
+  protected DomainService domainEntryService;
+
+
+  @Autowired
+  protected DomainRepository domainEntryRepo;
+
+
 
   @Autowired
   protected VocabularyLibraryRepository vocabularyLibraryRepository;
@@ -259,7 +275,7 @@ public abstract class ResourcebundleLoader {
   private String appVersion;
 
   @Value("${app.domain}")
-  private String appDomain;
+  private String appSubTitle;
 
   @Value("${app.home.title}")
   private String appHomeTitle;
@@ -314,19 +330,6 @@ public abstract class ResourcebundleLoader {
   private String appConfidentialityLink;
 
 
-  @Value("${app.messageContentInfo.content:#{null}}")
-  private String appMessageContentInfoContent;
-
-  @Value("${app.validationResultInfo.content:#{null}}")
-  private String appValidationResultInfoContent;
-
-  @Value("${app.valueSetCopyRight.content:#{null}}")
-  private String appValueSetCopyRightContent;
-
-  @Value("${app.profileInfo.content:#{null}}")
-  private String appProfileInfoContent;
-
-
   @Value("${app.registration.title}")
   private String appRegistrationTitle;
 
@@ -346,6 +349,7 @@ public abstract class ResourcebundleLoader {
   @Value("${download.war.disabled:false}")
   private boolean appDownloadWarDisabled;
 
+  private final Set<String> domains = new HashSet<String>();
 
 
   public ResourcebundleLoader() {
@@ -379,7 +383,7 @@ public abstract class ResourcebundleLoader {
   public void load(String directory)
       throws JsonProcessingException, IOException, ProfileParserException {
     AppInfo appInfo = appInfoService.get();
-    if(appInfo == null){
+    if (appInfo == null) {
       appInfo = new AppInfo();
       appInfoRepository.save(appInfo);
     }
@@ -390,7 +394,8 @@ public abstract class ResourcebundleLoader {
       logger.info("clearing tables...");
       clearDB();
       this.idLocationMap = new HashMap<>();
-      this.loadAppInfo();
+
+      this.loadAppInfo(directory);
       this.loadConstraints(directory);
       this.loadVocabularyLibraries(directory);
       this.loadIntegrationProfiles(directory);
@@ -417,7 +422,7 @@ public abstract class ResourcebundleLoader {
   }
 
   public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage,
-      String rootPath) throws IOException;
+      String rootPath, String domain) throws IOException;
 
   public abstract TestCaseDocument generateTestCaseDocument(TestContext c) throws IOException;
 
@@ -425,57 +430,111 @@ public abstract class ResourcebundleLoader {
       String conformanceProfileId, String constraintsXml, String additionalConstraintsXml)
       throws ProfileParserException, UnsupportedOperationException;
 
-  public abstract VocabularyLibrary vocabLibrary(String content) throws JsonGenerationException,
-      JsonMappingException, IOException, UnsupportedOperationException;
+  public abstract VocabularyLibrary vocabLibrary(String content, String domain)
+      throws JsonGenerationException, JsonMappingException, IOException,
+      UnsupportedOperationException;
 
-  public void loadAppInfo() throws JsonProcessingException, IOException {
+  public void loadAppInfo(String rootPath) throws JsonProcessingException, IOException {
     logger.info("loading app info...");
     AppInfo appInfo = new AppInfo();
+    Resource metadataResource =
+        ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN + "MetaData.json");
+    if (metadataResource == null)
+      throw new RuntimeException("No MetaData.json found in the resource bundle");
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode metaData = mapper.readTree(FileUtil.getContent(metadataResource));
+    if (metaData.get("domains") == null) {
+      throw new RuntimeException("domains not found in MetaData.json");
+    }
+    Iterator<JsonNode> it = metaData.get("domains").iterator();
+    while (it.hasNext()) {
+      JsonNode node = it.next();
+      boolean disabled = node.get("disabled") != null && (node.get("disabled").asBoolean() == true);
+      if (!disabled) {
+        Domain entry = new Domain();
+        String key = node.get("key").textValue();
+        entry.setValue(key);
+        entry.setName(node.get("name").textValue());
+        entry.setHomeTitle(node.get("homeTitle").textValue());
+        entry.setDisabled(false);
+        String domainPath = getDomainBasedPath(ResourcebundleLoader.ABOUT_PATTERN, key);
+        Resource resource = this.getResource(domainPath + PROFILE_INFO_PATTERN, rootPath);
+        if (resource != null) {
+          entry.setProfileInfo(FileUtil.getContent(resource));
+        }
+        resource = this.getResource(domainPath + ResourcebundleLoader.VALUE_SET_COPYRIGHT_PATTERN,
+            rootPath);
+        if (resource != null) {
+          entry.setValueSetCopyright(FileUtil.getContent(resource));
+        }
+        resource = this.getResource(domainPath + ResourcebundleLoader.VALIDATIONRESULT_INFO_PATTERN,
+            rootPath);
+        if (resource != null) {
+          entry.setValidationResultInfo(FileUtil.getContent(resource));
+        }
+        resource = this.getResource(domainPath + ResourcebundleLoader.HOME_PATTERN, rootPath);
+        if (resource != null) {
+          entry.setHomeContent(FileUtil.getContent(resource));
+        }
+        resource = this.getResource(domainPath + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN,
+            rootPath);
+        if (resource != null) {
+          entry.setMessageContentInfo(FileUtil.getContent(resource));
+        }
+        domains.add(key);
+        appInfo.getDomains().add(entry);
+      }
+    }
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");
   }
 
 
+
   public void loadUserDocs(String rootPath) throws IOException {
-    logger.info("loading user documents...");
-    Resource resource = getResource(USERDOCS_PATTERN + USERDOCS_FILE_PATTERN, rootPath);
-    if (resource != null) {
-      String descriptorContent = FileUtil.getContent(resource);
-      ObjectMapper mapper = new ObjectMapper();
-      JsonNode userDocsObj = mapper.readTree(descriptorContent);
-      List<gov.nist.hit.core.domain.Document> userDocs =
-          new ArrayList<gov.nist.hit.core.domain.Document>();
-      if (userDocsObj.isArray()) {
-        Iterator<JsonNode> it = userDocsObj.elements();
-        if (it != null) {
-          while (it.hasNext()) {
-            JsonNode node = it.next();
-            gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-            document.setPosition(node.findValue("order") != null
-                ? node.findValue("order").intValue() : userDocs.size() + 1);
-            document.setTitle(
-                node.findValue("title") != null ? node.findValue("title").textValue() : null);
-            if (node.findValue("name") != null) {
-              String path = node.findValue("name").textValue();
-              if (path.endsWith("*")) {
-                Resource rs = getLatestResource(
-                    USERDOCS_PATTERN + node.findValue("name").textValue(), rootPath);
-                path = rs.getFilename();
+    for (String domain : getDomains()) {
+      logger.info("loading user documents of domain=" + domain);
+      Resource resource = getResource(
+          getDomainBasedPath(USERDOCS_PATTERN, domain) + USERDOCS_FILE_PATTERN, rootPath);
+      if (resource != null) {
+        String descriptorContent = FileUtil.getContent(resource);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode userDocsObj = mapper.readTree(descriptorContent);
+        List<gov.nist.hit.core.domain.Document> userDocs =
+            new ArrayList<gov.nist.hit.core.domain.Document>();
+        if (userDocsObj.isArray()) {
+          Iterator<JsonNode> it = userDocsObj.elements();
+          if (it != null) {
+            while (it.hasNext()) {
+              JsonNode node = it.next();
+              gov.nist.hit.core.domain.Document document =
+                  new gov.nist.hit.core.domain.Document(domain);
+              document.setPosition(node.findValue("order") != null
+                  ? node.findValue("order").intValue() : userDocs.size() + 1);
+              document.setTitle(
+                  node.findValue("title") != null ? node.findValue("title").textValue() : null);
+              if (node.findValue("name") != null) {
+                String path = node.findValue("name").textValue();
+                if (path.endsWith("*")) {
+                  Resource rs = getLatestResource(getDomainBasedPath(USERDOCS_PATTERN, domain)
+                      + node.findValue("name").textValue(), rootPath);
+                  path = rs.getFilename();
+                }
+                document.setName(path);
+                document.setPath(getDomainBasedPath(USERDOCS_PATTERN, domain) + path);
+              } else if (node.findValue("link") != null) {
+                document.setPath(node.findValue("link").textValue());
               }
-              document.setName(path);
-              document.setPath(USERDOCS_PATTERN + path);
-            } else if (node.findValue("link") != null) {
-              document.setPath(node.findValue("link").textValue());
+              document.setDate(
+                  node.findValue("date") != null ? node.findValue("date").textValue() : null);
+              document.setType(DocumentType.USERDOC);
+              document.setComments(node.findValue("comments") != null
+                  ? node.findValue("comments").textValue() : null);
+              userDocs.add(document);
             }
-            document.setDate(
-                node.findValue("date") != null ? node.findValue("date").textValue() : null);
-            document.setType(DocumentType.USERDOC);
-            document.setComments(
-                node.findValue("comments") != null ? node.findValue("comments").textValue() : null);
-            userDocs.add(document);
-          }
-          if (!userDocs.isEmpty()) {
-            documentRepository.save(userDocs);
+            if (!userDocs.isEmpty()) {
+              documentRepository.save(userDocs);
+            }
           }
         }
       }
@@ -483,72 +542,89 @@ public abstract class ResourcebundleLoader {
   }
 
   public void loadTransport(String rootPath) throws IOException {
-    logger.info("loading protocols info...");
-    JsonNode json = toJsonObj(TRANSPORT_PATTERN + TRANSPORT_CONF_PATTERN, rootPath);
-    if (json != null) {
-      List<TransportForms> transportForms = new ArrayList<TransportForms>();
-      if (json.isArray()) {
-        Iterator<JsonNode> it = json.elements();
-        while (it.hasNext()) {
-          JsonNode node = it.next();
-          if (node.findValue("protocol") != null && node.findValue("forms") != null
-              && node.findValue("domain") != null) {
-            TransportForms tForms = new TransportForms();
-            tForms.setProtocol(node.findValue("protocol").textValue());
-            tForms.setDomain(node.findValue("domain").textValue());
-            tForms.setDescription(node.findValue("description") != null
-                ? node.findValue("description").textValue() : null);
-            JsonNode forms = node.findValue("forms");
-            if (forms.get("TA_INITIATOR") == null || forms.get("SUT_INITIATOR") == null) {
-              throw new RuntimeException(
-                  "Transport.json TA_INITIATOR or SUT_INITIATOR form is missing");
+    for (String domain : getDomains()) {
+      logger.info("loading transport for domain=" + domain);
+      Resource resource = getResource(
+          getDomainBasedPath(TRANSPORT_PATTERN, domain) + TRANSPORT_CONF_PATTERN, rootPath);
+      if (resource != null) {
+        logger.info("loading protocols info...");
+        String descriptorContent = FileUtil.getContent(resource);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode json = mapper.readTree(descriptorContent);
+        if (json != null) {
+          List<TransportForms> transportForms = new ArrayList<TransportForms>();
+          if (json.isArray()) {
+            Iterator<JsonNode> it = json.elements();
+            while (it.hasNext()) {
+              JsonNode node = it.next();
+              if (node.findValue("protocol") != null && node.findValue("forms") != null) {
+                TransportForms tForms = new TransportForms();
+                tForms.setProtocol(node.findValue("protocol").textValue());
+                tForms.setDomain(domain);
+                tForms.setDescription(node.findValue("description") != null
+                    ? node.findValue("description").textValue() : null);
+                JsonNode forms = node.findValue("forms");
+                if (forms.get("TA_INITIATOR") == null || forms.get("SUT_INITIATOR") == null) {
+                  throw new RuntimeException(
+                      "Transport.json TA_INITIATOR or SUT_INITIATOR form is missing");
+                }
+                tForms.setTaInitiatorForm(
+                    FileUtil.getContent(getResource(getDomainBasedPath(TRANSPORT_PATTERN, domain)
+                        + forms.get("TA_INITIATOR").textValue(), rootPath)));
+                tForms.setSutInitiatorForm(
+                    FileUtil.getContent(getResource(getDomainBasedPath(TRANSPORT_PATTERN, domain)
+                        + forms.get("SUT_INITIATOR").textValue(), rootPath)));
+                transportForms.add(tForms);
+              } else {
+                throw new RuntimeException(
+                    "Properties protocol or forms not found in Transport.json");
+              }
             }
-            tForms.setTaInitiatorForm(FileUtil.getContent(
-                getResource(TRANSPORT_PATTERN + forms.get("TA_INITIATOR").textValue(), rootPath)));
-            tForms.setSutInitiatorForm(FileUtil.getContent(
-                getResource(TRANSPORT_PATTERN + forms.get("SUT_INITIATOR").textValue(), rootPath)));
-            transportForms.add(tForms);
+            if (!transportForms.isEmpty()) {
+              transportFormsRepository.save(transportForms);
+            }
           } else {
-            throw new RuntimeException(
-                "Properties protocol, domain or forms not found in Transport.json");
+            throw new RuntimeException("Transport.json file content must be an array");
           }
         }
-        if (!transportForms.isEmpty()) {
-          transportFormsRepository.save(transportForms);
-        }
-      } else {
-        throw new RuntimeException("Transport.json file content must be an array");
       }
     }
   }
 
   private List<gov.nist.hit.core.domain.Document> getProfilesDocs(String rootPath)
       throws IOException {
-    logger.info("loading integration profiles...");
     List<gov.nist.hit.core.domain.Document> resourceDocs =
         new ArrayList<gov.nist.hit.core.domain.Document>();
-    JsonNode conf = toJsonObj(PROFILE_PATTERN + PROFILES_CONF_FILE_PATTERN, rootPath);
-    Set<String> skipped = null;
-    JsonNode ordersObj = null;
-    if (conf != null) {
-      skipped = skippedAsList(conf.findValue("skip"));
-      ordersObj = conf.findValue("orders");
 
-    }
-    List<Resource> resources = getResources(PROFILE_PATTERN + "*.xml", rootPath);
-    if (resources != null && !resources.isEmpty()) {
-      for (Resource resource : resources) {
-        String fileName = resource.getFilename();
-        if (skipped == null || !skipped.contains(fileName)) {
-          gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-          document.setTitle(
-              resource.getFilename().substring(0, resource.getFilename().indexOf(".xml")));
-          document.setName(resource.getFilename());
-          document.setPath(PROFILE_PATTERN + resource.getFilename());
-          document.setType(DocumentType.PROFILE);
-          document.setPosition(ordersObj != null && ordersObj.findValue(fileName) != null
-              ? ordersObj.findValue(fileName).intValue() : 0);
-          resourceDocs.add(document);
+    for (String domain : getDomains()) {
+      logger.info("loading integration profiles documents for domain=" + domain);
+
+      JsonNode conf = toJsonObj(
+          getDomainBasedPath(PROFILE_PATTERN, domain) + PROFILES_CONF_FILE_PATTERN, rootPath);
+      Set<String> skipped = null;
+      JsonNode ordersObj = null;
+      if (conf != null) {
+        skipped = skippedAsList(conf.findValue("skip"));
+        ordersObj = conf.findValue("orders");
+
+      }
+      List<Resource> resources =
+          getResources(getDomainBasedPath(PROFILE_PATTERN, domain) + "*.xml", rootPath);
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          String fileName = resource.getFilename();
+          if (skipped == null || !skipped.contains(fileName)) {
+            gov.nist.hit.core.domain.Document document =
+                new gov.nist.hit.core.domain.Document(domain);
+            document.setTitle(
+                resource.getFilename().substring(0, resource.getFilename().indexOf(".xml")));
+            document.setName(resource.getFilename());
+            document.setPath(getDomainBasedPath(PROFILE_PATTERN, domain) + resource.getFilename());
+            document.setType(DocumentType.PROFILE);
+            document.setPosition(ordersObj != null && ordersObj.findValue(fileName) != null
+                ? ordersObj.findValue(fileName).intValue() : 0);
+            resourceDocs.add(document);
+          }
         }
       }
     }
@@ -557,30 +633,36 @@ public abstract class ResourcebundleLoader {
 
   private List<gov.nist.hit.core.domain.Document> getConstraintsDocs(String rootPath)
       throws IOException {
-    logger.info("loading constraints...");
     List<gov.nist.hit.core.domain.Document> resourceDocs =
         new ArrayList<gov.nist.hit.core.domain.Document>();
-    JsonNode conf = toJsonObj(CONSTRAINT_PATTERN + CONSTRAINTS_CONF_FILE_PATTERN, rootPath);
-    Set<String> skipped = null;
-    JsonNode ordersObj = null;
-    if (conf != null) {
-      skipped = skippedAsList(conf.findValue("skip"));
-      ordersObj = conf.findValue("orders");
-    }
-    List<Resource> resources = getResources(CONSTRAINT_PATTERN + "*.xml", rootPath);
-    if (resources != null && !resources.isEmpty()) {
-      for (Resource resource : resources) {
-        String fileName = resource.getFilename();
-        if (skipped == null || !skipped.contains(fileName)) {
-          gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-          document.setTitle(
-              resource.getFilename().substring(0, resource.getFilename().indexOf(".xml")));
-          document.setName(resource.getFilename());
-          document.setPath(CONSTRAINT_PATTERN + resource.getFilename());
-          document.setType(DocumentType.CONSTRAINT);
-          document.setPosition(ordersObj != null && ordersObj.findValue(fileName) != null
-              ? ordersObj.findValue(fileName).intValue() : 0);
-          resourceDocs.add(document);
+    for (String domain : getDomains()) {
+      logger.info("loading constraints documents for domain=" + domain);
+      JsonNode conf = toJsonObj(
+          getDomainBasedPath(CONSTRAINT_PATTERN, domain) + CONSTRAINTS_CONF_FILE_PATTERN, rootPath);
+      Set<String> skipped = null;
+      JsonNode ordersObj = null;
+      if (conf != null) {
+        skipped = skippedAsList(conf.findValue("skip"));
+        ordersObj = conf.findValue("orders");
+      }
+      List<Resource> resources =
+          getResources(getDomainBasedPath(CONSTRAINT_PATTERN, domain) + "*.xml", rootPath);
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          String fileName = resource.getFilename();
+          if (skipped == null || !skipped.contains(fileName)) {
+            gov.nist.hit.core.domain.Document document =
+                new gov.nist.hit.core.domain.Document(domain);
+            document.setTitle(
+                resource.getFilename().substring(0, resource.getFilename().indexOf(".xml")));
+            document.setName(resource.getFilename());
+            document
+                .setPath(getDomainBasedPath(CONSTRAINT_PATTERN, domain) + resource.getFilename());
+            document.setType(DocumentType.CONSTRAINT);
+            document.setPosition(ordersObj != null && ordersObj.findValue(fileName) != null
+                ? ordersObj.findValue(fileName).intValue() : 0);
+            resourceDocs.add(document);
+          }
         }
       }
     }
@@ -589,33 +671,38 @@ public abstract class ResourcebundleLoader {
 
   private List<gov.nist.hit.core.domain.Document> getValueSetsDocs(String rootPath)
       throws IOException {
-    logger.info("loading constraints...");
     List<gov.nist.hit.core.domain.Document> resourceDocs =
         new ArrayList<gov.nist.hit.core.domain.Document>();
-    JsonNode conf = toJsonObj(VALUESET_PATTERN + TABLES_CONF_FILE_PATTERN, rootPath);
-    Set<String> skipped = null;
-    JsonNode ordersObj = null;
-    logger.info("loading value sets...");
-    // value sets
-    skipped = null;
-    if (conf != null) {
-      skipped = skippedAsList(conf.findValue("skip"));
-      ordersObj = conf.findValue("orders");
-    }
-    List<Resource> resources = getResources(VALUESET_PATTERN + "*.xml", rootPath);
-    if (resources != null && !resources.isEmpty()) {
-      for (Resource resource : resources) {
-        String fileName = resource.getFilename();
-        if (skipped == null || !skipped.contains(fileName)) {
-          gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
-          document.setTitle(
-              resource.getFilename().substring(0, resource.getFilename().indexOf(".xml")));
-          document.setName(resource.getFilename());
-          document.setPath(VALUESET_PATTERN + resource.getFilename());
-          document.setType(DocumentType.TABLE);
-          document.setPosition(ordersObj != null && ordersObj.findValue(fileName) != null
-              ? ordersObj.findValue(fileName).intValue() : 0);
-          resourceDocs.add(document);
+    for (String domain : getDomains()) {
+      logger.info("loading constraints documents for domain=" + domain);
+      JsonNode conf = toJsonObj(
+          getDomainBasedPath(VALUESET_PATTERN, domain) + TABLES_CONF_FILE_PATTERN, rootPath);
+      Set<String> skipped = null;
+      JsonNode ordersObj = null;
+      logger.info("loading value sets...");
+      // value sets
+      skipped = null;
+      if (conf != null) {
+        skipped = skippedAsList(conf.findValue("skip"));
+        ordersObj = conf.findValue("orders");
+      }
+      List<Resource> resources =
+          getResources(getDomainBasedPath(VALUESET_PATTERN, domain) + "*.xml", rootPath);
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          String fileName = resource.getFilename();
+          if (skipped == null || !skipped.contains(fileName)) {
+            gov.nist.hit.core.domain.Document document =
+                new gov.nist.hit.core.domain.Document(domain);
+            document.setTitle(
+                resource.getFilename().substring(0, resource.getFilename().indexOf(".xml")));
+            document.setName(resource.getFilename());
+            document.setPath(getDomainBasedPath(VALUESET_PATTERN, domain) + resource.getFilename());
+            document.setType(DocumentType.TABLE);
+            document.setPosition(ordersObj != null && ordersObj.findValue(fileName) != null
+                ? ordersObj.findValue(fileName).intValue() : 0);
+            resourceDocs.add(document);
+          }
         }
       }
     }
@@ -648,7 +735,8 @@ public abstract class ResourcebundleLoader {
         if (it != null) {
           while (it.hasNext()) {
             JsonNode node = it.next();
-            gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+            gov.nist.hit.core.domain.Document document =
+                new gov.nist.hit.core.domain.Document(ALL_DOMAINS);
             document.setVersion(
                 node.findValue("version") != null ? node.findValue("version").textValue() : null);
             document.setTitle(
@@ -686,7 +774,8 @@ public abstract class ResourcebundleLoader {
         if (it != null) {
           while (it.hasNext()) {
             JsonNode node = it.next();
-            gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+            gov.nist.hit.core.domain.Document document =
+                new gov.nist.hit.core.domain.Document(ALL_DOMAINS);
             document.setVersion(
                 node.findValue("version") != null ? node.findValue("version").textValue() : null);
             document.setTitle(
@@ -716,7 +805,8 @@ public abstract class ResourcebundleLoader {
       JsonNode confObj = toJsonObj(TOOL_DOWNLOADS_PATTERN + TOOL_DOWNLOADS_CONF_PATTERN, rootPath);
       if (confObj != null) {
         if (confObj.findValue("installationGuide") != null) {
-          gov.nist.hit.core.domain.Document installation = new gov.nist.hit.core.domain.Document();
+          gov.nist.hit.core.domain.Document installation =
+              new gov.nist.hit.core.domain.Document(ALL_DOMAINS);
           JsonNode instructionObj = confObj.findValue("installationGuide");
           if (instructionObj.findValue("title") == null || instructionObj.findValue("name") == null
               || instructionObj.findValue("date") == null) {
@@ -743,7 +833,7 @@ public abstract class ResourcebundleLoader {
               while (it.hasNext()) {
                 JsonNode node = it.next();
                 gov.nist.hit.core.domain.Document document =
-                    new gov.nist.hit.core.domain.Document();
+                    new gov.nist.hit.core.domain.Document(ALL_DOMAINS);
                 if (node.findValue("title") == null || node.findValue("link") == null
                     || node.findValue("date") == null) {
                   throw new IllegalArgumentException(
@@ -782,16 +872,26 @@ public abstract class ResourcebundleLoader {
 
   public void loadConstraints(String rootPath) throws IOException {
     logger.info("loading constraints...");
-    List<Resource> resources = getResources(domainPath(CONSTRAINT_PATTERN) + "*.xml", rootPath);
-    if (resources != null && !resources.isEmpty()) {
-      for (Resource resource : resources) {
-        String content = FileUtil.getContent(resource);
-        Constraints constraints = constraint(content);
-        cachedRepository.getCachedConstraints().put(constraints.getSourceId(), constraints);
-        this.constraintsRepository.save(constraints);
+    for (String domain : getDomains()) {
+      List<Resource> resources =
+          getResources(getDomainBasedPath(CONSTRAINT_PATTERN, domain) + "*.xml", rootPath);
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          String content = FileUtil.getContent(resource);
+          Constraints constraints = constraint(content, domain);
+          constraints.setDomain(domain);
+          cachedRepository.getCachedConstraints().put(constraints.getSourceId(), constraints);
+          this.constraintsRepository.save(constraints);
+        }
       }
     }
   }
+
+
+  public Set<String> getDomains() throws IOException {
+    return domains;
+  }
+
 
   private JsonNode toJsonObj(String path, String rootPath) throws IOException {
     Resource resource = getResource(path, rootPath);
@@ -812,43 +912,58 @@ public abstract class ResourcebundleLoader {
     return skipped;
   }
 
-  public void loadIntegrationProfiles(String rootPath) throws IOException {
-    logger.info("loading integration profiles...");
-    List<Resource> resources = getResources(domainPath(PROFILE_PATTERN) + "*.xml", rootPath);
-    if (resources != null && !resources.isEmpty()) {
-
-      for (Resource resource : resources) {
-        IntegrationProfile integrationProfile = integrationProfile(FileUtil.getContent(resource));
-        integrationProfileRepository.save(integrationProfile);
-      }
+  private String getDomainBasedPath(String path, String domain) {
+    if (domain.equals("")) {
+      return path;
+    } else {
+      return path + domain + "/";
     }
   }
 
-  public void loadVocabularyLibraries(String rootPath) throws IOException {
-    logger.info("loading value set libraries...");
-    List<Resource> resources = getResources(domainPath(VALUESET_PATTERN) + "*.xml", rootPath);
-    if (resources != null && !resources.isEmpty()) {
-      for (Resource resource : resources) {
-        String content = FileUtil.getContent(resource);
-        try {
-          VocabularyLibrary vocabLibrary = vocabLibrary(content);
-          this.vocabularyLibraryRepository.save(vocabLibrary);
-          cachedRepository.getCachedVocabLibraries().put(vocabLibrary.getSourceId(), vocabLibrary);
-        } catch (UnsupportedOperationException e) {
+
+  public void loadIntegrationProfiles(String rootPath) throws IOException {
+    for (String domain : getDomains()) {
+      logger.info("loading integration profiles... of domain=" + domain);
+      List<Resource> resources =
+          getResources(getDomainBasedPath(PROFILE_PATTERN, domain) + "*.xml", rootPath);
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          IntegrationProfile integrationProfile =
+              integrationProfile(FileUtil.getContent(resource), domain);
+          integrationProfileRepository.save(integrationProfile);
         }
       }
     }
   }
 
-  protected Constraints additionalConstraints(String content) throws IOException {
+  public void loadVocabularyLibraries(String rootPath) throws IOException {
+    for (String domain : getDomains()) {
+      logger.info("loading value set libraries of domain=" + domain);
+      List<Resource> resources =
+          getResources(getDomainBasedPath(VALUESET_PATTERN, domain) + "*.xml", rootPath);
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          String content = FileUtil.getContent(resource);
+          try {
+            VocabularyLibrary vocabLibrary = vocabLibrary(content, domain);
+            this.vocabularyLibraryRepository.save(vocabLibrary);
+            cachedRepository.getCachedVocabLibraries().put(vocabLibrary.getSourceId(),
+                vocabLibrary);
+          } catch (UnsupportedOperationException e) {
+          }
+        }
+      }
+    }
+  }
+
+  protected Constraints additionalConstraints(String content, String domain) throws IOException {
     if (content == null) {
       return null;
     }
-    return constraint(content);
-
+    return constraint(content, domain);
   }
 
-  public IntegrationProfile integrationProfile(String content) {
+  public IntegrationProfile integrationProfile(String content, String domain) {
     Document doc = this.stringToDom(content);
     IntegrationProfile integrationProfile = new IntegrationProfile();
     Element profileElement = (Element) doc.getElementsByTagName("ConformanceProfile").item(0);
@@ -856,6 +971,7 @@ public abstract class ResourcebundleLoader {
     Element metaDataElement = (Element) profileElement.getElementsByTagName("MetaData").item(0);
     integrationProfile.setName(metaDataElement.getAttribute("Name"));
     integrationProfile.setXml(content);
+    integrationProfile.setDomain(domain);
     Element conformanceProfilElementRoot =
         (Element) profileElement.getElementsByTagName("Messages").item(0);
     NodeList messages = conformanceProfilElementRoot.getElementsByTagName("Message");
@@ -877,22 +993,23 @@ public abstract class ResourcebundleLoader {
     return integrationProfile;
   }
 
-  protected Message message(String content) {
+  protected Message message(String content, String domain) {
     if (content != null) {
       Message m = new Message();
       m.setContent(content);
+      m.setDomain(domain);
       return m;
     }
     return null;
   }
 
-  public Constraints constraint(String content) {
+  public Constraints constraint(String content, String domain) {
     Document doc = this.stringToDom(content);
     Constraints constraints = new Constraints();
     constraints.setXml(content);
     Element constraintsElement = (Element) doc.getElementsByTagName("ConformanceContext").item(0);
     constraints.setSourceId(constraintsElement.getAttribute("UUID"));
-
+    constraints.setDomain(domain);
     Element metaDataElement = (Element) constraintsElement.getElementsByTagName("MetaData").item(0);
     if (metaDataElement != null)
       constraints.setDescription(metaDataElement.getAttribute("Description"));
@@ -976,41 +1093,46 @@ public abstract class ResourcebundleLoader {
   }
 
   public void loadContextBasedTestCases(String rootPath) throws IOException {
-    List<Resource> resources =
-        this.getDirectories(domainPath(CONTEXTBASED_PATTERN) + "*/", rootPath);
-    if (resources != null && !resources.isEmpty()) {
-      for (Resource resource : resources) {
-        String fileName = fileName(resource);
-        String location = fileName.substring(fileName.indexOf(domainPath(CONTEXTBASED_PATTERN)),
-            fileName.length());
-        TestPlan testPlan = testPlan(location, TestingStage.CB, rootPath);
-        if (testPlan != null) {
-          checkPersistentId(testPlan.getPersistentId(), location);
-          testPlanRepository.save(testPlan);
+    for (String domain : getDomains()) {
+      List<Resource> resources =
+          this.getDirectories(getDomainBasedPath(CONTEXTBASED_PATTERN, domain) + "*/", rootPath);
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          String fileName = fileName(resource);
+          String location =
+              fileName.substring(fileName.indexOf(getDomainBasedPath(CONTEXTBASED_PATTERN, domain)),
+                  fileName.length());
+          TestPlan testPlan = testPlan(location, TestingStage.CB, rootPath, domain);
+          if (testPlan != null) {
+            checkPersistentId(testPlan.getPersistentId(), location);
+            testPlanRepository.save(testPlan);
+          }
         }
       }
     }
   }
 
   public void loadContextFreeTestCases(String rootPath) throws IOException, ProfileParserException {
-    List<Resource> resources =
-        this.getDirectories(domainPath(CONTEXTFREE_PATTERN) + "*/", rootPath);
-    if (resources != null && !resources.isEmpty()) {
-      for (Resource resource : resources) {
-        String fileName = fileName(resource);
-        String location = fileName.substring(fileName.indexOf(domainPath(CONTEXTFREE_PATTERN)),
-            fileName.length());
-        CFTestPlan testPlan = cfTestPlan(location, rootPath);
-        if (testPlan != null) {
-          checkPersistentId(testPlan.getPersistentId(), fileName);
-          cfTestPlanRepository.save(testPlan);
+    for (String domain : getDomains()) {
+      List<Resource> resources =
+          this.getDirectories(getDomainBasedPath(CONTEXTFREE_PATTERN, domain) + "*/", rootPath);
+      if (resources != null && !resources.isEmpty()) {
+        for (Resource resource : resources) {
+          String fileName = fileName(resource);
+          String location = fileName.substring(
+              fileName.indexOf(getDomainBasedPath(CONTEXTFREE_PATTERN, domain)), fileName.length());
+          CFTestPlan testPlan = cfTestPlan(location, rootPath, domain);
+          if (testPlan != null) {
+            checkPersistentId(testPlan.getPersistentId(), fileName);
+            cfTestPlanRepository.save(testPlan);
+          }
         }
       }
     }
   }
 
   protected TestCase testCase(String location, TestingStage stage, boolean transportSupported,
-      String rootPath) throws IOException {
+      String rootPath, String domain) throws IOException {
     logger.info("Processing test case located at:" + location);
     TestCase tc = new TestCase();
     Resource res = this.getResource(location + "TestCase.json", rootPath);
@@ -1030,19 +1152,21 @@ public abstract class ResourcebundleLoader {
     tc.setVersion(!testCaseObj.has("version") ? 1.0
         : Double.parseDouble(testCaseObj.findValue("version").asText()));
 
-    tc.setTestStory(testStory(location, rootPath));
-    tc.setJurorDocument(jurorDocument(location, rootPath));
+    tc.setTestStory(testStory(location, rootPath, domain));
+    tc.setJurorDocument(jurorDocument(location, rootPath, domain));
     if (testCaseObj.findValue("position") != null) {
       tc.setPosition(testCaseObj.findValue("position").intValue());
     }
     if (testCaseObj.has("supplements")) {
-      tc.getSupplements().addAll((testDocuments(location, testCaseObj.findValue("supplements"))));
+      tc.getSupplements()
+          .addAll((testDocuments(location, testCaseObj.findValue("supplements"), domain)));
     }
+    tc.setDomain(domain);
     List<Resource> resources = this.getDirectories(location + "*", rootPath);
     for (Resource resource : resources) {
       String fileName = fileName(resource);
       String tcLocation = fileName.substring(fileName.indexOf(location), fileName.length());
-      TestStep testStep = testStep(tcLocation, stage, transportSupported, rootPath);
+      TestStep testStep = testStep(tcLocation, stage, transportSupported, rootPath, domain);
       checkPersistentId(testStep.getPersistentId(), fileName);
       tc.addTestStep(testStep);
     }
@@ -1122,7 +1246,7 @@ public abstract class ResourcebundleLoader {
   }
 
   protected TestStep testStep(String location, TestingStage stage, boolean transportSupported,
-      String rootPath) throws IOException {
+      String rootPath, String domain) throws IOException {
     logger.info("Processing test step at:" + location);
     TestStep testStep = new TestStep();
     Resource res = this.getResource(location + "TestStep.json", rootPath);
@@ -1136,6 +1260,7 @@ public abstract class ResourcebundleLoader {
       throw new IllegalArgumentException("Missing id for Test Step at " + location);
     }
     testStep.setPreloaded(true);
+    testStep.setDomain(domain);
     testStep.setScope(TestScope.GLOBAL);
     testStep.setPersistentId(Long.parseLong(testStepObj.findValue("id").asText()));
     testStep.setDescription(testStepObj.findValue("description").textValue());
@@ -1160,17 +1285,17 @@ public abstract class ResourcebundleLoader {
     }
 
     if (!testingType.equals(TestingType.SUT_MANUAL) && !testingType.equals(TestingType.TA_MANUAL)) {
-      testStep.setTestContext(testContext(location, testStepObj, stage, rootPath));
+      testStep.setTestContext(testContext(location, testStepObj, stage, rootPath, domain));
     }
 
     if (testStepObj.has("supplements")) {
       testStep.getSupplements()
-          .addAll((testDocuments(location, testStepObj.findValue("supplements"))));
+          .addAll((testDocuments(location, testStepObj.findValue("supplements"), domain)));
     }
-    testStep.setTestStory(testStory(location, rootPath));
-    testStep.setJurorDocument(jurorDocument(location, rootPath));
-    testStep.setMessageContent(messageContent(location, rootPath));
-    testStep.setTestDataSpecification(testDataSpecification(location, rootPath));
+    testStep.setTestStory(testStory(location, rootPath, domain));
+    testStep.setJurorDocument(jurorDocument(location, rootPath, domain));
+    testStep.setMessageContent(messageContent(location, rootPath, domain));
+    testStep.setTestDataSpecification(testDataSpecification(location, rootPath, domain));
     if (testStepObj.findValue("position") != null) {
       testStep.setPosition(testStepObj.findValue("position").intValue());
     }
@@ -1178,15 +1303,18 @@ public abstract class ResourcebundleLoader {
     return testStep;
   }
 
-  private TestArtifact testStory(String location, String rootPath) throws IOException {
-    return artifact(location, "TestStory", rootPath);
+  private TestArtifact testStory(String location, String rootPath, String domain)
+      throws IOException {
+    return artifact(location, "TestStory", rootPath, domain);
   }
 
-  private TestArtifact jurorDocument(String location, String rootPath) throws IOException {
-    return artifact(location, "JurorDocument", rootPath);
+  private TestArtifact jurorDocument(String location, String rootPath, String domain)
+      throws IOException {
+    return artifact(location, "JurorDocument", rootPath, domain);
   }
 
-  private TestArtifact artifact(String location, String type, String rootPath) throws IOException {
+  private TestArtifact artifact(String location, String type, String rootPath, String domain)
+      throws IOException {
     TestArtifact doc = null;
 
     String path = location + type + ".html";
@@ -1194,6 +1322,7 @@ public abstract class ResourcebundleLoader {
     if (resource != null) {
       doc = doc == null ? new TestArtifact(type) : doc;
       doc.setHtml(FileUtil.getContent(resource));
+      doc.setDomain(domain);
     }
 
     path = location + type + ".pdf";
@@ -1201,6 +1330,7 @@ public abstract class ResourcebundleLoader {
     if (resource != null) {
       doc = doc == null ? new TestArtifact(type) : doc;
       doc.setPdfPath(path);
+      doc.setDomain(domain);
     }
 
     if (type.equals("TestStory")) { // TODO: Temporary hack
@@ -1209,31 +1339,37 @@ public abstract class ResourcebundleLoader {
       if (resource != null) {
         doc = doc == null ? new TestArtifact(type) : doc;
         doc.setJson(FileUtil.getContent(resource));
+        doc.setDomain(domain);
       }
     }
+
 
     return doc;
   }
 
-  private TestArtifact messageContent(String location, String rootPath) throws IOException {
-    return artifact(location, "MessageContent", rootPath);
+  private TestArtifact messageContent(String location, String rootPath, String domain)
+      throws IOException {
+    return artifact(location, "MessageContent", rootPath, domain);
   }
 
-  private TestArtifact testDataSpecification(String location, String rootPath) throws IOException {
-    return artifact(location, "TestDataSpecification", rootPath);
+  private TestArtifact testDataSpecification(String location, String rootPath, String domain)
+      throws IOException {
+    return artifact(location, "TestDataSpecification", rootPath, domain);
   }
 
-  private TestArtifact testPackage(String location, String rootPath) throws IOException {
-    return artifact(location, "TestPackage", rootPath);
+  private TestArtifact testPackage(String location, String rootPath, String domain)
+      throws IOException {
+    return artifact(location, "TestPackage", rootPath, domain);
   }
 
-  private TestArtifact testPlanSummary(String location, String rootPath) throws IOException {
+  private TestArtifact testPlanSummary(String location, String rootPath, String domain)
+      throws IOException {
     // return artifact(location, "QuickTestCaseReferenceGuide");
-    return artifact(location, "TestPlanSummary", rootPath);
+    return artifact(location, "TestPlanSummary", rootPath, domain);
   }
 
   protected TestCaseGroup testCaseGroup(String location, TestingStage stage,
-      boolean transportEnabled, String rootPath) throws IOException {
+      boolean transportEnabled, String rootPath, String domain) throws IOException {
     logger.info("Processing test case group at:" + location);
     Resource descriptorRsrce = this.getResource(location + "TestCaseGroup.json", rootPath);
     if (descriptorRsrce == null)
@@ -1254,14 +1390,16 @@ public abstract class ResourcebundleLoader {
       tcg.setDescription(testPlanObj.findValue("description").textValue());
       tcg.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
-      tcg.setTestStory(testStory(location, rootPath));
+      tcg.setTestStory(testStory(location, rootPath, domain));
+      tcg.setDomain(domain);
       if (testPlanObj.findValue("position") != null) {
         tcg.setPosition(testPlanObj.findValue("position").intValue());
       } else {
         tcg.setPosition(1);
       }
       if (testPlanObj.has("supplements")) {
-        tcg.getSupplements().addAll(testDocuments(location, testPlanObj.findValue("supplements")));
+        tcg.getSupplements()
+            .addAll(testDocuments(location, testPlanObj.findValue("supplements"), domain));
       }
       List<Resource> resources = this.getDirectories(location + "*/", rootPath);
       for (Resource resource : resources) {
@@ -1272,11 +1410,11 @@ public abstract class ResourcebundleLoader {
           String filename = descriptorResource.getFilename();
           if (filename.endsWith("TestCaseGroup.json")) {
             TestCaseGroup testCaseGroup =
-                testCaseGroup(tcLocation, stage, transportEnabled, rootPath);
+                testCaseGroup(tcLocation, stage, transportEnabled, rootPath, domain);
             checkPersistentId(testCaseGroup.getPersistentId(), location);
             tcg.getTestCaseGroups().add(testCaseGroup);
           } else if (filename.endsWith("TestCase.json")) {
-            TestCase testCase = testCase(tcLocation, stage, transportEnabled, rootPath);
+            TestCase testCase = testCase(tcLocation, stage, transportEnabled, rootPath, domain);
             checkPersistentId(testCase.getPersistentId(), location);
             tcg.getTestCases().add(testCase);
           }
@@ -1288,7 +1426,8 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  protected CFTestStepGroup cfTestStepGroup(String location, String rootPath) throws IOException {
+  protected CFTestStepGroup cfTestStepGroup(String location, String rootPath, String domain)
+      throws IOException {
     logger.info("Processing test case group at:" + location);
     Resource descriptorRsrce = this.getResource(location + "TestStepGroup.json", rootPath);
     if (descriptorRsrce == null)
@@ -1309,15 +1448,17 @@ public abstract class ResourcebundleLoader {
       tcg.setDescription(testPlanObj.findValue("description").textValue());
       tcg.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
-      tcg.setTestStory(testStory(location, rootPath));
+      tcg.setTestStory(testStory(location, rootPath, domain));
       if (testPlanObj.findValue("position") != null) {
         tcg.setPosition(testPlanObj.findValue("position").intValue());
       } else {
         tcg.setPosition(1);
       }
       if (testPlanObj.has("supplements")) {
-        tcg.getSupplements().addAll(testDocuments(location, testPlanObj.findValue("supplements")));
+        tcg.getSupplements()
+            .addAll(testDocuments(location, testPlanObj.findValue("supplements"), domain));
       }
+      tcg.setDomain(domain);
       List<Resource> resources = this.getDirectories(location + "*/", rootPath);
       for (Resource resource : resources) {
         String fileName = fileName(resource);
@@ -1326,13 +1467,13 @@ public abstract class ResourcebundleLoader {
         if (descriptorResource != null) {
           String filename = descriptorResource.getFilename();
           if (filename.endsWith("TestStepGroup.json")) {
-            CFTestStepGroup testStepGroup = cfTestStepGroup(tcLocation, rootPath);
+            CFTestStepGroup testStepGroup = cfTestStepGroup(tcLocation, rootPath, domain);
             if (testStepGroup != null) {
               checkPersistentId(testStepGroup.getPersistentId(), filename);
               tcg.getTestStepGroups().add(testStepGroup);
             }
           } else if (filename.endsWith("TestObject.json")) {
-            CFTestStep testStep = cfTestStep(tcLocation, rootPath);
+            CFTestStep testStep = cfTestStep(tcLocation, rootPath, domain);
             if (testStep != null) {
               checkPersistentId(testStep.getPersistentId(), filename);
               tcg.getTestSteps().add(testStep);
@@ -1346,7 +1487,7 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  protected TestPlan testPlan(String location, TestingStage stage, String rootPath)
+  protected TestPlan testPlan(String location, TestingStage stage, String rootPath, String domain)
       throws IOException {
     logger.info("Processing test plan  at:" + location);
 
@@ -1370,20 +1511,9 @@ public abstract class ResourcebundleLoader {
           ? testPlanObj.findValue("category").textValue() : DEFAULT_CATEGORY);
       tp.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
-      tp.setTestStory(testStory(location, rootPath));
+      tp.setTestStory(testStory(location, rootPath, domain));
       tp.setStage(stage);
 
-      if (testPlanObj.findValue("transport") != null
-          && testPlanObj.findValue("transport").booleanValue()
-          && (testPlanObj.findValue("domain") == null
-              || testPlanObj.findValue("domain").textValue() == null
-              || testPlanObj.findValue("domain").textValue() == "")) {
-        throw new IllegalArgumentException(
-            "Transport is supported for the following test plan but no domain is defined. Test Plan location="
-                + location);
-      }
-      tp.setDomain(testPlanObj.findValue("domain") != null
-          ? testPlanObj.findValue("domain").textValue() : null);
       tp.setTransport(testPlanObj.findValue("transport") != null
           ? testPlanObj.findValue("transport").booleanValue() : false);
       if (testPlanObj.findValue("position") != null) {
@@ -1391,10 +1521,11 @@ public abstract class ResourcebundleLoader {
       } else {
         tp.setPosition(1);
       }
-      tp.setTestPackage(testPackage(location, rootPath));
-      tp.setTestPlanSummary(testPlanSummary(location, rootPath));
+      tp.setTestPackage(testPackage(location, rootPath, domain));
+      tp.setTestPlanSummary(testPlanSummary(location, rootPath, domain));
       if (testPlanObj.has("supplements")) {
-        tp.getSupplements().addAll((testDocuments(location, testPlanObj.findValue("supplements"))));
+        tp.getSupplements()
+            .addAll((testDocuments(location, testPlanObj.findValue("supplements"), domain)));
       }
 
       List<Resource> resources = this.getDirectories(location + "*/", rootPath);
@@ -1405,23 +1536,26 @@ public abstract class ResourcebundleLoader {
         if (descriptorResource != null) {
           String filename = descriptorResource.getFilename();
           if (filename.endsWith("TestCaseGroup.json")) {
-            TestCaseGroup testCaseGroup = testCaseGroup(loca, stage, tp.isTransport(), rootPath);
+            TestCaseGroup testCaseGroup =
+                testCaseGroup(loca, stage, tp.isTransport(), rootPath, domain);
             checkPersistentId(testCaseGroup.getPersistentId(), fileName);
             tp.getTestCaseGroups().add(testCaseGroup);
           } else if (filename.endsWith("TestCase.json")) {
-            TestCase testCase = testCase(loca, stage, tp.isTransport(), rootPath);
+            TestCase testCase = testCase(loca, stage, tp.isTransport(), rootPath, domain);
             checkPersistentId(testCase.getPersistentId(), fileName);
             tp.getTestCases().add(testCase);
           }
         }
       }
+      tp.setDomain(domain);
       return tp;
     }
     return null;
   }
 
 
-  protected CFTestPlan cfTestPlan(String testPlanPath, String rootPath) throws IOException {
+  protected CFTestPlan cfTestPlan(String testPlanPath, String rootPath, String domain)
+      throws IOException {
     logger.info("Processing test plan at:" + testPlanPath);
     Resource res = this.getResource(testPlanPath + "TestPlan.json", rootPath);
     if (res == null)
@@ -1436,6 +1570,7 @@ public abstract class ResourcebundleLoader {
         throw new IllegalArgumentException("Missing id for Test Object at " + testPlanPath);
       }
       testPlan.setPreloaded(true);
+      testPlan.setDomain(domain);
       testPlan.setScope(TestScope.GLOBAL);
       testPlan.setCategory(testPlanObj.findValue("category") != null
           ? testPlanObj.findValue("category").textValue() : DEFAULT_CATEGORY);
@@ -1449,7 +1584,7 @@ public abstract class ResourcebundleLoader {
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
       if (testPlanObj.has("supplements")) {
         testPlan.getSupplements()
-            .addAll(testDocuments(testPlanPath, testPlanObj.findValue("supplements")));
+            .addAll(testDocuments(testPlanPath, testPlanObj.findValue("supplements"), domain));
       }
 
 
@@ -1461,13 +1596,13 @@ public abstract class ResourcebundleLoader {
         if (descriptorResource != null) {
           String filename = descriptorResource.getFilename();
           if (filename.endsWith("TestStepGroup.json")) {
-            CFTestStepGroup testStepeGroup = cfTestStepGroup(tcLocation, rootPath);
+            CFTestStepGroup testStepeGroup = cfTestStepGroup(tcLocation, rootPath, domain);
             if (testStepeGroup != null) {
               checkPersistentId(testStepeGroup.getPersistentId(), filename);
               testPlan.getTestStepGroups().add(testStepeGroup);
             }
           } else if (filename.endsWith("TestObject.json")) {
-            CFTestStep testStep = cfTestStep(tcLocation, rootPath);
+            CFTestStep testStep = cfTestStep(tcLocation, rootPath, domain);
             if (testStep != null) {
               checkPersistentId(testStep.getPersistentId(), filename);
               testPlan.getTestSteps().add(testStep);
@@ -1482,7 +1617,8 @@ public abstract class ResourcebundleLoader {
 
 
 
-  protected CFTestStep cfTestStep(String testObjectPath, String rootPath) throws IOException {
+  protected CFTestStep cfTestStep(String testObjectPath, String rootPath, String domain)
+      throws IOException {
     logger.info("Processing test object at:" + testObjectPath);
     Resource res = this.getResource(testObjectPath + "TestObject.json", rootPath);
     if (res == null)
@@ -1497,6 +1633,7 @@ public abstract class ResourcebundleLoader {
         throw new IllegalArgumentException("Missing id for Test Object at " + testObjectPath);
       }
       testStep.setPreloaded(true);
+      testStep.setDomain(domain);
       testStep.setScope(TestScope.GLOBAL);
       testStep.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       if (testPlanObj.findValue("position") != null) {
@@ -1505,10 +1642,11 @@ public abstract class ResourcebundleLoader {
       testStep.setDescription(testPlanObj.findValue("description").textValue());
       testStep.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
-      testStep.setTestContext(testContext(testObjectPath, testPlanObj, TestingStage.CF, rootPath));
+      testStep.setTestContext(
+          testContext(testObjectPath, testPlanObj, TestingStage.CF, rootPath, domain));
       if (testPlanObj.has("supplements")) {
         testStep.getSupplements()
-            .addAll(testDocuments(testObjectPath, testPlanObj.findValue("supplements")));
+            .addAll(testDocuments(testObjectPath, testPlanObj.findValue("supplements"), domain));
       }
       return testStep;
     }
@@ -1516,17 +1654,26 @@ public abstract class ResourcebundleLoader {
   }
 
   public void loadTestCasesDocumentation() throws IOException {
-    TestCaseDocumentation doc = generateCFTestPlanDocumentation("Context-free", TestingStage.CF,
-        cfTestPlanRepository.findAllByStageAndScope(TestingStage.CF, TestScope.GLOBAL));
-    if (doc != null) {
-      doc.setJson(obm.writeValueAsString(doc));
-      testCaseDocumentationRepository.save(doc);
-    }
-    doc = generateCBTestPlansDocumentation("Context-based", TestingStage.CB,
-        testPlanRepository.findAllByStageAndScope(TestingStage.CB, TestScope.GLOBAL));
-    if (doc != null) {
-      doc.setJson(obm.writeValueAsString(doc));
-      testCaseDocumentationRepository.save(doc);
+    for (String domain : getDomains()) {
+      List<CFTestPlan> contextfreeTestPlans = cfTestPlanRepository
+          .findAllByStageAndScopeAndDomain(TestingStage.CF, TestScope.GLOBAL, domain);
+      TestCaseDocumentation doc =
+          generateCFTestPlanDocumentation("Context-free", TestingStage.CF, contextfreeTestPlans);
+      if (doc != null) {
+        doc.setDomain(domain);
+        doc.setJson(obm.writeValueAsString(doc));
+        testCaseDocumentationRepository.save(doc);
+      }
+
+      List<TestPlan> contextbasedTestPlans = testPlanRepository
+          .findAllByStageAndScopeAndDomain(TestingStage.CB, TestScope.GLOBAL, domain);
+      doc =
+          generateCBTestPlansDocumentation("Context-based", TestingStage.CB, contextbasedTestPlans);
+      if (doc != null) {
+        doc.setDomain(domain);
+        doc.setJson(obm.writeValueAsString(doc));
+        testCaseDocumentationRepository.save(doc);
+      }
     }
   }
 
@@ -1662,6 +1809,7 @@ public abstract class ResourcebundleLoader {
       throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
     doc.setId(tp.getId());
+
     if (tp.getTestStepGroups() != null && !tp.getTestStepGroups().isEmpty()) {
       List<CFTestStepGroup> list = new ArrayList<CFTestStepGroup>(tp.getTestStepGroups());
       Collections.sort(list);
@@ -1728,14 +1876,15 @@ public abstract class ResourcebundleLoader {
   }
 
 
-  private Set<gov.nist.hit.core.domain.Document> testDocuments(String testPath, JsonNode nodeObj) {
+  private Set<gov.nist.hit.core.domain.Document> testDocuments(String testPath, JsonNode nodeObj,
+      String domain) {
     Set<gov.nist.hit.core.domain.Document> documents =
         new HashSet<gov.nist.hit.core.domain.Document>();
     Iterator<JsonNode> it = nodeObj.elements();
     if (it != null) {
       while (it.hasNext()) {
         JsonNode node = it.next();
-        gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document();
+        gov.nist.hit.core.domain.Document document = new gov.nist.hit.core.domain.Document(domain);
         if (node.findValue("title") == null
             || (node.findValue("link") == null && node.findValue("name") == null)
             || node.findValue("date") == null) {
@@ -1782,7 +1931,7 @@ public abstract class ResourcebundleLoader {
     appInfo.setCfManagementSupported(cfManagementSupported);
     appInfo.setAuthenticationRequired(authenticationRequired);
     appInfo.setEmployerRequired(employerRequired);
-
+    appInfo.setSubTitle(appSubTitle);
     appInfo.setOrganization(organizationName);
     appInfo.setOrganizationName(organizationName);
     appInfo.setOrganizationLogo(appOrganizationLogo);
@@ -1792,11 +1941,7 @@ public abstract class ResourcebundleLoader {
       appResourceBundleVersion = getRsbleVersion();
     }
     appInfo.setRsbVersion(appResourceBundleVersion);
-
-    appInfo.setDomain(appDomain);
     appInfo.setHeader(appHeader);
-    appInfo.setHomeTitle(appHomeTitle);
-    appInfo.setHomeContent(appHomeContent); // compatibility
     appInfo.setName(appName);
     appInfo.setVersion(appVersion);
     appInfo.setDate(new Date().getTime() + "");
@@ -1805,13 +1950,7 @@ public abstract class ResourcebundleLoader {
     appInfo.setDisclaimer(appDisclaimerContent);
     appInfo.setDisclaimerLink(appDisclaimerLink);
 
-    appInfo.setHomeContent(appHomeContent);
-
-    appInfo.setMessageContentInfo(appMessageContentInfoContent);
-    appInfo.setValidationResultInfo(appValidationResultInfoContent);
     appInfo.setAcknowledgment(appAcknowledgment);
-    appInfo.setProfileInfo(appProfileInfoContent);
-    appInfo.setValueSetCopyright(appValueSetCopyRightContent);
     appInfo.setConfidentiality(appConfidentialityContent);
     appInfo.setConfidentialityLink(appConfidentialityLink);
     appInfo.setPrivacy(appPrivacyContent);
@@ -1851,6 +1990,7 @@ public abstract class ResourcebundleLoader {
     }
     return null;
   }
+
 
 
   public TestPlanRepository getTestPlanRepository() {

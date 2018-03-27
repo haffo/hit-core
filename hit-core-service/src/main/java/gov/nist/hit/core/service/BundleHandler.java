@@ -10,7 +10,7 @@ public interface BundleHandler {
 
   public String unzip(byte[] bytes, String path) throws Exception;
 
-  public GVTSaveInstance createGVTSaveInstance(String dir)
+  public GVTSaveInstance createGVTSaveInstance(String dir, String domain)
       throws IOException, ProfileParserException;
 
   public String getProfileContentFromZipDirectory(String dir) throws IOException;

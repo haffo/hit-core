@@ -7,8 +7,6 @@
  */
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -25,7 +23,7 @@ import io.swagger.annotations.ApiModel;
  */
 @Entity
 @ApiModel(value = "Document", description = "Data Model representing a document")
-public class Document implements Serializable {
+public class Document extends DomainBased {
 
   @Id
   @GeneratedValue(strategy = GenerationType.TABLE)
@@ -48,13 +46,18 @@ public class Document implements Serializable {
   private int position;
 
   @JsonIgnore
-
   @Enumerated(EnumType.STRING)
   private DocumentType type;
+
+  public Document(String domain) {
+    super();
+    this.domain = domain;
+  }
 
   public Document() {
     super();
   }
+
 
   // public Document(DocumentType type, String title, String description, String path, String
   // version, String format,
@@ -168,6 +171,7 @@ public class Document implements Serializable {
   public void setName(String name) {
     this.name = name;
   }
+
 
 
 }

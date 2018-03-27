@@ -1,7 +1,5 @@
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 
 @Entity
-public class TransportForms implements Serializable {
+public class TransportForms extends DomainBased {
 
   private static final long serialVersionUID = 8805967508478985159L;
 
@@ -21,9 +19,6 @@ public class TransportForms implements Serializable {
 
   @NotNull
   private String protocol;
-
-  @NotNull
-  private String domain;
 
   private String description;
 
@@ -69,13 +64,6 @@ public class TransportForms implements Serializable {
     this.id = id;
   }
 
-  public String getDomain() {
-    return domain;
-  }
-
-  public void setDomain(String domain) {
-    this.domain = domain;
-  }
 
   public String getDescription() {
     return description;

@@ -13,17 +13,23 @@
 package gov.nist.hit.core.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
-import gov.nist.hit.core.domain.TestCaseDocumentation;
-import gov.nist.hit.core.domain.TestingStage;
+import gov.nist.hit.core.domain.CFTestStepGroup;
+import gov.nist.hit.core.domain.TestScope;
 
-public interface TestCaseDocumentationRepository
-    extends JpaRepository<TestCaseDocumentation, Long> {
+public interface CFTestStepGroupRepository extends JpaRepository<CFTestStepGroup, Long> {
 
-  @Query("select docu from TestCaseDocumentation docu where docu.stage = :stage and docu.domain = :domain")
-  public TestCaseDocumentation findOneByStageAndDomain(@Param("stage") TestingStage stage,
-      @Param("domain") String domain);
+  @Query("select to from CFTestStepGroup to where to.persistentId = :id")
+  public CFTestStepGroup getByPersistentId(@Param("id") Long id);
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from CFTestStepGroup to where to.scope = :scope")
+  public void deleteByScope(@Param("scope") TestScope scope);
+
 
 }

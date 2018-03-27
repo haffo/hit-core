@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,13 +35,10 @@ import gov.nist.hit.core.domain.CFTestPlan;
 import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.service.AccountService;
-import gov.nist.hit.core.service.AppInfoService;
 import gov.nist.hit.core.service.CFTestPlanService;
 import gov.nist.hit.core.service.CFTestStepService;
 import gov.nist.hit.core.service.ResourceLoader;
 import gov.nist.hit.core.service.Streamer;
-import gov.nist.hit.core.service.UserIdService;
-import gov.nist.hit.core.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -71,29 +66,14 @@ public class ContextFreeController {
 	private AccountService accountService;
 
 	@Autowired
-	private UserService userService;
-
-	@Autowired
-	private UserIdService userIdService;
-
-	@Autowired
 	@Qualifier("resourceLoader")
 	private ResourceLoader resouceLoader;
 
 	@Autowired
 	private Streamer streamer;
 
-	@Autowired
-	private MailSender mailSender;
-
-	@Autowired
-	private SimpleMailMessage templateMessage;
-
 	@Value("${server.email}")
 	private String SERVER_EMAIL;
-
-	@Autowired
-	private AppInfoService appInfoService;
 
 	@Value("${mail.tool}")
 	private String TOOL_NAME;
@@ -103,6 +83,7 @@ public class ContextFreeController {
 	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
 	public void getTestPlansByScope(
 			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = false) TestScope scope,
+			@ApiParam(value = "the domain of the test plans", required = true) @RequestParam(required = true) String domain,
 			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		logger.info("Fetching context-free testplans of scope=" + scope + "...");
 		List<CFTestPlan> results = null;
@@ -112,12 +93,12 @@ public class ContextFreeController {
 			if (userId != null) {
 				Account account = accountService.findOne(userId);
 				if (account != null) {
-					results = testPlanService.findShortAllByStageAndAuthor(TestingStage.CF, account.getUsername(),
-							scope);
+					results = testPlanService.findShortAllByStageAndAuthorAndDomain(TestingStage.CF,
+							account.getUsername(), scope, domain);
 				}
 			}
 		} else {
-			results = testPlanService.findShortAllByStageAndScope(TestingStage.CF, scope);
+			results = testPlanService.findShortAllByStageAndScopeAndDomain(TestingStage.CF, scope, domain);
 		}
 		streamer.stream2(response.getOutputStream(), results);
 	}

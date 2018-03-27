@@ -62,9 +62,11 @@ public class DocumentationController {
 
 	// @Cacheable(value = "HitCache", key = "'testcases-documentation'")
 	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
-	public void testCases(HttpServletResponse response) throws IOException {
+	public void testCases(HttpServletResponse response, @RequestParam(required = true) String domain)
+			throws IOException {
 		logger.info("Fetching test case documentation");
-		streamer.stream(response.getOutputStream(), testCaseDocumentationService.findOneByStage(TestingStage.CB));
+		streamer.stream(response.getOutputStream(),
+				testCaseDocumentationService.findOneByStageAndDomain(TestingStage.CB, domain));
 	}
 
 	// @Cacheable(value = "HitCache", key = "'releasenotes'")
@@ -75,10 +77,11 @@ public class DocumentationController {
 	}
 
 	// @Cacheable(value = "HitCache", key = "'userdocs'")
-	@RequestMapping(value = "/userdocs", method = RequestMethod.GET, produces = "application/json")
-	public void userDocs(HttpServletResponse response) throws IOException {
+	@RequestMapping(value = "/{domain}/userdocs", method = RequestMethod.GET, produces = "application/json")
+	public void userDocs(HttpServletResponse response, @RequestParam(required = true) String domain)
+			throws IOException {
 		logger.info("Fetching  all release notes");
-		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllUserDocs());
+		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllUserDocsByDomain(domain));
 	}
 
 	// @Cacheable(value = "HitCache", key = "'knownissues'")
@@ -91,9 +94,10 @@ public class DocumentationController {
 	// @Cacheable(value = "HitCache", key = "#type.name() +
 	// 'resource-documentation'")
 	@RequestMapping(value = "/resourcedocs", method = RequestMethod.GET, produces = "application/json")
-	public void resourcedocs(@RequestParam("type") DocumentType type, HttpServletResponse response) throws IOException {
+	public void resourcedocs(@RequestParam("type") DocumentType type, HttpServletResponse response,
+			@RequestParam(required = true) String domain) throws IOException {
 		logger.info("Fetching all resources docs of type=" + type);
-		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllResourceDocs(type));
+		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllResourceDocsByDomain(type, domain));
 	}
 
 	// @Cacheable(value = "HitCache", key = "'deliverables-documentation'")

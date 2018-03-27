@@ -27,16 +27,18 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
 
 
   @Override
-  public List<CFTestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope) {
+  public List<CFTestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
+      String domain) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findShortAllByStageAndScope(stage, scope);
+    return testPlanRepository.findShortAllByStageAndScopeAndDomain(stage, scope, domain);
   }
 
   @Override
-  public List<CFTestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername,
-      TestScope scope) {
+  public List<CFTestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage,
+      String authorUsername, TestScope scope, String domain) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findShortAllByStageAndAuthor(stage, authorUsername, scope);
+    return testPlanRepository.findShortAllByStageAndAuthorAndDomain(stage, authorUsername, scope,
+        domain);
   }
 
   @Override
@@ -46,15 +48,16 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
   }
 
   @Override
-  public List<CFTestPlan> findAllByStageAndScope(TestingStage stage, TestScope scope) {
+  public List<CFTestPlan> findAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
+      String domain) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findAllByStageAndScope(stage, scope);
+    return testPlanRepository.findAllByStageAndScopeAndDomain(stage, scope, domain);
   }
 
   @Override
-  public List<CFTestPlan> findAllByScope(TestScope scope) {
+  public List<CFTestPlan> findAllByScopeAndDomain(TestScope scope, String domain) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findAllByScope(scope);
+    return testPlanRepository.findAllByScopeAndDomain(scope, domain);
   }
 
 
@@ -67,27 +70,31 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
 
 
   @Override
-  public List<CFTestPlan> findShortAllByScopeAndUsername(TestScope scope, String authorUsername) {
+  public List<CFTestPlan> findShortAllByScopeAndUsernameAndDomain(TestScope scope,
+      String authorUsername, String domain) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findShortAllByScopeAndUsername(scope, authorUsername);
+    return testPlanRepository.findShortAllByScopeAndUsernameAndDomain(scope, authorUsername,
+        domain);
 
   }
 
   @Override
-  public List<CFTestPlan> findAllByScopeAndUsername(TestScope scope, String authorUsername) {
-    return testPlanRepository.findAllByScopeAndUsername(scope, authorUsername);
+  public List<CFTestPlan> findAllByScopeAndUsernameAndDomain(TestScope scope, String authorUsername,
+      String domain) {
+    return testPlanRepository.findAllByScopeAndUsernameAndDomain(scope, authorUsername, domain);
   }
 
   @Override
-  public Set<String> findAllCategoriesByScope(TestScope scope) {
+  public Set<String> findAllCategoriesByScopeAndDomain(TestScope scope, String domain) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findAllCategoriesByScope(scope);
+    return testPlanRepository.findAllCategoriesByScopeAndDomain(scope, domain);
   }
 
   @Override
-  public Set<String> findAllCategoriesByScopeAndUser(TestScope scope, String username) {
+  public Set<String> findAllCategoriesByScopeAndUserAndDomain(TestScope scope, String username,
+      String domain) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findAllCategoriesByScopeAndUser(scope, username);
+    return testPlanRepository.findAllCategoriesByScopeAndUserAndDomain(scope, username, domain);
   }
 
   @Override
@@ -103,9 +110,9 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
   }
 
   @Override
-  public List<CFTestPlan> findShortAllByScope(TestScope scope) {
+  public List<CFTestPlan> findShortAllByScopeAndDomain(TestScope scope, String domain) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findShortAllByScope(scope);
+    return testPlanRepository.findShortAllByScopeAndDomain(scope, domain);
   }
 
   @Override

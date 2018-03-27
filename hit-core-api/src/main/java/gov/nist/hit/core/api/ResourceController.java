@@ -45,10 +45,9 @@ public class ResourceController {
 
 	@ModelAttribute("requestObj")
 	public AddOrUpdateRequest initRequest(Authentication u, @RequestPart("file") MultipartFile file,
-			@RequestPart("id") Long id, @RequestPart("scope") String scope, HttpServletResponse resp) throws Exception {
-
+			@RequestPart("id") Long id, @RequestPart("scope") String scope, @RequestPart("domain") String domain,
+			HttpServletResponse resp) throws Exception {
 		String zipFolder = "";
-
 		if (!file.isEmpty()) {
 			zipFolder = ResourcebundleHelper.getResourcesFromZip(file.getInputStream());
 		}
@@ -60,13 +59,7 @@ public class ResourceController {
 				resp.sendError(500, "Invalid Scope");
 			}
 		}
-
-		System.out.println("Handling API request DATA");
-		System.out.println("File : " + zipFolder);
-		System.out.println("ID   : " + id);
-		System.out.println("Scope: " + scope);
-
-		return new AddOrUpdateRequest(id, zipFolder, scope);
+		return new AddOrUpdateRequest(id, zipFolder, scope, domain);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,9 +77,11 @@ public class ResourceController {
 	@RequestMapping(value = "/cb/addOrUpdate/testStep", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestStep(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
+		validateRequest(request);
+
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestStep> steps = resourceLoader.createTS(request.getZip() + "/");
+		List<TestStep> steps = resourceLoader.createTS(request.getZip() + "/", request.getDomain());
 
 		for (TestStep ts : steps) {
 			ResourceUploadStatus tmp = resourceLoader.handleTS(request.getId(), ts);
@@ -106,9 +101,11 @@ public class ResourceController {
 	@RequestMapping(value = "/cb/update/testCase", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> updateTestCase(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
+		validateRequest(request);
+
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/");
+		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/", request.getDomain());
 		for (TestCase tc : cases) {
 			ResourceUploadStatus tmp = resourceLoader.updateTC(tc);
 			results.add(tmp);
@@ -125,9 +122,11 @@ public class ResourceController {
 	@RequestMapping(value = "/cb/add/testCase/to/testPlan", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestCaseToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
+		validateRequest(request);
+
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/");
+		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/", request.getDomain());
 		for (TestCase tc : cases) {
 			ResourceUploadStatus tmp = resourceLoader.addTC(request.getId(), tc, "plan");
 			results.add(tmp);
@@ -144,10 +143,11 @@ public class ResourceController {
 	@RequestMapping(value = "/cb/add/testCase/to/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestCaseToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws ProfileParserException, IOException, NotFoundException {
+		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/");
+		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/", request.getDomain());
 		for (TestCase tc : cases) {
 			ResourceUploadStatus tmp = resourceLoader.addTC(request.getId(), tc, "group");
 			results.add(tmp);
@@ -166,10 +166,11 @@ public class ResourceController {
 	@RequestMapping(value = "/cb/update/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> updateTestGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws ProfileParserException, IOException, NotFoundException {
+		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/");
+		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/", request.getDomain());
 		for (TestCaseGroup tcg : groups) {
 			ResourceUploadStatus tmp = resourceLoader.updateTCG(tcg);
 			results.add(tmp);
@@ -186,10 +187,11 @@ public class ResourceController {
 	@RequestMapping(value = "/cb/add/testCaseGroup/to/testPlan", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestGroupToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
+		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/");
+		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/", request.getDomain());
 		for (TestCaseGroup tcg : groups) {
 			ResourceUploadStatus tmp = resourceLoader.addTCG(request.getId(), tcg, "plan");
 			results.add(tmp);
@@ -206,10 +208,11 @@ public class ResourceController {
 	@RequestMapping(value = "/cb/add/testCaseGroup/to/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestGroupToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
+		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/");
+		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/", request.getDomain());
 		for (TestCaseGroup tcg : groups) {
 			ResourceUploadStatus tmp = resourceLoader.addTCG(request.getId(), tcg, "group");
 			results.add(tmp);
@@ -228,11 +231,12 @@ public class ResourceController {
 	@RequestMapping(value = "/cb/addOrUpdate/testPlan", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addOrUpdateTestPlan(Authentication u,
 			@ModelAttribute("requestObj") AddOrUpdateRequest request, HttpServletResponse resp) throws IOException {
+		validateRequest(request);
 
 		String scope = request.getScope().replaceAll("\"", "");
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
-		List<TestPlan> plans = resourceLoader.createTP(request.getZip() + "/");
+		List<TestPlan> plans = resourceLoader.createTP(request.getZip() + "/", request.getDomain());
 
 		if (scope == null) {
 			resp.sendError(500, "Scope Argument is required");
@@ -268,9 +272,10 @@ public class ResourceController {
 	@RequestMapping(value = "/cf/addOrUpdate/testCase", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addCFTestCase(Authentication u,
 			@ModelAttribute("requestObj") AddOrUpdateRequest request, HttpServletResponse resp) throws IOException {
+		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
-		List<CFTestStep> cases = resourceLoader.createCFTC(request.getZip() + "/");
+		List<CFTestStep> cases = resourceLoader.createCFTC(request.getZip() + "/", request.getDomain());
 
 		String scope = request.getScope().replaceAll("\"", "");
 		if (scope == null) {
@@ -307,8 +312,10 @@ public class ResourceController {
 	@RequestMapping(value = "/global/addOrUpdate/profile", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addOrUpdateProfile(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
+		validateRequest(request);
 
-		List<ResourceUploadStatus> res = resourceLoader.addOrReplaceIntegrationProfile(request.getZip() + "/");
+		List<ResourceUploadStatus> res = resourceLoader.addOrReplaceIntegrationProfile(request.getZip() + "/",
+				request.getDomain());
 
 		FileUtils.deleteDirectory(new File(request.getZip()));
 		return res;
@@ -320,8 +327,10 @@ public class ResourceController {
 	@RequestMapping(value = "/global/addOrUpdate/constraints", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addOrUpdateConstraints(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
+		validateRequest(request);
 
-		List<ResourceUploadStatus> res = resourceLoader.addOrReplaceConstraints(request.getZip() + "/");
+		List<ResourceUploadStatus> res = resourceLoader.addOrReplaceConstraints(request.getZip() + "/",
+				request.getDomain());
 
 		FileUtils.deleteDirectory(new File(request.getZip()));
 		return res;
@@ -333,11 +342,18 @@ public class ResourceController {
 	@RequestMapping(value = "/global/addOrUpdate/valueSet", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addOrUpdateValueSet(@ModelAttribute("requestObj") AddOrUpdateRequest request)
 			throws IOException {
-
-		List<ResourceUploadStatus> res = resourceLoader.addOrReplaceValueSet(request.getZip() + "/");
+		validateRequest(request);
+		List<ResourceUploadStatus> res = resourceLoader.addOrReplaceValueSet(request.getZip() + "/",
+				request.getDomain());
 
 		FileUtils.deleteDirectory(new File(request.getZip()));
 		return res;
+	}
+
+	private void validateRequest(AddOrUpdateRequest request) {
+		if (request.getDomain() == null || "".equals(request.getDomain())) {
+			throw new IllegalArgumentException("Domain cannot be empty");
+		}
 	}
 
 }

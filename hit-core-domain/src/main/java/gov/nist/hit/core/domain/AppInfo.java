@@ -15,9 +15,12 @@ package gov.nist.hit.core.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -26,10 +29,16 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import gov.nist.hit.core.Constant;
+import io.swagger.annotations.ApiModelProperty;
 
 
 /**
@@ -55,8 +64,6 @@ public class AppInfo implements Serializable {
 
   private String organization;
 
-  private String domain;
-
   private String header;
 
   private String contactEmail;
@@ -65,27 +72,12 @@ public class AppInfo implements Serializable {
   @ElementCollection(fetch = FetchType.EAGER)
   private List<String> adminEmails = new ArrayList<String>();
 
-  private String homeTitle;
-
-  @Column(columnDefinition = "TEXT")
-  private String messageContentInfo;
-
-  @Column(columnDefinition = "TEXT")
-  private String homeContent;
-
-  @Column(columnDefinition = "TEXT")
-  private String profileInfo;
-
-  @Column(columnDefinition = "TEXT")
-  private String valueSetCopyright;
-
 
   @Column(columnDefinition = "TEXT")
   private String disclaimer;
 
   @Column
   private String disclaimerLink;
-
 
   @Column(columnDefinition = "TEXT")
   private String confidentiality;
@@ -94,11 +86,10 @@ public class AppInfo implements Serializable {
   private String confidentialityLink;
 
   @Column(columnDefinition = "TEXT")
-  private String validationResultInfo;
-
-
-  @Column(columnDefinition = "TEXT")
   private String acknowledgment;
+
+
+  private String subTitle;
 
 
   @Column(columnDefinition = "TEXT")
@@ -138,6 +129,16 @@ public class AppInfo implements Serializable {
   @MapKeyColumn(name = "OPTION_TYPE")
   @Column(name = "OPTION_VALUE")
   private Map<String, String> options = new HashMap<String, String>();
+
+
+  @JsonIgnoreProperties(value = {"messageContentInfo", "homeContent", "profileInfo",
+      "valueSetCopyright", "validationResultInfo"})
+  @ApiModelProperty(required = false, value = "test steps of the test step group")
+  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
+  @JoinTable(name = "AppInfo_domains", joinColumns = {@JoinColumn(name = "appInfo_id")},
+      inverseJoinColumns = {@JoinColumn(name = "domain_id")})
+  private Set<Domain> domains = new HashSet<Domain>();
+
 
   public AppInfo() {
     uploadMaxSize = "10MB";
@@ -179,13 +180,6 @@ public class AppInfo implements Serializable {
     this.name = name;
   }
 
-  public String getDomain() {
-    return domain;
-  }
-
-  public void setDomain(String domain) {
-    this.domain = domain;
-  }
 
   public String getHeader() {
     return header;
@@ -203,31 +197,6 @@ public class AppInfo implements Serializable {
     this.adminEmails = adminEmails;
   }
 
-
-  public String getHomeContent() {
-    return homeContent;
-  }
-
-  public void setHomeContent(String homeContent) {
-    this.homeContent = homeContent;
-  }
-
-  public String getProfileInfo() {
-    return profileInfo;
-  }
-
-  public void setProfileInfo(String profileInfo) {
-    this.profileInfo = profileInfo;
-  }
-
-
-  public String getValueSetCopyright() {
-    return valueSetCopyright;
-  }
-
-  public void setValueSetCopyright(String valueSetCopyright) {
-    this.valueSetCopyright = valueSetCopyright;
-  }
 
   public Long getId() {
     return id;
@@ -256,29 +225,12 @@ public class AppInfo implements Serializable {
   }
 
 
-  public String getValidationResultInfo() {
-    return validationResultInfo;
-  }
-
-  public void setValidationResultInfo(String validationResultInfo) {
-    this.validationResultInfo = validationResultInfo;
-  }
-
   public String getAcknowledgment() {
     return acknowledgment;
   }
 
   public void setAcknowledgment(String acknowledgment) {
     this.acknowledgment = acknowledgment;
-  }
-
-
-  public String getHomeTitle() {
-    return homeTitle;
-  }
-
-  public void setHomeTitle(String homeTitle) {
-    this.homeTitle = homeTitle;
   }
 
 
@@ -289,17 +241,6 @@ public class AppInfo implements Serializable {
   public void setCsrfToken(String csrfToken) {
     this.csrfToken = csrfToken;
   }
-
-
-
-  public String getMessageContentInfo() {
-    return messageContentInfo;
-  }
-
-  public void setMessageContentInfo(String messageContentInfo) {
-    this.messageContentInfo = messageContentInfo;
-  }
-
 
 
   public String getRsbVersion() {
@@ -323,8 +264,8 @@ public class AppInfo implements Serializable {
   @Override
   public String toString() {
     return "AppInfo [id=" + id + ", url=" + url + ", version=" + version + ", date=" + date
-        + ", name=" + name + ", domain=" + domain + ", header=" + header + ", adminEmails="
-        + adminEmails + ", homeContent=" + homeContent + ", profileInfo=" + profileInfo + "]";
+        + ", name=" + name + ", domains=" + domains + ", header=" + header + ", adminEmails="
+        + adminEmails;
   }
 
   public String getMailFrom() {
@@ -559,6 +500,30 @@ public class AppInfo implements Serializable {
 
   public void setContactEmail(String contactEmail) {
     this.contactEmail = contactEmail;
+  }
+
+
+
+  public Set<Domain> getDomains() {
+    return domains;
+  }
+
+
+
+  public void setDomains(Set<Domain> domains) {
+    this.domains = domains;
+  }
+
+
+
+  public String getSubTitle() {
+    return subTitle;
+  }
+
+
+
+  public void setSubTitle(String subTitle) {
+    this.subTitle = subTitle;
   }
 
 

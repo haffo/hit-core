@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  * 
  */
 @MappedSuperclass
-public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
+public abstract class AbstractTestCase extends DomainBased implements Comparable<AbstractTestCase> {
 
   @ApiModelProperty(required = true, value = "name of the test case")
   @Column(columnDefinition = "TEXT")
@@ -75,6 +75,7 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   protected TestScope scope;
+
 
   protected boolean preloaded = false;
 

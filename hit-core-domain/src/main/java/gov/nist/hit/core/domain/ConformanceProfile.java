@@ -12,8 +12,6 @@
 
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,7 +32,7 @@ import io.swagger.annotations.ApiModel;
 @Entity
 @ApiModel(value = "ConformanceProfile",
     description = "Data Model representing the conformance profile")
-public class ConformanceProfile implements Serializable {
+public class ConformanceProfile extends ValidationArtifact {
 
   private static final long serialVersionUID = 1L;
 

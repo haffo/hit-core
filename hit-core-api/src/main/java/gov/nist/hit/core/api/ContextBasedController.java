@@ -72,6 +72,7 @@ public class ContextBasedController {
 	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
 	public void getTestPlansByScope(
 			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = false) TestScope scope,
+			@ApiParam(value = "the domain of the test plans", required = true) @RequestParam(required = true) String domain,
 			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		logger.info("Fetching all testplans of type=" + scope + "...");
 		List<TestPlan> results = null;
@@ -81,11 +82,12 @@ public class ContextBasedController {
 			if (userId != null) {
 				Account account = userService.findOne(userId);
 				if (account != null) {
-					results = testPlanService.findShortAllByStageAndAuthor(TestingStage.CB, account.getUsername());
+					results = testPlanService.findShortAllByStageAndAuthorAndDomain(TestingStage.CB,
+							account.getUsername(), domain);
 				}
 			}
 		} else {
-			results = testPlanService.findShortAllByStageAndScope(TestingStage.CB, scope);
+			results = testPlanService.findShortAllByStageAndScopeAndDomain(TestingStage.CB, scope, domain);
 		}
 		streamer.stream(response.getOutputStream(), results);
 	}
@@ -141,6 +143,7 @@ public class ContextBasedController {
 	@RequestMapping(value = "/categories", method = RequestMethod.GET, produces = "application/json")
 	public Set<String> getTestPlanCategories(
 			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = true) TestScope scope,
+			@ApiParam(value = "the domain of the test plans", required = true) @RequestParam(required = true) String domain,
 			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Set<String> results = null;
 		scope = scope == null ? TestScope.GLOBAL : scope;
@@ -153,9 +156,10 @@ public class ContextBasedController {
 			}
 		}
 		if (scope.equals(TestScope.GLOBAL)) {
-			results = testPlanService.findAllCategoriesByStageAndScope(TestingStage.CB, scope);
+			results = testPlanService.findAllCategoriesByStageAndScopeAndDomain(TestingStage.CB, scope, domain);
 		} else {
-			results = testPlanService.findAllCategoriesByStageAndScopeAndUser(TestingStage.CB, scope, username);
+			results = testPlanService.findAllCategoriesByStageAndScopeAndUserAndDomain(TestingStage.CB, scope, username,
+					domain);
 		}
 		return results;
 	}

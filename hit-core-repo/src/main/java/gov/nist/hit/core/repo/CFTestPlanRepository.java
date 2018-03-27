@@ -28,32 +28,35 @@ import gov.nist.hit.core.domain.TestingStage;
 
 public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
 
-  @Query("select tp from CFTestPlan tp where tp.scope = :scope")
-  public List<CFTestPlan> findAllByScope(@Param("scope") TestScope scope);
+  @Query("select tp from CFTestPlan tp where tp.scope = :scope and tp.domain = :domain")
+  public List<CFTestPlan> findAllByScopeAndDomain(@Param("scope") TestScope scope,
+      @Param("domain") String domain);
 
 
-  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId,category) from CFTestPlan tp where tp.scope = :scope and tp.authorUsername = :authorUsername")
-  public List<CFTestPlan> findShortAllByScopeAndUsername(@Param("scope") TestScope scope,
-      @Param("authorUsername") String authorUsername);
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId,category,domain) from CFTestPlan tp where tp.scope = :scope and tp.authorUsername = :authorUsername and tp.domain =:domain")
+  public List<CFTestPlan> findShortAllByScopeAndUsernameAndDomain(@Param("scope") TestScope scope,
+      @Param("authorUsername") String authorUsername, @Param("domain") String domain);
 
-  @Query("select tp from CFTestPlan tp where tp.scope = :scope and tp.authorUsername = :authorUsername")
-  public List<CFTestPlan> findAllByScopeAndUsername(@Param("scope") TestScope scope,
-      @Param("authorUsername") String authorUsername);
+  @Query("select tp from CFTestPlan tp where tp.scope = :scope and tp.authorUsername = :authorUsername and tp.domain=:domain")
+  public List<CFTestPlan> findAllByScopeAndUsernameAndDomain(@Param("scope") TestScope scope,
+      @Param("authorUsername") String authorUsername, @Param("domain") String domain);
 
-  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId,category) from CFTestPlan tp where tp.scope = :scope")
-  public List<CFTestPlan> findShortAllByScope(@Param("scope") TestScope scope);
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId,category,domain) from CFTestPlan tp where tp.scope = :scope and tp.domain = :domain")
+  public List<CFTestPlan> findShortAllByScopeAndDomain(@Param("scope") TestScope scope,
+      @Param("domain") String domain);
 
 
-  @Query("select tp from CFTestPlan tp where tp.stage = :stage and tp.scope = :scope")
-  public List<CFTestPlan> findAllByStageAndScope(@Param("stage") TestingStage stage,
-      @Param("scope") TestScope scope);
+  @Query("select tp from CFTestPlan tp where tp.stage = :stage and tp.scope = :scope and tp.domain = :domain")
+  public List<CFTestPlan> findAllByStageAndScopeAndDomain(@Param("stage") TestingStage stage,
+      @Param("scope") TestScope scope, @Param("domain") String domain);
 
-  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId,category) from CFTestPlan tp where tp.stage = ?1 and tp.scope = ?2")
-  public List<CFTestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position,persistentId,category,domain) from CFTestPlan tp where tp.stage = ?1 and tp.scope = ?2 and tp.domain = ?3")
+  public List<CFTestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
+      String domain);
 
-  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position, persistentId,category) from CFTestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3")
-  public List<CFTestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername,
-      TestScope scope);
+  @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position, persistentId,category,domain) from CFTestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3 and tp.domain = ?4")
+  public List<CFTestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage,
+      String authorUsername, TestScope scope, String domain);
 
   @Modifying
   @Transactional(value = "transactionManager")
@@ -66,14 +69,15 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
   public void deleteNonPreloaded();
 
   @Transactional(value = "transactionManager")
-  @Query("select tp.category from CFTestPlan tp where tp.scope=:scope")
-  public Set<String> findAllCategoriesByScope(@Param("scope") TestScope scope);
+  @Query("select tp.category from CFTestPlan tp where tp.scope=:scope and tp.domain=:domain")
+  public Set<String> findAllCategoriesByScopeAndDomain(@Param("scope") TestScope scope,
+      @Param("domain") String domain);
 
 
   @Transactional(value = "transactionManager")
-  @Query("select tp.category from CFTestPlan tp where tp.scope=:scope and tp.authorUsername = :username")
-  public Set<String> findAllCategoriesByScopeAndUser(@Param("scope") TestScope scope,
-      @Param("username") String username);
+  @Query("select tp.category from CFTestPlan tp where tp.scope=:scope and tp.authorUsername = :username and tp.domain = :domain")
+  public Set<String> findAllCategoriesByScopeAndUserAndDomain(@Param("scope") TestScope scope,
+      @Param("username") String username, @Param("domain") String domain);
 
 
   @Query("select tp from CFTestPlan tp where tp.id IN (:ids)")

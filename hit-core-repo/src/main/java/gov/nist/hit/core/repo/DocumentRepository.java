@@ -12,14 +12,14 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.Document;
-import gov.nist.hit.core.domain.DocumentType;
-
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import gov.nist.hit.core.domain.Document;
+import gov.nist.hit.core.domain.DocumentType;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
@@ -29,11 +29,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
   @Query("select doc from Document doc where doc.type = 'KNOWNISSUE' order by doc.version desc")
   public List<Document> findAllKnownIssues();
 
-  @Query("select doc from Document doc where doc.type = 'USERDOC' order by doc.position asc")
-  public List<Document> findAllUserDocs();
+  @Query("select doc from Document doc where doc.type = 'USERDOC' and doc.domain = :domain order by doc.position asc")
+  public List<Document> findAllUserDocsByDomain(@Param("domain") String domain);
 
-  @Query("select doc from Document doc where doc.type = :type order by doc.position asc")
-  public List<Document> findAllResourceDocs(@Param("type") DocumentType type);
+  @Query("select doc from Document doc where doc.type = :type  and doc.domain = :domain order by doc.position asc")
+  public List<Document> findAllResourceDocsByDomain(@Param("type") DocumentType type,
+      @Param("domain") String domain);
 
   @Query("select doc from Document doc where doc.name = :name")
   public Document findOneByName(@Param("name") String name);

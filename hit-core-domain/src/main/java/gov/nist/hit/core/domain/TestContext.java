@@ -1,7 +1,5 @@
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -23,7 +21,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @ApiModel(value = "TestContext", description = "Data Model representing the context of a test")
-public class TestContext implements Serializable {
+public class TestContext extends DomainBased {
 
   private static final long serialVersionUID = 1L;
 

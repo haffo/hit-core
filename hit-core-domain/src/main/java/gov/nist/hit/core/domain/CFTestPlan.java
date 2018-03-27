@@ -38,17 +38,19 @@ public class CFTestPlan extends AbstractTestCase implements Serializable {
     this.stage = TestingStage.CF;
   }
 
-  public CFTestPlan(Long id, String name, String description, int position, Long persistentId) {
+  public CFTestPlan(Long id, String name, String description, int position, Long persistentId,
+      String domain) {
     super();
     this.id = id;
     this.name = name;
     this.description = description;
     this.position = position;
     this.persistentId = persistentId;
+    this.domain = domain;
   }
 
   public CFTestPlan(Long id, String name, String description, int position, Long persistentId,
-      String category) {
+      String category, String domain) {
     super();
     this.id = id;
     this.name = name;
@@ -56,6 +58,7 @@ public class CFTestPlan extends AbstractTestCase implements Serializable {
     this.position = position;
     this.persistentId = persistentId;
     this.category = category;
+    this.domain = domain;
   }
 
   public CFTestPlan(String category) {

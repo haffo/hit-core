@@ -64,10 +64,6 @@ public class TestPlan extends AbstractTestCase implements Serializable {
   @ApiModelProperty(required = true, value = "transport support of the test plan")
   private boolean transport;
 
-  @ApiModelProperty(required = true, value = "domain of the test plan", example = "iz, erx, etc...")
-  @Column(nullable = true)
-  private String domain;
-
 
   @ApiModelProperty(required = true, value = "category of the test plan",
       example = "CDC, AIRA etc...")
@@ -98,6 +94,7 @@ public class TestPlan extends AbstractTestCase implements Serializable {
     this.domain = null;
     this.persistentId = null;
     this.category = category;
+    this.domain = null;
   }
 
 
@@ -151,14 +148,6 @@ public class TestPlan extends AbstractTestCase implements Serializable {
 
   public void setTestPackage(TestArtifact testPackage) {
     this.testPackage = testPackage;
-  }
-
-  public String getDomain() {
-    return domain;
-  }
-
-  public void setDomain(String domain) {
-    this.domain = domain;
   }
 
   public String getCategory() {
