@@ -22,7 +22,7 @@ public class Log4jConfigListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
 			Properties p = new Properties();
-			String configPath = System.getenv("LOGGING_CONFIG");
+			String configPath = System.getenv("HIT_LOGGING_CONFIG");
 			InputStream log4jFile = null;
 			if (configPath != null) {
 				log4jFile = new FileInputStream(new File(configPath));
@@ -30,7 +30,7 @@ public class Log4jConfigListener implements ServletContextListener {
 				log4jFile = Log4jConfigListener.class.getResourceAsStream("/app-log4j.properties");
 			}
 			p.load(log4jFile);
-			String logDir = System.getenv("LOGGING_DIR");
+			String logDir = System.getenv("HIT_LOGGING_DIR");
 			if (logDir == null) {
 				logDir = sce.getServletContext().getRealPath("/logs");
 			}
