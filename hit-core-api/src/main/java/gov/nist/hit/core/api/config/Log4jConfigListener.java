@@ -1,6 +1,7 @@
 package gov.nist.hit.core.api.config;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -17,31 +18,39 @@ import org.apache.log4j.PropertyConfigurator;
 @WebListener
 public class Log4jConfigListener implements ServletContextListener {
 
-  @Override
-  public void contextInitialized(ServletContextEvent sce) {
-    try {
-      Properties p = new Properties();
-      InputStream log4jFile =
-          Log4jConfigListener.class.getResourceAsStream("/app-log4j.properties");
-      p.load(log4jFile);
-      String logDir = sce.getServletContext().getRealPath("/logs");
+	@Override
+	public void contextInitialized(ServletContextEvent sce) {
+		try {
+			Properties p = new Properties();
+			String configPath = System.getenv("LOGGING_CONFIG");
+			InputStream log4jFile = null;
+			if (configPath != null) {
+				log4jFile = new FileInputStream(new File(configPath));
+			} else {
+				log4jFile = Log4jConfigListener.class.getResourceAsStream("/app-log4j.properties");
+			}
+			p.load(log4jFile);
+			String logDir = System.getenv("LOGGING_DIR");
+			if (logDir == null) {
+				logDir = sce.getServletContext().getRealPath("/logs");
+			}
 
-      File f = new File(logDir);
-      if (!f.exists()) {
-        f.mkdir();
-      }
-      p.put("log.dir", logDir);
-      PropertyConfigurator.configure(p);
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+			File f = new File(logDir);
+			if (!f.exists()) {
+				f.mkdir();
+			}
+			p.put("log.dir", logDir);
+			PropertyConfigurator.configure(p);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-  }
+	}
 
-  @Override
-  public void contextDestroyed(ServletContextEvent sce) {
-    // TODO Auto-generated method stub
-  }
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+		// TODO Auto-generated method stub
+	}
 
 }
