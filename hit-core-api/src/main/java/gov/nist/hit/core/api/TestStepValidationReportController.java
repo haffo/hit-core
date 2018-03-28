@@ -295,7 +295,7 @@ public class TestStepValidationReportController {
 		if (testStepId == null || ((testStepService.findOne(testStepId)) == null))
 			throw new ValidationReportException("No test step or unknown test step specified");
 		TestStepValidationReport report = findReport(testReportId, testStepId, userId);
-		if (userId == null || !userId.equals(report.getUserId()))
+		if (report != null && !userId.equals(report.getUserId()))
 			throw new MessageValidationException("Invalid user credentials");
 		return report;
 	}
@@ -306,19 +306,20 @@ public class TestStepValidationReportController {
 		} else {
 			List<TestStepValidationReport> reports = validationReportService.findAllByTestStepAndUser(testStepId,
 					userId);
-			if (reports != null && reports.size() > 1) {
-				Collections.sort(reports, new Comparator<TestStepValidationReport>() {
-					@Override
-					public int compare(TestStepValidationReport o1, TestStepValidationReport o2) {
-						return o2.getDateUpdated().compareTo(o1.getDateUpdated());
+			if (reports != null && !reports.isEmpty()) {
+				if (reports.size() > 1) {
+					Collections.sort(reports, new Comparator<TestStepValidationReport>() {
+						@Override
+						public int compare(TestStepValidationReport o1, TestStepValidationReport o2) {
+							return o2.getDateUpdated().compareTo(o1.getDateUpdated());
+						}
+					});
+					for (int i = 1; i < reports.size(); i++) {
+						validationReportService.delete(reports.get(i).getId());
 					}
-				});
-				for (int i = 1; i < reports.size(); i++) {
-					validationReportService.delete(reports.get(i).getId());
 				}
-			}
-			if (reports.size() == 1)
 				return reports.get(0);
+			}
 		}
 
 		return null;
