@@ -360,19 +360,15 @@ public abstract class ResourcebundleLoader {
 
 
   public boolean isNewResourcebundle() throws JsonProcessingException, IOException {
-    if (reloadDb()) {
-      return true;
-    } else {
-      String oldRsbVersion = appInfoService.getRsbVersion();
-      return oldRsbVersion == null || appResourceBundleVersion == null
-          || !appResourceBundleVersion.equals(oldRsbVersion);
-    }
+    String oldRsbVersion = appInfoService.getRsbVersion();
+    return oldRsbVersion == null || appResourceBundleVersion == null
+        || !appResourceBundleVersion.equals(oldRsbVersion);
   }
 
 
   public boolean reloadDb() throws IOException {
     String create = System.getenv("RELOAD_DB");
-    return create != null && (Boolean.valueOf(create) == true);
+    return create != null && (Boolean.valueOf(create) == true) || isNewResourcebundle();
   }
 
 
@@ -392,6 +388,11 @@ public abstract class ResourcebundleLoader {
     transactionRepository.deleteAll();
   }
 
+  public void init() throws JsonProcessingException, ProfileParserException, IOException {
+    load("");
+  }
+
+
   public void load(String directory)
       throws JsonProcessingException, IOException, ProfileParserException {
     AppInfo appInfo = appInfoService.get();
@@ -402,11 +403,10 @@ public abstract class ResourcebundleLoader {
     if (appResourceBundleVersion == null) {
       appResourceBundleVersion = getRsbleVersion();
     }
-    if (isNewResourcebundle()) {
+    if (reloadDb() || isNewResourcebundle()) {
       logger.info("clearing tables...");
       clearDB();
       this.idLocationMap = new HashMap<>();
-
       this.loadAppInfo(directory);
       this.loadConstraints(directory);
       this.loadVocabularyLibraries(directory);
