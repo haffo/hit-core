@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 
 
 @Entity
-public class TestCaseDocumentation extends DomainBased {
+public class TestCaseDocumentation extends TestResource {
 
 
   private static final long serialVersionUID = 1L;

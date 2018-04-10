@@ -93,7 +93,7 @@ public class ContextFreeController {
 			if (userId != null) {
 				Account account = accountService.findOne(userId);
 				if (account != null) {
-					results = testPlanService.findShortAllByStageAndAuthorAndDomain(TestingStage.CF,
+					results = testPlanService.findShortAllByStageAndAuthorAndScopeAndDomain(TestingStage.CF,
 							account.getUsername(), scope, domain);
 				}
 			}

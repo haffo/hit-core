@@ -12,7 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @ApiModel(value = "TestArtifact", description = "Data Model representing a test artifact")
-public class TestArtifact extends DomainBased {
+public class TestArtifact extends TestResource {
 
   private static final long serialVersionUID = 1L;
 

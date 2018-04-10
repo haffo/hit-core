@@ -28,10 +28,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.DocumentType;
+import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.DocumentRepository;
+import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestCaseDocumentationService;
 import gov.nist.hit.core.service.ZipGenerator;
@@ -60,13 +63,29 @@ public class DocumentationController {
 	@Autowired
 	private Streamer streamer;
 
+	@Autowired
+	private AccountService userService;
+
 	// @Cacheable(value = "HitCache", key = "'testcases-documentation'")
 	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
-	public void testCases(HttpServletResponse response, @RequestParam(required = true) String domain)
-			throws IOException {
+	public void testCases(HttpServletResponse response, @RequestParam(required = true) String domain,
+			@RequestParam(required = false) TestScope scope, HttpServletRequest request) throws IOException {
 		logger.info("Fetching test case documentation");
-		streamer.stream(response.getOutputStream(),
-				testCaseDocumentationService.findOneByStageAndDomain(TestingStage.CB, domain));
+		scope = scope == null ? TestScope.GLOBAL : scope;
+		if (TestScope.USER.equals(scope)) {
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId != null) {
+				Account account = userService.findOne(userId);
+				if (account != null) {
+					streamer.stream(response.getOutputStream(),
+							testCaseDocumentationService.findOneByStageAndDomainAndAuthorAndScope(TestingStage.CB,
+									domain, account.getUsername(), scope));
+				}
+			}
+		} else {
+			streamer.stream(response.getOutputStream(),
+					testCaseDocumentationService.findOneByStageAndDomainAndScope(TestingStage.CB, domain, scope));
+		}
 	}
 
 	// @Cacheable(value = "HitCache", key = "'releasenotes'")
@@ -77,11 +96,24 @@ public class DocumentationController {
 	}
 
 	// @Cacheable(value = "HitCache", key = "'userdocs'")
-	@RequestMapping(value = "/{domain}/userdocs", method = RequestMethod.GET, produces = "application/json")
-	public void userDocs(HttpServletResponse response, @RequestParam(required = true) String domain)
-			throws IOException {
+	@RequestMapping(value = "/userdocs", method = RequestMethod.GET, produces = "application/json")
+	public void userDocs(HttpServletResponse response, @RequestParam(required = true) String domain,
+			@RequestParam(required = false) TestScope scope, HttpServletRequest request) throws IOException {
 		logger.info("Fetching  all release notes");
-		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllUserDocsByDomain(domain));
+		scope = scope == null ? TestScope.GLOBAL : scope;
+		if (TestScope.USER.equals(scope)) {
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId != null) {
+				Account account = userService.findOne(userId);
+				if (account != null) {
+					streamer.streamDocs(response.getOutputStream(), documentRepository
+							.findAllUserDocsByDomainAndAuthorAndScope(domain, account.getUsername(), scope));
+				}
+			}
+		} else {
+			streamer.streamDocs(response.getOutputStream(),
+					documentRepository.findAllUserDocsByDomainAndScope(domain, TestScope.GLOBAL));
+		}
 	}
 
 	// @Cacheable(value = "HitCache", key = "'knownissues'")
@@ -95,9 +127,25 @@ public class DocumentationController {
 	// 'resource-documentation'")
 	@RequestMapping(value = "/resourcedocs", method = RequestMethod.GET, produces = "application/json")
 	public void resourcedocs(@RequestParam("type") DocumentType type, HttpServletResponse response,
-			@RequestParam(required = true) String domain) throws IOException {
+			@RequestParam(required = true) String domain, @RequestParam(required = false) TestScope scope,
+			HttpServletRequest request) throws IOException {
 		logger.info("Fetching all resources docs of type=" + type);
-		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllResourceDocsByDomain(type, domain));
+		scope = scope == null ? TestScope.GLOBAL : scope;
+		if (TestScope.USER.equals(scope)) {
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId != null) {
+				Account account = userService.findOne(userId);
+				if (account != null) {
+					streamer.streamDocs(response.getOutputStream(),
+							documentRepository.findAllResourceDocsByTypeAndDomainAndAuthorAndScope(type, domain,
+									account.getUsername(), scope));
+				}
+			}
+		} else {
+			streamer.streamDocs(response.getOutputStream(),
+					documentRepository.findAllResourceDocsByTypeAndDomainAndScope(type, domain, TestScope.GLOBAL));
+		}
+
 	}
 
 	// @Cacheable(value = "HitCache", key = "'deliverables-documentation'")

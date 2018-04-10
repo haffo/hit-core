@@ -21,7 +21,7 @@ import io.swagger.annotations.ApiModelProperty;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @ApiModel(value = "TestContext", description = "Data Model representing the context of a test")
-public class TestContext extends DomainBased {
+public class TestContext extends TestResource {
 
   private static final long serialVersionUID = 1L;
 

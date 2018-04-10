@@ -1,9 +1,13 @@
 package gov.nist.hit.core.domain;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,6 +44,11 @@ public class Domain implements Serializable {
 
   @Column(columnDefinition = "TEXT")
   private String validationResultInfo;
+
+  @ElementCollection(fetch = FetchType.EAGER)
+  @Column(name = "OWNER_EMAILS", nullable = false)
+  @NotNull
+  private Set<String> ownerEmails = new HashSet<String>();
 
 
   public Domain() {}
@@ -120,6 +129,14 @@ public class Domain implements Serializable {
 
   public void setValue(String value) {
     this.value = value;
+  }
+
+  public Set<String> getOwnerEmails() {
+    return ownerEmails;
+  }
+
+  public void setOwnerEmails(Set<String> ownerEmails) {
+    this.ownerEmails = ownerEmails;
   }
 
 

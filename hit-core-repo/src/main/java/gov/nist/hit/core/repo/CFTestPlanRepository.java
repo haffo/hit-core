@@ -55,8 +55,14 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
       String domain);
 
   @Query("select new gov.nist.hit.core.domain.CFTestPlan(id, name, description, position, persistentId,category,domain) from CFTestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3 and tp.domain = ?4")
-  public List<CFTestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage,
+  public List<CFTestPlan> findShortAllByStageAndAuthorAndScopeAndDomain(TestingStage stage,
       String authorUsername, TestScope scope, String domain);
+
+
+  @Query("select tp from CFTestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3 and tp.domain = ?4")
+  public List<CFTestPlan> findAllByStageAndAuthorAndScopeAndDomain(TestingStage stage,
+      String authorUsername, TestScope scope, String domain);
+
 
   @Modifying
   @Transactional(value = "transactionManager")

@@ -34,11 +34,11 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
   }
 
   @Override
-  public List<CFTestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage,
+  public List<CFTestPlan> findShortAllByStageAndAuthorAndScopeAndDomain(TestingStage stage,
       String authorUsername, TestScope scope, String domain) {
     // TODO Auto-generated method stub
-    return testPlanRepository.findShortAllByStageAndAuthorAndDomain(stage, authorUsername, scope,
-        domain);
+    return testPlanRepository.findShortAllByStageAndAuthorAndScopeAndDomain(stage, authorUsername,
+        scope, domain);
   }
 
   @Override

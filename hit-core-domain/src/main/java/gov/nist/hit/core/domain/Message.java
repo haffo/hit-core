@@ -18,7 +18,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Message extends DomainBased {
+public class Message extends TestResource {
 
 
   private static final long serialVersionUID = 1L;

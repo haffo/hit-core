@@ -75,13 +75,14 @@ public class ResourceController {
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/addOrUpdate/testStep", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addTestStep(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws IOException {
+	public List<ResourceUploadStatus> addTestStep(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws IOException {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestStep> steps = resourceLoader.createTS(request.getZip() + "/", request.getDomain());
+		List<TestStep> steps = resourceLoader.createTS(request.getZip() + "/", request.getDomain(),
+				TestScope.valueOf(request.getScope()), u.getName(), false);
 
 		for (TestStep ts : steps) {
 			ResourceUploadStatus tmp = resourceLoader.handleTS(request.getId(), ts);
@@ -99,13 +100,14 @@ public class ResourceController {
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/update/testCase", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> updateTestCase(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws IOException {
+	public List<ResourceUploadStatus> updateTestCase(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws IOException {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/", request.getDomain());
+		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/", request.getDomain(),
+				TestScope.valueOf(request.getScope()), u.getName(), false);
 		for (TestCase tc : cases) {
 			ResourceUploadStatus tmp = resourceLoader.updateTC(tc);
 			results.add(tmp);
@@ -120,13 +122,14 @@ public class ResourceController {
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/add/testCase/to/testPlan", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addTestCaseToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws IOException {
+	public List<ResourceUploadStatus> addTestCaseToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws IOException {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/", request.getDomain());
+		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/", request.getDomain(),
+				TestScope.valueOf(request.getScope()), u.getName(), false);
 		for (TestCase tc : cases) {
 			ResourceUploadStatus tmp = resourceLoader.addTC(request.getId(), tc, "plan");
 			results.add(tmp);
@@ -141,13 +144,14 @@ public class ResourceController {
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/add/testCase/to/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addTestCaseToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws ProfileParserException, IOException, NotFoundException {
+	public List<ResourceUploadStatus> addTestCaseToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws ProfileParserException, IOException, NotFoundException {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/", request.getDomain());
+		List<TestCase> cases = resourceLoader.createTC(request.getZip() + "/", request.getDomain(),
+				TestScope.valueOf(request.getScope()), u.getName(), false);
 		for (TestCase tc : cases) {
 			ResourceUploadStatus tmp = resourceLoader.addTC(request.getId(), tc, "group");
 			results.add(tmp);
@@ -164,13 +168,14 @@ public class ResourceController {
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/update/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> updateTestGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws ProfileParserException, IOException, NotFoundException {
+	public List<ResourceUploadStatus> updateTestGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws ProfileParserException, IOException, NotFoundException {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/", request.getDomain());
+		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/", request.getDomain(),
+				TestScope.valueOf(request.getScope()), u.getName(), false);
 		for (TestCaseGroup tcg : groups) {
 			ResourceUploadStatus tmp = resourceLoader.updateTCG(tcg);
 			results.add(tmp);
@@ -185,13 +190,14 @@ public class ResourceController {
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/add/testCaseGroup/to/testPlan", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addTestGroupToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws IOException {
+	public List<ResourceUploadStatus> addTestGroupToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws IOException {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/", request.getDomain());
+		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/", request.getDomain(),
+				TestScope.valueOf(request.getScope()), u.getName(), false);
 		for (TestCaseGroup tcg : groups) {
 			ResourceUploadStatus tmp = resourceLoader.addTCG(request.getId(), tcg, "plan");
 			results.add(tmp);
@@ -206,13 +212,14 @@ public class ResourceController {
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/add/testCaseGroup/to/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addTestGroupToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws IOException {
+	public List<ResourceUploadStatus> addTestGroupToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws IOException {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
 
-		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/", request.getDomain());
+		List<TestCaseGroup> groups = resourceLoader.createTCG(request.getZip() + "/", request.getDomain(),
+				TestScope.valueOf(request.getScope()), u.getName(), false);
 		for (TestCaseGroup tcg : groups) {
 			ResourceUploadStatus tmp = resourceLoader.addTCG(request.getId(), tcg, "group");
 			results.add(tmp);
@@ -236,21 +243,14 @@ public class ResourceController {
 		String scope = request.getScope().replaceAll("\"", "");
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
-		List<TestPlan> plans = resourceLoader.createTP(request.getZip() + "/", request.getDomain());
+		List<TestPlan> plans = resourceLoader.createTP(request.getZip() + "/", request.getDomain(),
+				TestScope.valueOf(request.getScope()), u.getName(), false);
 
 		if (scope == null) {
 			resp.sendError(500, "Scope Argument is required");
 		}
 
 		for (TestPlan tp : plans) {
-
-			try {
-				tp.setAuthorUsername(u.getName());
-				tp.setScope(TestScope.valueOf(scope));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
 			ResourceUploadStatus tmp = resourceLoader.handleTP(tp);
 			results.add(tmp);
 		}
@@ -275,7 +275,8 @@ public class ResourceController {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
-		List<CFTestStep> cases = resourceLoader.createCFTC(request.getZip() + "/", request.getDomain());
+		List<CFTestStep> cases = resourceLoader.createCFTC(request.getZip() + "/", request.getDomain(),
+				TestScope.valueOf(request.getScope()), u.getName(), false);
 
 		String scope = request.getScope().replaceAll("\"", "");
 		if (scope == null) {
@@ -283,14 +284,6 @@ public class ResourceController {
 		}
 
 		for (CFTestStep tc : cases) {
-
-			try {
-				tc.setAuthorUsername(u.getName());
-				tc.setScope(TestScope.valueOf(scope));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
 			ResourceUploadStatus tmp = resourceLoader.handleCFTC(request.getId(), tc);
 			results.add(tmp);
 		}
@@ -310,12 +303,12 @@ public class ResourceController {
 	// nickname = "addOrUpdateProfile")
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@RequestMapping(value = "/global/addOrUpdate/profile", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addOrUpdateProfile(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws IOException {
+	public List<ResourceUploadStatus> addOrUpdateProfile(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws IOException {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> res = resourceLoader.addOrReplaceIntegrationProfile(request.getZip() + "/",
-				request.getDomain());
+				request.getDomain(), TestScope.valueOf(request.getScope()), u.getName(), false);
 
 		FileUtils.deleteDirectory(new File(request.getZip()));
 		return res;
@@ -325,12 +318,12 @@ public class ResourceController {
 	// nickname = "addOrUpdateConstraints")
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@RequestMapping(value = "/global/addOrUpdate/constraints", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addOrUpdateConstraints(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws IOException {
+	public List<ResourceUploadStatus> addOrUpdateConstraints(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws IOException {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> res = resourceLoader.addOrReplaceConstraints(request.getZip() + "/",
-				request.getDomain());
+				request.getDomain(), TestScope.valueOf(request.getScope()), u.getName(), false);
 
 		FileUtils.deleteDirectory(new File(request.getZip()));
 		return res;
@@ -340,11 +333,11 @@ public class ResourceController {
 	// exists",nickname = "addOrUpdateValueSet")
 	@PreAuthorize("hasRole('deployer') or hasRole('supervisor')")
 	@RequestMapping(value = "/global/addOrUpdate/valueSet", method = RequestMethod.POST, produces = "application/json")
-	public List<ResourceUploadStatus> addOrUpdateValueSet(@ModelAttribute("requestObj") AddOrUpdateRequest request)
-			throws IOException {
+	public List<ResourceUploadStatus> addOrUpdateValueSet(@ModelAttribute("requestObj") AddOrUpdateRequest request,
+			Authentication u) throws IOException {
 		validateRequest(request);
 		List<ResourceUploadStatus> res = resourceLoader.addOrReplaceValueSet(request.getZip() + "/",
-				request.getDomain());
+				request.getDomain(), TestScope.valueOf(request.getScope()), u.getName(), false);
 
 		FileUtils.deleteDirectory(new File(request.getZip()));
 		return res;
@@ -354,6 +347,16 @@ public class ResourceController {
 		if (request.getDomain() == null || "".equals(request.getDomain())) {
 			throw new IllegalArgumentException("Domain cannot be empty");
 		}
+		if (request.getScope() == null || "".equals(request.getScope())) {
+			throw new IllegalArgumentException("Scope cannot be empty");
+		}
+
+		try {
+			TestScope.valueOf(request.getScope());
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Invalid Scope");
+		}
+
 	}
 
 }

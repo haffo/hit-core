@@ -82,8 +82,8 @@ public class ContextBasedController {
 			if (userId != null) {
 				Account account = userService.findOne(userId);
 				if (account != null) {
-					results = testPlanService.findShortAllByStageAndAuthorAndDomain(TestingStage.CB,
-							account.getUsername(), domain);
+					results = testPlanService.findAllShortByStageAndUsernameAndScopeAndDomain(TestingStage.CB,
+							account.getUsername(), scope, domain);
 				}
 			}
 		} else {

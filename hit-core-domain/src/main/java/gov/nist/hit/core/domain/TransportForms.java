@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 
 @Entity
-public class TransportForms extends DomainBased {
+public class TransportForms extends TestResource {
 
   private static final long serialVersionUID = 8805967508478985159L;
 

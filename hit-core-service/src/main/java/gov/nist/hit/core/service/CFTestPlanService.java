@@ -32,8 +32,8 @@ public interface CFTestPlanService {
   List<CFTestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
       String domain);
 
-  List<CFTestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage, String authorUsername,
-      TestScope scope, String domain);
+  List<CFTestPlan> findShortAllByStageAndAuthorAndScopeAndDomain(TestingStage stage,
+      String authorUsername, TestScope scope, String domain);
 
   List<CFTestPlan> findShortAllByScopeAndUsernameAndDomain(TestScope scope, String authorUsername,
       String domain);

@@ -132,7 +132,7 @@ public class AppInfo implements Serializable {
 
 
   @JsonIgnoreProperties(value = {"messageContentInfo", "homeContent", "profileInfo",
-      "valueSetCopyright", "validationResultInfo"})
+      "valueSetCopyright", "validationResultInfo", "adminEmails"})
   @ApiModelProperty(required = false, value = "test steps of the test step group")
   @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
   @JoinTable(name = "AppInfo_domains", joinColumns = {@JoinColumn(name = "appInfo_id")},
@@ -454,6 +454,11 @@ public class AppInfo implements Serializable {
         && Boolean.valueOf(this.getOptions().get(Constant.DOWNLOAD_WAR_DISABLED));
   }
 
+
+  @Transient
+  public void setDocManagementSupported(boolean supported) {
+    this.getOptions().put(Constant.DOC_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
+  }
 
 
   public String getPrivacy() {

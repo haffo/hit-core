@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiModel;
  */
 @Entity
 @ApiModel(value = "Document", description = "Data Model representing a document")
-public class Document extends DomainBased {
+public class Document extends TestResource {
 
   @Id
   @GeneratedValue(strategy = GenerationType.TABLE)

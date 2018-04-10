@@ -44,5 +44,7 @@ public class Constant {
 
   public static final String DOWNLOAD_WAR_DISABLED = "DOWNLOAD_WAR_DISABLED";
 
+  public static final String DOC_MANAGEMENT_SUPPORTED = "DOC_MANAGEMENT_SUPPORTED";
+
 
 }

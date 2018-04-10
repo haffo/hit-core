@@ -18,6 +18,7 @@ import gov.nist.hit.core.domain.ResourceUploadStatus;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.TestCaseGroupRepository;
@@ -362,13 +363,15 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   // ---- Helper Functions
   // Creation Methods
 
-  public List<TestStep> createTS(String rootPath, String domain) throws IOException {
+  public List<TestStep> createTS(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) throws IOException {
 
     List<TestStep> tmp = new ArrayList<TestStep>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      TestStep testStep = testStep(fileName + "/", null, false, rootPath, domain);
+      TestStep testStep = testStep(fileName + "/", TestingStage.CB, false, rootPath, domain, scope,
+          authorUsername, preloaded);
       if (testStep != null) {
         tmp.add(testStep);
       }
@@ -376,12 +379,14 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<TestCase> createTC(String rootPath, String domain) throws IOException {
+  public List<TestCase> createTC(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) throws IOException {
     List<TestCase> tmp = new ArrayList<TestCase>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      TestCase testCase = testCase(fileName + "/", null, false, rootPath, domain);
+      TestCase testCase = testCase(fileName + "/", TestingStage.CB, false, rootPath, domain, scope,
+          authorUsername, preloaded);
       if (testCase != null) {
         tmp.add(testCase);
       }
@@ -389,12 +394,14 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<TestCaseGroup> createTCG(String rootPath, String domain) throws IOException {
+  public List<TestCaseGroup> createTCG(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) throws IOException {
     List<TestCaseGroup> tmp = new ArrayList<TestCaseGroup>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      TestCaseGroup testCaseGroup = testCaseGroup(fileName + "/", null, false, rootPath, domain);
+      TestCaseGroup testCaseGroup = testCaseGroup(fileName + "/", TestingStage.CB, false, rootPath,
+          domain, scope, authorUsername, preloaded);
       if (testCaseGroup != null) {
         tmp.add(testCaseGroup);
       }
@@ -402,14 +409,16 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<TestPlan> createTP(String rootPath, String domain) {
+  public List<TestPlan> createTP(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) {
     List<TestPlan> tmp = new ArrayList<TestPlan>();
     List<Resource> resources;
     try {
       resources = getApiDirectories("*", rootPath);
       for (Resource resource : resources) {
         String fileName = resource.getFilename();
-        TestPlan testPlan = testPlan(fileName + "/", TestingStage.CB, rootPath, domain);
+        TestPlan testPlan = testPlan(fileName + "/", TestingStage.CB, rootPath, domain, scope,
+            authorUsername, preloaded);
         if (testPlan != null) {
           tmp.add(testPlan);
         }
@@ -422,13 +431,15 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<CFTestStep> createCFTC(String rootPath, String domain) throws IOException {
+  public List<CFTestStep> createCFTC(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) throws IOException {
 
     List<CFTestStep> tmp = new ArrayList<CFTestStep>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      CFTestStep testObject = cfTestStep(fileName + "/", rootPath, domain);
+      CFTestStep testObject =
+          cfTestStep(fileName + "/", rootPath, domain, scope, authorUsername, preloaded);
       if (testObject != null) {
         tmp.add(testObject);
       }
@@ -617,13 +628,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     this.testPlanRepository.flush();
   }
 
-  public abstract List<ResourceUploadStatus> addOrReplaceValueSet(String rootPath, String domain)
-      throws IOException;
+  public abstract List<ResourceUploadStatus> addOrReplaceValueSet(String rootPath, String domain,
+      TestScope scope, String username, boolean preloaded) throws IOException;
 
-  public abstract List<ResourceUploadStatus> addOrReplaceConstraints(String rootPath, String domain)
-      throws IOException;
+  public abstract List<ResourceUploadStatus> addOrReplaceConstraints(String rootPath, String domain,
+      TestScope scope, String username, boolean preloaded) throws IOException;
 
   public abstract List<ResourceUploadStatus> addOrReplaceIntegrationProfile(String rootPath,
-      String domain) throws IOException;
+      String domain, TestScope scope, String username, boolean preloaded) throws IOException;
 
 }

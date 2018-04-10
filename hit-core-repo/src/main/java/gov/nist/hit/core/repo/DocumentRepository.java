@@ -20,6 +20,7 @@ import org.springframework.data.repository.query.Param;
 
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.DocumentType;
+import gov.nist.hit.core.domain.TestScope;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
@@ -29,12 +30,24 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
   @Query("select doc from Document doc where doc.type = 'KNOWNISSUE' order by doc.version desc")
   public List<Document> findAllKnownIssues();
 
-  @Query("select doc from Document doc where doc.type = 'USERDOC' and doc.domain = :domain order by doc.position asc")
-  public List<Document> findAllUserDocsByDomain(@Param("domain") String domain);
+  @Query("select doc from Document doc where doc.type = 'USERDOC' and doc.domain = :domain and doc.scope = :scope order by doc.position asc")
+  public List<Document> findAllUserDocsByDomainAndScope(@Param("domain") String domain,
+      @Param("scope") TestScope scope);
 
-  @Query("select doc from Document doc where doc.type = :type  and doc.domain = :domain order by doc.position asc")
-  public List<Document> findAllResourceDocsByDomain(@Param("type") DocumentType type,
-      @Param("domain") String domain);
+  @Query("select doc from Document doc where doc.type = 'USERDOC' and doc.domain = :domain and doc.authorUsername = :authorUsername and doc.scope =:scope order by doc.position asc")
+  public List<Document> findAllUserDocsByDomainAndAuthorAndScope(@Param("domain") String domain,
+      @Param("authorUsername") String authorUsername, @Param("scope") TestScope scope);
+
+
+  @Query("select doc from Document doc where doc.type = :type  and doc.domain = :domain and doc.scope = :scope order by doc.position asc")
+  public List<Document> findAllResourceDocsByTypeAndDomainAndScope(@Param("type") DocumentType type,
+      @Param("domain") String domain, @Param("scope") TestScope scope);
+
+  @Query("select doc from Document doc where doc.type = :type and doc.domain = :domain and doc.authorUsername = :authorUsername and doc.scope =:scope order by doc.position asc")
+  public List<Document> findAllResourceDocsByTypeAndDomainAndAuthorAndScope(
+      @Param("type") DocumentType type, @Param("domain") String domain,
+      @Param("authorUsername") String authorUsername, @Param("scope") TestScope scope);
+
 
   @Query("select doc from Document doc where doc.name = :name")
   public Document findOneByName(@Param("name") String name);
