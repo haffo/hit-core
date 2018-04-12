@@ -16,6 +16,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -220,36 +221,52 @@ public class ResourcebundleHelper {
 		File tmpDir = Files.createTempDir();
 		tmpDir.mkdir();
 		String DIR_PATH = tmpDir.getAbsolutePath();
-		byte[] buffer = new byte[1024];
 
 		if (tmpDir.isDirectory()) {
 
 			// Extract ZIP
 			ZipInputStream zip = new ZipInputStream(stream);
-			ZipEntry ze = zip.getNextEntry();
-			while (ze != null) {
-				String fileName = ze.getName();
-				File newFile = new File(DIR_PATH + File.separator + fileName);
-				System.out.println("file unzip : " + newFile.getAbsoluteFile());
-				new File(newFile.getParent()).mkdirs();
-
-				FileOutputStream fos = new FileOutputStream(newFile);
-
-				int len;
-				while ((len = zip.read(buffer)) > 0) {
-					fos.write(buffer, 0, len);
-				}
-
-				fos.close();
-				ze = zip.getNextEntry();
-			}
-			zip.closeEntry();
-			zip.close();
-			System.out.println("Done");
-			return DIR_PATH;
-		} else {
-			throw new Exception("Could not create TMP directory");
+			
+			unzip(zip, DIR_PATH);
+			
 		}
+		return DIR_PATH;
+			
 	}
+  
+  public static void unzip(ZipInputStream zipIn, String destDirectory) throws IOException {
+
+      ZipEntry entry = zipIn.getNextEntry();
+      // iterates over entries in the zip file
+      while (entry != null) {
+          String filePath = destDirectory + File.separator + entry.getName();
+          if (!entry.isDirectory()) {
+              // if the entry is a file, extracts it
+              extractFile(zipIn, filePath);
+          } else {
+              // if the entry is a directory, make the directory
+              File dir = new File(filePath);
+              dir.mkdir();
+          }
+          zipIn.closeEntry();
+          entry = zipIn.getNextEntry();
+      }
+      zipIn.close();
+  }
+  /**
+   * Extracts a zip entry (file entry)
+   * @param zipIn
+   * @param filePath
+   * @throws IOException
+   */
+  private static void  extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+      BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+      byte[] bytesIn = new byte[1024];
+      int read = 0;
+      while ((read = zipIn.read(bytesIn)) != -1) {
+          bos.write(bytesIn, 0, read);
+      }
+      bos.close();
+  }
 
 }
