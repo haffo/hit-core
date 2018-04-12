@@ -1042,9 +1042,9 @@ public class AccountController {
 			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 			msg.setSubject(organizationName + " Application Received");
 			msg.setTo(acc.getEmail());
-			msg.setText("Dear " + acc.getUsername() + " \n\n"
-					+ "Thank you for submitting an application for use of the " + TOOL_NAME + "\n\n"
-					+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n"
+					+ "Thank you for submitting an application for use of the " + TOOL_NAME + ".\n\n"
+					+ "Please refer to the Quick Start Guide for Testing, under the Documentation tab, for additional account set-up steps." + "\n\n" + "Sincerely, " + "\n\n"
 					+ "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
 					+ appInfoService.get().getAdminEmails().get(0) + "'");
 
@@ -1062,9 +1062,9 @@ public class AccountController {
 
 			msg.setSubject("Welcome! You are successfully registered on " + TOOL_NAME + "");
 			msg.setTo(acc.getEmail());
-			msg.setText("Dear " + acc.getUsername() + " \n\n" + "You've successfully registered on the " + TOOL_NAME
+			msg.setText("Dear " + acc.getUsername() + ", \n\n" + "You've successfully registered on the " + TOOL_NAME
 					+ " Site." + " \n" + "Your username is: " + acc.getUsername() + " \n\n"
-					+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n"
+					+ "Please refer to the to the Quick Start Guide for Testing, under the Documentation tab, for additional account set-up steps." + "\n\n" + "Sincerely, " + "\n\n"
 					+ "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
 					+ appInfoService.get().getAdminEmails().get(0) + "'");
 
@@ -1101,7 +1101,7 @@ public class AccountController {
 
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Account Approval Notification ");
-			msg.setText("Dear " + acc.getUsername() + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n"
 					+ "**** If you have not requested a new account, please disregard this email **** \n\n\n"
 					+ "Your account has been approved and you can proceed " + "to login .\n" + "\n\n" + "Sincerely, "
 					+ "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
@@ -1121,7 +1121,7 @@ public class AccountController {
 
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Registration Notification ");
-			msg.setText("Dear " + acc.getUsername() + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n"
 					+ "**** If you have not requested a new account, please disregard this email **** \n\n\n"
 					+ "Your account request has been processed and you can proceed " + "to login .\n"
 					+ "You need to change your password in order to login.\n"
@@ -1144,7 +1144,7 @@ public class AccountController {
 
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Password Reset Request Notification");
-			msg.setText("Dear " + acc.getUsername() + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n"
 					+ "**** If you have not requested a password reset, please disregard this email **** \n\n\n"
 					+ "You password reset request has been processed.\n"
 					+ "Copy and paste the following url to your browser to initiate the password change:\n" + url
@@ -1165,7 +1165,7 @@ public class AccountController {
 
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Password Change Notification");
-			msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully changed." + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your password has been successfully changed." + " \n\n"
 					+ "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
 			this.mailSender.send(msg);
@@ -1181,7 +1181,7 @@ public class AccountController {
 			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Password Change Notification");
-			msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully changed." + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your password has been successfully changed." + " \n\n"
 					+ "Your new temporary password is ." + newPassword + " \n\n"
 					+ "Please update your password once logged in. \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME
 					+ " Team");
@@ -1199,7 +1199,7 @@ public class AccountController {
 			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Account Type Change Notification");
-			msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your account type has been successfully changed."
+			msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your account type has been successfully changed."
 					+ " \n\n" + "Your are now a " + newAccountType + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME
 					+ " Team");
 
@@ -1216,7 +1216,7 @@ public class AccountController {
 
 		msg.setTo(acc.getEmail());
 		msg.setSubject("" + TOOL_NAME + " Password Rest Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully reset." + " \n"
+		msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your password has been successfully reset." + " \n"
 				+ "Your username is: " + acc.getUsername() + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
 		try {
@@ -1233,7 +1233,7 @@ public class AccountController {
 
 		msg.setTo(acc.getEmail());
 		msg.setSubject("" + TOOL_NAME + " Registration and Password Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully set." + " \n"
+		msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your password has been successfully set." + " \n"
 				+ "Your username is: " + acc.getUsername() + " \n" + "Your registration with the " + TOOL_NAME
 				+ " is complete." + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
@@ -1251,7 +1251,7 @@ public class AccountController {
 
 		msg.setTo(acc.getEmail());
 		msg.setSubject("" + TOOL_NAME + " Username Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your username is: " + acc.getUsername() + " \n\n"
+		msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your username is: " + acc.getUsername() + " \n\n"
 				+ "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
 		try {
