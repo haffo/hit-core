@@ -12,21 +12,36 @@
 
 package gov.nist.hit.core.api;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.Document;
@@ -35,10 +50,14 @@ import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.DocumentRepository;
 import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.AppInfoService;
 import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestCaseDocumentationService;
+import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
+import gov.nist.hit.core.service.exception.MessageUploadException;
+import gov.nist.hit.core.service.exception.NoUserFoundException;
 import io.swagger.annotations.ApiParam;
 
 /**
@@ -64,7 +83,73 @@ public class DocumentationController {
 	private Streamer streamer;
 
 	@Autowired
-	private AccountService userService;
+	private AccountService accountService;
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private AppInfoService appInfoService;
+
+	@Value("${UPLOADED_RESOURCE_BUNDLE:/sites/data/uploaded_resource_bundles}")
+	private String UPLOADED_RESOURCE_BUNDLE;
+
+	public String DOCUMENTATION_FOLDER_ROOT = "/documentation";
+
+	private void checkManagementSupport() throws Exception {
+		if (!appInfoService.get().isDocumentManagementSupported()) {
+			throw new Exception("This operation is not supported by this tool");
+		}
+	}
+
+	@PreAuthorize("hasRole('tester')")
+	@RequestMapping(value = "/uploadDocument", method = RequestMethod.POST, consumes = { "multipart/form-data" })
+	@ResponseBody
+	public Map<String, Object> uploadProfile(ServletRequest request, @RequestPart("file") MultipartFile part,
+			@RequestParam("domain") String domain, Authentication auth) throws Exception {
+		checkManagementSupport();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			if (!part.getContentType().equalsIgnoreCase("text/xml"))
+				throw new MessageUploadException("Unsupported content type. Supported content types are: '.xml' ");
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			org.apache.commons.io.IOUtils.copy(part.getInputStream(), baos);
+			byte[] bytes = baos.toByteArray();
+			String content = IOUtils.toString(new ByteArrayInputStream(bytes));
+			resultMap.put("success", true);
+			File profileFile = new File(
+					UPLOADED_RESOURCE_BUNDLE + DOCUMENTATION_FOLDER_ROOT + "/" + domain + "/" + part.getName());
+			FileUtils.writeStringToFile(profileFile, content);
+			resultMap.put("path", DOCUMENTATION_FOLDER_ROOT + "/" + domain + "/" + part.getName());
+			logger.info("Uploaded valid profile file " + part.getName());
+
+			return resultMap;
+		} catch (MessageUploadException e) {
+			resultMap.put("success", false);
+			resultMap.put("message", "An error occured. The tool could not upload the profile file sent");
+			resultMap.put("debugError", ExceptionUtils.getMessage(e));
+			return resultMap;
+		} catch (Exception e) {
+			resultMap.put("success", false);
+			resultMap.put("message", "An error occured. The tool could not upload the profile file sent");
+			resultMap.put("debugError", ExceptionUtils.getStackTrace(e));
+			return resultMap;
+		}
+	}
+
+	private void checkPermission(Document document, Authentication auth) throws Exception {
+		String username = auth.getName();
+		if (username == null)
+			throw new NoUserFoundException("User could not be found");
+		TestScope scope = document.getScope();
+		if (TestScope.GLOBAL.equals(scope) && !userService.hasGlobalAuthorities(username)) {
+			throw new NoUserFoundException("You do not have the permission to perform this task");
+		}
+		if (!username.equals(document.getAuthorUsername()) && !userService.isAdmin(username)) {
+			throw new NoUserFoundException("You do not have the permission to perform this task");
+		}
+	}
 
 	// @Cacheable(value = "HitCache", key = "'testcases-documentation'")
 	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
@@ -75,7 +160,7 @@ public class DocumentationController {
 		if (TestScope.USER.equals(scope)) {
 			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 			if (userId != null) {
-				Account account = userService.findOne(userId);
+				Account account = accountService.findOne(userId);
 				if (account != null) {
 					streamer.stream(response.getOutputStream(),
 							testCaseDocumentationService.findOneByStageAndDomainAndAuthorAndScope(TestingStage.CB,
@@ -104,7 +189,7 @@ public class DocumentationController {
 		if (TestScope.USER.equals(scope)) {
 			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 			if (userId != null) {
-				Account account = userService.findOne(userId);
+				Account account = accountService.findOne(userId);
 				if (account != null) {
 					streamer.streamDocs(response.getOutputStream(), documentRepository
 							.findAllUserDocsByDomainAndAuthorAndScope(domain, account.getUsername(), scope));
@@ -114,6 +199,46 @@ public class DocumentationController {
 			streamer.streamDocs(response.getOutputStream(),
 					documentRepository.findAllUserDocsByDomainAndScope(domain, TestScope.GLOBAL));
 		}
+	}
+
+	@PreAuthorize("hasRole('tester')")
+	@RequestMapping(value = "/userdocs", method = RequestMethod.POST, produces = "application/json")
+	public Document saveUserDocument(HttpServletResponse response, @RequestBody Document document,
+			HttpServletRequest request, Authentication auth) throws Exception {
+		logger.info("Fetching  all release notes");
+		Document result = null;
+		document.setAuthorUsername(auth.getName());
+		document.setType(DocumentType.USERDOC);
+		document.setVersion("1");
+		document.setPreloaded(false);
+		document.setDate("");
+		document.setTitle(document.getName());
+
+		checkPermission(document, auth);
+		if (document.getScope() == null) {
+			throw new IllegalArgumentException("No document's scope found");
+		}
+		if (document.getDomain() == null) {
+			throw new IllegalArgumentException("No document's domain found");
+		}
+		if (document.getPath() == null) {
+			throw new IllegalArgumentException("No document's location found");
+		}
+		if (document.getName() == null) {
+			throw new IllegalArgumentException("No document's name found");
+		}
+		Long id = document.getId();
+		if (id == null) {
+			result = document;
+		} else {
+			result = documentRepository.findOne(id);
+			if (result == null) {
+				throw new IllegalArgumentException("Unknown document with id=" + id);
+			}
+			result.merge(document);
+		}
+		documentRepository.saveAndFlush(result);
+		return result;
 	}
 
 	// @Cacheable(value = "HitCache", key = "'knownissues'")
@@ -134,7 +259,7 @@ public class DocumentationController {
 		if (TestScope.USER.equals(scope)) {
 			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 			if (userId != null) {
-				Account account = userService.findOne(userId);
+				Account account = accountService.findOne(userId);
 				if (account != null) {
 					streamer.streamDocs(response.getOutputStream(),
 							documentRepository.findAllResourceDocsByTypeAndDomainAndAuthorAndScope(type, domain,
@@ -170,6 +295,9 @@ public class DocumentationController {
 			if (path != null) {
 				String fileName = null;
 				path = !path.startsWith("/") ? "/" + path : path;
+				if (path.startsWith(DOCUMENTATION_FOLDER_ROOT)) {
+					path = UPLOADED_RESOURCE_BUNDLE + path;
+				}
 				InputStream content = DocumentationController.class.getResourceAsStream(path);
 				if (content != null) {
 					fileName = path.substring(path.lastIndexOf("/") + 1);

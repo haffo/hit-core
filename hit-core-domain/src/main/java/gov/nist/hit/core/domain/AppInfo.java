@@ -388,6 +388,14 @@ public class AppInfo implements Serializable {
         && Boolean.valueOf(this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED));
   }
 
+
+  @Transient
+  public Boolean isDocumentManagementSupported() {
+    return this.getOptions().get(Constant.DOC_MANAGEMENT_SUPPORTED) != null
+        && Boolean.valueOf(this.getOptions().get(Constant.DOC_MANAGEMENT_SUPPORTED));
+  }
+
+
   @Transient
   public void setAuthenticationRequired(boolean required) {
     this.getOptions().put(Constant.AUTHENTICATION_REQUIRED, Boolean.toString(required));
@@ -459,6 +467,19 @@ public class AppInfo implements Serializable {
   public void setDocManagementSupported(boolean supported) {
     this.getOptions().put(Constant.DOC_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
   }
+
+  @Transient
+  public void setDomainManagementSupported(boolean supported) {
+    this.getOptions().put(Constant.DOMAIN_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
+  }
+
+
+  @Transient
+  public Boolean isDomainManagementSupported() {
+    return this.getOptions().get(Constant.DOMAIN_MANAGEMENT_SUPPORTED) != null
+        && Boolean.valueOf(this.getOptions().get(Constant.DOMAIN_MANAGEMENT_SUPPORTED));
+  }
+
 
 
   public String getPrivacy() {

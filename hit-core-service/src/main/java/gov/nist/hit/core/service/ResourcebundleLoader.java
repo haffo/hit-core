@@ -356,6 +356,12 @@ public abstract class ResourcebundleLoader {
   @Value("${download.war.disabled:#{false}}")
   private boolean appDownloadWarDisabled;
 
+
+  @Value("${domain.management.supported:#{false}}")
+  private boolean domainManagementSupported;
+
+
+
   private final Set<String> domains = new HashSet<String>();
 
 
@@ -470,50 +476,49 @@ public abstract class ResourcebundleLoader {
     while (it.hasNext()) {
       JsonNode node = it.next();
       boolean disabled = node.get("disabled") != null && (node.get("disabled").asBoolean() == true);
-      if (!disabled) {
-        Domain entry = new Domain();
-        String key = node.get("key").textValue();
-        entry.setValue(key);
-        entry.setName(node.get("name").textValue());
-        entry.setHomeTitle(node.get("homeTitle").textValue());
-        entry.setDisabled(false);
-        if (node.get("ownerEmails") == null || !node.get("ownerEmails").isArray()) {
-          throw new IllegalArgumentException("Owner emails not found for domain= " + key);
-        }
-        Iterator<JsonNode> ownerEmailNodes = node.get("ownerEmails").iterator();
-        while (ownerEmailNodes.hasNext()) {
-          JsonNode ownerNode = ownerEmailNodes.next();
-          entry.getOwnerEmails().add(ownerNode.textValue());
-        }
-
-        String domainPath = getDomainBasedPath(ResourcebundleLoader.ABOUT_PATTERN, key);
-        Resource resource = this.getResource(domainPath + PROFILE_INFO_PATTERN, rootPath);
-        if (resource != null) {
-          entry.setProfileInfo(FileUtil.getContent(resource));
-        }
-        resource = this.getResource(domainPath + ResourcebundleLoader.VALUE_SET_COPYRIGHT_PATTERN,
-            rootPath);
-        if (resource != null) {
-          entry.setValueSetCopyright(FileUtil.getContent(resource));
-        }
-        resource = this.getResource(domainPath + ResourcebundleLoader.VALIDATIONRESULT_INFO_PATTERN,
-            rootPath);
-        if (resource != null) {
-          entry.setValidationResultInfo(FileUtil.getContent(resource));
-        }
-        resource = this.getResource(domainPath + ResourcebundleLoader.HOME_PATTERN, rootPath);
-        if (resource != null) {
-          entry.setHomeContent(FileUtil.getContent(resource));
-        }
-        resource = this.getResource(domainPath + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN,
-            rootPath);
-        if (resource != null) {
-          entry.setMessageContentInfo(FileUtil.getContent(resource));
-        }
-
-        domains.add(key);
-        appInfo.getDomains().add(entry);
+      Domain entry = new Domain();
+      String key = node.get("key").textValue();
+      entry.setValue(key);
+      entry.setScope(TestScope.GLOBAL);
+      entry.setName(node.get("name").textValue());
+      entry.setHomeTitle(node.get("homeTitle").textValue());
+      entry.setDisabled(disabled);
+      if (node.get("ownerEmails") == null || !node.get("ownerEmails").isArray()) {
+        throw new IllegalArgumentException("Owner emails not found for domain= " + key);
       }
+      Iterator<JsonNode> ownerEmailNodes = node.get("ownerEmails").iterator();
+      while (ownerEmailNodes.hasNext()) {
+        JsonNode ownerNode = ownerEmailNodes.next();
+        entry.getOwnerEmails().add(ownerNode.textValue());
+      }
+
+      String domainPath = getDomainBasedPath(ResourcebundleLoader.ABOUT_PATTERN, key);
+      Resource resource = this.getResource(domainPath + PROFILE_INFO_PATTERN, rootPath);
+      if (resource != null) {
+        entry.setProfileInfo(FileUtil.getContent(resource));
+      }
+      resource =
+          this.getResource(domainPath + ResourcebundleLoader.VALUE_SET_COPYRIGHT_PATTERN, rootPath);
+      if (resource != null) {
+        entry.setValueSetCopyright(FileUtil.getContent(resource));
+      }
+      resource = this.getResource(domainPath + ResourcebundleLoader.VALIDATIONRESULT_INFO_PATTERN,
+          rootPath);
+      if (resource != null) {
+        entry.setValidationResultInfo(FileUtil.getContent(resource));
+      }
+      resource = this.getResource(domainPath + ResourcebundleLoader.HOME_PATTERN, rootPath);
+      if (resource != null) {
+        entry.setHomeContent(FileUtil.getContent(resource));
+      }
+      resource =
+          this.getResource(domainPath + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN, rootPath);
+      if (resource != null) {
+        entry.setMessageContentInfo(FileUtil.getContent(resource));
+      }
+
+      domains.add(key);
+      appInfo.getDomains().add(entry);
     }
     appInfoRepository.save(appInfo);
     logger.info("loading app info...DONE");
@@ -2095,6 +2100,7 @@ public abstract class ResourcebundleLoader {
     appInfo.setUploadContentTypes(appUploadContentTypes);
     appInfo.setUploadMaxSize(appUploadMaxSize);
     appInfo.setDownloadWarDisabled(appDownloadWarDisabled);
+    appInfo.setDomainManagementSupported(domainManagementSupported);
 
 
     appInfoRepository.save(appInfo);

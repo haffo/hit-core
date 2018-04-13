@@ -173,5 +173,18 @@ public class Document extends TestResource {
   }
 
 
+  public void merge(Document source) {
+    this.name = source.name;
+    this.authorUsername = source.authorUsername;
+    this.comments = source.comments;
+    this.domain = source.domain;
+    this.path = source.path;
+    this.position = source.position;
+    this.preloaded = source.preloaded;
+    this.scope = source.scope;
+    this.title = source.title;
+    this.type = source.type;
+    this.version = source.version;
+  }
 
 }

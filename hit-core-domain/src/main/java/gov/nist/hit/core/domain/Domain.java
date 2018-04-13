@@ -14,17 +14,13 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class Domain implements Serializable {
+public class Domain extends TestResource implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-
-  @NotNull
-  @Column(unique = true, nullable = false)
-  private String value;
 
   private String name;
   private String homeTitle;
@@ -53,9 +49,9 @@ public class Domain implements Serializable {
 
   public Domain() {}
 
-  public Domain(String name, String value) {
+  public Domain(String name, String domain) {
     this.name = name;
-    this.value = value;
+    this.domain = domain;
   }
 
 
@@ -124,11 +120,11 @@ public class Domain implements Serializable {
   }
 
   public String getValue() {
-    return value;
+    return domain;
   }
 
-  public void setValue(String value) {
-    this.value = value;
+  public void setValue(String domain) {
+    this.domain = domain;
   }
 
   public Set<String> getOwnerEmails() {
@@ -137,6 +133,29 @@ public class Domain implements Serializable {
 
   public void setOwnerEmails(Set<String> ownerEmails) {
     this.ownerEmails = ownerEmails;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void merge(Domain source) {
+    this.homeTitle = source.homeTitle;
+    this.authorUsername = source.authorUsername;
+    this.disabled = source.disabled;
+    this.domain = source.domain;
+    this.messageContentInfo = source.messageContentInfo;
+    this.name = source.name;
+    this.ownerEmails = source.ownerEmails;
+    this.preloaded = source.preloaded;
+    this.profileInfo = source.profileInfo;
+    this.scope = source.scope;
+    this.validationResultInfo = source.validationResultInfo;
+    this.valueSetCopyright = source.valueSetCopyright;
   }
 
 

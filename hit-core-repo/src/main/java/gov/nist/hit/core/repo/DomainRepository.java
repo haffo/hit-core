@@ -20,6 +20,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import gov.nist.hit.core.domain.Domain;
+import gov.nist.hit.core.domain.TestScope;
 
 public interface DomainRepository extends JpaRepository<Domain, Long> {
 
@@ -27,8 +28,12 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
   public Domain findOneByKey(@Param("key") String key);
 
 
-  @Query("select new gov.nist.hit.core.domain.Domain(name, value) from Domain d")
-  public List<Domain> findShortAll();
+  @Query("select new gov.nist.hit.core.domain.Domain(name, value) from Domain d where d.disabled = :disabled")
+  public List<Domain> findShortAll(@Param("disable") boolean disabled);
+
+  @Query("select new gov.nist.hit.core.domain.Domain(name, value) from Domain d where d.scope=:scope and d.authorUsername=:authorUsername")
+  public List<Domain> findShortAllByScopeAndAuthorname(@Param("scope") TestScope scope,
+      @Param("authorUsername") String authorUsername);
 
 
 

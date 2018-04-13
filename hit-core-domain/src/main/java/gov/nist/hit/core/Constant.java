@@ -46,5 +46,7 @@ public class Constant {
 
   public static final String DOC_MANAGEMENT_SUPPORTED = "DOC_MANAGEMENT_SUPPORTED";
 
+  public static final String DOMAIN_MANAGEMENT_SUPPORTED = "DOMAIN_MANAGEMENT_SUPPORTED";
+
 
 }

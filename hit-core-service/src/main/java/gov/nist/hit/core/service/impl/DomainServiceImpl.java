@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gov.nist.hit.core.domain.Domain;
+import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.repo.DomainRepository;
 import gov.nist.hit.core.service.DomainService;
 
@@ -28,9 +29,28 @@ public class DomainServiceImpl implements DomainService {
 
 
   @Override
-  public List<Domain> findShortAll() {
+  public List<Domain> findShortAll(boolean disabled) {
     // TODO Auto-generated method stub
-    return domainEntryRepo.findShortAll();
+    return domainEntryRepo.findShortAll(disabled);
+  }
+
+  @Override
+  public List<Domain> findAllByScopeAndAuthorname(TestScope scope, String authorUsername) {
+    // TODO Auto-generated method stub
+    return domainEntryRepo.findShortAllByScopeAndAuthorname(scope, authorUsername);
+  }
+
+
+  @Override
+  public Domain findOne(Long id) {
+    // TODO Auto-generated method stub
+    return domainEntryRepo.findOne(id);
+  }
+
+  @Override
+  public void delete(Domain domain) {
+    // TODO Auto-generated method stub
+    domainEntryRepo.delete(domain);
   }
 
 
