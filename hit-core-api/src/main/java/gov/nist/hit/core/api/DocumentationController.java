@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -34,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -173,17 +175,11 @@ public class DocumentationController {
 		}
 	}
 
-	// @Cacheable(value = "HitCache", key = "'releasenotes'")
-	@RequestMapping(value = "/releasenotes", method = RequestMethod.GET, produces = "application/json")
-	public void releaseNotes(HttpServletResponse response) throws IOException {
-		logger.info("Fetching  all release notes");
-		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllReleaseNotes());
-	}
-
 	// @Cacheable(value = "HitCache", key = "'userdocs'")
-	@RequestMapping(value = "/userdocs", method = RequestMethod.GET, produces = "application/json")
-	public void userDocs(HttpServletResponse response, @RequestParam(required = true) String domain,
-			@RequestParam(required = false) TestScope scope, HttpServletRequest request) throws IOException {
+	@RequestMapping(value = "/documents", method = RequestMethod.GET, produces = "application/json")
+	public List<Document> userDocs(HttpServletResponse response, @RequestParam(required = false) DocumentType type,
+			@RequestParam(required = true) String domain, @RequestParam(required = true) TestScope scope,
+			HttpServletRequest request) throws IOException {
 		logger.info("Fetching  all release notes");
 		scope = scope == null ? TestScope.GLOBAL : scope;
 		if (TestScope.USER.equals(scope)) {
@@ -191,100 +187,39 @@ public class DocumentationController {
 			if (userId != null) {
 				Account account = accountService.findOne(userId);
 				if (account != null) {
-					streamer.streamDocs(response.getOutputStream(), documentRepository
-							.findAllUserDocsByDomainAndAuthorAndScope(domain, account.getUsername(), scope));
+					return documentRepository.findAllByDomainAndAuthorAndScopeAndType(domain, account.getUsername(),
+							scope, type);
 				}
 			}
 		} else {
-			streamer.streamDocs(response.getOutputStream(),
-					documentRepository.findAllUserDocsByDomainAndScope(domain, TestScope.GLOBAL));
+
+			return documentRepository.findAllByDomainAndScopeAndType(domain, scope, type);
 		}
+		return null;
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@RequestMapping(value = "/userdocs", method = RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value = "/documents", method = RequestMethod.POST, produces = "application/json")
 	public Document saveUserDocument(HttpServletResponse response, @RequestBody Document document,
 			HttpServletRequest request, Authentication auth) throws Exception {
-		logger.info("Fetching  all release notes");
-		Document result = null;
-		document.setAuthorUsername(auth.getName());
-		document.setType(DocumentType.USERDOC);
-		document.setVersion("1");
-		document.setPreloaded(false);
-		document.setDate("");
-		document.setTitle(document.getName());
-
-		checkPermission(document, auth);
-		if (document.getScope() == null) {
-			throw new IllegalArgumentException("No document's scope found");
-		}
-		if (document.getDomain() == null) {
-			throw new IllegalArgumentException("No document's domain found");
-		}
-		if (document.getPath() == null) {
-			throw new IllegalArgumentException("No document's location found");
-		}
-		if (document.getName() == null) {
-			throw new IllegalArgumentException("No document's name found");
-		}
-		Long id = document.getId();
-		if (id == null) {
-			result = document;
-		} else {
-			result = documentRepository.findOne(id);
-			if (result == null) {
-				throw new IllegalArgumentException("Unknown document with id=" + id);
-			}
-			result.merge(document);
-		}
-		documentRepository.saveAndFlush(result);
-		return result;
+		logger.info("Saving user document");
+		return saveDocument(document, auth);
 	}
 
-	// @Cacheable(value = "HitCache", key = "'knownissues'")
-	@RequestMapping(value = "/knownissues", method = RequestMethod.GET, produces = "application/json")
-	public void knownIssues(HttpServletResponse response) throws IOException {
-		logger.info("Fetching  all known issues");
-		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllKnownIssues());
+	@PreAuthorize("hasRole('tester')")
+	@RequestMapping(value = "/documents/{id}/delete", method = RequestMethod.POST, produces = "application/json")
+	public boolean deleteUserDocument(HttpServletResponse response, @PathVariable Long id, HttpServletRequest request,
+			Authentication auth) throws Exception {
+		logger.info("Deleting  user doc with id=" + id);
+		return deleteDocument(id, auth);
 	}
 
-	// @Cacheable(value = "HitCache", key = "#type.name() +
-	// 'resource-documentation'")
-	@RequestMapping(value = "/resourcedocs", method = RequestMethod.GET, produces = "application/json")
-	public void resourcedocs(@RequestParam("type") DocumentType type, HttpServletResponse response,
-			@RequestParam(required = true) String domain, @RequestParam(required = false) TestScope scope,
-			HttpServletRequest request) throws IOException {
-		logger.info("Fetching all resources docs of type=" + type);
-		scope = scope == null ? TestScope.GLOBAL : scope;
-		if (TestScope.USER.equals(scope)) {
-			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-			if (userId != null) {
-				Account account = accountService.findOne(userId);
-				if (account != null) {
-					streamer.streamDocs(response.getOutputStream(),
-							documentRepository.findAllResourceDocsByTypeAndDomainAndAuthorAndScope(type, domain,
-									account.getUsername(), scope));
-				}
-			}
-		} else {
-			streamer.streamDocs(response.getOutputStream(),
-					documentRepository.findAllResourceDocsByTypeAndDomainAndScope(type, domain, TestScope.GLOBAL));
-		}
-
-	}
-
-	// @Cacheable(value = "HitCache", key = "'deliverables-documentation'")
-	@RequestMapping(value = "/deliverables", method = RequestMethod.GET, produces = "application/json")
-	public void toolDownloads(HttpServletResponse response) throws IOException {
-		logger.info("Fetching all tooldownloads");
-		streamer.streamDocs(response.getOutputStream(), documentRepository.findAllDeliverableDocs());
-	}
-
-	// @Cacheable(value = "HitCache", key = "'installationguide-documentation'")
-	@RequestMapping(value = "/installationguide", method = RequestMethod.GET, produces = "application/json")
-	public void installationGuide(HttpServletResponse response) throws IOException {
-		logger.info("Fetching installation guide");
-		streamer.stream(response.getOutputStream(), documentRepository.findInstallationDoc());
+	@PreAuthorize("hasRole('tester')")
+	@RequestMapping(value = "/documents/{id}/publish", method = RequestMethod.POST, produces = "application/json")
+	public boolean publishUserDocument(HttpServletResponse response, @PathVariable Long id, HttpServletRequest request,
+			Authentication auth) throws Exception {
+		logger.info("Publishing user document with id=" + id);
+		return publishDocument(id, auth);
 	}
 
 	@RequestMapping(value = "/downloadDocument", method = RequestMethod.POST)
@@ -508,6 +443,65 @@ public class DocumentationController {
 			ext = fileName.substring(i + 1);
 		}
 		return ext;
+	}
+
+	private boolean deleteDocument(Long id, Authentication auth) throws Exception {
+		logger.info("Fetching  all release notes");
+		Document result = documentRepository.findOne(id);
+		if (result == null) {
+			throw new IllegalArgumentException("Unknown document with id=" + id);
+		}
+		checkPermission(result, auth);
+		documentRepository.delete(result);
+		return true;
+	}
+
+	public boolean publishDocument(Long id, Authentication auth) throws Exception {
+		logger.info("Fetching  all release notes");
+		Document result = documentRepository.findOne(id);
+		if (result == null) {
+			throw new IllegalArgumentException("Unknown document with id=" + id);
+		}
+		checkPermission(result, auth);
+		result.setScope(TestScope.GLOBAL);
+		documentRepository.saveAndFlush(result);
+		return deleteDocument(id, auth);
+	}
+
+	private Document saveDocument(Document document, Authentication auth) throws Exception {
+		logger.info("Fetching  all release notes");
+		Document result = null;
+		document.setAuthorUsername(auth.getName());
+		document.setVersion("1");
+		document.setPreloaded(false);
+		document.setDate("");
+		document.setTitle(document.getName());
+
+		checkPermission(document, auth);
+		if (document.getScope() == null) {
+			throw new IllegalArgumentException("No document's scope found");
+		}
+		if (document.getDomain() == null) {
+			throw new IllegalArgumentException("No document's domain found");
+		}
+		if (document.getPath() == null) {
+			throw new IllegalArgumentException("No document's location found");
+		}
+		if (document.getName() == null) {
+			throw new IllegalArgumentException("No document's name found");
+		}
+		Long id = document.getId();
+		if (id == null) {
+			result = document;
+		} else {
+			result = documentRepository.findOne(id);
+			if (result == null) {
+				throw new IllegalArgumentException("Unknown document with id=" + id);
+			}
+			result.merge(document);
+		}
+		documentRepository.saveAndFlush(result);
+		return result;
 	}
 
 }
