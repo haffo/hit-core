@@ -17,6 +17,7 @@ package gov.nist.hit.core.domain;
  * 
  */
 public class TestCaseCommand {
+
   protected Long testCaseId;
 
   public Long getTestCaseId() {

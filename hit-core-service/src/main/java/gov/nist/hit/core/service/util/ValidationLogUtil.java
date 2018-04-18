@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
-import gov.nist.healthcare.unified.model.EnhancedReport;
-import gov.nist.hit.core.domain.TestContext;
-import gov.nist.hit.core.service.impl.ValidationLogReport;
+import gov.nist.hit.core.domain.log.ValidationLog;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -41,11 +39,7 @@ public class ValidationLogUtil implements EnvironmentAware {
     this.environment = environment;
   }
 
-  public static String generateValidationLog(TestContext testContext, EnhancedReport report) {
-    return generateValidationLog(new ValidationLogReport(testContext, report));
-  }
-
-  public static String generateValidationLog(ValidationLogReport validationLogReport) {
+  public static String toString(ValidationLog validationLog) {
     // Read environment properties related to the validation logs
     String logFormat =
         (environment == null || environment.getProperty("validation.logs.format") == null
@@ -57,29 +51,28 @@ public class ValidationLogUtil implements EnvironmentAware {
                 ? DEFAULT_LOG_DATE_FORMAT : environment.getProperty("validation.logs.date.format"));
     // Replace the fields in log
     if (logFormat.contains("%date")) {
-      logFormat = logFormat.replace("%date", validationLogReport.getDate(logDateFormat));
+      logFormat = logFormat.replace("%date", validationLog.getDate(logDateFormat));
     }
     if (logFormat.contains("%testingStage")) {
-      logFormat = logFormat.replace("%testingStage", validationLogReport.getTestingStage());
+      logFormat = logFormat.replace("%testingStage", validationLog.getTestingStage());
     }
     if (logFormat.contains("%format")) {
-      logFormat = logFormat.replace("%format", validationLogReport.getFormat());
+      logFormat = logFormat.replace("%format", validationLog.getFormat());
     }
     if (logFormat.contains("%messageId")) {
-      logFormat = logFormat.replace("%messageId", validationLogReport.getMessageId());
+      logFormat = logFormat.replace("%messageId", validationLog.getMessageId());
     }
     if (logFormat.contains("%errorCount")) {
-      logFormat =
-          logFormat.replace("%errorCount", String.valueOf(validationLogReport.getErrorCount()));
+      logFormat = logFormat.replace("%errorCount", String.valueOf(validationLog.getErrorCount()));
     }
     if (logFormat.contains("%errorsInSegments")) {
       // Generate the segment errors log
       // TODO Make the format a parameter?
-      if (validationLogReport.getErrorCountInSegment().size() > 0) {
+      if (validationLog.getErrorCountInSegment().size() > 0) {
         StringBuilder errorsInSegments = new StringBuilder();
         errorsInSegments.append("(");
         boolean isFirst = true;
-        for (Map.Entry<String, Integer> segment : validationLogReport.getErrorCountInSegment()
+        for (Map.Entry<String, Integer> segment : validationLog.getErrorCountInSegment()
             .entrySet()) {
           if (!isFirst) {
             errorsInSegments.append(", ");
@@ -98,10 +91,10 @@ public class ValidationLogUtil implements EnvironmentAware {
     }
     if (logFormat.contains("%warningCount")) {
       logFormat =
-          logFormat.replace("%warningCount", String.valueOf(validationLogReport.getWarningCount()));
+          logFormat.replace("%warningCount", String.valueOf(validationLog.getWarningCount()));
     }
     if (logFormat.contains("%validationResult")) {
-      if (validationLogReport.isValidationResult()) {
+      if (validationLog.isValidationResult()) {
         logFormat = logFormat.replace("%validationResult", "SUCCESS");
       } else {
         logFormat = logFormat.replace("%validationResult", "FAILURE");
