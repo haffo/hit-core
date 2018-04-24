@@ -11,13 +11,20 @@ public interface DomainService {
 
   public void save(Domain domain);
 
-  List<Domain> findShortAll(boolean disabled);
+  // List<Domain> findShortAll(boolean disabled);
 
-  List<Domain> findAllByScopeAndAuthorname(TestScope scope, String authorname);
+  List<Domain> findShortAllByScopeAndAuthorname(TestScope scope, String authorname);
 
   Domain findOne(Long id);
 
   void delete(Domain domain);
+
+  List<Domain> findShortAllWithGlobalOrAuthornameOrParticipantEmail(String authorname,
+      String participantEmail);
+
+  public List<Domain> findShortAllGlobalDomains();
+
+  public void deletePreloaded();
 
 
 }

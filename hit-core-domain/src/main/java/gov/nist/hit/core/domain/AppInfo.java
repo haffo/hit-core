@@ -15,12 +15,9 @@ package gov.nist.hit.core.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -29,16 +26,13 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.MapKeyColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import gov.nist.hit.core.Constant;
-import io.swagger.annotations.ApiModelProperty;
 
 
 /**
@@ -66,7 +60,14 @@ public class AppInfo implements Serializable {
 
   private String header;
 
+  @NotNull
+  @Column(nullable = false)
   private String contactEmail;
+
+  @JsonIgnore
+  @NotNull
+  @Column(nullable = false)
+  private String ownerUsername;
 
 
   @ElementCollection(fetch = FetchType.EAGER)
@@ -100,7 +101,6 @@ public class AppInfo implements Serializable {
 
   private String csrfToken;
 
-  private String rsbVersion;
 
   private String apiDocsPath;
 
@@ -130,14 +130,6 @@ public class AppInfo implements Serializable {
   @Column(name = "OPTION_VALUE")
   private Map<String, String> options = new HashMap<String, String>();
 
-
-  @JsonIgnoreProperties(value = {"messageContentInfo", "homeContent", "profileInfo",
-      "valueSetCopyright", "validationResultInfo", "adminEmails"})
-  @ApiModelProperty(required = false, value = "test steps of the test step group")
-  @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL}, orphanRemoval = true)
-  @JoinTable(name = "AppInfo_domains", joinColumns = {@JoinColumn(name = "appInfo_id")},
-      inverseJoinColumns = {@JoinColumn(name = "domain_id")})
-  private Set<Domain> domains = new HashSet<Domain>();
 
 
   public AppInfo() {
@@ -243,15 +235,6 @@ public class AppInfo implements Serializable {
   }
 
 
-  public String getRsbVersion() {
-    return rsbVersion;
-  }
-
-  public void setRsbVersion(String rsbVersion) {
-    this.rsbVersion = rsbVersion;
-  }
-
-
 
   public String getApiDocsPath() {
     return apiDocsPath;
@@ -264,8 +247,7 @@ public class AppInfo implements Serializable {
   @Override
   public String toString() {
     return "AppInfo [id=" + id + ", url=" + url + ", version=" + version + ", date=" + date
-        + ", name=" + name + ", domains=" + domains + ", header=" + header + ", adminEmails="
-        + adminEmails;
+        + ", name=" + name + ", header=" + header + ", adminEmails=" + adminEmails;
   }
 
   public String getMailFrom() {
@@ -530,18 +512,6 @@ public class AppInfo implements Serializable {
 
 
 
-  public Set<Domain> getDomains() {
-    return domains;
-  }
-
-
-
-  public void setDomains(Set<Domain> domains) {
-    this.domains = domains;
-  }
-
-
-
   public String getSubTitle() {
     return subTitle;
   }
@@ -550,6 +520,18 @@ public class AppInfo implements Serializable {
 
   public void setSubTitle(String subTitle) {
     this.subTitle = subTitle;
+  }
+
+
+
+  public String getOwnerUsername() {
+    return ownerUsername;
+  }
+
+
+
+  public void setOwnerUsername(String ownerUsername) {
+    this.ownerUsername = ownerUsername;
   }
 
 

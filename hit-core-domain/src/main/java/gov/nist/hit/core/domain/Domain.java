@@ -11,7 +11,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
 
 @Entity
 public class Domain extends TestResource implements Serializable {
@@ -42,9 +41,14 @@ public class Domain extends TestResource implements Serializable {
   private String validationResultInfo;
 
   @ElementCollection(fetch = FetchType.EAGER)
-  @Column(name = "OWNER_EMAILS", nullable = false)
-  @NotNull
-  private Set<String> ownerEmails = new HashSet<String>();
+  @Column(name = "PARTICIPANT_EMAILS", nullable = true)
+  private Set<String> participantEmails = new HashSet<String>();
+
+
+  private String rsbVersion;
+
+  private String igVersion;
+
 
 
   public Domain() {}
@@ -119,43 +123,55 @@ public class Domain extends TestResource implements Serializable {
     this.validationResultInfo = validationResultInfo;
   }
 
-  public String getValue() {
-    return domain;
+  public Set<String> getParticipantEmails() {
+    return participantEmails;
   }
 
-  public void setValue(String domain) {
-    this.domain = domain;
-  }
-
-  public Set<String> getOwnerEmails() {
-    return ownerEmails;
-  }
-
-  public void setOwnerEmails(Set<String> ownerEmails) {
-    this.ownerEmails = ownerEmails;
+  public void setParticipantEmails(Set<String> participantEmails) {
+    this.participantEmails = participantEmails;
   }
 
   public Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
-    this.id = id;
+
+
+  public String getRsbVersion() {
+    return rsbVersion;
+  }
+
+  public void setRsbVersion(String rsbVersion) {
+    this.rsbVersion = rsbVersion;
+  }
+
+
+
+  public String getIgVersion() {
+    return igVersion;
+  }
+
+  public void setIgVersion(String igVersion) {
+    this.igVersion = igVersion;
   }
 
   public void merge(Domain source) {
     this.homeTitle = source.homeTitle;
+    this.homeContent = source.homeContent;
     this.authorUsername = source.authorUsername;
     this.disabled = source.disabled;
     this.domain = source.domain;
     this.messageContentInfo = source.messageContentInfo;
     this.name = source.name;
-    this.ownerEmails = source.ownerEmails;
+    this.participantEmails = source.participantEmails;
     this.preloaded = source.preloaded;
     this.profileInfo = source.profileInfo;
     this.scope = source.scope;
     this.validationResultInfo = source.validationResultInfo;
     this.valueSetCopyright = source.valueSetCopyright;
+    this.rsbVersion = source.rsbVersion;
+    this.igVersion = source.igVersion;
+
   }
 
 

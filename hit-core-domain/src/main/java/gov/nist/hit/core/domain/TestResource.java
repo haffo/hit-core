@@ -23,7 +23,8 @@ public class TestResource implements Serializable {
   protected String domain;
 
   @JsonIgnore
-  @Column(nullable = true)
+  // @NotNull
+  // @Column(nullable = false)
   protected String authorUsername;
 
   public String getDomain() {
