@@ -14,8 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import io.swagger.annotations.ApiModel;
 
 /**
@@ -45,7 +43,6 @@ public class Document extends TestResource {
 
   private int position;
 
-  @JsonIgnore
   @Enumerated(EnumType.STRING)
   private DocumentType type;
 

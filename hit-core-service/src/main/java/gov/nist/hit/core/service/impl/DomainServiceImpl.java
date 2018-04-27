@@ -63,9 +63,9 @@ public class DomainServiceImpl implements DomainService {
     if (all != null && !all.isEmpty()) {
       results = new ArrayList<Domain>();
       for (Domain dom : all) {
-        if (dom.getScope().equals(TestScope.GLOBAL)
-            || dom.getAuthorUsername().equals(authorUsername)
-            || dom.getParticipantEmails().contains(participantEmail)) {
+        if (TestScope.GLOBAL.equals(dom.getScope())
+            || authorUsername.equals(dom.getAuthorUsername()) || (dom.getParticipantEmails() != null
+                && dom.getParticipantEmails().contains(participantEmail))) {
           results.add(dom);
         }
       }

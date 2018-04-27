@@ -49,14 +49,30 @@ public class Domain extends TestResource implements Serializable {
 
   private String igVersion;
 
+  private String owner;
 
 
-  public Domain() {}
+
+  public Domain() {
+    this.owner = this.authorUsername;
+  }
 
   public Domain(String name, String domain) {
     this.name = name;
     this.domain = domain;
+    this.owner = this.authorUsername;
   }
+
+
+  public Domain(String name, String domain, TestScope scope, String authorUsername,
+      Set<String> participantEmails) {
+    this(name, domain);
+    this.scope = scope;
+    this.authorUsername = authorUsername;
+    this.participantEmails = participantEmails;
+    this.owner = authorUsername;
+  }
+
 
 
   public String getName() {
@@ -155,23 +171,28 @@ public class Domain extends TestResource implements Serializable {
     this.igVersion = igVersion;
   }
 
+
+
+  public String getOwner() {
+    owner = authorUsername;
+    return owner;
+  }
+
+
   public void merge(Domain source) {
     this.homeTitle = source.homeTitle;
     this.homeContent = source.homeContent;
-    this.authorUsername = source.authorUsername;
     this.disabled = source.disabled;
     this.domain = source.domain;
     this.messageContentInfo = source.messageContentInfo;
     this.name = source.name;
     this.participantEmails = source.participantEmails;
-    this.preloaded = source.preloaded;
     this.profileInfo = source.profileInfo;
-    this.scope = source.scope;
     this.validationResultInfo = source.validationResultInfo;
     this.valueSetCopyright = source.valueSetCopyright;
     this.rsbVersion = source.rsbVersion;
     this.igVersion = source.igVersion;
-
+    this.owner = this.authorUsername;
   }
 
 

@@ -45,7 +45,6 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
   @Query("select new gov.nist.hit.core.domain.Domain(name, domain) from Domain d where d.scope= 'GLOBAL' and d.disabled =:disabled")
   public List<Domain> findAllShortWithGlobal(@Param("disabled") boolean disabled);
 
-
   @Modifying
   @Transactional(value = "transactionManager")
   @Query("delete from Domain dom where dom.preloaded = true")

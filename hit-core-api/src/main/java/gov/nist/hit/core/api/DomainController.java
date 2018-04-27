@@ -155,12 +155,15 @@ public class DomainController {
 		if (result == null) {
 			throw new IllegalArgumentException("Unknown domain " + domain);
 		}
-		if (result.getAuthorUsername() != authentication.getName()) {
+
+		String username = authentication.getName();
+		if (!result.getAuthorUsername().equals(username)) {
 			throw new IllegalArgumentException("You do not have the privilege to perform this action");
 		}
 
 		checkPermission(result, authentication);
 		result.merge(domain);
+		result.setPreloaded(false);
 		domainService.save(result);
 		return result;
 	}
@@ -220,7 +223,8 @@ public class DomainController {
 			throw new IllegalArgumentException("Domain with id=" + id + " not found");
 		}
 
-		if (found.getAuthorUsername() != authentication.getName()) {
+		String username = authentication.getName();
+		if (!found.getAuthorUsername().equals(username)) {
 			throw new IllegalArgumentException("You do not have the privilege to perform this action");
 		}
 		checkPermission(found, authentication);
@@ -230,7 +234,7 @@ public class DomainController {
 
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/{id}/publish", method = RequestMethod.POST, produces = "application/json")
-	public boolean deleteDomain(HttpServletRequest request, @PathVariable("id") Long id, @RequestBody Domain domain,
+	public Domain publishDomain(HttpServletRequest request, @PathVariable("id") Long id, @RequestBody Domain domain,
 			Authentication authentication) throws Exception {
 		checkManagementSupport();
 		Domain found = domainService.findOne(id);
@@ -238,14 +242,18 @@ public class DomainController {
 			throw new IllegalArgumentException("Domain with id=" + id + " not found");
 		}
 
-		if (found.getAuthorUsername() != authentication.getName()) {
+		String username = authentication.getName();
+		if (!found.getAuthorUsername().equals(username)) {
 			throw new IllegalArgumentException("You do not have the privilege to perform this action");
 		}
 
 		checkPermission(found, authentication);
 		found.merge(domain);
+		found.setScope(TestScope.GLOBAL);
+		found.setPreloaded(false);
+		domainService.save(found);
 		// TODO : publish artifacts
-		return true;
+		return found;
 	}
 
 }

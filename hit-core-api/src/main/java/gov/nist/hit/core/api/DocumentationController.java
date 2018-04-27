@@ -12,7 +12,6 @@
 
 package gov.nist.hit.core.api;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,7 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -48,18 +46,23 @@ import org.springframework.web.multipart.MultipartFile;
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.DocumentType;
+import gov.nist.hit.core.domain.Domain;
 import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.DocumentRepository;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.AppInfoService;
+import gov.nist.hit.core.service.DomainService;
 import gov.nist.hit.core.service.Streamer;
 import gov.nist.hit.core.service.TestCaseDocumentationService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ZipGenerator;
+import gov.nist.hit.core.service.exception.DocumentationException;
+import gov.nist.hit.core.service.exception.DomainException;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
 import gov.nist.hit.core.service.exception.MessageUploadException;
 import gov.nist.hit.core.service.exception.NoUserFoundException;
+import gov.nist.hit.core.service.exception.PermissionException;
 import io.swagger.annotations.ApiParam;
 
 /**
@@ -93,6 +96,9 @@ public class DocumentationController {
 	@Autowired
 	private AppInfoService appInfoService;
 
+	@Autowired
+	private DomainService domainService;
+
 	@Value("${UPLOADED_RESOURCE_BUNDLE:/sites/data/uploaded_resource_bundles}")
 	private String UPLOADED_RESOURCE_BUNDLE;
 
@@ -107,50 +113,74 @@ public class DocumentationController {
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/uploadDocument", method = RequestMethod.POST, consumes = { "multipart/form-data" })
 	@ResponseBody
-	public Map<String, Object> uploadProfile(ServletRequest request, @RequestPart("file") MultipartFile part,
-			@RequestParam("domain") String domain, Authentication auth) throws Exception {
-		checkManagementSupport();
+	public Map<String, Object> uploadDocument(ServletRequest request, @RequestPart("file") MultipartFile part,
+			@RequestParam("domain") String domain, @RequestParam("type") String type, Authentication auth)
+			throws Exception {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		try {
-			if (!part.getContentType().equalsIgnoreCase("text/xml"))
-				throw new MessageUploadException("Unsupported content type. Supported content types are: '.xml' ");
+			checkDomainPermission(domain, auth);
+			String filename = part.getOriginalFilename();
+			String extension = filename.substring(filename.lastIndexOf(".") + 1);
+			if (extension.equals("xml") && extension.equals("pdf") && extension.equals("ppt")
+					&& extension.equals("pptx") && extension.equals("doc") && extension.equals("docx")
+					&& extension.equals("html")) {
+				throw new MessageUploadException("Unsupported file type.");
+			}
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			org.apache.commons.io.IOUtils.copy(part.getInputStream(), baos);
 			byte[] bytes = baos.toByteArray();
-			String content = IOUtils.toString(new ByteArrayInputStream(bytes));
 			resultMap.put("success", true);
-			File profileFile = new File(
-					UPLOADED_RESOURCE_BUNDLE + DOCUMENTATION_FOLDER_ROOT + "/" + domain + "/" + part.getName());
-			FileUtils.writeStringToFile(profileFile, content);
-			resultMap.put("path", DOCUMENTATION_FOLDER_ROOT + "/" + domain + "/" + part.getName());
-			logger.info("Uploaded valid profile file " + part.getName());
+			String dirName = UPLOADED_RESOURCE_BUNDLE + DOCUMENTATION_FOLDER_ROOT + "/" + domain + "/" + type;
+			File dir = new File(dirName);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+			File file = new File(dirName + "/" + filename);
+			FileUtils.writeByteArrayToFile(file, bytes);
+			resultMap.put("path", DOCUMENTATION_FOLDER_ROOT + "/" + domain + "/" + type + "/" + filename);
+			logger.info("Uploaded valid file " + filename);
 
 			return resultMap;
 		} catch (MessageUploadException e) {
 			resultMap.put("success", false);
-			resultMap.put("message", "An error occured. The tool could not upload the profile file sent");
+			resultMap.put("message", "An error occured. The tool could not upload the file sent");
 			resultMap.put("debugError", ExceptionUtils.getMessage(e));
 			return resultMap;
 		} catch (Exception e) {
 			resultMap.put("success", false);
-			resultMap.put("message", "An error occured. The tool could not upload the profile file sent");
+			resultMap.put("message", "An error occured. The tool could not upload the file sent");
 			resultMap.put("debugError", ExceptionUtils.getStackTrace(e));
 			return resultMap;
 		}
 	}
 
-	private void checkPermission(Document document, Authentication auth) throws Exception {
+	private void checkDocumentPermission(Document document, Authentication auth) throws Exception {
+		String username = auth.getName();
+		TestScope scope = document.getScope();
+		if (TestScope.GLOBAL.equals(scope) && !userService.hasGlobalAuthorities(username)) {
+			throw new PermissionException("You do not have the permission to perform this task");
+		}
+		if (!username.equals(document.getAuthorUsername()) && !userService.isAdmin(username)) {
+			throw new PermissionException("You do not have the permission to perform this task");
+		}
+
+		checkDomainPermission(document.getDomain(), auth);
+
+	}
+
+	private void checkDomainPermission(String domainKey, Authentication auth) throws Exception {
 		String username = auth.getName();
 		if (username == null)
 			throw new NoUserFoundException("User could not be found");
-		TestScope scope = document.getScope();
-		if (TestScope.GLOBAL.equals(scope) && !userService.hasGlobalAuthorities(username)) {
-			throw new NoUserFoundException("You do not have the permission to perform this task");
+		Domain domain = domainService.findOneByKey(domainKey);
+		if (domain == null) {
+			throw new DomainException("Unknown domain " + domainKey);
 		}
-		if (!username.equals(document.getAuthorUsername()) && !userService.isAdmin(username)) {
-			throw new NoUserFoundException("You do not have the permission to perform this task");
+		if (!domain.getAuthorUsername().equals(auth.getName()) && !userService.isAdmin(username)) {
+			throw new PermissionException("You do not have the permission to perform this task");
 		}
+
 	}
 
 	// @Cacheable(value = "HitCache", key = "'testcases-documentation'")
@@ -177,11 +207,10 @@ public class DocumentationController {
 
 	// @Cacheable(value = "HitCache", key = "'userdocs'")
 	@RequestMapping(value = "/documents", method = RequestMethod.GET, produces = "application/json")
-	public List<Document> userDocs(HttpServletResponse response, @RequestParam(required = false) DocumentType type,
+	public List<Document> userDocs(HttpServletResponse response, @RequestParam(required = true) DocumentType type,
 			@RequestParam(required = true) String domain, @RequestParam(required = true) TestScope scope,
 			HttpServletRequest request) throws IOException {
 		logger.info("Fetching  all release notes");
-		scope = scope == null ? TestScope.GLOBAL : scope;
 		if (TestScope.USER.equals(scope)) {
 			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 			if (userId != null) {
@@ -192,7 +221,6 @@ public class DocumentationController {
 				}
 			}
 		} else {
-
 			return documentRepository.findAllByDomainAndScopeAndType(domain, scope, type);
 		}
 		return null;
@@ -229,11 +257,14 @@ public class DocumentationController {
 		try {
 			if (path != null) {
 				String fileName = null;
+				InputStream content = null;
 				path = !path.startsWith("/") ? "/" + path : path;
 				if (path.startsWith(DOCUMENTATION_FOLDER_ROOT)) {
 					path = UPLOADED_RESOURCE_BUNDLE + path;
+					content = new FileInputStream(path);
+				} else {
+					content = DocumentationController.class.getResourceAsStream(path);
 				}
-				InputStream content = DocumentationController.class.getResourceAsStream(path);
 				if (content != null) {
 					fileName = path.substring(path.lastIndexOf("/") + 1);
 					response.setContentType(getContentType(path));
@@ -449,9 +480,9 @@ public class DocumentationController {
 		logger.info("Fetching  all release notes");
 		Document result = documentRepository.findOne(id);
 		if (result == null) {
-			throw new IllegalArgumentException("Unknown document with id=" + id);
+			throw new DocumentationException("Unknown document with id=" + id);
 		}
-		checkPermission(result, auth);
+		checkDocumentPermission(result, auth);
 		documentRepository.delete(result);
 		return true;
 	}
@@ -460,9 +491,9 @@ public class DocumentationController {
 		logger.info("Fetching  all release notes");
 		Document result = documentRepository.findOne(id);
 		if (result == null) {
-			throw new IllegalArgumentException("Unknown document with id=" + id);
+			throw new DocumentationException("Unknown document with id=" + id);
 		}
-		checkPermission(result, auth);
+		checkDocumentPermission(result, auth);
 		result.setScope(TestScope.GLOBAL);
 		documentRepository.saveAndFlush(result);
 		return deleteDocument(id, auth);
@@ -475,20 +506,26 @@ public class DocumentationController {
 		document.setVersion("1");
 		document.setPreloaded(false);
 		document.setDate("");
-		document.setTitle(document.getName());
+		if (document.getName() == null) {
+			document.setName(document.getTitle());
+		}
 
-		checkPermission(document, auth);
+		checkDocumentPermission(document, auth);
+		if (document.getType() == null) {
+			throw new DocumentationException("No document's type found");
+		}
+
 		if (document.getScope() == null) {
-			throw new IllegalArgumentException("No document's scope found");
+			throw new DocumentationException("No document's scope found");
 		}
 		if (document.getDomain() == null) {
-			throw new IllegalArgumentException("No document's domain found");
+			throw new DocumentationException("No document's domain found");
 		}
 		if (document.getPath() == null) {
-			throw new IllegalArgumentException("No document's location found");
+			throw new DocumentationException("No document's location found");
 		}
 		if (document.getName() == null) {
-			throw new IllegalArgumentException("No document's name found");
+			throw new DocumentationException("No document's name found");
 		}
 		Long id = document.getId();
 		if (id == null) {
@@ -496,7 +533,7 @@ public class DocumentationController {
 		} else {
 			result = documentRepository.findOne(id);
 			if (result == null) {
-				throw new IllegalArgumentException("Unknown document with id=" + id);
+				throw new DocumentationException("Unknown document with id=" + id);
 			}
 			result.merge(document);
 		}
