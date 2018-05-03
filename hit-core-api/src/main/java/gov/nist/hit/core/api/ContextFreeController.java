@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -59,7 +60,7 @@ public class ContextFreeController {
 
 	static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
 
-	public static final String CF_UPLOAD_DIR = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + "/cf";
+
 
 	@Autowired
 	private CFTestStepService testStepService;
@@ -97,6 +98,9 @@ public class ContextFreeController {
 
 	@Value("${mail.tool}")
 	private String TOOL_NAME;
+	
+
+	
 
 	@ApiOperation(value = "Find all context-free test plans by scope", nickname = "getTestPlansByScope")
 	// @Cacheable(value = "HitCache", key = "'cb-testplans'")
