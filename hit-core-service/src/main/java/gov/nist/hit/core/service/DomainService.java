@@ -2,6 +2,8 @@ package gov.nist.hit.core.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+
 import gov.nist.hit.core.domain.Domain;
 import gov.nist.hit.core.domain.TestScope;
 
@@ -25,6 +27,9 @@ public interface DomainService {
   public List<Domain> findShortAllGlobalDomains();
 
   public void deletePreloaded();
+
+  public void hasPermission(String domainKey, Authentication auth) throws Exception;
+
 
 
 }

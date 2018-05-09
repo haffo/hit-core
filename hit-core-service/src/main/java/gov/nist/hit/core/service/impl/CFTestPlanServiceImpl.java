@@ -84,30 +84,13 @@ public class CFTestPlanServiceImpl implements CFTestPlanService {
     return testPlanRepository.findAllByScopeAndUsernameAndDomain(scope, authorUsername, domain);
   }
 
-  @Override
-  public Set<String> findAllCategoriesByScopeAndDomain(TestScope scope, String domain) {
-    // TODO Auto-generated method stub
-    return testPlanRepository.findAllCategoriesByScopeAndDomain(scope, domain);
-  }
-
-  @Override
-  public Set<String> findAllCategoriesByScopeAndUserAndDomain(TestScope scope, String username,
-      String domain) {
-    // TODO Auto-generated method stub
-    return testPlanRepository.findAllCategoriesByScopeAndUserAndDomain(scope, username, domain);
-  }
 
   @Override
   public CFTestPlan save(CFTestPlan testPlan) {
     return testPlanRepository.saveAndFlush(testPlan);
   }
 
-  @Override
-  public void updateCategory(Set<Long> ids, String cat) {
-    String sql = "update CFTestPlan tp set tp.category = ? where tp.id IN ?";
-    entityManager.createNativeQuery(sql, CFTestPlan.class).setParameter(1, cat).setParameter(2, ids)
-        .executeUpdate();
-  }
+
 
   @Override
   public List<CFTestPlan> findShortAllByScopeAndDomain(TestScope scope, String domain) {

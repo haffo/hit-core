@@ -1,7 +1,6 @@
 package gov.nist.hit.core.service;
 
 import java.util.List;
-import java.util.Set;
 
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
@@ -25,11 +24,6 @@ public interface TestPlanService {
   public List<TestPlan> findShortAllByStageAndScopeAndAuthorAndDomain(TestingStage stage,
       TestScope scope, String authorUsername, String domain);
 
-  public Set<String> findAllCategoriesByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
-      String domain);
-
-  public Set<String> findAllCategoriesByStageAndScopeAndUserAndDomain(TestingStage stage,
-      TestScope scope, String username, String domain);
 
   void delete(TestPlan testPlan);
 

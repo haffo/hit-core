@@ -43,6 +43,8 @@ public class CFTestStepGroup extends AbstractTestCase implements Serializable {
   public CFTestStepGroup() {
     super();
     this.type = ObjectType.TestStepGroup;
+    this.stage = TestingStage.CF;
+    this.preloaded = false;
   }
 
   @ApiModelProperty(required = false, value = "test steps groups of the test step group")

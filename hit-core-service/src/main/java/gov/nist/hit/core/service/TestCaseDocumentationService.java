@@ -1,18 +1,21 @@
 package gov.nist.hit.core.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
 import gov.nist.hit.core.domain.TestCaseDocumentation;
 import gov.nist.hit.core.domain.TestScope;
-import gov.nist.hit.core.domain.TestingStage;
 
 public interface TestCaseDocumentationService {
 
+  public List<TestCaseDocumentation> generate(TestScope scope, String domain) throws IOException;
 
-  public TestCaseDocumentation findOneByStageAndDomainAndScope(TestingStage stage, String domain,
-      TestScope scope);
+  public InputStream zipContextfreeMessages(TestScope scope, String domain) throws Exception;
 
-  public TestCaseDocumentation findOneByStageAndDomainAndAuthorAndScope(TestingStage stage,
-      String domain, String authorname, TestScope scope);
+  public InputStream zipContextbasedMessages(TestScope scope, String domain) throws Exception;
 
+  public InputStream zipContextbasedTestPackages(TestScope scope, String domain) throws Exception;
 
 
 }

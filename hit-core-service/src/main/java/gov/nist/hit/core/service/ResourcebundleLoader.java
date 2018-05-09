@@ -55,7 +55,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gov.nist.auth.hit.core.domain.TestingType;
 import gov.nist.auth.hit.core.repo.AccountRepository;
-import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.AppInfo;
 import gov.nist.hit.core.domain.CFTestPlan;
 import gov.nist.hit.core.domain.CFTestStep;
@@ -75,7 +74,6 @@ import gov.nist.hit.core.domain.Protocol;
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseDocument;
-import gov.nist.hit.core.domain.TestCaseDocumentation;
 import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.domain.TestContext;
 import gov.nist.hit.core.domain.TestPlan;
@@ -193,8 +191,8 @@ public abstract class ResourcebundleLoader {
   @Autowired
   protected TestCaseDocumentationRepository testCaseDocumentationRepository;
 
-  @Autowired
-  protected CachedRepository cachedRepository;
+  // @Autowired
+  // protected CachedRepository cachedRepository;
 
   @Autowired
   protected TransportFormsRepository transportFormsRepository;
@@ -364,8 +362,9 @@ public abstract class ResourcebundleLoader {
 
 
   public boolean reloadDb() throws IOException {
+    AppInfo appInfo = appInfoService.get();
     String create = System.getenv("RELOAD_DB");
-    return create != null && (Boolean.valueOf(create) == true);
+    return (create != null && (Boolean.valueOf(create) == true)) || appInfo == null;
   }
 
 
@@ -385,34 +384,33 @@ public abstract class ResourcebundleLoader {
     transactionRepository.deleteAll();
   }
 
-  public void init() throws JsonProcessingException, ProfileParserException, IOException {
+  public void init() throws Exception {
     load("");
   }
 
 
-  public void load(String directory)
-      throws JsonProcessingException, IOException, ProfileParserException {
+  public void load(String directory) throws Exception {
     if (reloadDb()) {
       logger.info("clearing tables...");
       clearDB();
       this.idLocationMap = new HashMap<>();
       this.loadAppInfo();
       this.loadDomains(directory);
-      cachedRepository.getCachedProfiles().clear();
-      cachedRepository.getCachedVocabLibraries().clear();
-      cachedRepository.getCachedConstraints().clear();
+      // cachedRepository.getCachedProfiles().clear();
+      // cachedRepository.getCachedVocabLibraries().clear();
+      // cachedRepository.getCachedConstraints().clear();
       logger.info("resource bundle loaded successfully...");
     }
     GCUtil.performGC();
   }
 
-  public void load() throws JsonProcessingException, IOException, ProfileParserException {
+  public void load() throws Exception {
     load("");
   }
 
   public abstract TestContext testContext(String location, JsonNode parentOb, TestingStage stage,
       String rootPath, String domain, TestScope scope, String authorUsername, boolean preloaded)
-      throws IOException;
+      throws Exception;
 
   public abstract TestCaseDocument generateTestCaseDocument(TestContext c) throws IOException;
 
@@ -425,8 +423,7 @@ public abstract class ResourcebundleLoader {
       JsonMappingException, IOException, UnsupportedOperationException;
 
 
-  public void loadDomains(String rootPath)
-      throws JsonProcessingException, IOException, ProfileParserException {
+  public void loadDomains(String rootPath) throws Exception {
     logger.info("loading domains...");
     Resource metadataResource =
         ResourcebundleHelper.getResource(ResourcebundleLoader.ABOUT_PATTERN + "MetaData.json");
@@ -451,13 +448,12 @@ public abstract class ResourcebundleLoader {
 
 
   private void loadDomainsArtifacts(String directory, TestScope scope, boolean preloaded,
-      String domain) throws IOException, ProfileParserException {
+      String domain) throws Exception {
     this.loadConstraints(directory, scope, preloaded, domain);
     this.loadVocabularyLibraries(directory, scope, preloaded, domain);
     this.loadIntegrationProfiles(directory, scope, preloaded, domain);
     this.loadContextFreeTestCases(directory, scope, preloaded, domain);
     this.loadContextBasedTestCases(directory, scope, preloaded, domain);
-    this.loadTestCasesDocumentation(scope, preloaded, domain);
     this.loadUserDocs(directory, scope, preloaded, domain);
     this.loadKownIssues(directory, scope, preloaded, domain);
     this.loadReleaseNotes(directory, scope, preloaded, domain);
@@ -474,7 +470,7 @@ public abstract class ResourcebundleLoader {
     String key = node.get("key").textValue();
     entry.setDomain(key);
     entry.setScope(node.get("scope") != null ? TestScope.valueOf(node.get("scope").textValue())
-        : TestScope.USER);
+        : TestScope.GLOBAL);
     entry.setName(node.get("name").textValue());
     entry.setHomeTitle(node.get("homeTitle").textValue());
     entry.setAuthorUsername(node.get("authorUsername").textValue());
@@ -961,14 +957,14 @@ public abstract class ResourcebundleLoader {
         constraints.setScope(scope);
         constraints.setAuthorUsername(username);
         constraints.setPreloaded(preloaded);
-        cachedRepository.getCachedConstraints().put(constraints.getSourceId(), constraints);
+        // cachedRepository.getCachedConstraints().put(constraints.getSourceId(), constraints);
         this.constraintsRepository.save(constraints);
       }
     }
   }
 
 
-  private String getDomainAuthorname(String domain) {
+  public String getDomainAuthorname(String domain) {
     if (!TOOL_DOCUMENT_DOMAIN.equals(domain)) {
       Domain dom = domainService.findOneByKey(domain);
       if (dom == null) {
@@ -1035,7 +1031,8 @@ public abstract class ResourcebundleLoader {
           VocabularyLibrary vocabLibrary =
               vocabLibrary(content, domain, scope, getDomainAuthorname(domain), preloaded);
           this.vocabularyLibraryRepository.save(vocabLibrary);
-          cachedRepository.getCachedVocabLibraries().put(vocabLibrary.getSourceId(), vocabLibrary);
+          // cachedRepository.getCachedVocabLibraries().put(vocabLibrary.getSourceId(),
+          // vocabLibrary);
         } catch (UnsupportedOperationException e) {
         }
       }
@@ -1056,6 +1053,10 @@ public abstract class ResourcebundleLoader {
     IntegrationProfile integrationProfile = new IntegrationProfile();
     Element profileElement = (Element) doc.getElementsByTagName("ConformanceProfile").item(0);
     integrationProfile.setSourceId(profileElement.getAttribute("ID"));
+    if (integrationProfileRepository.findBySourceId(integrationProfile.getSourceId()) != null) {
+      throw new RuntimeException("An integration profile with sourceId="
+          + integrationProfile.getSourceId() + " already exist");
+    }
     Element metaDataElement = (Element) profileElement.getElementsByTagName("MetaData").item(0);
     integrationProfile.setName(metaDataElement.getAttribute("Name"));
     integrationProfile.setXml(content);
@@ -1075,11 +1076,6 @@ public abstract class ResourcebundleLoader {
       Element elmCode = (Element) messages.item(j);
       String id = elmCode.getAttribute("ID");
       ids.add(id);
-
-      if (cachedRepository.getCachedProfiles().containsKey(id)) {
-        throw new RuntimeException("Found duplicate conformance profile id " + id);
-      }
-      cachedRepository.getCachedProfiles().put(id, integrationProfile);
     }
     integrationProfile.setMessages(ids);
     return integrationProfile;
@@ -1149,28 +1145,30 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  protected IntegrationProfile getIntegrationProfile(String id) throws IOException {
-    IntegrationProfile p = cachedRepository.getCachedProfiles().get(id);
+
+
+  protected IntegrationProfile getIntegrationProfile(String sourceId) throws IOException {
+    IntegrationProfile p = integrationProfileRepository.findBySourceId(sourceId);
     if (p == null) {
       throw new IllegalArgumentException(
-          "Cannot find integration profile of conformance profile with id = " + id);
+          "Cannot find integration profile with sourceId = " + sourceId);
     }
 
     return p;
   }
 
-  protected Constraints getConstraints(String id) throws IOException {
-    Constraints c = cachedRepository.getCachedConstraints().get(id);
+  protected Constraints getConstraints(String sourceId) throws IOException {
+    Constraints c = constraintsRepository.findOneBySourceId(sourceId);
     if (c == null) {
-      throw new IllegalArgumentException("Constraints with id = " + id + " not found");
+      throw new IllegalArgumentException("Constraints with sourceId = " + sourceId + " not found");
     }
     return c;
   }
 
-  protected VocabularyLibrary getVocabularyLibrary(String id) throws IOException {
-    VocabularyLibrary v = cachedRepository.getCachedVocabLibraries().get(id);
+  protected VocabularyLibrary getVocabularyLibrary(String sourceId) throws IOException {
+    VocabularyLibrary v = vocabularyLibraryRepository.findOneBySourceId(sourceId);
     if (v == null) {
-      throw new IllegalArgumentException("VocabularyLibrary with id = " + id + " not found");
+      throw new IllegalArgumentException("VocabularyLibrary with id = " + sourceId + " not found");
     }
     return v;
   }
@@ -1193,7 +1191,7 @@ public abstract class ResourcebundleLoader {
   }
 
   public void loadContextBasedTestCases(String rootPath, TestScope scope, boolean preloaded,
-      String domain) throws IOException {
+      String domain) throws Exception {
     List<Resource> resources =
         this.getDirectories(getDomainBasedPath(CONTEXTBASED_PATTERN, domain) + "*/", rootPath);
     if (resources != null && !resources.isEmpty()) {
@@ -1212,7 +1210,7 @@ public abstract class ResourcebundleLoader {
   }
 
   public void loadContextFreeTestCases(String rootPath, TestScope scope, boolean preloaded,
-      String domain) throws IOException, ProfileParserException {
+      String domain) throws Exception {
     List<Resource> resources =
         this.getDirectories(getDomainBasedPath(CONTEXTFREE_PATTERN, domain) + "*/", rootPath);
     if (resources != null && !resources.isEmpty()) {
@@ -1232,7 +1230,7 @@ public abstract class ResourcebundleLoader {
 
   protected TestCase testCase(String location, TestingStage stage, boolean transportSupported,
       String rootPath, String domain, TestScope scope, String authorUsername, boolean preloaded)
-      throws IOException {
+      throws Exception {
     logger.info("Processing test case located at:" + location);
     TestCase tc = new TestCase();
     Resource res = this.getResource(location + "TestCase.json", rootPath);
@@ -1348,7 +1346,7 @@ public abstract class ResourcebundleLoader {
 
   protected TestStep testStep(String location, TestingStage stage, boolean transportSupported,
       String rootPath, String domain, TestScope scope, String authorUsername, boolean preloaded)
-      throws IOException {
+      throws Exception {
     logger.info("Processing test step at:" + location);
     TestStep testStep = new TestStep();
     Resource res = this.getResource(location + "TestStep.json", rootPath);
@@ -1481,7 +1479,7 @@ public abstract class ResourcebundleLoader {
 
   protected TestCaseGroup testCaseGroup(String location, TestingStage stage,
       boolean transportEnabled, String rootPath, String domain, TestScope scope,
-      String authorUsername, boolean preloaded) throws IOException {
+      String authorUsername, boolean preloaded) throws Exception {
     logger.info("Processing test case group at:" + location);
     Resource descriptorRsrce = this.getResource(location + "TestCaseGroup.json", rootPath);
     if (descriptorRsrce == null)
@@ -1541,7 +1539,7 @@ public abstract class ResourcebundleLoader {
 
 
   protected CFTestStepGroup cfTestStepGroup(String location, String rootPath, String domain,
-      TestScope scope, String authorUsername, boolean preloaded) throws IOException {
+      TestScope scope, String authorUsername, boolean preloaded) throws Exception {
     logger.info("Processing test case group at:" + location);
     Resource descriptorRsrce = this.getResource(location + "TestStepGroup.json", rootPath);
     if (descriptorRsrce == null)
@@ -1605,7 +1603,7 @@ public abstract class ResourcebundleLoader {
 
 
   protected TestPlan testPlan(String location, TestingStage stage, String rootPath, String domain,
-      TestScope scope, String authorUsername, boolean preloaded) throws IOException {
+      TestScope scope, String authorUsername, boolean preloaded) throws Exception {
     logger.info("Processing test plan  at:" + location);
 
     Resource res = this.getResource(location + "TestPlan.json", rootPath);
@@ -1626,8 +1624,8 @@ public abstract class ResourcebundleLoader {
       tp.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       tp.setName(testPlanObj.findValue("name").textValue());
       tp.setDescription(testPlanObj.findValue("description").textValue());
-      tp.setCategory(testPlanObj.findValue("category") != null
-          ? testPlanObj.findValue("category").textValue() : DEFAULT_CATEGORY);
+      // tp.setCategory(testPlanObj.findValue("category") != null
+      // ? testPlanObj.findValue("category").textValue() : DEFAULT_CATEGORY);
       tp.setVersion(!testPlanObj.has("version") ? 1.0
           : Double.parseDouble(testPlanObj.findValue("version").asText()));
       tp.setTestStory(testStory(location, rootPath, domain));
@@ -1675,7 +1673,7 @@ public abstract class ResourcebundleLoader {
 
 
   protected CFTestPlan cfTestPlan(String testPlanPath, String rootPath, String domain,
-      TestScope scope, String authorUsername, boolean preloaded) throws IOException {
+      TestScope scope, String authorUsername, boolean preloaded) throws Exception {
     logger.info("Processing test plan at:" + testPlanPath);
     Resource res = this.getResource(testPlanPath + "TestPlan.json", rootPath);
     if (res == null)
@@ -1693,8 +1691,8 @@ public abstract class ResourcebundleLoader {
       testPlan.setDomain(domain);
       testPlan.setScope(scope);
       testPlan.setAuthorUsername(authorUsername);
-      testPlan.setCategory(testPlanObj.findValue("category") != null
-          ? testPlanObj.findValue("category").textValue() : DEFAULT_CATEGORY);
+      // testPlan.setCategory(testPlanObj.findValue("category") != null
+      // ? testPlanObj.findValue("category").textValue() : DEFAULT_CATEGORY);
       testPlan.setPersistentId(Long.parseLong(testPlanObj.findValue("id").asText()));
       if (testPlanObj.findValue("position") != null) {
         testPlan.setPosition(testPlanObj.findValue("position").intValue());
@@ -1741,7 +1739,7 @@ public abstract class ResourcebundleLoader {
 
 
   protected CFTestStep cfTestStep(String testObjectPath, String rootPath, String domain,
-      TestScope scope, String authorUsername, boolean preloaded) throws IOException {
+      TestScope scope, String authorUsername, boolean preloaded) throws Exception {
     logger.info("Processing test object at:" + testObjectPath);
     Resource res = this.getResource(testObjectPath + "TestObject.json", rootPath);
     if (res == null)
@@ -1777,225 +1775,6 @@ public abstract class ResourcebundleLoader {
     return null;
   }
 
-  public void loadTestCasesDocumentation(TestScope scope, boolean preloaded, String domain)
-      throws IOException {
-    List<CFTestPlan> cfTestPlans = null;
-    String authorUsername = getDomainAuthorname(domain);
-    if (authorUsername != null) {
-      cfTestPlans = cfTestPlanRepository.findAllByStageAndAuthorAndScopeAndDomain(TestingStage.CF,
-          authorUsername, scope, domain);
-    } else {
-      cfTestPlans =
-          cfTestPlanRepository.findAllByStageAndScopeAndDomain(TestingStage.CF, scope, domain);
-    }
-    TestCaseDocumentation doc =
-        generateCFTestPlanDocumentation("Context-free", TestingStage.CF, cfTestPlans);
-    if (doc != null) {
-      doc.setDomain(domain);
-      doc.setAuthorUsername(authorUsername);
-      doc.setScope(scope);
-      doc.setJson(obm.writeValueAsString(doc));
-      testCaseDocumentationRepository.save(doc);
-    }
-
-    List<TestPlan> cbTestPlans = null;
-    if (authorUsername != null) {
-      cbTestPlans = testPlanRepository.findAllByStageAndScopeAndDomainAndAuthor(TestingStage.CF,
-          scope, domain, authorUsername);
-    } else {
-      cbTestPlans =
-          testPlanRepository.findAllByStageAndScopeAndDomain(TestingStage.CB, scope, domain);
-    }
-
-    doc = generateCBTestPlansDocumentation("Context-based", TestingStage.CB, cbTestPlans);
-    if (doc != null) {
-      doc.setDomain(domain);
-      doc.setAuthorUsername(authorUsername);
-      doc.setScope(scope);
-      doc.setJson(obm.writeValueAsString(doc));
-      testCaseDocumentationRepository.save(doc);
-    }
-  }
-
-
-  private TestCaseDocumentation generateCBTestPlansDocumentation(String title, TestingStage stage,
-      List<TestPlan> tps) throws IOException {
-    if (tps != null && !tps.isEmpty()) {
-      TestCaseDocumentation documentation = new TestCaseDocumentation();
-      documentation.setTitle(title);
-      documentation.setStage(stage);
-      for (TestPlan testPlan : tps) {
-        documentation.getChildren().add(generateTestCaseDocument(testPlan));
-      }
-      return documentation;
-    }
-    return null;
-  }
-
-  private TestCaseDocumentation generateCFTestPlanDocumentation(String title, TestingStage stage,
-      List<CFTestPlan> tos) throws IOException {
-    if (tos != null && !tos.isEmpty()) {
-      TestCaseDocumentation documentation = new TestCaseDocumentation();
-      documentation.setTitle(title);
-      documentation.setStage(stage);
-      Collections.sort(tos);
-      for (CFTestPlan to : tos) {
-        documentation.getChildren().add(generateTestCaseDocument(to));
-      }
-      return documentation;
-    }
-    return null;
-  }
-
-  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestPlan tp)
-      throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
-    doc.setId(tp.getId());
-    if (tp.getTestCaseGroups() != null && !tp.getTestCaseGroups().isEmpty()) {
-      List<TestCaseGroup> list = new ArrayList<TestCaseGroup>(tp.getTestCaseGroups());
-      Collections.sort(list);
-      for (TestCaseGroup tcg : list) {
-        doc.getChildren().add(generateTestCaseDocument(tcg));
-      }
-    }
-    if (tp.getTestCases() != null && !tp.getTestCases().isEmpty()) {
-      List<TestCase> list = new ArrayList<TestCase>(tp.getTestCases());
-      Collections.sort(list);
-      for (TestCase tc : list) {
-        doc.getChildren().add(generateTestCaseDocument(tc));
-      }
-    }
-    return doc;
-  }
-
-  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestCaseGroup tcg)
-      throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tcg);
-    doc.setId(tcg.getId());
-    if (tcg.getTestCaseGroups() != null && !tcg.getTestCaseGroups().isEmpty()) {
-      List<TestCaseGroup> list = new ArrayList<TestCaseGroup>(tcg.getTestCaseGroups());
-      Collections.sort(list);
-      for (TestCaseGroup child : list) {
-        doc.getChildren().add(generateTestCaseDocument(child));
-      }
-    }
-
-    if (tcg.getTestCases() != null && !tcg.getTestCases().isEmpty()) {
-      List<TestCase> list = new ArrayList<TestCase>(tcg.getTestCases());
-      Collections.sort(list);
-      for (TestCase tc : list) {
-        doc.getChildren().add(generateTestCaseDocument(tc));
-      }
-    }
-
-    return doc;
-  }
-
-
-  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(CFTestStepGroup tcg)
-      throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tcg);
-    doc.setId(tcg.getId());
-    if (tcg.getTestStepGroups() != null && !tcg.getTestStepGroups().isEmpty()) {
-      List<CFTestStepGroup> list = new ArrayList<CFTestStepGroup>(tcg.getTestStepGroups());
-      Collections.sort(list);
-      for (CFTestStepGroup child : list) {
-        doc.getChildren().add(generateTestCaseDocument(child));
-      }
-    }
-    if (tcg.getTestSteps() != null && !tcg.getTestSteps().isEmpty()) {
-      List<CFTestStep> list = new ArrayList<CFTestStep>(tcg.getTestSteps());
-      Collections.sort(list);
-      for (CFTestStep tc : list) {
-        doc.getChildren().add(generateTestCaseDocument(tc));
-      }
-    }
-    return doc;
-  }
-
-
-  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestCase tc)
-      throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tc);
-    doc.setId(tc.getId());
-    if (tc.getTestSteps() != null && !tc.getTestSteps().isEmpty()) {
-      List<TestStep> list = new ArrayList<TestStep>(tc.getTestSteps());
-      Collections.sort(list);
-      for (TestStep ts : list) {
-        doc.getChildren().add(generateTestCaseDocument(ts));
-      }
-    }
-    return doc;
-  }
-
-  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(TestStep ts)
-      throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(ts.getTestContext());
-    doc = initTestCaseDocument(ts, doc);
-    if (ts.getTestContext() != null) {
-      doc.setId(ts.getTestContext().getId());
-    }
-    return doc;
-  }
-
-  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(CFTestStep to)
-      throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = generateTestCaseDocument(to.getTestContext());
-    doc = initTestCaseDocument(to, doc);
-    doc.setId(to.getId());
-    return doc;
-  }
-
-  private gov.nist.hit.core.domain.TestCaseDocument generateTestCaseDocument(CFTestPlan tp)
-      throws IOException {
-    gov.nist.hit.core.domain.TestCaseDocument doc = initTestCaseDocument(tp);
-    doc.setId(tp.getId());
-
-    if (tp.getTestStepGroups() != null && !tp.getTestStepGroups().isEmpty()) {
-      List<CFTestStepGroup> list = new ArrayList<CFTestStepGroup>(tp.getTestStepGroups());
-      Collections.sort(list);
-      for (CFTestStepGroup tcg : list) {
-        doc.getChildren().add(generateTestCaseDocument(tcg));
-      }
-    }
-    if (tp.getTestSteps() != null && !tp.getTestSteps().isEmpty()) {
-      List<CFTestStep> list = new ArrayList<CFTestStep>(tp.getTestSteps());
-      Collections.sort(list);
-      for (CFTestStep tc : list) {
-        doc.getChildren().add(generateTestCaseDocument(tc));
-      }
-    }
-
-    return doc;
-  }
-
-
-
-  private gov.nist.hit.core.domain.TestCaseDocument initTestCaseDocument(AbstractTestCase ts)
-      throws IOException {
-    return initTestCaseDocument(ts, new TestCaseDocument());
-  }
-
-  private gov.nist.hit.core.domain.TestCaseDocument initTestCaseDocument(AbstractTestCase ts,
-      TestCaseDocument doc) throws IOException {
-    doc.setTitle(ts.getName());
-    doc.setType(ts.getType().toString());
-    doc.setTsPath(ts.getTestStory() != null ? ts.getTestStory().getPdfPath() : null);
-    if (ts instanceof TestPlan) {
-      TestPlan tp = (TestPlan) ts;
-      doc.setTpPath(tp.getTestPackage() != null ? tp.getTestPackage().getPdfPath() : null);
-      doc.setTpsPath(tp.getTestPlanSummary() != null ? tp.getTestPlanSummary().getPdfPath() : null);
-    } else if (ts instanceof TestStep) {
-      TestStep tStep = (TestStep) ts;
-      doc.setMcPath(
-          tStep.getMessageContent() != null ? tStep.getMessageContent().getPdfPath() : null);
-      doc.setTdsPath(tStep.getTestDataSpecification() != null
-          ? tStep.getTestDataSpecification().getPdfPath() : null);
-      doc.setJdPath(
-          tStep.getJurorDocument() != null ? tStep.getJurorDocument().getPdfPath() : null);
-    }
-    return doc;
-  }
 
   protected Resource getDescriptorResource(String location, String rootPath) throws IOException {
     Resource resource = this.getResource(location + "TestPlan.json", rootPath);
@@ -2154,14 +1933,6 @@ public abstract class ResourcebundleLoader {
     this.documentRepository = documentRepository;
   }
 
-
-  public CachedRepository getCachedRepository() {
-    return cachedRepository;
-  }
-
-  public void setCachedRepository(CachedRepository cachedRepository) {
-    this.cachedRepository = cachedRepository;
-  }
 
   public TransportFormsRepository getTransportFormsRepository() {
     return transportFormsRepository;

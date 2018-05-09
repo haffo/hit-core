@@ -85,15 +85,16 @@ public class DomainController {
 		return domainService.findShortAllGlobalDomains();
 	}
 
-	private void checkPermission(Domain domain, Authentication auth) throws Exception {
-		String username = auth.getName();
-		if (username == null)
-			throw new NoUserFoundException("User could not be found");
-		TestScope scope = domain.getScope();
-		if (scope.equals(TestScope.GLOBAL) && !userService.hasGlobalAuthorities(username)) {
+	private void hasScopeAccess(TestScope scope, Authentication auth) throws Exception {
+		if (scope.equals(TestScope.GLOBAL) && !userService.hasGlobalAuthorities(auth.getName())
+				&& !userService.isAdmin(auth.getName()) && !userService.isSupervisor(auth.getName())) {
 			throw new NoUserFoundException("You do not have the permission to perform this task");
 		}
-		if (!username.equals(domain.getAuthorUsername()) && !userService.isAdmin(username)) {
+	}
+
+	private void hasDomainAccess(Domain domain, Authentication auth) throws Exception {
+		if (!userService.hasGlobalAuthorities(auth.getName()) && !userService.isAdmin(auth.getName())
+				&& !userService.isSupervisor(auth.getName())) {
 			throw new NoUserFoundException("You do not have the permission to perform this task");
 		}
 	}
@@ -150,20 +151,14 @@ public class DomainController {
 	public Domain saveDomain(HttpServletRequest request, @PathVariable("id") Long id, @RequestBody Domain domain,
 			Authentication authentication) throws Exception {
 		checkManagementSupport();
-		Domain result = null;
-		result = domainService.findOne(id);
+		domainService.hasPermission(domain.getDomain(), authentication);
+		Domain result = domainService.findOne(id);
 		if (result == null) {
 			throw new IllegalArgumentException("Unknown domain " + domain);
 		}
-
-		String username = authentication.getName();
-		if (!result.getAuthorUsername().equals(username)) {
-			throw new IllegalArgumentException("You do not have the privilege to perform this action");
-		}
-
-		checkPermission(result, authentication);
 		result.merge(domain);
 		result.setPreloaded(false);
+		hasScopeAccess(result.getScope(), authentication);
 		domainService.save(result);
 		return result;
 	}
@@ -208,9 +203,21 @@ public class DomainController {
 		result.setDomain(key);
 		result.setName(name);
 		result.setDisabled(true);
-		checkPermission(result, authentication);
+		hasScopeAccess(result.getScope(), authentication);
 		domainService.save(result);
 		return result;
+	}
+
+	@PreAuthorize("hasRole('tester')")
+	@RequestMapping(value = "/new", method = RequestMethod.POST, produces = "application/json")
+	public Domain createDomain(HttpServletRequest request, @RequestParam String key, @RequestParam String name,
+			Authentication authentication) throws Exception {
+		Domain d = new Domain();
+		d.setDomain(key);
+		d.setName(name);
+		d.setScope(TestScope.USER);
+		d.setDisabled(true);
+		return createDomain(request, d, authentication);
 	}
 
 	@PreAuthorize("hasRole('tester')")
@@ -222,12 +229,7 @@ public class DomainController {
 		if (found == null) {
 			throw new IllegalArgumentException("Domain with id=" + id + " not found");
 		}
-
-		String username = authentication.getName();
-		if (!found.getAuthorUsername().equals(username)) {
-			throw new IllegalArgumentException("You do not have the privilege to perform this action");
-		}
-		checkPermission(found, authentication);
+		domainService.hasPermission(found.getDomain(), authentication);
 		domainService.delete(found);
 		return true;
 	}
@@ -237,20 +239,16 @@ public class DomainController {
 	public Domain publishDomain(HttpServletRequest request, @PathVariable("id") Long id, @RequestBody Domain domain,
 			Authentication authentication) throws Exception {
 		checkManagementSupport();
+		domainService.hasPermission(domain.getDomain(), authentication);
 		Domain found = domainService.findOne(id);
 		if (found == null) {
 			throw new IllegalArgumentException("Domain with id=" + id + " not found");
 		}
-
-		String username = authentication.getName();
-		if (!found.getAuthorUsername().equals(username)) {
-			throw new IllegalArgumentException("You do not have the privilege to perform this action");
-		}
-
-		checkPermission(found, authentication);
+		hasDomainAccess(found, authentication);
 		found.merge(domain);
 		found.setScope(TestScope.GLOBAL);
 		found.setPreloaded(false);
+		hasScopeAccess(found.getScope(), authentication);
 		domainService.save(found);
 		// TODO : publish artifacts
 		return found;

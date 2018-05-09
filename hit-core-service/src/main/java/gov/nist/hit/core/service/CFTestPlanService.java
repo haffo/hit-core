@@ -45,14 +45,7 @@ public interface CFTestPlanService {
 
   List<CFTestPlan> findAllByScopeAndDomain(TestScope scope, String domain);
 
-  Set<String> findAllCategoriesByScopeAndDomain(TestScope scope, String domain);
-
-  Set<String> findAllCategoriesByScopeAndUserAndDomain(TestScope scope, String username,
-      String domain);
-
   List<CFTestPlan> findByIds(Set<Long> ids);
-
-  void updateCategory(Set<Long> ids, String cat);
 
   void delete(CFTestPlan testPlan);
 

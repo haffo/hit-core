@@ -46,7 +46,6 @@ import org.springframework.web.multipart.MultipartFile;
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.DocumentType;
-import gov.nist.hit.core.domain.Domain;
 import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.DocumentRepository;
@@ -58,11 +57,8 @@ import gov.nist.hit.core.service.TestCaseDocumentationService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ZipGenerator;
 import gov.nist.hit.core.service.exception.DocumentationException;
-import gov.nist.hit.core.service.exception.DomainException;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
 import gov.nist.hit.core.service.exception.MessageUploadException;
-import gov.nist.hit.core.service.exception.NoUserFoundException;
-import gov.nist.hit.core.service.exception.PermissionException;
 import io.swagger.annotations.ApiParam;
 
 /**
@@ -104,11 +100,11 @@ public class DocumentationController {
 
 	public String DOCUMENTATION_FOLDER_ROOT = "/documentation";
 
-	private void checkManagementSupport() throws Exception {
-		if (!appInfoService.get().isDocumentManagementSupported()) {
-			throw new Exception("This operation is not supported by this tool");
-		}
-	}
+	// private void checkManagementSupport() throws Exception {
+	// if (!appInfoService.get().isDocumentManagementSupported()) {
+	// throw new Exception("This operation is not supported by this tool");
+	// }
+	// }
 
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/uploadDocument", method = RequestMethod.POST, consumes = { "multipart/form-data" })
@@ -118,7 +114,7 @@ public class DocumentationController {
 			throws Exception {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		try {
-			checkDomainPermission(domain, auth);
+			domainService.hasPermission(domain, auth);
 			String filename = part.getOriginalFilename();
 			String extension = filename.substring(filename.lastIndexOf(".") + 1);
 			if (extension.equals("xml") && extension.equals("pdf") && extension.equals("ppt")
@@ -156,53 +152,53 @@ public class DocumentationController {
 	}
 
 	private void checkDocumentPermission(Document document, Authentication auth) throws Exception {
-		String username = auth.getName();
-		TestScope scope = document.getScope();
-		if (TestScope.GLOBAL.equals(scope) && !userService.hasGlobalAuthorities(username)) {
-			throw new PermissionException("You do not have the permission to perform this task");
-		}
-		if (!username.equals(document.getAuthorUsername()) && !userService.isAdmin(username)) {
-			throw new PermissionException("You do not have the permission to perform this task");
-		}
-
-		checkDomainPermission(document.getDomain(), auth);
-
-	}
-
-	private void checkDomainPermission(String domainKey, Authentication auth) throws Exception {
-		String username = auth.getName();
-		if (username == null)
-			throw new NoUserFoundException("User could not be found");
-		Domain domain = domainService.findOneByKey(domainKey);
-		if (domain == null) {
-			throw new DomainException("Unknown domain " + domainKey);
-		}
-		if (!domain.getAuthorUsername().equals(auth.getName()) && !userService.isAdmin(username)) {
-			throw new PermissionException("You do not have the permission to perform this task");
-		}
-
+		// String username = auth.getName();
+		// TestScope scope = document.getScope();
+		// if (TestScope.GLOBAL.equals(scope) &&
+		// !userService.hasGlobalAuthorities(username)) {
+		// throw new PermissionException("You do not have the permission to
+		// perform this task");
+		// }
+		// if (!username.equals(document.getAuthorUsername()) &&
+		// !userService.isAdmin(username)) {
+		// throw new PermissionException("You do not have the permission to
+		// perform this task");
+		// }
+		domainService.hasPermission(document.getDomain(), auth);
 	}
 
 	// @Cacheable(value = "HitCache", key = "'testcases-documentation'")
+	// @RequestMapping(value = "/testcases", method = RequestMethod.GET,
+	// produces = "application/json")
+	// public void testCases(HttpServletResponse response,
+	// @RequestParam(required = true) String domain,
+	// @RequestParam(required = false) TestScope scope, HttpServletRequest
+	// request) throws IOException {
+	// logger.info("Fetching test case documentation");
+	// scope = scope == null ? TestScope.GLOBAL : scope;
+	// if (TestScope.USER.equals(scope)) {
+	// Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+	// if (userId != null) {
+	// Account account = accountService.findOne(userId);
+	// if (account != null) {
+	// streamer.stream(response.getOutputStream(),
+	// testCaseDocumentationService.findOneByStageAndDomainAndAuthorAndScope(TestingStage.CB,
+	// domain, account.getUsername(), scope));
+	// }
+	// }
+	// } else {
+	// streamer.stream(response.getOutputStream(),
+	// testCaseDocumentationService.findOneByStageAndDomainAndScope(TestingStage.CB,
+	// domain, scope));
+	// }
+	// }
+
 	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
 	public void testCases(HttpServletResponse response, @RequestParam(required = true) String domain,
-			@RequestParam(required = false) TestScope scope, HttpServletRequest request) throws IOException {
+			@RequestParam(required = true) TestScope scope, HttpServletRequest request) throws IOException {
 		logger.info("Fetching test case documentation");
-		scope = scope == null ? TestScope.GLOBAL : scope;
-		if (TestScope.USER.equals(scope)) {
-			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-			if (userId != null) {
-				Account account = accountService.findOne(userId);
-				if (account != null) {
-					streamer.stream(response.getOutputStream(),
-							testCaseDocumentationService.findOneByStageAndDomainAndAuthorAndScope(TestingStage.CB,
-									domain, account.getUsername(), scope));
-				}
-			}
-		} else {
-			streamer.stream(response.getOutputStream(),
-					testCaseDocumentationService.findOneByStageAndDomainAndScope(TestingStage.CB, domain, scope));
-		}
+		streamer.streamTestCaseDocuments(response.getOutputStream(),
+				testCaseDocumentationService.generate(scope, domain));
 	}
 
 	// @Cacheable(value = "HitCache", key = "'userdocs'")
@@ -314,12 +310,13 @@ public class DocumentationController {
 	}
 
 	@RequestMapping(value = "/testPackages", method = RequestMethod.POST, produces = "application/zip")
-	public void downloadTestPackages(HttpServletRequest request, HttpServletResponse response)
+	public void downloadTestPackages(HttpServletRequest request, @RequestParam(required = true) String domain,
+			@RequestParam(required = true) TestScope scope, HttpServletResponse response)
 			throws DownloadDocumentException {
 		try {
-			InputStream stream = zipTestPackages(TestingStage.CB);
+			InputStream stream = testCaseDocumentationService.zipContextbasedTestPackages(scope, domain);
 			response.setContentType("application/zip");
-			response.setHeader("Content-disposition", "attachment;filename=ContextBasedTestPackages.zip");
+			response.setHeader("Content-disposition", "attachment;filename=TestPackages.zip");
 			streamer.stream(response.getOutputStream(), stream);
 		} catch (IOException e) {
 			logger.debug("Failed to download the test packages ");
@@ -331,12 +328,19 @@ public class DocumentationController {
 	}
 
 	@RequestMapping(value = "/exampleMessages", method = RequestMethod.POST, produces = "application/zip")
-	public void downloadAllExampleMessages(HttpServletRequest request, HttpServletResponse response)
+	public void downloadAllExampleMessages(HttpServletRequest request,
+			@RequestParam(required = true) TestingStage stage, @RequestParam(required = true) String domain,
+			@RequestParam(required = true) TestScope scope, HttpServletResponse response)
 			throws DownloadDocumentException {
 		try {
-			InputStream stream = zipExampleMessages(TestingStage.CB);
+			InputStream stream = null;
+			if (stage.equals(TestingStage.CB)) {
+				stream = testCaseDocumentationService.zipContextbasedMessages(scope, domain);
+			} else {
+				stream = testCaseDocumentationService.zipContextfreeMessages(scope, domain);
+			}
 			response.setContentType("application/zip");
-			response.setHeader("Content-disposition", "attachment;filename=" + "ContextBasedExampleMessages.zip");
+			response.setHeader("Content-disposition", "attachment;filename=" + "ExampleMessages.zip");
 			streamer.stream(response.getOutputStream(), stream);
 		} catch (IOException e) {
 			logger.debug("Failed to download the example messages ");
@@ -401,6 +405,24 @@ public class DocumentationController {
 		}
 		return generateZip(pattern, name);
 	}
+
+	// public InputStream zipExampleMessages(TestingStage stage) throws
+	// Exception {
+	// String pattern = null;
+	// String name = null;
+	// if (stage == TestingStage.CB) {
+	// pattern = "/*Contextbased/**/Message.*";
+	// name = "ContextbasedExampleMessages";
+	// } else if (stage == TestingStage.CF) {
+	// pattern = "/*Contextfree/**/Message.*";
+	// name = "ContextfreeExampleMessages";
+	// } else if (stage == TestingStage.ISOLATED) {
+	// pattern = "/*Isolated/**/Message.*";
+	// name = "IsolatedExampleMessages";
+	// }
+	// return generateZip(pattern, name);
+	// }
+	//
 
 	public InputStream zipExampleMessages(TestingStage stage) throws Exception {
 		String pattern = null;

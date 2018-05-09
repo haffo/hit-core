@@ -24,7 +24,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 
  */
 @MappedSuperclass
-public abstract class AbstractTestCase extends TestResource implements Comparable<AbstractTestCase> {
+public abstract class AbstractTestCase extends TestResource
+    implements Comparable<AbstractTestCase> {
 
   @ApiModelProperty(required = true, value = "name of the test case")
   @Column(columnDefinition = "TEXT")

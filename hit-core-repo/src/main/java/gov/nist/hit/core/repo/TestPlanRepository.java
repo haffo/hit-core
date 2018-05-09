@@ -14,7 +14,6 @@ package gov.nist.hit.core.repo;
 
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -48,21 +47,21 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 
 
   @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.domain=?2")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.domain=?2")
   public List<TestPlan> findShortAllByStageAndDomain(TestingStage stage, String domain);
 
   @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.scope = ?2 and tp.domain=?3")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.scope = ?2 and tp.domain=?3")
   public List<TestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
       String domain);
 
   @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.domain=?3")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.domain=?3")
   public List<TestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage,
       String authorUsername, String domain);
 
   @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3 and tp.domain=?4")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3 and tp.domain=?4")
   public List<TestPlan> findAllShortByStageAndUsernameAndScopeAndDomain(TestingStage stage,
       String authorUsername, TestScope scope, String domain);
 
@@ -95,18 +94,6 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
   @Transactional(value = "transactionManager")
   @Query("delete from TestPlan to where to.preloaded = false")
   public void deleteNonPreloaded();
-
-  @Transactional(value = "transactionManager")
-  @Query("select tp.category from TestPlan tp where tp.stage = :stage and tp.scope=:scope and tp.domain = :domain")
-  public Set<String> findAllCategoriesByStageAndScopeAndDomain(@Param("stage") TestingStage stage,
-      @Param("scope") TestScope scope, @Param("domain") String domain);
-
-  @Transactional(value = "transactionManager")
-  @Query("select tp.category from TestPlan tp where tp.stage = :stage and tp.scope=:scope and tp.authorUsername = :username and tp.domain=:domain")
-  public Set<String> findAllCategoriesByStageAndScopeAndUserAndDomain(
-      @Param("stage") TestingStage stage, @Param("scope") TestScope scope,
-      @Param("username") String username, @Param("domain") String domain);
-
 
 
 }

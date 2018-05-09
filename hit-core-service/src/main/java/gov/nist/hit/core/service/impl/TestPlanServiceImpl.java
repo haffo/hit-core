@@ -2,7 +2,6 @@ package gov.nist.hit.core.service.impl;
 
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,20 +62,6 @@ public class TestPlanServiceImpl implements TestPlanService {
     return testPlanRepository.findShortAllByStageAndAuthorAndDomain(stage, authorUsername, domain);
   }
 
-  @Override
-  @Transactional(value = "transactionManager")
-  public Set<String> findAllCategoriesByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
-      String domain) {
-    return testPlanRepository.findAllCategoriesByStageAndScopeAndDomain(stage, scope, domain);
-  }
-
-  @Override
-  @Transactional(value = "transactionManager")
-  public Set<String> findAllCategoriesByStageAndScopeAndUserAndDomain(TestingStage stage,
-      TestScope scope, String username, String domain) {
-    return testPlanRepository.findAllCategoriesByStageAndScopeAndUserAndDomain(stage, scope,
-        username, domain);
-  }
 
   @Override
   public List<TestPlan> findShortAllByStageAndScopeAndAuthorAndDomain(TestingStage stage,

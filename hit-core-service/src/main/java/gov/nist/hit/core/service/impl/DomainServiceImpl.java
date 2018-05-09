@@ -4,18 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import gov.nist.hit.core.domain.Domain;
 import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.repo.DomainRepository;
 import gov.nist.hit.core.service.DomainService;
+import gov.nist.hit.core.service.UserService;
+import gov.nist.hit.core.service.exception.DomainException;
+import gov.nist.hit.core.service.exception.PermissionException;
 
 @Service
 public class DomainServiceImpl implements DomainService {
 
   @Autowired
   protected DomainRepository domainRepo;
+
+  @Autowired
+  private UserService userService;
 
   @Override
   public Domain findOneByKey(String key) {
@@ -82,6 +89,24 @@ public class DomainServiceImpl implements DomainService {
   public void deletePreloaded() {
     domainRepo.deletePreloaded();
 
+  }
+
+  @Override
+  public void hasPermission(String domainKey, Authentication auth) throws Exception {
+    String username = auth.getName();
+    if (!"app".equalsIgnoreCase(domainKey)) {
+      Domain domain = findOneByKey(domainKey);
+      if (domain == null) {
+        throw new DomainException("Unknown domain " + domainKey);
+      }
+      if (!domain.getAuthorUsername().equals(auth.getName()) && !userService.isAdmin(username)) {
+        throw new PermissionException("You do not have the permission to perform this task");
+      }
+    } else {
+      if (!userService.isAdmin(username)) {
+        throw new PermissionException("You do not have the permission to perform this task");
+      }
+    }
   }
 
 
