@@ -75,26 +75,49 @@ public class TestCaseDocumentationServiceImpl implements TestCaseDocumentationSe
     List<TestCaseDocumentation> documents = new ArrayList<TestCaseDocumentation>();
     List<CFTestPlan> cfTestPlans =
         cfTestPlanRepository.findAllByStageAndScopeAndDomain(TestingStage.CF, scope, domain);
-    TestCaseDocumentation doc = cf("Context-free", TestingStage.CF, cfTestPlans);
-    if (doc != null) {
-      doc.setDomain(domain);
-      doc.setScope(scope);
-      doc.setJson(obm.writeValueAsString(doc));
-      documents.add(doc);
-    }
-
+    documents.addAll(generateCfDocumentations(cfTestPlans));
     List<TestPlan> cbTestPlans =
         testPlanRepository.findAllByStageAndScopeAndDomain(TestingStage.CB, scope, domain);
+    documents.addAll(generateCbDocumentations(cbTestPlans));
+    return documents;
+  }
 
-    doc = cb("Context-based", TestingStage.CB, cbTestPlans);
+  @Override
+  public List<TestCaseDocumentation> generate(TestScope scope, String domain, String username)
+      throws IOException {
+    List<TestCaseDocumentation> documents = new ArrayList<TestCaseDocumentation>();
+    List<CFTestPlan> cfTestPlans = cfTestPlanRepository
+        .findAllByStageAndAuthorAndScopeAndDomain(TestingStage.CF, username, scope, domain);
+    documents.addAll(generateCfDocumentations(cfTestPlans));
+    List<TestPlan> cbTestPlans = testPlanRepository
+        .findAllByStageAndScopeAndDomainAndAuthor(TestingStage.CB, scope, domain, username);
+    documents.addAll(generateCbDocumentations(cbTestPlans));
+    return documents;
+  }
+
+
+  public List<TestCaseDocumentation> generateCbDocumentations(List<TestPlan> testPlans)
+      throws IOException {
+    List<TestCaseDocumentation> documents = new ArrayList<TestCaseDocumentation>();
+    TestCaseDocumentation doc = cb("Context-based", TestingStage.CB, testPlans);
     if (doc != null) {
-      doc.setDomain(domain);
-      doc.setScope(scope);
       doc.setJson(obm.writeValueAsString(doc));
       documents.add(doc);
     }
     return documents;
   }
+
+  public List<TestCaseDocumentation> generateCfDocumentations(List<CFTestPlan> testPlans)
+      throws IOException {
+    List<TestCaseDocumentation> documents = new ArrayList<TestCaseDocumentation>();
+    TestCaseDocumentation doc = cf("Context-free", TestingStage.CF, testPlans);
+    if (doc != null) {
+      doc.setJson(obm.writeValueAsString(doc));
+      documents.add(doc);
+    }
+    return documents;
+  }
+
 
 
   private TestCaseDocumentation cb(String title, TestingStage stage, List<TestPlan> tps)

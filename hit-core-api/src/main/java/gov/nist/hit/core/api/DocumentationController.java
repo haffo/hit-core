@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.DocumentType;
+import gov.nist.hit.core.domain.TestCaseDocumentation;
 import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.DocumentRepository;
@@ -194,11 +197,22 @@ public class DocumentationController {
 	// }
 
 	@RequestMapping(value = "/testcases", method = RequestMethod.GET, produces = "application/json")
-	public void testCases(HttpServletResponse response, @RequestParam(required = true) String domain,
-			@RequestParam(required = true) TestScope scope, HttpServletRequest request) throws IOException {
+	public List<TestCaseDocumentation> testCases(HttpServletResponse response,
+			@RequestParam(required = true) String domain, @RequestParam(required = true) TestScope scope,
+			HttpServletRequest request) throws IOException {
 		logger.info("Fetching test case documentation");
-		streamer.streamTestCaseDocuments(response.getOutputStream(),
-				testCaseDocumentationService.generate(scope, domain));
+		if (TestScope.USER.equals(scope)) {
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId != null) {
+				Account account = accountService.findOne(userId);
+				if (account != null) {
+					return testCaseDocumentationService.generate(scope, domain, account.getUsername());
+				}
+			}
+		} else {
+			return testCaseDocumentationService.generate(scope, domain);
+		}
+		return null;
 	}
 
 	// @Cacheable(value = "HitCache", key = "'userdocs'")
@@ -521,13 +535,18 @@ public class DocumentationController {
 		return deleteDocument(id, auth);
 	}
 
+	private String format(Date date) {
+		SimpleDateFormat dt1 = new SimpleDateFormat("yyyy/mm/dd");
+		return dt1.format(date);
+	}
+
 	private Document saveDocument(Document document, Authentication auth) throws Exception {
 		logger.info("Fetching  all release notes");
 		Document result = null;
 		document.setAuthorUsername(auth.getName());
 		document.setVersion("1");
 		document.setPreloaded(false);
-		document.setDate("");
+		document.setDate(format(new Date()));
 		if (document.getName() == null) {
 			document.setName(document.getTitle());
 		}

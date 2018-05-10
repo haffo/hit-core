@@ -17,5 +17,8 @@ public interface TestCaseDocumentationService {
 
   public InputStream zipContextbasedTestPackages(TestScope scope, String domain) throws Exception;
 
+  List<TestCaseDocumentation> generate(TestScope scope, String domain, String username)
+      throws IOException;
+
 
 }
