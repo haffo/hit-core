@@ -364,7 +364,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   // Creation Methods
 
   public List<TestStep> createTS(String rootPath, String domain, TestScope scope,
-      String authorUsername, boolean preloaded) throws IOException {
+      String authorUsername, boolean preloaded) throws Exception {
 
     List<TestStep> tmp = new ArrayList<TestStep>();
     List<Resource> resources = getApiDirectories("*", rootPath);
@@ -380,7 +380,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   }
 
   public List<TestCase> createTC(String rootPath, String domain, TestScope scope,
-      String authorUsername, boolean preloaded) throws IOException {
+      String authorUsername, boolean preloaded) throws Exception {
     List<TestCase> tmp = new ArrayList<TestCase>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
@@ -395,7 +395,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   }
 
   public List<TestCaseGroup> createTCG(String rootPath, String domain, TestScope scope,
-      String authorUsername, boolean preloaded) throws IOException {
+      String authorUsername, boolean preloaded) throws Exception {
     List<TestCaseGroup> tmp = new ArrayList<TestCaseGroup>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
@@ -410,7 +410,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   }
 
   public List<TestPlan> createTP(String rootPath, String domain, TestScope scope,
-      String authorUsername, boolean preloaded) {
+      String authorUsername, boolean preloaded) throws Exception {
     List<TestPlan> tmp = new ArrayList<TestPlan>();
     List<Resource> resources;
     try {
@@ -432,7 +432,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   }
 
   public List<CFTestStep> createCFTC(String rootPath, String domain, TestScope scope,
-      String authorUsername, boolean preloaded) throws IOException {
+      String authorUsername, boolean preloaded) throws Exception {
 
     List<CFTestStep> tmp = new ArrayList<CFTestStep>();
     List<Resource> resources = getApiDirectories("*", rootPath);
