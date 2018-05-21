@@ -202,6 +202,7 @@ public class DomainController {
 		result.setScope(scope);
 		result.setDomain(key);
 		result.setName(name);
+		result.setHomeTitle(domain.getHomeTitle());
 		result.setDisabled(true);
 		hasScopeAccess(result.getScope(), authentication);
 		domainService.save(result);

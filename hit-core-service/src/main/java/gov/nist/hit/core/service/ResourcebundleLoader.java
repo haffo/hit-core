@@ -505,9 +505,12 @@ public abstract class ResourcebundleLoader {
       entry.setValidationResultInfo(FileUtil.getContent(resource));
     }
     resource = this.getResource(domainPath + ResourcebundleLoader.HOME_PATTERN, rootPath);
-    if (resource != null) {
-      entry.setHomeContent(FileUtil.getContent(resource));
+    if (resource == null) {
+      throw new IllegalArgumentException(
+          "No " + ResourcebundleLoader.HOME_PATTERN + " found at " + domainPath);
     }
+
+    entry.setHomeContent(FileUtil.getContent(resource));
     resource =
         this.getResource(domainPath + ResourcebundleLoader.MESSAGECONTENT_INFO_PATTERN, rootPath);
     if (resource != null) {
