@@ -76,7 +76,7 @@ public class ResourceController {
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/addOrUpdate/testStep", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestStep(@ModelAttribute("requestObj") AddOrUpdateRequest request,
-			Authentication u) throws IOException {
+			Authentication u) throws Exception {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
@@ -101,7 +101,7 @@ public class ResourceController {
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/update/testCase", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> updateTestCase(@ModelAttribute("requestObj") AddOrUpdateRequest request,
-			Authentication u) throws IOException {
+			Authentication u) throws Exception {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
@@ -123,7 +123,7 @@ public class ResourceController {
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/add/testCase/to/testPlan", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestCaseToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request,
-			Authentication u) throws IOException {
+			Authentication u) throws Exception {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
@@ -145,7 +145,7 @@ public class ResourceController {
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/add/testCase/to/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestCaseToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request,
-			Authentication u) throws ProfileParserException, IOException, NotFoundException {
+			Authentication u) throws Exception {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
@@ -169,7 +169,7 @@ public class ResourceController {
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/update/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> updateTestGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request,
-			Authentication u) throws ProfileParserException, IOException, NotFoundException {
+			Authentication u) throws Exception {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
@@ -191,7 +191,7 @@ public class ResourceController {
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/add/testCaseGroup/to/testPlan", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestGroupToPlan(@ModelAttribute("requestObj") AddOrUpdateRequest request,
-			Authentication u) throws IOException {
+			Authentication u) throws Exception {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
@@ -213,7 +213,7 @@ public class ResourceController {
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/add/testCaseGroup/to/testCaseGroup", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addTestGroupToGroup(@ModelAttribute("requestObj") AddOrUpdateRequest request,
-			Authentication u) throws IOException {
+			Authentication u) throws Exception {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
@@ -237,7 +237,7 @@ public class ResourceController {
 	@CacheEvict(value = "HitCache", key = "'cb-testcases'", allEntries = true)
 	@RequestMapping(value = "/cb/addOrUpdate/testPlan", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addOrUpdateTestPlan(Authentication u,
-			@ModelAttribute("requestObj") AddOrUpdateRequest request, HttpServletResponse resp) throws IOException {
+			@ModelAttribute("requestObj") AddOrUpdateRequest request, HttpServletResponse resp) throws Exception {
 		validateRequest(request);
 
 		String scope = request.getScope().replaceAll("\"", "");
@@ -271,7 +271,7 @@ public class ResourceController {
 	@CacheEvict(value = "HitCache", key = "'cf-testcases'", allEntries = true)
 	@RequestMapping(value = "/cf/addOrUpdate/testCase", method = RequestMethod.POST, produces = "application/json")
 	public List<ResourceUploadStatus> addCFTestCase(Authentication u,
-			@ModelAttribute("requestObj") AddOrUpdateRequest request, HttpServletResponse resp) throws IOException {
+			@ModelAttribute("requestObj") AddOrUpdateRequest request, HttpServletResponse resp) throws Exception {
 		validateRequest(request);
 
 		List<ResourceUploadStatus> results = new ArrayList<>();
