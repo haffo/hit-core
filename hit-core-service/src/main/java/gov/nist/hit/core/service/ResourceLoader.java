@@ -336,7 +336,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     TestPlan existing = this.testPlanRepository.getByPersistentId(tp.getPersistentId());
 
     if (existing != null) {
-      if (existing.getDomain() != tp.getDomain()) {
+      if (!existing.getDomain().equals(tp.getDomain())) {
         result.setAction(ResourceUploadAction.UPDATE);
         result.setStatus(ResourceUploadResult.FAILURE);
         result.setMessage("You cannot change TestPlan(" + tp.getPersistentId() + ") domain from "
