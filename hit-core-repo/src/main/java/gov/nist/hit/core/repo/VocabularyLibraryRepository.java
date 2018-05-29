@@ -40,5 +40,11 @@ public interface VocabularyLibraryRepository extends JpaRepository<VocabularyLib
   @Query("delete from VocabularyLibrary to where to.preloaded = false")
   public void deleteNonPreloaded();
 
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from VocabularyLibrary to where to.domain = :domain")
+  public void deleteByDomain(@Param("domain") String domain);
+
+
 
 }

@@ -78,6 +78,11 @@ public interface CFTestPlanRepository extends JpaRepository<CFTestPlan, Long> {
   @Query("select tp from CFTestPlan tp where tp.id IN (:ids)")
   public List<CFTestPlan> findByIds(@Param("ids") Set<Long> ids);
 
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from CFTestPlan to where to.domain = :domain")
+  public void deleteByDomain(@Param("domain") String domain);
+
 
 
 }

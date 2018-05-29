@@ -15,8 +15,10 @@ package gov.nist.hit.core.repo;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.DocumentType;
@@ -68,6 +70,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
   public List<Document> findAllByDomainAndAuthorAndScopeAndType(@Param("domain") String domain,
       @Param("authorUsername") String authorUsername, @Param("scope") TestScope scope,
       @Param("type") DocumentType type);
+
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from Document to where to.domain = :domain")
+  public void deleteByDomain(@Param("domain") String domain);
 
 
 

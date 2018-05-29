@@ -203,21 +203,23 @@ public class DomainController {
 		result.setDomain(key);
 		result.setName(name);
 		result.setHomeTitle(domain.getHomeTitle());
-		result.setDisabled(true);
+		result.setDisabled(false);
 		hasScopeAccess(result.getScope(), authentication);
 		domainService.save(result);
 		return result;
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@RequestMapping(value = "/new", method = RequestMethod.POST, produces = "application/json")
-	public Domain createDomain(HttpServletRequest request, @RequestParam String key, @RequestParam String name,
+	@RequestMapping(value = "/new", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8", produces = "application/json")
+	public Domain createDomain(HttpServletRequest request, @RequestParam("key") String key,
+			@RequestParam("name") String name, @RequestParam("homeTitle") String homeTitle,
 			Authentication authentication) throws Exception {
 		Domain d = new Domain();
 		d.setDomain(key);
 		d.setName(name);
 		d.setScope(TestScope.USER);
-		d.setDisabled(true);
+		d.setHomeTitle(homeTitle);
+		d.setDisabled(false);
 		return createDomain(request, d, authentication);
 	}
 

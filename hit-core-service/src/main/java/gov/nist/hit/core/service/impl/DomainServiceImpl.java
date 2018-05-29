@@ -9,7 +9,20 @@ import org.springframework.stereotype.Service;
 
 import gov.nist.hit.core.domain.Domain;
 import gov.nist.hit.core.domain.TestScope;
+import gov.nist.hit.core.repo.AppInfoRepository;
+import gov.nist.hit.core.repo.CFTestPlanRepository;
+import gov.nist.hit.core.repo.CFTestStepGroupRepository;
+import gov.nist.hit.core.repo.CFTestStepRepository;
+import gov.nist.hit.core.repo.ConstraintsRepository;
+import gov.nist.hit.core.repo.DocumentRepository;
 import gov.nist.hit.core.repo.DomainRepository;
+import gov.nist.hit.core.repo.IntegrationProfileRepository;
+import gov.nist.hit.core.repo.MessageRepository;
+import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
+import gov.nist.hit.core.repo.TestPlanRepository;
+import gov.nist.hit.core.repo.TestStepRepository;
+import gov.nist.hit.core.repo.TransportFormsRepository;
+import gov.nist.hit.core.repo.VocabularyLibraryRepository;
 import gov.nist.hit.core.service.DomainService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.DomainException;
@@ -23,6 +36,49 @@ public class DomainServiceImpl implements DomainService {
 
   @Autowired
   private UserService userService;
+
+
+  @Autowired
+  protected TransportFormsRepository transportFormsRepository;
+
+
+  @Autowired
+  protected IntegrationProfileRepository integrationProfileRepository;
+
+  @Autowired
+  protected MessageRepository messageRepository;
+
+  @Autowired
+  protected ConstraintsRepository constraintsRepository;
+
+  @Autowired
+  protected AppInfoRepository appInfoRepository;
+
+  @Autowired
+  protected DocumentRepository documentRepository;
+
+  @Autowired
+  protected TestPlanRepository testPlanRepository;
+
+  @Autowired
+  protected CFTestStepRepository cfTestStepRepository;
+
+  @Autowired
+  protected CFTestStepGroupRepository cfTestSteGroupRepository;
+
+  @Autowired
+  protected CFTestPlanRepository cfTestPlanRepository;
+
+  @Autowired
+  protected TestStepRepository testStepRepository;
+
+  @Autowired
+  protected TestCaseDocumentationRepository testCaseDocumentationRepository;
+
+
+  @Autowired
+  protected VocabularyLibraryRepository vocabularyLibraryRepository;
+
 
   @Override
   public Domain findOneByKey(String key) {
@@ -57,7 +113,14 @@ public class DomainServiceImpl implements DomainService {
 
   @Override
   public void delete(Domain domain) {
-    // TODO Auto-generated method stub
+    String d = domain.getDomain();
+    testPlanRepository.deleteByDomain(d);
+    cfTestPlanRepository.deleteByDomain(d);
+    vocabularyLibraryRepository.deleteByDomain(d);
+    constraintsRepository.deleteByDomain(d);
+    integrationProfileRepository.deleteByDomain(d);
+    transportFormsRepository.deleteByDomain(d);
+    documentRepository.deleteByDomain(d);
     domainRepo.delete(domain);
   }
 

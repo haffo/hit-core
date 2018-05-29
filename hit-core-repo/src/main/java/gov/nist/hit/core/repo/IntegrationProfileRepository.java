@@ -39,4 +39,12 @@ public interface IntegrationProfileRepository extends JpaRepository<IntegrationP
   @Query("delete from IntegrationProfile to where to.preloaded = false")
   public void deleteNonPreloaded();
 
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from IntegrationProfile to where to.domain = :domain")
+  public void deleteByDomain(@Param("domain") String domain);
+
+
+
 }

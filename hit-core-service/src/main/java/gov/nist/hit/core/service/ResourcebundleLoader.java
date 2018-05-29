@@ -184,7 +184,6 @@ public abstract class ResourcebundleLoader {
   @Autowired
   protected CFTestPlanRepository cfTestPlanRepository;
 
-
   @Autowired
   protected TestStepRepository testStepRepository;
 
