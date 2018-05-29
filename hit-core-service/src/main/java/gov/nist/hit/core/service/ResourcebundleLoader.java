@@ -14,6 +14,8 @@ package gov.nist.hit.core.service;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +32,14 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +52,7 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -1132,6 +1143,20 @@ public abstract class ResourcebundleLoader {
     }
     return null;
   }
+  
+  protected String prettyPrint(Document xml) {
+	  try {
+		  Transformer tf = TransformerFactory.newInstance().newTransformer();
+			tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			tf.setOutputProperty(OutputKeys.INDENT, "yes");
+			Writer out = new StringWriter();
+			tf.transform(new DOMSource(xml), new StreamResult(out));
+			return out.toString();
+	  } catch (Exception e) {
+
+	    }
+		return null;
+	}
 
   public String jsonConformanceProfile(String integrationProfileXml, String conformanceProfileId,
       String constraintsXml, String additionalConstraintsXml) throws ProfileParserException,
@@ -1146,6 +1171,33 @@ public abstract class ResourcebundleLoader {
     }
     return null;
   }
+  
+  public String getConformanceProfileContent(String integrationProfileXml, String messageId)  {
+		Document doc = stringToDom(integrationProfileXml);
+		IntegrationProfile integrationProfile = new IntegrationProfile();
+		Element profileElement = (Element) doc.getElementsByTagName("ConformanceProfile").item(0);
+		integrationProfile.setSourceId(profileElement.getAttribute("ID"));
+		Element conformanceProfilElementRoot = (Element) profileElement.getElementsByTagName("Messages").item(0);
+		NodeList messages = conformanceProfilElementRoot.getElementsByTagName("Message");
+		List<Node> toRemove = new ArrayList<Node>();
+		for (int index = 0; index < messages.getLength(); index++) {
+			Node node = messages.item(index);
+			Element messagesElm = (Element) node;
+			String id = messagesElm.getAttribute("ID");
+			if (!id.equals(messageId)) {
+				toRemove.add(node);
+			}
+		}
+
+		if (!toRemove.isEmpty()) {
+			for (int index = 0; index < toRemove.size(); index++) {
+				conformanceProfilElementRoot.removeChild(toRemove.get(index));
+			}
+		}
+		doc.normalize();
+		return prettyPrint(doc);
+	}
+
 
 
 
