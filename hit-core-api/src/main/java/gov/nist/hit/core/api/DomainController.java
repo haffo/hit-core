@@ -85,6 +85,14 @@ public class DomainController {
 		return domainService.findShortAllGlobalDomains();
 	}
 
+	@PreAuthorize("hasRole('tester')")
+	@ApiOperation(value = "Find all domains", nickname = "findDomainByUsername")
+	@RequestMapping(method = RequestMethod.GET, value = "/findByUser", produces = "application/json")
+	public List<Domain> findDomainByUsername(HttpServletRequest request, Authentication authentication) {
+		logger.info("Fetching all domains ...");
+		return domainService.findShortAllByAuthorname(authentication.getName());
+	}
+
 	private void hasScopeAccess(TestScope scope, Authentication auth) throws Exception {
 		if (scope.equals(TestScope.GLOBAL) && !userService.hasGlobalAuthorities(auth.getName())
 				&& !userService.isAdmin(auth.getName()) && !userService.isSupervisor(auth.getName())) {

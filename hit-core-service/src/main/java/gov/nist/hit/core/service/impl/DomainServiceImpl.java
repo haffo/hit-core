@@ -145,7 +145,7 @@ public class DomainServiceImpl implements DomainService {
 
   @Override
   public List<Domain> findShortAllGlobalDomains() {
-    return domainRepo.findAllShortWithGlobal(false);
+    return domainRepo.findAllShortWithGlobal();
   }
 
   @Override
@@ -170,6 +170,12 @@ public class DomainServiceImpl implements DomainService {
         throw new PermissionException("You do not have the permission to perform this task");
       }
     }
+  }
+
+  @Override
+  public List<Domain> findShortAllByAuthorname(String authorname) {
+    // TODO Auto-generated method stub
+    return domainRepo.findShortAllByAuthorname(authorname);
   }
 
 

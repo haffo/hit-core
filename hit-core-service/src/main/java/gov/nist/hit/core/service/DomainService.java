@@ -17,6 +17,9 @@ public interface DomainService {
 
   List<Domain> findShortAllByScopeAndAuthorname(TestScope scope, String authorname);
 
+  List<Domain> findShortAllByAuthorname(String authorname);
+
+
   Domain findOne(Long id);
 
   void delete(Domain domain);

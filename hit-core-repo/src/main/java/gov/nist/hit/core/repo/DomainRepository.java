@@ -37,13 +37,19 @@ public interface DomainRepository extends JpaRepository<Domain, Long> {
   public List<Domain> findShortAllByScopeAndAuthorname(@Param("scope") TestScope scope,
       @Param("authorUsername") String authorUsername);
 
+
+
+  @Query("select new gov.nist.hit.core.domain.Domain(name, domain) from Domain d where d.authorUsername=:authorUsername")
+  public List<Domain> findShortAllByAuthorname(@Param("authorUsername") String authorUsername);
+
+
   @Query("select new gov.nist.hit.core.domain.Domain(name, domain) from Domain d where d.disabled = false and (d.scope='GLOBAL' or d.authorUsername=:authorUsername)")
   public List<Domain> findShortAllWithGlobalOrAuthorname(
       @Param("authorUsername") String authorUsername);
 
 
-  @Query("select new gov.nist.hit.core.domain.Domain(name, domain) from Domain d where d.scope= 'GLOBAL' and d.disabled =:disabled")
-  public List<Domain> findAllShortWithGlobal(@Param("disabled") boolean disabled);
+  @Query("select new gov.nist.hit.core.domain.Domain(name, domain) from Domain d where d.scope= 'GLOBAL'")
+  public List<Domain> findAllShortWithGlobal();
 
   @Modifying
   @Transactional(value = "transactionManager")
