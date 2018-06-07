@@ -47,11 +47,10 @@ public class ConformanceProfile extends ValidationArtifact {
 	// @Column(nullable = false)
 	// protected Long integrationProfileId;
 
-	// @NotNull
-	// @JsonIgnore
-	//
-	// @Column(nullable = false)
-	// protected String sourceId;
+	 @NotNull
+	 @JsonIgnore
+	 @Column(nullable = false)
+	 protected String sourceId;
 
 	@NotNull
 	@JsonIgnore
@@ -97,14 +96,14 @@ public class ConformanceProfile extends ValidationArtifact {
 	public void setJson(String json) {
 		this.json = json;
 	}
-	//
-	// public String getSourceId() {
-	// return sourceId;
-	// }
-	//
-	// public void setSourceId(String sourceId) {
-	// this.sourceId = sourceId;
-	// }
+	
+	 public String getSourceId() {
+	 return sourceId;
+	 }
+	
+	 public void setSourceId(String sourceId) {
+	 this.sourceId = sourceId;
+	 }
 
 	public String getXml() {
 		return xml;

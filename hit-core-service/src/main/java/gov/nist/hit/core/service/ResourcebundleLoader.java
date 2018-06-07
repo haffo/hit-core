@@ -988,10 +988,6 @@ public abstract class ResourcebundleLoader {
 		IntegrationProfile integrationProfile = new IntegrationProfile();
 		Element profileElement = (Element) doc.getElementsByTagName("ConformanceProfile").item(0);
 		integrationProfile.setSourceId(profileElement.getAttribute("ID"));
-		if (integrationProfileRepository.findBySourceId(integrationProfile.getSourceId()) != null) {
-			throw new RuntimeException(
-					"An integration profile with sourceId=" + integrationProfile.getSourceId() + " already exist");
-		}
 		Element metaDataElement = (Element) profileElement.getElementsByTagName("MetaData").item(0);
 		integrationProfile.setName(metaDataElement.getAttribute("Name"));
 		integrationProfile.setXml(content);
