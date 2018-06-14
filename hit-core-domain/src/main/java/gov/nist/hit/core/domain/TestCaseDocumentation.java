@@ -12,7 +12,6 @@
 
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,11 +25,9 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 @Entity
-public class TestCaseDocumentation implements Serializable {
+public class TestCaseDocumentation extends TestResource {
 
 
   private static final long serialVersionUID = 1L;
@@ -39,9 +36,7 @@ public class TestCaseDocumentation implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
 
-  private String title; 
-  
-
+  private String title;
 
   @Enumerated(EnumType.STRING)
   private TestingStage stage;
@@ -93,7 +88,6 @@ public class TestCaseDocumentation implements Serializable {
     this.stage = stage;
   }
 
- 
-  
+
 
 }

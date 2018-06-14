@@ -18,33 +18,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import gov.nist.hit.core.domain.VocabularyLibrary;
+import gov.nist.hit.core.domain.CFTestStepGroup;
+import gov.nist.hit.core.domain.TestScope;
 
-public interface VocabularyLibraryRepository extends JpaRepository<VocabularyLibrary, Long> {
+public interface CFTestStepGroupRepository extends JpaRepository<CFTestStepGroup, Long> {
 
-  @Query("select vocab from VocabularyLibrary vocab where vocab.sourceId = :sourceId")
-  VocabularyLibrary findOneBySourceId(@Param("sourceId") String sourceId);
-
-  @Query("select vocab.json from VocabularyLibrary vocab where vocab.id = :valueSetLibraryId")
-  public String getJson(@Param("valueSetLibraryId") Long valueSetLibraryId);
-
-
+  @Query("select to from CFTestStepGroup to where to.persistentId = :id")
+  public CFTestStepGroup getByPersistentId(@Param("id") Long id);
 
   @Modifying
   @Transactional(value = "transactionManager")
-  @Query("delete from VocabularyLibrary to where to.preloaded = true")
-  public void deletePreloaded();
-
-  @Modifying
-  @Transactional(value = "transactionManager")
-  @Query("delete from VocabularyLibrary to where to.preloaded = false")
-  public void deleteNonPreloaded();
-
-  @Modifying
-  @Transactional(value = "transactionManager")
-  @Query("delete from VocabularyLibrary to where to.domain = :domain")
-  public void deleteByDomain(@Param("domain") String domain);
-
+  @Query("delete from CFTestStepGroup to where to.scope = :scope")
+  public void deleteByScope(@Param("scope") TestScope scope);
 
 
 }

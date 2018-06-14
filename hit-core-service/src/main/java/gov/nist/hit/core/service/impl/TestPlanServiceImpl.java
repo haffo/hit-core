@@ -2,7 +2,6 @@ package gov.nist.hit.core.service.impl;
 
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,28 +23,30 @@ public class TestPlanServiceImpl implements TestPlanService {
 
   @Override
   @Transactional(value = "transactionManager")
-  public List<TestPlan> findShortAllByStage(TestingStage stage) {
-    return testPlanRepository.findShortAllByStage(stage);
+  public List<TestPlan> findShortAllByStageAndDomain(TestingStage stage, String domain) {
+    return testPlanRepository.findShortAllByStageAndDomain(stage, domain);
   }
 
   @Override
   @Transactional(value = "transactionManager")
-  public List<TestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope) {
-    return testPlanRepository.findShortAllByStageAndScope(stage, scope);
+  public List<TestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
+      String domain) {
+    return testPlanRepository.findShortAllByStageAndScopeAndDomain(stage, scope, domain);
   }
 
   @Override
   @Transactional(value = "transactionManager")
-  public List<TestPlan> findAllShortByStageAndUsernameAndScope(TestingStage stage,
-      String authorUsername, TestScope scope) {
-    return testPlanRepository.findAllShortByStageAndUsernameAndScope(stage, authorUsername, scope);
+  public List<TestPlan> findAllShortByStageAndUsernameAndScopeAndDomain(TestingStage stage,
+      String authorUsername, TestScope scope, String domain) {
+    return testPlanRepository.findAllShortByStageAndUsernameAndScopeAndDomain(stage, authorUsername,
+        scope, domain);
   }
 
 
   @Override
   @Transactional(value = "transactionManager")
-  public List<TestArtifact> findAllTestPackages(TestingStage stage) {
-    return testPlanRepository.findAllTestPackages(stage);
+  public List<TestArtifact> findAllTestPackagesByDomain(TestingStage stage, String domain) {
+    return testPlanRepository.findAllTestPackagesByDomain(stage, domain);
   }
 
   @Override
@@ -56,26 +57,15 @@ public class TestPlanServiceImpl implements TestPlanService {
 
   @Override
   @Transactional(value = "transactionManager")
-  public List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername) {
-    return testPlanRepository.findShortAllByStageAndAuthor(stage, authorUsername);
+  public List<TestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage,
+      String authorUsername, String domain) {
+    return testPlanRepository.findShortAllByStageAndAuthorAndDomain(stage, authorUsername, domain);
   }
 
-  @Override
-  @Transactional(value = "transactionManager")
-  public Set<String> findAllCategoriesByStageAndScope(TestingStage stage, TestScope scope) {
-    return testPlanRepository.findAllCategoriesByStageAndScope(stage, scope);
-  }
 
   @Override
-  @Transactional(value = "transactionManager")
-  public Set<String> findAllCategoriesByStageAndScopeAndUser(TestingStage stage, TestScope scope,
-      String username) {
-    return testPlanRepository.findAllCategoriesByStageAndScopeAndUser(stage, scope, username);
-  }
-
-  @Override
-  public List<TestPlan> findShortAllByStageAndScopeAndAuthor(TestingStage stage, TestScope scope,
-      String authorUsername) {
+  public List<TestPlan> findShortAllByStageAndScopeAndAuthorAndDomain(TestingStage stage,
+      TestScope scope, String authorUsername, String domain) {
     // TODO Auto-generated method stub
     return null;
   }

@@ -19,15 +19,14 @@ public class TestCaseDocument {
   protected Long id;
   protected String type;
   protected String title;
-  protected String mcPath; // message content 
+  protected String mcPath; // message content
   protected String tdsPath; // test data specification
   protected String tpPath; // test procedure
   protected String tpsPath; // test plan summary
-  protected String jdPath; // juror document 
-  protected String tsPath; // test story 
-  protected String csPath; // constraint 
+  protected String jdPath; // juror document
+  protected String tsPath; // test story
+  protected String csPath; // constraint
   protected String format;
-
 
 
   protected List<TestCaseDocument> children = new ArrayList<TestCaseDocument>();
@@ -99,7 +98,7 @@ public class TestCaseDocument {
   public void setChildren(List<TestCaseDocument> children) {
     this.children = children;
   }
- 
+
   public Long getId() {
     return id;
   }
@@ -132,9 +131,6 @@ public class TestCaseDocument {
     this.tpsPath = tpsPath;
   }
 
-  
-   
 
-  
 
 }
