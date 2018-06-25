@@ -70,15 +70,15 @@ public class DomainController {
 		}
 	}
 
-	@ApiOperation(value = "Find all domains", nickname = "findDomainByScope")
+	@ApiOperation(value = "Find all domains", nickname = "findDomains")
 	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
-	public List<Domain> findDomainse(HttpServletRequest request) {
+	public List<Domain> findDomains(HttpServletRequest request) {
 		logger.info("Fetching all domains ...");
 		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 		if (userId != null) {
 			Account account = accountService.findOne(userId);
 			if (account != null && !account.isGuestAccount()) {
-				return domainService.findShortAllWithGlobalOrAuthornameOrParticipantEmail(account.getUsername(),
+				return domainService.findShortAllWithAuthornameOrParticipantEmail(account.getUsername(),
 						account.getEmail());
 			}
 		}
