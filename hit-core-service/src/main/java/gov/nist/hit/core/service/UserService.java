@@ -127,4 +127,6 @@ public interface UserService {
 
   public boolean isAdmin(String username) throws NoUserFoundException;
 
+  boolean isSupervisor(String username) throws NoUserFoundException;
+
 }

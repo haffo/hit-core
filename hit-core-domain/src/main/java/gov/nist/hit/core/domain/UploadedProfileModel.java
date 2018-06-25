@@ -30,6 +30,7 @@ public class UploadedProfileModel {
   private String exampleMessage;
   private int position;
   private boolean activated;
+  private String domain;
 
   public UploadedProfileModel() {
 
@@ -128,6 +129,14 @@ public class UploadedProfileModel {
 
   public void setPosition(int position) {
     this.position = position;
+  }
+
+  public String getDomain() {
+    return domain;
+  }
+
+  public void setDomain(String domain) {
+    this.domain = domain;
   }
 
 

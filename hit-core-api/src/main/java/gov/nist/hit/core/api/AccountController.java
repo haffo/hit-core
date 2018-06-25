@@ -14,6 +14,7 @@ package gov.nist.hit.core.api;
 import static org.springframework.data.jpa.domain.Specifications.where;
 
 import java.util.Date;
+import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +75,10 @@ import gov.nist.hit.core.service.UserService;
 public class AccountController {
 
 	static final Logger logger = LoggerFactory.getLogger(AccountController.class);
+	private static Log statLog = LogFactory.getLog("StatLog");
 
 	public final String DEFAULT_PAGE_SIZE = "0";
+	public final String REGISTRATION_LOG_TEMPLATE = "[Registration] fullname=%s, company=%s, date=%tD";
 
 	public AccountController() {
 	}
@@ -100,6 +105,9 @@ public class AccountController {
 
 	@Value("${mail.tool}")
 	private String TOOL_NAME;
+
+	@Value("${app.organization.name:'NIST'}")
+	private String organizationName;
 
 	@Autowired
 	TestCaseValidationReportService testCaseValidationService;
@@ -145,6 +153,8 @@ public class AccountController {
 					sacc.setFullName(acc.getFullName());
 					sacc.setUsername(acc.getUsername());
 					sacc.setEmployer(acc.getEmployer());
+					sacc.setRegistrationDate(acc.getRegistrationDate());
+					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
 					saccs.add(sacc);
 				}
 			}
@@ -226,6 +236,7 @@ public class AccountController {
 					sacc.setAccountType(acc.getAccountType());
 					sacc.setUsername(acc.getUsername());
 					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
+					sacc.setRegistrationDate(acc.getRegistrationDate());
 					sacc.setAccountType(acc.getAccountType());
 					sacc.setEmployer(acc.getEmployer());
 					saccs.add(sacc);
@@ -279,6 +290,7 @@ public class AccountController {
 					sacc.setUsername(acc.getUsername());
 					sacc.setAccountType(acc.getAccountType());
 					sacc.setLastLoggedInDate(acc.getLastLoggedInDate());
+					sacc.setRegistrationDate(acc.getRegistrationDate());
 					sacc.setEmployer(acc.getEmployer());
 					saccs.add(sacc);
 				}
@@ -428,7 +440,10 @@ public class AccountController {
 			registeredAccount.setPending(false);
 			registeredAccount.setGuestAccount(false);
 			registeredAccount.setEmployer(account.getEmployer());
+			registeredAccount.setRegistrationDate(new Date());
 			accountService.save(registeredAccount);
+
+			logger.info("FirstName=");
 		} catch (Exception e) {
 			return new ResponseMessage(ResponseMessage.Type.danger, "errorWithAccount", null);
 		}
@@ -463,6 +478,15 @@ public class AccountController {
 
 		return new ResponseMessage(ResponseMessage.Type.success, "userAdded", account.getUsername());
 
+	}
+
+	private void logRegistration(Account registeredAccount) {
+		StringBuilder sbuf = new StringBuilder();
+		Formatter fmt = new Formatter(sbuf);
+		fmt.format(REGISTRATION_LOG_TEMPLATE, registeredAccount.getFullName(), registeredAccount.getEmployer(),
+				registeredAccount.getRegistrationDate());
+		String lo = sbuf.toString();
+		statLog.info(lo);
 	}
 
 	@PreAuthorize("hasPermission(#id, 'accessAccountBasedResource')")
@@ -600,18 +624,17 @@ public class AccountController {
 			registeredAccount.setSignedConfidentialityAgreement(account.getSignedConfidentialityAgreement());
 			registeredAccount.setGuestAccount(false);
 			registeredAccount.setEmployer(account.getEmployer());
-
+			registeredAccount.setRegistrationDate(new Date());
 			accountService.save(registeredAccount);
+			this.logRegistration(registeredAccount);
 		} catch (Exception e) {
 			userService.deleteUser(account.getUsername());
 			logger.error(e.getMessage(), e);
 			return new ResponseMessage(ResponseMessage.Type.danger, "errorWithAccount", null);
 		}
-
 		// generate and send email
 		this.sendRegistrationNotificationToAdmin(account);
 		this.sendApplicationConfirmationNotification(account);
-
 		return new ResponseMessage(ResponseMessage.Type.success, "userAdded", registeredAccount.getId().toString(),
 				"true");
 	}
@@ -1017,11 +1040,11 @@ public class AccountController {
 	private void sendApplicationConfirmationNotification(Account acc) {
 		try {
 			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-			msg.setSubject("NIST  Application Received");
+			msg.setSubject(organizationName + " Application Received");
 			msg.setTo(acc.getEmail());
-			msg.setText("Dear " + acc.getUsername() + " \n\n"
-					+ "Thank you for submitting an application for use of the " + TOOL_NAME + "\n\n"
-					+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n"
+					+ "Thank you for submitting an application for use of the " + TOOL_NAME + ".\n\n"
+					+ "Please refer to the Quick Start Guide for Testing, under the Documentation tab, for additional account set-up steps." + "\n\n" + "Sincerely, " + "\n\n"
 					+ "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
 					+ appInfoService.get().getAdminEmails().get(0) + "'");
 
@@ -1039,9 +1062,9 @@ public class AccountController {
 
 			msg.setSubject("Welcome! You are successfully registered on " + TOOL_NAME + "");
 			msg.setTo(acc.getEmail());
-			msg.setText("Dear " + acc.getUsername() + " \n\n" + "You've successfully registered on the " + TOOL_NAME
+			msg.setText("Dear " + acc.getUsername() + ", \n\n" + "You've successfully registered on the " + TOOL_NAME
 					+ " Site." + " \n" + "Your username is: " + acc.getUsername() + " \n\n"
-					+ "Please refer to the user guide for the detailed steps. " + "\n\n" + "Sincerely, " + "\n\n"
+					+ "Please refer to the to the Quick Start Guide for Testing, under the Documentation tab, for additional account set-up steps." + "\n\n" + "Sincerely, " + "\n\n"
 					+ "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
 					+ appInfoService.get().getAdminEmails().get(0) + "'");
 
@@ -1078,7 +1101,7 @@ public class AccountController {
 
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Account Approval Notification ");
-			msg.setText("Dear " + acc.getUsername() + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n"
 					+ "**** If you have not requested a new account, please disregard this email **** \n\n\n"
 					+ "Your account has been approved and you can proceed " + "to login .\n" + "\n\n" + "Sincerely, "
 					+ "\n\n" + "The " + TOOL_NAME + " Team" + "\n\n" + "P.S: If you need help, contact us at '"
@@ -1098,7 +1121,7 @@ public class AccountController {
 
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Registration Notification ");
-			msg.setText("Dear " + acc.getUsername() + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n"
 					+ "**** If you have not requested a new account, please disregard this email **** \n\n\n"
 					+ "Your account request has been processed and you can proceed " + "to login .\n"
 					+ "You need to change your password in order to login.\n"
@@ -1121,7 +1144,7 @@ public class AccountController {
 
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Password Reset Request Notification");
-			msg.setText("Dear " + acc.getUsername() + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n"
 					+ "**** If you have not requested a password reset, please disregard this email **** \n\n\n"
 					+ "You password reset request has been processed.\n"
 					+ "Copy and paste the following url to your browser to initiate the password change:\n" + url
@@ -1142,7 +1165,7 @@ public class AccountController {
 
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Password Change Notification");
-			msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully changed." + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your password has been successfully changed." + " \n\n"
 					+ "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
 			this.mailSender.send(msg);
@@ -1158,7 +1181,7 @@ public class AccountController {
 			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Password Change Notification");
-			msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully changed." + " \n\n"
+			msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your password has been successfully changed." + " \n\n"
 					+ "Your new temporary password is ." + newPassword + " \n\n"
 					+ "Please update your password once logged in. \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME
 					+ " Team");
@@ -1176,7 +1199,7 @@ public class AccountController {
 			SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
 			msg.setTo(acc.getEmail());
 			msg.setSubject("" + TOOL_NAME + " Account Type Change Notification");
-			msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your account type has been successfully changed."
+			msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your account type has been successfully changed."
 					+ " \n\n" + "Your are now a " + newAccountType + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME
 					+ " Team");
 
@@ -1193,7 +1216,7 @@ public class AccountController {
 
 		msg.setTo(acc.getEmail());
 		msg.setSubject("" + TOOL_NAME + " Password Rest Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully reset." + " \n"
+		msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your password has been successfully reset." + " \n"
 				+ "Your username is: " + acc.getUsername() + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
 		try {
@@ -1210,7 +1233,7 @@ public class AccountController {
 
 		msg.setTo(acc.getEmail());
 		msg.setSubject("" + TOOL_NAME + " Registration and Password Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your password has been successfully set." + " \n"
+		msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your password has been successfully set." + " \n"
 				+ "Your username is: " + acc.getUsername() + " \n" + "Your registration with the " + TOOL_NAME
 				+ " is complete." + " \n\n" + "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
@@ -1228,7 +1251,7 @@ public class AccountController {
 
 		msg.setTo(acc.getEmail());
 		msg.setSubject("" + TOOL_NAME + " Username Notification");
-		msg.setText("Dear " + acc.getUsername() + " \n\n" + "Your username is: " + acc.getUsername() + " \n\n"
+		msg.setText("Dear " + acc.getUsername() + ", \n\n" + "Your username is: " + acc.getUsername() + " \n\n"
 				+ "Sincerely,\n\n" + "The " + TOOL_NAME + " Team");
 
 		try {

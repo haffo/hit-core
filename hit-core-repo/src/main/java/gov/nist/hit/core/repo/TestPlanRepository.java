@@ -14,7 +14,6 @@ package gov.nist.hit.core.repo;
 
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -30,39 +29,52 @@ import gov.nist.hit.core.domain.TestingStage;
 public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
 
   @Transactional(value = "transactionManager")
-  @Query("select tp from TestPlan tp where tp.stage= :stage")
-  public List<TestPlan> findAllByStage(@Param("stage") TestingStage stage);
+  @Query("select tp from TestPlan tp where tp.stage= :stage and tp.domain = :domain")
+  public List<TestPlan> findAllByStageAndDomain(@Param("stage") TestingStage stage,
+      @Param("domain") String domain);
 
   @Transactional(value = "transactionManager")
-  @Query("select tp from TestPlan tp where tp.stage=:stage and tp.scope=:scope")
-  public List<TestPlan> findAllByStageAndScope(@Param("stage") TestingStage stage,
-      @Param("scope") TestScope scope);
-
-  @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1")
-  public List<TestPlan> findShortAllByStage(TestingStage stage);
-
-  @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.scope = ?2")
-  public List<TestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
-
-  @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2")
-  public List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
-
-  @Transactional(value = "transactionManager")
-  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId, category) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3")
-  public List<TestPlan> findAllShortByStageAndUsernameAndScope(TestingStage stage,
-      String authorUsername, TestScope scope);
+  @Query("select tp from TestPlan tp where tp.stage=:stage and tp.scope=:scope and tp.domain=:domain")
+  public List<TestPlan> findAllByStageAndScopeAndDomain(@Param("stage") TestingStage stage,
+      @Param("scope") TestScope scope, @Param("domain") String domain);
 
 
   @Transactional(value = "transactionManager")
-  @Query("select tp.testPackage from TestPlan tp where tp.stage = :stage")
-  public List<TestArtifact> findAllTestPackages(@Param("stage") TestingStage stage);
+  @Query("select tp from TestPlan tp where tp.stage=:stage and tp.scope=:scope and tp.domain=:domain and tp.authorUsername = :authorUsername")
+  public List<TestPlan> findAllByStageAndScopeAndDomainAndAuthor(@Param("stage") TestingStage stage,
+      @Param("scope") TestScope scope, @Param("domain") String domain,
+      @Param("authorUsername") String authorUsername);
+
 
   @Transactional(value = "transactionManager")
-  @Query("select tp.testPlanSummary from TestPlan tp where tp.stage = :stage")
-  public List<TestArtifact> findAllTestPlanSummary(@Param("stage") TestingStage stage);
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.domain=?2")
+  public List<TestPlan> findShortAllByStageAndDomain(TestingStage stage, String domain);
+
+  @Transactional(value = "transactionManager")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.scope = ?2 and tp.domain=?3")
+  public List<TestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
+      String domain);
+
+  @Transactional(value = "transactionManager")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.domain=?3")
+  public List<TestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage,
+      String authorUsername, String domain);
+
+  @Transactional(value = "transactionManager")
+  @Query("select new gov.nist.hit.core.domain.TestPlan(id, name, description, position, transport, domain, persistentId) from TestPlan tp where tp.stage = ?1 and tp.authorUsername = ?2 and tp.scope = ?3 and tp.domain=?4")
+  public List<TestPlan> findAllShortByStageAndUsernameAndScopeAndDomain(TestingStage stage,
+      String authorUsername, TestScope scope, String domain);
+
+
+  @Transactional(value = "transactionManager")
+  @Query("select tp.testPackage from TestPlan tp where tp.stage = :stage and tp.domain = :domain")
+  public List<TestArtifact> findAllTestPackagesByDomain(@Param("stage") TestingStage stage,
+      @Param("domain") String domain);
+
+  @Transactional(value = "transactionManager")
+  @Query("select tp.testPlanSummary from TestPlan tp where tp.stage = :stage and tp.domain = :domain")
+  public List<TestArtifact> findAllTestPlanSummary(@Param("stage") TestingStage stage,
+      @Param("domain") String domain);
 
   @Query("select tp.testPlanSummary from TestPlan tp where tp.id = :id")
   public TestArtifact testPlanSummary(@Param("id") Long id);
@@ -83,16 +95,9 @@ public interface TestPlanRepository extends JpaRepository<TestPlan, Long> {
   @Query("delete from TestPlan to where to.preloaded = false")
   public void deleteNonPreloaded();
 
+  @Modifying
   @Transactional(value = "transactionManager")
-  @Query("select tp.category from TestPlan tp where tp.stage = :stage and tp.scope=:scope")
-  public Set<String> findAllCategoriesByStageAndScope(@Param("stage") TestingStage stage,
-      @Param("scope") TestScope scope);
-
-  @Transactional(value = "transactionManager")
-  @Query("select tp.category from TestPlan tp where tp.stage = :stage and tp.scope=:scope and tp.authorUsername = :username")
-  public Set<String> findAllCategoriesByStageAndScopeAndUser(@Param("stage") TestingStage stage,
-      @Param("scope") TestScope scope, @Param("username") String username);
-
-
+  @Query("delete from TestPlan to where to.domain = :domain")
+  public void deleteByDomain(@Param("domain") String domain);
 
 }

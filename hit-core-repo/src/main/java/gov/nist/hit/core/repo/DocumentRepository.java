@@ -12,37 +12,71 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.Document;
-import gov.nist.hit.core.domain.DocumentType;
-
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
+import gov.nist.hit.core.domain.Document;
+import gov.nist.hit.core.domain.DocumentType;
+import gov.nist.hit.core.domain.TestScope;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
-  @Query("select doc from Document doc where doc.type = 'RELEASENOTE' order by doc.version desc")
-  public List<Document> findAllReleaseNotes();
+  // @Query("select doc from Document doc where doc.type = 'RELEASENOTE' order by doc.version desc")
+  // public List<Document> findAllReleaseNotes();
+  //
+  // @Query("select doc from Document doc where doc.type = 'KNOWNISSUE' order by doc.version desc")
+  // public List<Document> findAllKnownIssues();
+  //
+  // @Query("select doc from Document doc where doc.type = 'USERDOC' and doc.domain = :domain and
+  // doc.scope = :scope order by doc.position asc")
+  // public List<Document> findAllUserDocsByDomainAndScope(@Param("domain") String domain,
+  // @Param("scope") TestScope scope);
 
-  @Query("select doc from Document doc where doc.type = 'KNOWNISSUE' order by doc.version desc")
-  public List<Document> findAllKnownIssues();
+  //
+  // @Query("select doc from Document doc where doc.type = :type and doc.domain = :domain and
+  // doc.scope = :scope order by doc.position asc")
+  // public List<Document> findAllResourceDocsByTypeAndDomainAndScope(@Param("type") DocumentType
+  // type,
+  // @Param("domain") String domain, @Param("scope") TestScope scope);
 
-  @Query("select doc from Document doc where doc.type = 'USERDOC' order by doc.position asc")
-  public List<Document> findAllUserDocs();
+  // @Query("select doc from Document doc where doc.type = :type and doc.domain = :domain and
+  // doc.authorUsername = :authorUsername and doc.scope =:scope order by doc.position asc")
+  // public List<Document> findAllResourceDocsByTypeAndDomainAndAuthorAndScope(
+  // @Param("type") DocumentType type, @Param("domain") String domain,
+  // @Param("authorUsername") String authorUsername, @Param("scope") TestScope scope);
 
-  @Query("select doc from Document doc where doc.type = :type order by doc.position asc")
-  public List<Document> findAllResourceDocs(@Param("type") DocumentType type);
 
   @Query("select doc from Document doc where doc.name = :name")
   public Document findOneByName(@Param("name") String name);
 
-  @Query("select doc from Document doc where doc.type = 'DELIVERABLE' order by doc.date desc")
-  public List<Document> findAllDeliverableDocs();
+  // @Query("select doc from Document doc where doc.type = 'DELIVERABLE' order by doc.date desc")
+  // public List<Document> findAllDeliverableDocs();
+  //
+  // @Query("select doc from Document doc where doc.type = 'INSTALLATION'")
+  // public Document findInstallationDoc();
 
-  @Query("select doc from Document doc where doc.type = 'INSTALLATION'")
-  public Document findInstallationDoc();
+
+  @Query("select doc from Document doc where doc.domain = :domain and doc.type = :type and doc.scope = :scope order by doc.position asc")
+  public List<Document> findAllByDomainAndScopeAndType(@Param("domain") String domain,
+      @Param("scope") TestScope scope, @Param("type") DocumentType type);
+
+
+  @Query("select doc from Document doc where  doc.domain = :domain and doc.authorUsername = :authorUsername and doc.scope =:scope and doc.type = :type order by doc.position asc")
+  public List<Document> findAllByDomainAndAuthorAndScopeAndType(@Param("domain") String domain,
+      @Param("authorUsername") String authorUsername, @Param("scope") TestScope scope,
+      @Param("type") DocumentType type);
+
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from Document to where to.domain = :domain")
+  public void deleteByDomain(@Param("domain") String domain);
+
 
 
 }

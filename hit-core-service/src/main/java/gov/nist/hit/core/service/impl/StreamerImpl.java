@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import gov.nist.hit.core.domain.AbstractTestCase;
 import gov.nist.hit.core.domain.CFTestPlan;
 import gov.nist.hit.core.domain.CFTestStep;
+import gov.nist.hit.core.domain.CFTestStepGroup;
 import gov.nist.hit.core.domain.DataMapping;
 import gov.nist.hit.core.domain.Document;
 import gov.nist.hit.core.domain.Json;
@@ -307,6 +308,23 @@ public class StreamerImpl implements Streamer {
   }
 
 
+  @Override
+  public void streamTestCaseDocuments(OutputStream os, List<TestCaseDocumentation> documents)
+      throws IOException {
+    JsonGenerator jGenerator = createGenerator(os);
+    if (documents != null) {
+      jGenerator.writeStartArray();
+      for (TestCaseDocumentation child : documents) {
+        write(jGenerator, child);
+      }
+      jGenerator.writeEndArray();
+    } else {
+      jGenerator.writeNull();
+    }
+    jGenerator.close();
+  }
+
+
 
   private void write(JsonGenerator jGenerator, TestStep testStep, boolean endObject)
       throws IOException {
@@ -496,21 +514,63 @@ public class StreamerImpl implements Streamer {
   }
 
 
+  private void write(JsonGenerator jGenerator, CFTestStepGroup testStepGroup) throws IOException {
+    if (testStepGroup != null) {
+      jGenerator.writeStartObject();
+      writeAbstractTest(jGenerator, testStepGroup);
+      writeLongField(jGenerator, "id", testStepGroup.getId());
+      writeLongField(jGenerator, "persistentId", testStepGroup.getPersistentId());
+      if (testStepGroup.getTestSteps() != null) {
+        jGenerator.writeArrayFieldStart("testSteps");
+        for (CFTestStep child : testStepGroup.getTestSteps()) {
+          write(jGenerator, child);
+        }
+        jGenerator.writeEndArray();
+      } else {
+        jGenerator.writeNullField("testSteps");
+      }
+
+      if (testStepGroup.getTestStepGroups() != null) {
+        jGenerator.writeArrayFieldStart("testStepGroups");
+        for (CFTestStepGroup child : testStepGroup.getTestStepGroups()) {
+          write(jGenerator, child);
+        }
+        jGenerator.writeEndArray();
+      } else {
+        jGenerator.writeNullField("testStepGroups");
+      }
+      jGenerator.writeEndObject();
+    }
+  }
+
+
+
   private void write(JsonGenerator jGenerator, CFTestPlan testPlan) throws IOException {
     if (testPlan != null) {
       jGenerator.writeStartObject();
       writeAbstractTest(jGenerator, testPlan);
       writeLongField(jGenerator, "id", testPlan.getId());
       writeLongField(jGenerator, "persistentId", testPlan.getPersistentId());
-      jGenerator.writeStringField("category", testPlan.getCategory());
-      if (testPlan.getTestCases() != null) {
-        jGenerator.writeArrayFieldStart("children");
-        for (CFTestStep child : testPlan.getTestCases()) {
-          write(jGenerator, child);
+      // jGenerator.writeStringField("category", testPlan.getCategory());
+
+      if (testPlan.getTestSteps() != null) {
+        jGenerator.writeArrayFieldStart("testSteps");
+        for (CFTestStep testStep : testPlan.getTestSteps()) {
+          write(jGenerator, testStep);
         }
         jGenerator.writeEndArray();
       } else {
-        jGenerator.writeNullField("children");
+        jGenerator.writeNullField("testSteps");
+      }
+
+      if (testPlan.getTestStepGroups() != null) {
+        jGenerator.writeArrayFieldStart("testStepGroups");
+        for (CFTestStepGroup testStepGroup : testPlan.getTestStepGroups()) {
+          write(jGenerator, testStepGroup);
+        }
+        jGenerator.writeEndArray();
+      } else {
+        jGenerator.writeNullField("testStepGroups");
       }
       jGenerator.writeEndObject();
     }
@@ -523,7 +583,6 @@ public class StreamerImpl implements Streamer {
       writeAbstractTest(jGenerator, testPlan);
       jGenerator.writeBooleanField("transport", testPlan.isTransport());
       jGenerator.writeStringField("domain", testPlan.getDomain());
-      jGenerator.writeStringField("category", testPlan.getCategory());
 
       writeLongField(jGenerator, "id", testPlan.getId());
 
@@ -644,15 +703,6 @@ public class StreamerImpl implements Streamer {
   private void write(JsonGenerator jGenerator, CFTestStep testStep) throws IOException {
     if (testStep != null) {
       write(jGenerator, testStep, false);
-      if (testStep.getChildren() != null) {
-        jGenerator.writeArrayFieldStart("children");
-        for (CFTestStep child : testStep.getChildren()) {
-          write(jGenerator, child);
-        }
-        jGenerator.writeEndArray();
-      } else {
-        jGenerator.writeNullField("children");
-      }
       jGenerator.writeEndObject();
     }
   }

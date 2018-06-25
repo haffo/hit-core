@@ -146,5 +146,17 @@ public class TransactionServiceImpl implements TransactionService {
     return q.getResultList();
   }
 
+  @Override
+  public long countAll() {
+    // TODO Auto-generated method stub
+    return transactionRepository.count();
+  }
+
+  @Override
+  public List<Transaction> findAll() {
+    // TODO Auto-generated method stub
+    return transactionRepository.findAll();
+  }
+
 
 }

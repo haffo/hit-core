@@ -97,6 +97,10 @@ public class Account implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastLoggedInDate;
 
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date registrationDate;
+
+
   public Account() {
     this(null);
   }
@@ -274,6 +278,14 @@ public class Account implements Serializable {
 
   public void setEmployer(String employer) {
     this.employer = employer;
+  }
+
+  public Date getRegistrationDate() {
+    return registrationDate;
+  }
+
+  public void setRegistrationDate(Date registrationDate) {
+    this.registrationDate = registrationDate;
   }
 
 

@@ -24,7 +24,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 
  */
 @MappedSuperclass
-public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
+public abstract class AbstractTestCase extends TestResource
+    implements Comparable<AbstractTestCase> {
 
   @ApiModelProperty(required = true, value = "name of the test case")
   @Column(columnDefinition = "TEXT")
@@ -33,10 +34,6 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   @NotNull
   @Column(unique = true, nullable = false)
   protected Long persistentId;
-
-  @JsonIgnore
-  @Column(nullable = true)
-  protected String authorUsername;
 
 
   @ApiModelProperty(required = false, value = "description of the test")
@@ -71,12 +68,6 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   protected Set<Document> supplements = new HashSet<Document>();
 
-  @NotNull
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  protected TestScope scope;
-
-  protected boolean preloaded = false;
 
   public String getName() {
     return name;
@@ -136,46 +127,6 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   }
 
 
-  // public String getParentName() {
-  // return parentName;
-  // }
-  //
-  // public void setParentName(String parentName) {
-  // this.parentName = parentName;
-  // }
-  //
-  // public String getTestCaseName() {
-  // return testCaseName;
-  // }
-  //
-  // public void setTestCaseName(String testCaseName) {
-  // this.testCaseName = testCaseName;
-  // }
-  //
-  // public String getTestPlanName() {
-  // return testPlanName;
-  // }
-  //
-  // public void setTestPlanName(String testPlanName) {
-  // this.testPlanName = testPlanName;
-  // }
-  //
-  // public String getTestCaseGroupName() {
-  // return testCaseGroupName;
-  // }
-  //
-  // public void setTestCaseGroupName(String testCaseGroupName) {
-  // this.testCaseGroupName = testCaseGroupName;
-  // }
-  //
-  // public String getTestStepName() {
-  // return testStepName;
-  // }
-  //
-  // public void setTestStepName(String testStepName) {
-  // this.testStepName = testStepName;
-  // }
-
   @Override
   public int compareTo(AbstractTestCase o) {
     // TODO Auto-generated method stub
@@ -211,31 +162,6 @@ public abstract class AbstractTestCase implements Comparable<AbstractTestCase> {
   public void setSupplements(Set<Document> supplements) {
     this.supplements = supplements;
   }
-
-  public String getAuthorUsername() {
-    return authorUsername;
-  }
-
-  public void setAuthorUsername(String authorUsername) {
-    this.authorUsername = authorUsername;
-  }
-
-  public TestScope getScope() {
-    return scope;
-  }
-
-  public void setScope(TestScope scope) {
-    this.scope = scope;
-  }
-
-  public boolean isPreloaded() {
-    return preloaded;
-  }
-
-  public void setPreloaded(boolean preloaded) {
-    this.preloaded = preloaded;
-  }
-
 
 
 }

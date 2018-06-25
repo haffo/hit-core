@@ -15,12 +15,17 @@ package gov.nist.hit.core.api;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.hit.core.domain.AppInfo;
+import gov.nist.hit.core.domain.Domain;
 import gov.nist.hit.core.service.AppInfoService;
+import gov.nist.hit.core.service.DomainService;
 
 /**
  * @author Harold Affo (NIST)
@@ -28,10 +33,17 @@ import gov.nist.hit.core.service.AppInfoService;
  */
 @RestController
 @RequestMapping("/appInfo")
+@PropertySource(value = { "classpath:app-config.properties" })
 public class AppInfoController {
+
+	@Value("${app.baseUrl:#{null}}")
+	private String baseUrl;
 
 	@Autowired
 	private AppInfoService appInfoService;
+
+	@Autowired
+	private DomainService domainService;
 
 	// @Autowired
 	// private ApplicationContext applicationContext;
@@ -42,8 +54,18 @@ public class AppInfoController {
 		if (appInfo == null) {
 			appInfo = new AppInfo();
 		}
-		appInfo.setUrl(getUrl(request));
+		String url = baseUrl != null ? baseUrl : getUrl(request);
+		appInfo.setUrl(url);
 		return appInfo;
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/domains/{key}", produces = "application/json")
+	public Domain findDomainByKey(HttpServletRequest request, @PathVariable("key") String key) {
+		Domain domain = domainService.findOneByKey(key);
+		if (domain == null) {
+			throw new IllegalArgumentException("Unknwon domain named " + key);
+		}
+		return domain;
 	}
 
 	private String getUrl(HttpServletRequest request) {

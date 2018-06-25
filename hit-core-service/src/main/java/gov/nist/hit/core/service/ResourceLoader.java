@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 
 import gov.nist.hit.core.domain.CFTestStep;
+import gov.nist.hit.core.domain.CFTestStepGroup;
 import gov.nist.hit.core.domain.ResourceType;
 import gov.nist.hit.core.domain.ResourceUploadAction;
 import gov.nist.hit.core.domain.ResourceUploadResult;
@@ -17,6 +18,7 @@ import gov.nist.hit.core.domain.ResourceUploadStatus;
 import gov.nist.hit.core.domain.TestCase;
 import gov.nist.hit.core.domain.TestCaseGroup;
 import gov.nist.hit.core.domain.TestPlan;
+import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestingStage;
 import gov.nist.hit.core.repo.TestCaseGroupRepository;
@@ -50,7 +52,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   // ------ Context-Free test Case
 
   @org.springframework.transaction.annotation.Transactional("transactionManager")
-  public ResourceUploadStatus handleCFTC(Long testCaseId, CFTestStep tc) {
+  public ResourceUploadStatus handleCFTC(Long testStepGroupId, CFTestStep tc) {
 
     ResourceUploadStatus result = new ResourceUploadStatus();
     result.setType(ResourceType.TESTSTEP);
@@ -59,25 +61,36 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     CFTestStep existing = this.cfTestStepRepository.getByPersistentId(tc.getPersistentId());
 
     if (existing != null) {
+      if (existing.getTestCase().getDomain() != tc.getDomain()) {
+        result.setAction(ResourceUploadAction.UPDATE);
+        result.setStatus(ResourceUploadResult.FAILURE);
+        result.setMessage("CFTestStepGroup(" + testStepGroupId + ") and CFTestStep("
+            + tc.getPersistentId() + ") cannot belong to different domain");
+        return result;
+      }
       result.setAction(ResourceUploadAction.UPDATE);
       Long exId = existing.getId();
       tc.setId(exId);
-      List<CFTestStep> merged = this.mergeCFTC(tc.getChildren(), existing.getChildren());
-      tc.setChildren(merged);
       this.cfTestStepRepository.saveAndFlush(tc);
       result.setStatus(ResourceUploadResult.SUCCESS);
       return result;
     } else {
       result.setAction(ResourceUploadAction.ADD);
-      if (testCaseId != null && testCaseId != -1) {
-        CFTestStep parent = this.cfTestStepRepository.getByPersistentId(testCaseId);
+      if (testStepGroupId != null && testStepGroupId != -1) {
+        CFTestStepGroup parent = this.cfTestSteGroupRepository.getByPersistentId(testStepGroupId);
         if (parent == null) {
           result.setStatus(ResourceUploadResult.FAILURE);
-          result.setMessage("CF TestCase(" + testCaseId + ") not found");
+          result.setMessage("CFTestStepGroup(" + testStepGroupId + ") not found");
           return result;
         } else {
-          parent.getChildren().add(tc);
-          this.cfTestStepRepository.saveAndFlush(parent);
+          if (tc.getDomain() != parent.getDomain()) {
+            result.setAction(ResourceUploadAction.UPDATE);
+            result.setStatus(ResourceUploadResult.FAILURE);
+            result.setMessage("CFTestStepGroup(" + testStepGroupId + ") and CFTestStep("
+                + tc.getPersistentId() + ") cannot belong to different domains");
+            return result;
+          }
+          this.cfTestSteGroupRepository.saveAndFlush(parent);
           result.setStatus(ResourceUploadResult.SUCCESS);
           return result;
         }
@@ -88,7 +101,6 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
         return result;
       }
     }
-
   }
 
   // ------ Context-Based test Case
@@ -102,6 +114,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     TestStep existing = this.testStepRepository.getByPersistentId(ts.getPersistentId());
 
     if (existing != null) {
+      if (existing.getTestCase().getDomain() != ts.getDomain()) {
+        result.setAction(ResourceUploadAction.UPDATE);
+        result.setStatus(ResourceUploadResult.FAILURE);
+        result.setMessage("TestCase(" + testCaseId + ") and TestStep(" + ts.getPersistentId()
+            + ") cannot belong to different domain");
+        return result;
+      }
       result.setAction(ResourceUploadAction.UPDATE);
       Long exId = existing.getId();
       ts.setId(exId);
@@ -117,6 +136,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
         result.setMessage("TestCase(" + testCaseId + ") not found");
         return result;
       } else {
+        if (tc.getDomain() != ts.getDomain()) {
+          result.setAction(ResourceUploadAction.UPDATE);
+          result.setStatus(ResourceUploadResult.FAILURE);
+          result.setMessage("TestCase(" + testCaseId + ") and TestStep(" + ts.getPersistentId()
+              + ") cannot belong to different domains");
+          return result;
+        }
         tc.addTestStep(ts);
         this.testCaseRepository.saveAndFlush(tc);
         result.setStatus(ResourceUploadResult.SUCCESS);
@@ -141,6 +167,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
         result.setMessage("TestCaseGroup(" + parentId + ") not found");
         return result;
       } else {
+        if (tcg.getDomain() != tc.getDomain()) {
+          result.setAction(ResourceUploadAction.UPDATE);
+          result.setStatus(ResourceUploadResult.FAILURE);
+          result.setMessage("TestCaseGroup(" + parentId + ") and TestCase(" + tc.getPersistentId()
+              + ") cannot belong to different domain");
+          return result;
+        }
         tcg.getTestCases().add(tc);
         this.testCaseGroupRepository.saveAndFlush(tcg);
         result.setStatus(ResourceUploadResult.SUCCESS);
@@ -154,6 +187,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
         result.setMessage("TestPlan(" + parentId + ") not found");
         return result;
       } else {
+        if (tp.getDomain() != tc.getDomain()) {
+          result.setAction(ResourceUploadAction.UPDATE);
+          result.setStatus(ResourceUploadResult.FAILURE);
+          result.setMessage("TestPlan(" + parentId + ") and TestCase(" + tc.getPersistentId()
+              + ") cannot belong to different domains");
+          return result;
+        }
         tp.getTestCases().add(tc);
         this.testPlanRepository.saveAndFlush(tp);
         result.setStatus(ResourceUploadResult.SUCCESS);
@@ -174,6 +214,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     TestCase existing = this.testCaseRepository.getByPersistentId(tc.getPersistentId());
 
     if (existing != null) {
+      if (tc.getDomain() != existing.getDomain()) {
+        result.setAction(ResourceUploadAction.UPDATE);
+        result.setStatus(ResourceUploadResult.FAILURE);
+        result.setMessage("You cannot change the TestCase(" + tc.getPersistentId()
+            + ") domain from " + existing.getDomain() + " to " + tc.getDomain());
+        return result;
+      }
       Long exId = existing.getId();
       Set<TestStep> merged = this.mergeTS(tc.getTestSteps(), existing.getTestSteps());
       tc.setId(exId);
@@ -205,6 +252,15 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
         result.setMessage("TestPlan(" + parentId + ") not found");
         return result;
       } else {
+
+        if (tcg.getDomain() != tp.getDomain()) {
+          result.setAction(ResourceUploadAction.UPDATE);
+          result.setStatus(ResourceUploadResult.FAILURE);
+          result.setMessage("TestPlan(" + parentId + ") and TestCaseGroup(" + tcg.getPersistentId()
+              + ") cannot belong to different domain");
+          return result;
+        }
+
         tp.getTestCaseGroups().add(tcg);
         this.testPlanRepository.saveAndFlush(tp);
         result.setStatus(ResourceUploadResult.SUCCESS);
@@ -217,6 +273,14 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
         result.setMessage("TestCaseGroup(" + parentId + ") not found");
         return result;
       } else {
+        if (tcg.getDomain() != tcgg.getDomain()) {
+          result.setAction(ResourceUploadAction.UPDATE);
+          result.setStatus(ResourceUploadResult.FAILURE);
+          result.setMessage("TestCaseGroup' Parent (" + parentId + ") and TestCaseGroup("
+              + tcg.getPersistentId() + ") cannot belong to different domain");
+          return result;
+        }
+
         tcgg.getTestCaseGroups().add(tcg);
         this.testCaseGroupRepository.saveAndFlush(tcgg);
         result.setStatus(ResourceUploadResult.SUCCESS);
@@ -235,10 +299,15 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     result.setType(ResourceType.TESTCASEGROUP);
     result.setAction(ResourceUploadAction.UPDATE);
     result.setId(tcg.getPersistentId());
-
     TestCaseGroup existing = this.testCaseGroupRepository.getByPersistentId(tcg.getPersistentId());
-
     if (existing != null) {
+      if (tcg.getDomain() != existing.getDomain()) {
+        result.setAction(ResourceUploadAction.UPDATE);
+        result.setStatus(ResourceUploadResult.FAILURE);
+        result.setMessage("You cannot change a Test Case Group domain from " + existing.getDomain()
+            + " to " + tcg.getDomain());
+        return result;
+      }
       Long exId = existing.getId();
       Set<TestCase> mergedTc = this.mergeTC(tcg.getTestCases(), existing.getTestCases());
       Set<TestCaseGroup> mergedTcg =
@@ -267,6 +336,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     TestPlan existing = this.testPlanRepository.getByPersistentId(tp.getPersistentId());
 
     if (existing != null) {
+      if (!existing.getDomain().equals(tp.getDomain())) {
+        result.setAction(ResourceUploadAction.UPDATE);
+        result.setStatus(ResourceUploadResult.FAILURE);
+        result.setMessage("You cannot change TestPlan(" + tp.getPersistentId() + ") domain from "
+            + existing.getDomain() + " to " + tp.getDomain());
+        return result;
+      }
       Long exId = existing.getId();
       Set<TestCase> mergedTc = this.mergeTC(tp.getTestCases(), existing.getTestCases());
       Set<TestCaseGroup> mergedTcg =
@@ -287,13 +363,15 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
   // ---- Helper Functions
   // Creation Methods
 
-  public List<TestStep> createTS(String rootPath) throws IOException {
+  public List<TestStep> createTS(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) throws Exception {
 
     List<TestStep> tmp = new ArrayList<TestStep>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      TestStep testStep = testStep(fileName + "/", null, false, rootPath);
+      TestStep testStep = testStep(fileName + "/", TestingStage.CB, false, rootPath, domain, scope,
+          authorUsername, preloaded);
       if (testStep != null) {
         tmp.add(testStep);
       }
@@ -301,12 +379,14 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<TestCase> createTC(String rootPath) throws IOException {
+  public List<TestCase> createTC(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) throws Exception {
     List<TestCase> tmp = new ArrayList<TestCase>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      TestCase testCase = testCase(fileName + "/", null, false, rootPath);
+      TestCase testCase = testCase(fileName + "/", TestingStage.CB, false, rootPath, domain, scope,
+          authorUsername, preloaded);
       if (testCase != null) {
         tmp.add(testCase);
       }
@@ -314,12 +394,14 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<TestCaseGroup> createTCG(String rootPath) throws IOException {
+  public List<TestCaseGroup> createTCG(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) throws Exception {
     List<TestCaseGroup> tmp = new ArrayList<TestCaseGroup>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      TestCaseGroup testCaseGroup = testCaseGroup(fileName + "/", null, false, rootPath);
+      TestCaseGroup testCaseGroup = testCaseGroup(fileName + "/", TestingStage.CB, false, rootPath,
+          domain, scope, authorUsername, preloaded);
       if (testCaseGroup != null) {
         tmp.add(testCaseGroup);
       }
@@ -327,14 +409,16 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<TestPlan> createTP(String rootPath) {
+  public List<TestPlan> createTP(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) throws Exception {
     List<TestPlan> tmp = new ArrayList<TestPlan>();
     List<Resource> resources;
     try {
       resources = getApiDirectories("*", rootPath);
       for (Resource resource : resources) {
         String fileName = resource.getFilename();
-        TestPlan testPlan = testPlan(fileName + "/", TestingStage.CB, rootPath);
+        TestPlan testPlan = testPlan(fileName + "/", TestingStage.CB, rootPath, domain, scope,
+            authorUsername, preloaded);
         if (testPlan != null) {
           tmp.add(testPlan);
         }
@@ -347,13 +431,15 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     return tmp;
   }
 
-  public List<CFTestStep> createCFTC(String rootPath) throws IOException {
+  public List<CFTestStep> createCFTC(String rootPath, String domain, TestScope scope,
+      String authorUsername, boolean preloaded) throws Exception {
 
     List<CFTestStep> tmp = new ArrayList<CFTestStep>();
     List<Resource> resources = getApiDirectories("*", rootPath);
     for (Resource resource : resources) {
       String fileName = resource.getFilename();
-      CFTestStep testObject = cfTestStep(fileName + "/", rootPath);
+      CFTestStep testObject =
+          cfTestStep(fileName + "/", rootPath, domain, scope, authorUsername, preloaded);
       if (testObject != null) {
         tmp.add(testObject);
       }
@@ -440,15 +526,6 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     for (CFTestStep tcs : newL) {
 
       if ((index = tmp.indexOf(tcs)) != -1) {
-        CFTestStep existing = tmp.get(index);
-        if (existing.getChildren() != null && existing.getChildren().size() > 0) {
-          if (tcs.getChildren() != null && tcs.getChildren().size() > 0) {
-            List<CFTestStep> children = mergeCFTC(tcs.getChildren(), existing.getChildren());
-            tcs.setChildren(children);
-          } else {
-            tcs.setChildren(existing.getChildren());
-          }
-        }
         tcs.setId(tmp.get(index).getId());
         tmp.set(index, tcs);
       } else
@@ -551,13 +628,13 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     this.testPlanRepository.flush();
   }
 
-  public abstract List<ResourceUploadStatus> addOrReplaceValueSet(String rootPath)
-      throws IOException;
+  public abstract List<ResourceUploadStatus> addOrReplaceValueSet(String rootPath, String domain,
+      TestScope scope, String username, boolean preloaded) throws IOException;
 
-  public abstract List<ResourceUploadStatus> addOrReplaceConstraints(String rootPath)
-      throws IOException;
+  public abstract List<ResourceUploadStatus> addOrReplaceConstraints(String rootPath, String domain,
+      TestScope scope, String username, boolean preloaded) throws IOException;
 
-  public abstract List<ResourceUploadStatus> addOrReplaceIntegrationProfile(String rootPath)
-      throws IOException;
+  public abstract List<ResourceUploadStatus> addOrReplaceIntegrationProfile(String rootPath,
+      String domain, TestScope scope, String username, boolean preloaded) throws IOException;
 
 }

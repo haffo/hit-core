@@ -11,23 +11,16 @@
  */
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class Message implements Serializable {
- 
- 
+public class Message extends TestResource {
+
+
   private static final long serialVersionUID = 1L;
 
   @Id
@@ -42,21 +35,23 @@ public class Message implements Serializable {
 
   @Column(columnDefinition = "LONGTEXT")
   protected String content;
-  
+
   public Message() {}
 
-  public Message(String name, String description, String content) {
+  public Message(String name, String description, String content, String domain) {
     super();
     this.name = name;
     this.description = description;
     this.content = content;
+    this.domain = domain;
   }
 
-  public Message(String content) {
+  public Message(String content, String domain) {
     super();
     this.name = null;
     this.description = null;
     this.content = content;
+    this.domain = domain;
   }
 
   @Override
@@ -99,5 +94,5 @@ public class Message implements Serializable {
   public void setId(Long id) {
     this.id = id;
   }
- 
+
 }

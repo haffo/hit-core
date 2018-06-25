@@ -3,16 +3,15 @@ package gov.nist.hit.core.domain;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public abstract class ValidationArtifact {
+public abstract class ValidationArtifact extends TestResource {
 
-  protected boolean preloaded = true;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
-  public boolean isPreloaded() {
-    return preloaded;
-  }
-
-  public void setPreloaded(boolean preloaded) {
-    this.preloaded = preloaded;
+  public ValidationArtifact() {
+    this.preloaded = true;
   }
 
 

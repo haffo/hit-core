@@ -96,9 +96,10 @@ public abstract class TestContextController {
 		try {
 			logger.info("Validating a message");
 			TestContext testContext = getTestContext(testContextId);
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			command.setUserId(userId);
 			MessageValidationResult result = getMessageValidator().validate(testContext, command);
-			TestStepValidationReport report = saveReport(testContext, result,
-					SessionContext.getCurrentUserId(request.getSession(false)));
+			TestStepValidationReport report = saveReport(testContext, result, userId);
 			result.setHtml(null);
 			result.setXml(null);
 			result.setReportId(report.getId());
