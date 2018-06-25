@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import gov.nist.hit.core.domain.log.ValidationLog;
+import gov.nist.auth.hit.core.domain.ValidationLog;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationLogService;
