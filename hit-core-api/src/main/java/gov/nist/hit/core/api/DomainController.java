@@ -36,6 +36,7 @@ import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.AppInfoService;
 import gov.nist.hit.core.service.DomainService;
 import gov.nist.hit.core.service.UserService;
+import gov.nist.hit.core.service.exception.DomainException;
 import gov.nist.hit.core.service.exception.NoUserFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -70,9 +71,9 @@ public class DomainController {
 		}
 	}
 
-	@ApiOperation(value = "Find all domains", nickname = "findDomainByScope")
+	@ApiOperation(value = "Find all domains", nickname = "findDomains")
 	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
-	public List<Domain> findDomainse(HttpServletRequest request) {
+	public List<Domain> findDomains(HttpServletRequest request) {
 		logger.info("Fetching all domains ...");
 		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
 		if (userId != null) {
@@ -162,7 +163,7 @@ public class DomainController {
 		domainService.hasPermission(domain.getDomain(), authentication);
 		Domain result = domainService.findOne(id);
 		if (result == null) {
-			throw new IllegalArgumentException("Unknown domain " + domain);
+			throw new DomainException("Unknown domain " + domain);
 		}
 		result.merge(domain);
 		result.setPreloaded(false);
@@ -190,19 +191,19 @@ public class DomainController {
 		TestScope scope = domain.getScope();
 
 		if (org.springframework.util.StringUtils.isEmpty(key)) {
-			throw new IllegalArgumentException("domain's key is missing");
+			throw new DomainException("domain's key is missing");
 		}
 		if (org.springframework.util.StringUtils.isEmpty(name)) {
-			throw new IllegalArgumentException("domain's name is missing");
+			throw new DomainException("domain's name is missing");
 		}
 
 		if (org.springframework.util.StringUtils.isEmpty(scope)) {
-			throw new IllegalArgumentException("Domain's scope is missing");
+			throw new DomainException("Domain's scope is missing");
 		}
 
 		Domain found = domainService.findOneByKey(key);
 		if (found != null) {
-			throw new IllegalArgumentException("A domain with key=" + key + " already exist");
+			throw new DomainException("A domain with key=" + key + " already exist");
 		}
 
 		Domain result = new Domain();
@@ -238,7 +239,7 @@ public class DomainController {
 		checkManagementSupport();
 		Domain found = domainService.findOne(id);
 		if (found == null) {
-			throw new IllegalArgumentException("Domain with id=" + id + " not found");
+			throw new DomainException("Domain with id=" + id + " not found");
 		}
 		domainService.hasPermission(found.getDomain(), authentication);
 		domainService.delete(found);
@@ -253,7 +254,7 @@ public class DomainController {
 		domainService.hasPermission(domain.getDomain(), authentication);
 		Domain found = domainService.findOne(id);
 		if (found == null) {
-			throw new IllegalArgumentException("Domain with id=" + id + " not found");
+			throw new DomainException("Domain with id=" + id + " not found");
 		}
 		hasDomainAccess(found, authentication);
 		found.merge(domain);

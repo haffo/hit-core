@@ -9,30 +9,28 @@ import gov.nist.hit.core.domain.TestScope;
 
 public interface DomainService {
 
-  public Domain findOneByKey(String key);
+	public Domain findOneByKey(String key);
 
-  public void save(Domain domain);
+	public void save(Domain domain);
 
-  // List<Domain> findShortAll(boolean disabled);
+	// List<Domain> findShortAll(boolean disabled);
 
-  List<Domain> findShortAllByScopeAndAuthorname(TestScope scope, String authorname);
+	List<Domain> findShortAllByScopeAndAuthorname(TestScope scope, String authorname);
 
-  List<Domain> findShortAllByAuthorname(String authorname);
+	List<Domain> findShortAllByAuthorname(String authorname);
 
+	Domain findOne(Long id);
 
-  Domain findOne(Long id);
+	void delete(Domain domain);
 
-  void delete(Domain domain);
+	List<Domain> findShortAllWithGlobalOrAuthornameOrParticipantEmail(String authorname, String participantEmail);
 
-  List<Domain> findShortAllWithGlobalOrAuthornameOrParticipantEmail(String authorname,
-      String participantEmail);
+	List<Domain> findShortAllWithAuthornameOrParticipantEmail(String authorname, String participantEmail);
 
-  public List<Domain> findShortAllGlobalDomains();
+	public List<Domain> findShortAllGlobalDomains();
 
-  public void deletePreloaded();
+	public void deletePreloaded();
 
-  public void hasPermission(String domainKey, Authentication auth) throws Exception;
-
-
+	public void hasPermission(String domainKey, Authentication auth) throws Exception;
 
 }
