@@ -1,4 +1,4 @@
-package gov.nist.hit.core.domain.log;
+package gov.nist.auth.hit.core.domain;
 
 
 import java.text.SimpleDateFormat;
@@ -16,7 +16,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
-import javax.validation.constraints.NotNull;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of
@@ -36,39 +35,31 @@ import javax.validation.constraints.NotNull;
  *
  */
 @Entity
-public class ValidationLog {
+public class ValidationLog extends LogEntry {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   protected Long id;
 
+  protected String messageId;
+  protected String format;
 
-  @NotNull
-  @Column(nullable = false)
-  private Long userId;
-
-  @NotNull
-  @Column(nullable = false)
-  private Long testStepId;
-  private String messageId;
-  private String format;
-  private String testingStage;
-  private int errorCount = 0;
-  private int warningCount = 0;
-
-  @NotNull
-  @Column(nullable = false)
-  private Date date;
+  protected int errorCount = 0;
+  protected int warningCount = 0;
 
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "ErrorCountInSegment",
       joinColumns = @JoinColumn(name = "validation_log_id"))
   @MapKeyColumn(name = "segment_name")
   @Column(name = "number_errors")
-  private Map<String, Integer> errorCountInSegment = new HashMap<String, Integer>();
+  protected Map<String, Integer> errorCountInSegment = new HashMap<String, Integer>();
 
-  private boolean validationResult = true;
+  protected boolean validationResult = true;
 
+  protected String testingStage;
+
+  @Column(columnDefinition = "LONGTEXT")
+  protected String message;
 
   public ValidationLog() {
 
@@ -115,6 +106,7 @@ public class ValidationLog {
     return simpleDateFormat.format(this.date);
   }
 
+  @Override
   public void setDate(Date date) {
     this.date = date;
   }
@@ -133,34 +125,6 @@ public class ValidationLog {
 
   public void setValidationResult(boolean validationResult) {
     this.validationResult = validationResult;
-  }
-
-  public String getTestingStage() {
-    return testingStage;
-  }
-
-  public void setTestingStage(String testingStage) {
-    this.testingStage = testingStage;
-  }
-
-  public Long getTestStepId() {
-    return testStepId;
-  }
-
-  public void setTestStepId(Long testStepId) {
-    this.testStepId = testStepId;
-  }
-
-  public Long getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Long userId) {
-    this.userId = userId;
-  }
-
-  public Date getDate() {
-    return date;
   }
 
 
