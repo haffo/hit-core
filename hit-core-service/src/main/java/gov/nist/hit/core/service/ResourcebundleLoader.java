@@ -285,18 +285,6 @@ public abstract class ResourcebundleLoader {
   @Value("${app.domain}")
   private String appSubTitle;
 
-  @Value("${app.home.title}")
-  private String appHomeTitle;
-
-  @Value("${app.home.content}")
-  private String appHomeContent;
-
-  @Value("${app.igVersion:#{null}}")
-  private String appIgVersion;
-
-  @Value("${app.description}")
-  private String appDescription;
-
   @Value("${app.header}")
   private String appHeader;
 
@@ -362,7 +350,8 @@ public abstract class ResourcebundleLoader {
 
   public boolean reloadDb() throws IOException {
     AppInfo appInfo = appInfoService.get();
-    String create = System.getenv("RELOAD_DB");
+    String create = System.getProperty("RELOAD_DB");
+    create = create == null ? System.getenv("RELOAD_DB") : create;
     return (create != null && (Boolean.valueOf(create) == true)) || appInfo == null;
   }
 
