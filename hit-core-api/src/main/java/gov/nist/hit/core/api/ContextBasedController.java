@@ -14,7 +14,6 @@ package gov.nist.hit.core.api;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,6 +71,7 @@ public class ContextBasedController {
 	@RequestMapping(value = "/testplans", method = RequestMethod.GET, produces = "application/json")
 	public void getTestPlansByScope(
 			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = false) TestScope scope,
+			@ApiParam(value = "the domain of the test plans", required = true) @RequestParam(required = true) String domain,
 			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		logger.info("Fetching all testplans of type=" + scope + "...");
 		List<TestPlan> results = null;
@@ -81,11 +81,12 @@ public class ContextBasedController {
 			if (userId != null) {
 				Account account = userService.findOne(userId);
 				if (account != null) {
-					results = testPlanService.findShortAllByStageAndAuthor(TestingStage.CB, account.getUsername());
+					results = testPlanService.findAllShortByStageAndUsernameAndScopeAndDomain(TestingStage.CB,
+							account.getUsername(), scope, domain);
 				}
 			}
 		} else {
-			results = testPlanService.findShortAllByStageAndScope(TestingStage.CB, scope);
+			results = testPlanService.findShortAllByStageAndScopeAndDomain(TestingStage.CB, scope, domain);
 		}
 		streamer.stream(response.getOutputStream(), results);
 	}
@@ -136,28 +137,6 @@ public class ContextBasedController {
 		logger.info("Fetching  test step...");
 		TestStep testStep = testStepService.findOne(testStepId);
 		return testStep;
-	}
-
-	@RequestMapping(value = "/categories", method = RequestMethod.GET, produces = "application/json")
-	public Set<String> getTestPlanCategories(
-			@ApiParam(value = "the scope of the test plans", required = false) @RequestParam(required = true) TestScope scope,
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Set<String> results = null;
-		scope = scope == null ? TestScope.GLOBAL : scope;
-		String username = null;
-		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-		if (userId != null) {
-			Account account = userService.findOne(userId);
-			if (account != null) {
-				username = account.getUsername();
-			}
-		}
-		if (scope.equals(TestScope.GLOBAL)) {
-			results = testPlanService.findAllCategoriesByStageAndScope(TestingStage.CB, scope);
-		} else {
-			results = testPlanService.findAllCategoriesByStageAndScopeAndUser(TestingStage.CB, scope, username);
-		}
-		return results;
 	}
 
 }

@@ -1,10 +1,10 @@
 package gov.nist.hit.core.service;
 
-import gov.nist.hit.core.domain.Transaction;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
+import gov.nist.hit.core.domain.Transaction;
 
 
 public interface TransactionService extends Serializable {
@@ -34,6 +34,11 @@ public interface TransactionService extends Serializable {
   List<Transaction> save(List<Transaction> transactions);
 
   Transaction findOne(Long id);
+
+  public long countAll();
+
+  public List<Transaction> findAll();
+
 
 
 }

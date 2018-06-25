@@ -62,6 +62,7 @@ public class AppInfoServiceImpl implements AppInfoService {
     return list.get(0);
   }
 
+  @Override
   public AppInfo get() {
     List<AppInfo> infos = appInfoRepository.findAll();
     if (infos != null && !infos.isEmpty()) {
@@ -69,6 +70,13 @@ public class AppInfoServiceImpl implements AppInfoService {
       return appInfo;
     }
     return null;
+  }
+
+
+  @Override
+  public AppInfo save(AppInfo appInfo) {
+    // TODO Auto-generated method stub
+    return appInfoRepository.saveAndFlush(appInfo);
   }
 
 

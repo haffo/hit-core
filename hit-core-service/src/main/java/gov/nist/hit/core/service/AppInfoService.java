@@ -12,4 +12,7 @@ public interface AppInfoService {
 
   public AppInfo get();
 
+  public AppInfo save(AppInfo appInfo);
+
+
 }

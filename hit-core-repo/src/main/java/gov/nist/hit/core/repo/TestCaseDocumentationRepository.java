@@ -12,16 +12,25 @@
 
 package gov.nist.hit.core.repo;
 
-import gov.nist.hit.core.domain.TestingStage;
-import gov.nist.hit.core.domain.TestCaseDocumentation;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface TestCaseDocumentationRepository extends JpaRepository<TestCaseDocumentation, Long> {
+import gov.nist.hit.core.domain.TestCaseDocumentation;
+import gov.nist.hit.core.domain.TestScope;
+import gov.nist.hit.core.domain.TestingStage;
 
-  @Query("select docu from TestCaseDocumentation docu where docu.stage = :stage")
-  public TestCaseDocumentation findOneByStage(@Param("stage") TestingStage stage);
+public interface TestCaseDocumentationRepository
+    extends JpaRepository<TestCaseDocumentation, Long> {
+
+  @Query("select docu from TestCaseDocumentation docu where docu.stage = :stage and docu.domain = :domain and docu.scope = :scope")
+  public TestCaseDocumentation findOneByStageAndDomainAndScope(@Param("stage") TestingStage stage,
+      @Param("domain") String domain, @Param("scope") TestScope scope);
+
+  @Query("select docu from TestCaseDocumentation docu where docu.stage = :stage and docu.domain = :domain and  docu.authorUsername = :authorUsername and docu.scope = :scope")
+  public TestCaseDocumentation findOneByStageAndDomainAndAuthorAndScope(
+      @Param("stage") TestingStage stage, @Param("domain") String domain,
+      @Param("authorUsername") String authorUsername, @Param("scope") TestScope scope);
+
 
 }

@@ -69,5 +69,8 @@ public interface Streamer {
 
   void streamElements(OutputStream os, List<MessageElement> elements) throws IOException;
 
+  void streamTestCaseDocuments(OutputStream os, List<TestCaseDocumentation> documents)
+      throws IOException;
+
 
 }

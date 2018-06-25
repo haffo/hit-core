@@ -41,8 +41,8 @@
 	<sec:http pattern="/api/testplans/*" security="none" />
 	<sec:http pattern="/api/transport/*" security="none" />
 	<sec:http pattern="/api/user/*" security="none" />
-	<sec:http pattern="/api/documentation/*" security="none" />
-
+<!-- 	<sec:http pattern="/api/documentation/*" security="none" />
+ -->
 	<sec:http create-session="ifRequired" use-expressions="true">
  
 		<sec:session-management  session-fixation-protection="none" invalid-session-url="/SessionTimeout.html">

@@ -43,7 +43,7 @@ public class ZipGeneratorImpl implements ZipGenerator {
         createFile(resource, folderToZip);
       }
       String zipFilename = rootFolder + File.separator + type + ".zip";
-      zipDir(zipFilename, folderToZip);
+      zip(zipFilename, folderToZip);
       return zipFilename;
     }
     return null;
@@ -51,7 +51,8 @@ public class ZipGeneratorImpl implements ZipGenerator {
   }
 
 
-  private void zipDir(String zipFileName, String dir) throws Exception {
+  @Override
+  public void zip(String zipFileName, String dir) throws Exception {
     File dirObj = new File(dir);
     ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
     addFile(dirObj, out, dir);

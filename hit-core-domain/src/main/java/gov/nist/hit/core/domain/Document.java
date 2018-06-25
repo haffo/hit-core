@@ -7,16 +7,12 @@
  */
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.swagger.annotations.ApiModel;
 
@@ -25,7 +21,7 @@ import io.swagger.annotations.ApiModel;
  */
 @Entity
 @ApiModel(value = "Document", description = "Data Model representing a document")
-public class Document implements Serializable {
+public class Document extends TestResource {
 
   @Id
   @GeneratedValue(strategy = GenerationType.TABLE)
@@ -47,14 +43,18 @@ public class Document implements Serializable {
 
   private int position;
 
-  @JsonIgnore
-
   @Enumerated(EnumType.STRING)
   private DocumentType type;
+
+  public Document(String domain) {
+    super();
+    this.domain = domain;
+  }
 
   public Document() {
     super();
   }
+
 
   // public Document(DocumentType type, String title, String description, String path, String
   // version, String format,
@@ -169,5 +169,19 @@ public class Document implements Serializable {
     this.name = name;
   }
 
+
+  public void merge(Document source) {
+    this.name = source.name;
+    this.authorUsername = source.authorUsername;
+    this.comments = source.comments;
+    this.domain = source.domain;
+    this.path = source.path;
+    this.position = source.position;
+    this.preloaded = source.preloaded;
+    this.scope = source.scope;
+    this.title = source.title;
+    this.type = source.type;
+    this.version = source.version;
+  }
 
 }

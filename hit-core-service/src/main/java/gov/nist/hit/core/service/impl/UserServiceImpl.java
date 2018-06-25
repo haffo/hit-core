@@ -300,6 +300,21 @@ public class UserServiceImpl implements UserService {
     return false;
   }
 
+  @Override
+  public boolean isSupervisor(String username) throws NoUserFoundException {
+    User user = this.retrieveUserByUsername(username);
+    if (user == null) {
+      throw new NoUserFoundException("User could not be found");
+    }
+    Collection<GrantedAuthority> authorit = user.getAuthorities();
+    for (GrantedAuthority auth : authorit) {
+      if (SUPERVISOR_AUTHORITY.equals(auth.getAuthority())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
 
 }

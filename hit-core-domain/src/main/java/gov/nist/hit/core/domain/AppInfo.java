@@ -28,6 +28,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import gov.nist.hit.core.Constant;
 
@@ -55,29 +58,20 @@ public class AppInfo implements Serializable {
 
   private String organization;
 
-  private String domain;
-
   private String header;
 
+  @NotNull
+  @Column(nullable = false)
   private String contactEmail;
+
+  @JsonIgnore
+  @NotNull
+  @Column(nullable = false)
+  private String ownerUsername;
 
 
   @ElementCollection(fetch = FetchType.EAGER)
   private List<String> adminEmails = new ArrayList<String>();
-
-  private String homeTitle;
-
-  @Column(columnDefinition = "TEXT")
-  private String messageContentInfo;
-
-  @Column(columnDefinition = "TEXT")
-  private String homeContent;
-
-  @Column(columnDefinition = "TEXT")
-  private String profileInfo;
-
-  @Column(columnDefinition = "TEXT")
-  private String valueSetCopyright;
 
 
   @Column(columnDefinition = "TEXT")
@@ -86,7 +80,6 @@ public class AppInfo implements Serializable {
   @Column
   private String disclaimerLink;
 
-
   @Column(columnDefinition = "TEXT")
   private String confidentiality;
 
@@ -94,11 +87,10 @@ public class AppInfo implements Serializable {
   private String confidentialityLink;
 
   @Column(columnDefinition = "TEXT")
-  private String validationResultInfo;
-
-
-  @Column(columnDefinition = "TEXT")
   private String acknowledgment;
+
+
+  private String subTitle;
 
 
   @Column(columnDefinition = "TEXT")
@@ -109,7 +101,6 @@ public class AppInfo implements Serializable {
 
   private String csrfToken;
 
-  private String rsbVersion;
 
   private String apiDocsPath;
 
@@ -138,6 +129,8 @@ public class AppInfo implements Serializable {
   @MapKeyColumn(name = "OPTION_TYPE")
   @Column(name = "OPTION_VALUE")
   private Map<String, String> options = new HashMap<String, String>();
+
+
 
   public AppInfo() {
     uploadMaxSize = "10MB";
@@ -179,13 +172,6 @@ public class AppInfo implements Serializable {
     this.name = name;
   }
 
-  public String getDomain() {
-    return domain;
-  }
-
-  public void setDomain(String domain) {
-    this.domain = domain;
-  }
 
   public String getHeader() {
     return header;
@@ -203,31 +189,6 @@ public class AppInfo implements Serializable {
     this.adminEmails = adminEmails;
   }
 
-
-  public String getHomeContent() {
-    return homeContent;
-  }
-
-  public void setHomeContent(String homeContent) {
-    this.homeContent = homeContent;
-  }
-
-  public String getProfileInfo() {
-    return profileInfo;
-  }
-
-  public void setProfileInfo(String profileInfo) {
-    this.profileInfo = profileInfo;
-  }
-
-
-  public String getValueSetCopyright() {
-    return valueSetCopyright;
-  }
-
-  public void setValueSetCopyright(String valueSetCopyright) {
-    this.valueSetCopyright = valueSetCopyright;
-  }
 
   public Long getId() {
     return id;
@@ -256,14 +217,6 @@ public class AppInfo implements Serializable {
   }
 
 
-  public String getValidationResultInfo() {
-    return validationResultInfo;
-  }
-
-  public void setValidationResultInfo(String validationResultInfo) {
-    this.validationResultInfo = validationResultInfo;
-  }
-
   public String getAcknowledgment() {
     return acknowledgment;
   }
@@ -273,41 +226,12 @@ public class AppInfo implements Serializable {
   }
 
 
-  public String getHomeTitle() {
-    return homeTitle;
-  }
-
-  public void setHomeTitle(String homeTitle) {
-    this.homeTitle = homeTitle;
-  }
-
-
   public String getCsrfToken() {
     return csrfToken;
   }
 
   public void setCsrfToken(String csrfToken) {
     this.csrfToken = csrfToken;
-  }
-
-
-
-  public String getMessageContentInfo() {
-    return messageContentInfo;
-  }
-
-  public void setMessageContentInfo(String messageContentInfo) {
-    this.messageContentInfo = messageContentInfo;
-  }
-
-
-
-  public String getRsbVersion() {
-    return rsbVersion;
-  }
-
-  public void setRsbVersion(String rsbVersion) {
-    this.rsbVersion = rsbVersion;
   }
 
 
@@ -323,8 +247,7 @@ public class AppInfo implements Serializable {
   @Override
   public String toString() {
     return "AppInfo [id=" + id + ", url=" + url + ", version=" + version + ", date=" + date
-        + ", name=" + name + ", domain=" + domain + ", header=" + header + ", adminEmails="
-        + adminEmails + ", homeContent=" + homeContent + ", profileInfo=" + profileInfo + "]";
+        + ", name=" + name + ", header=" + header + ", adminEmails=" + adminEmails;
   }
 
   public String getMailFrom() {
@@ -447,6 +370,14 @@ public class AppInfo implements Serializable {
         && Boolean.valueOf(this.getOptions().get(Constant.CB_MANAGEMENT_SUPPORTED));
   }
 
+
+  @Transient
+  public Boolean isDocumentManagementSupported() {
+    return this.getOptions().get(Constant.DOC_MANAGEMENT_SUPPORTED) != null
+        && Boolean.valueOf(this.getOptions().get(Constant.DOC_MANAGEMENT_SUPPORTED));
+  }
+
+
   @Transient
   public void setAuthenticationRequired(boolean required) {
     this.getOptions().put(Constant.AUTHENTICATION_REQUIRED, Boolean.toString(required));
@@ -514,6 +445,24 @@ public class AppInfo implements Serializable {
   }
 
 
+  @Transient
+  public void setDocManagementSupported(boolean supported) {
+    this.getOptions().put(Constant.DOC_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
+  }
+
+  @Transient
+  public void setDomainManagementSupported(boolean supported) {
+    this.getOptions().put(Constant.DOMAIN_MANAGEMENT_SUPPORTED, Boolean.toString(supported));
+  }
+
+
+  @Transient
+  public Boolean isDomainManagementSupported() {
+    return this.getOptions().get(Constant.DOMAIN_MANAGEMENT_SUPPORTED) != null
+        && Boolean.valueOf(this.getOptions().get(Constant.DOMAIN_MANAGEMENT_SUPPORTED));
+  }
+
+
 
   public String getPrivacy() {
     return privacy;
@@ -559,6 +508,30 @@ public class AppInfo implements Serializable {
 
   public void setContactEmail(String contactEmail) {
     this.contactEmail = contactEmail;
+  }
+
+
+
+  public String getSubTitle() {
+    return subTitle;
+  }
+
+
+
+  public void setSubTitle(String subTitle) {
+    this.subTitle = subTitle;
+  }
+
+
+
+  public String getOwnerUsername() {
+    return ownerUsername;
+  }
+
+
+
+  public void setOwnerUsername(String ownerUsername) {
+    this.ownerUsername = ownerUsername;
   }
 
 
