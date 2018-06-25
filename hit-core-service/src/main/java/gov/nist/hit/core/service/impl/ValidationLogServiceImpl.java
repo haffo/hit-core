@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.auth.hit.core.domain.ValidationLog;
 import gov.nist.auth.hit.core.repo.ValidationLogRepository;
 import gov.nist.healthcare.unified.exceptions.ConversionException;
@@ -19,6 +20,11 @@ import gov.nist.healthcare.unified.model.Detections;
 import gov.nist.healthcare.unified.model.EnhancedReport;
 import gov.nist.healthcare.unified.model.Section;
 import gov.nist.hit.core.domain.TestContext;
+import gov.nist.hit.core.domain.TestStep;
+import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.service.TestStepService;
+import gov.nist.hit.core.service.UserIdService;
+import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationLogService;
 import gov.nist.hit.core.service.util.ValidationLogUtil;
 
@@ -29,6 +35,18 @@ public class ValidationLogServiceImpl implements ValidationLogService {
 
 	@Autowired
 	private ValidationLogRepository validationLogRepository;
+
+	@Autowired
+	private AccountService accountService;
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private UserIdService userIdService;
+
+	@Autowired
+	protected TestStepService testStepService;
 
 	@Override
 	public ValidationLog findOne(Long id) {
@@ -68,6 +86,19 @@ public class ValidationLogServiceImpl implements ValidationLogService {
 		log.setDate(new Date());
 		log.setErrorCountInSegment(new HashMap<>());
 		log.setMessage(report.getMessage());
+		TestStep step = testContext.getTestStep();
+		if (step != null) {
+			String userfullName = null;
+			Account account = null;
+			if (log.getUserId() != null) {
+				account = accountService.findOne(log.getUserId());
+			}
+			userfullName = account != null ? account.getFullName() : "Guest-" + log.getUserId();
+			log.setUserFullname(userfullName);
+			log.setCompanyName(account != null ? account.getEmployer() : "NA");
+			log.setTestStepName(step.getName());
+		}
+
 		Detections detections = report.getDetections();
 		// Loop on the classifications (Affirmative, Warning or Error)
 		for (Classification classification : detections.classes()) {
