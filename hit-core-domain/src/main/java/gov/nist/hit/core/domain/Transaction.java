@@ -12,6 +12,8 @@
 
 package gov.nist.hit.core.domain;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +30,6 @@ import javax.persistence.MapKeyColumn;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -60,12 +61,16 @@ public class Transaction implements java.io.Serializable {
 
   @ApiModelProperty(required = true, value = "user executing the transaction")
   @JsonIgnore
-  
   protected Long userId;
+
+  @NotNull
+  @Column(nullable = false)
+  private Date date;
+
 
   @ApiModelProperty(required = true, value = "list of properties of the transaction")
   @JsonIgnore
-  
+
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "transaction_config", joinColumns = @JoinColumn(name = "transaction_id"))
   @MapKeyColumn(name = "property_key")
@@ -74,13 +79,14 @@ public class Transaction implements java.io.Serializable {
 
   @ApiModelProperty(required = false, value = "id of the response message id of the transaction")
   @JsonIgnore
-  
+
   @Column(nullable = true)
   protected Long responseMessageId;
 
 
   public Transaction() {
     super();
+    date = new Date();
   }
 
   public Long getId() {
@@ -95,6 +101,7 @@ public class Transaction implements java.io.Serializable {
     this.incoming = incoming;
     this.outgoing = outgoing;
   }
+
 
   public String getIncoming() {
     return incoming;
@@ -146,6 +153,23 @@ public class Transaction implements java.io.Serializable {
     this.responseMessageId = responseMessageId;
   }
 
+  public String getDate(String format) {
+    // Format the date as specified
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+    if (this.date == null) {
+      this.date = new Date();
+    }
+    return simpleDateFormat.format(this.date);
+  }
+
+
+  public Date getDate() {
+    return date;
+  }
+
+  public void setDate(Date date) {
+    this.date = date;
+  }
 
   @Override
   public String toString() {

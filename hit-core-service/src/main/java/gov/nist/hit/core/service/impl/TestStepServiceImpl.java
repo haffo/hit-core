@@ -66,5 +66,11 @@ public class TestStepServiceImpl implements TestStepService {
     testStepRepository.saveAndFlush(testStep);
   }
 
+  @Override
+  public TestStep findOneByPersistenceId(Long persistenceId) {
+    // TODO Auto-generated method stub
+    return testStepRepository.getByPersistentId(persistenceId);
+  }
+
 
 }

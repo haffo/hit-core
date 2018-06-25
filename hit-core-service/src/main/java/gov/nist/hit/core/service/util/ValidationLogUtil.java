@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
-import gov.nist.hit.core.domain.log.ValidationLog;
+import gov.nist.auth.hit.core.domain.ValidationLog;
 
 /**
  * This software was developed at the National Institute of Standards and Technology by employees of

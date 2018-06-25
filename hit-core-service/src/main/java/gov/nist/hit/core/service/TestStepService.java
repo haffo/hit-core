@@ -28,6 +28,8 @@ public interface TestStepService {
 
   void save(TestStep testStep);
 
+  public TestStep findOneByPersistenceId(Long persistenceId);
+
 
 
 }
