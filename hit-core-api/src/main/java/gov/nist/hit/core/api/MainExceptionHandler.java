@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import gov.nist.hit.core.domain.ResponseMessage;
 import gov.nist.hit.core.service.exception.DocumentationException;
+import gov.nist.hit.core.service.exception.DomainException;
 import gov.nist.hit.core.service.exception.DownloadDocumentException;
 import gov.nist.hit.core.service.exception.MessageDownloadException;
 import gov.nist.hit.core.service.exception.MessageParserException;
@@ -213,6 +214,14 @@ public class MainExceptionHandler {
 	public ResponseMessage accessDeniedException(AccessDeniedException ex) {
 		logger.error("ERROR: Access Denied", ex);
 		return new ResponseMessage(ResponseMessage.Type.danger, "accessDenied");
+	}
+
+	@ResponseBody
+	@ExceptionHandler(DomainException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String domainException(DomainException ex) {
+		logger.error("ERROR: Domain Exception", ex);
+		return ex.getMessage();
 	}
 
 }
