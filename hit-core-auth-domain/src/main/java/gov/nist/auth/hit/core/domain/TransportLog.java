@@ -15,7 +15,6 @@
  */
 package gov.nist.auth.hit.core.domain;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,71 +22,60 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
-
 @Entity
 public class TransportLog extends LogEntry {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	protected Long id;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  protected Long id;
+	@NotNull
+	@Column(nullable = false)
+	protected String protocol;
 
-  @NotNull
-  @Column(nullable = false)
-  protected String protocol;
+	@NotNull
+	@Column(nullable = false)
+	protected String domain;
 
-  @NotNull
-  @Column(nullable = false)
-  protected String domain;
+	@NotNull
+	@Column(columnDefinition = "LONGTEXT", nullable = false)
+	protected String content;
 
-  @NotNull
-  @Column(columnDefinition = "LONGTEXT", nullable = false)
-  protected String content;
+	public TransportLog() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
+	public Long getId() {
+		return id;
+	}
 
-  public TransportLog() {
-    super();
-    // TODO Auto-generated constructor stub
-  }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
+	public String getProtocol() {
+		return protocol;
+	}
 
-  public Long getId() {
-    return id;
-  }
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+	public String getDomain() {
+		return domain;
+	}
 
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
 
-  public String getProtocol() {
-    return protocol;
-  }
+	public String getContent() {
+		return content;
+	}
 
-  public void setProtocol(String protocol) {
-    this.protocol = protocol;
-  }
-
-
-  public String getDomain() {
-    return domain;
-  }
-
-
-  public void setDomain(String domain) {
-    this.domain = domain;
-  }
-
-
-  public String getContent() {
-    return content;
-  }
-
-
-  public void setContent(String content) {
-    this.content = content;
-  }
-
-
+	public void setContent(String content) {
+		this.content = content;
+	}
 
 }
