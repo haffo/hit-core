@@ -78,7 +78,7 @@ public class DomainController {
 		if (userId != null) {
 			Account account = accountService.findOne(userId);
 			if (account != null && !account.isGuestAccount()) {
-				return domainService.findShortAllWithAuthornameOrParticipantEmail(account.getUsername(),
+				return domainService.findShortAllWithGlobalOrAuthornameOrParticipantEmail(account.getUsername(),
 						account.getEmail());
 			}
 		}
