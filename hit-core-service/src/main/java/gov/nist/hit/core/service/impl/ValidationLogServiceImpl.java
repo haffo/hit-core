@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gov.nist.auth.hit.core.domain.ValidationLog;
+import gov.nist.auth.hit.core.repo.ValidationLogRepository;
 import gov.nist.healthcare.unified.exceptions.ConversionException;
 import gov.nist.healthcare.unified.exceptions.NotFoundException;
 import gov.nist.healthcare.unified.model.Classification;
@@ -17,8 +19,6 @@ import gov.nist.healthcare.unified.model.Detections;
 import gov.nist.healthcare.unified.model.EnhancedReport;
 import gov.nist.healthcare.unified.model.Section;
 import gov.nist.hit.core.domain.TestContext;
-import gov.nist.hit.core.domain.log.ValidationLog;
-import gov.nist.hit.core.repo.ValidationLogRepository;
 import gov.nist.hit.core.service.ValidationLogService;
 import gov.nist.hit.core.service.util.ValidationLogUtil;
 
@@ -49,6 +49,14 @@ public class ValidationLogServiceImpl implements ValidationLogService {
   }
 
   @Override
+  public List<ValidationLog> findByUserIdAndStage(Long userId, String testingStage) {
+    // TODO Auto-generated method stub
+    return validationLogRepository.findByUserIdAndStage(userId, testingStage);
+  }
+
+
+
+  @Override
   public List<ValidationLog> findByTestStepId(Long testStepId) {
     // TODO Auto-generated method stub
     return validationLogRepository.findByTestStepId(testStepId);
@@ -62,6 +70,7 @@ public class ValidationLogServiceImpl implements ValidationLogService {
     log.setTestStepId(testContext.getTestStep().getPersistentId());
     log.setDate(new Date());
     log.setErrorCountInSegment(new HashMap<>());
+    log.setMessage(report.getMessage());
     Detections detections = report.getDetections();
     // Loop on the classifications (Affirmative, Warning or Error)
     for (Classification classification : detections.classes()) {
@@ -119,5 +128,18 @@ public class ValidationLogServiceImpl implements ValidationLogService {
     logger.info(validationLog.toString());
     return save(log);
   }
+
+  @Override
+  public List<ValidationLog> findAll() {
+    // TODO Auto-generated method stub
+    return validationLogRepository.findAll();
+  }
+
+  @Override
+  public long countAll() {
+    // TODO Auto-generated method stub
+    return validationLogRepository.count();
+  }
+
 
 }

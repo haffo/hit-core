@@ -12,14 +12,11 @@
 
 package gov.nist.hit.core.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -32,90 +29,96 @@ import io.swagger.annotations.ApiModel;
  */
 
 @Entity
-@ApiModel(value = "ConformanceProfile",
-    description = "Data Model representing the conformance profile")
-public class ConformanceProfile implements Serializable {
+@ApiModel(value = "ConformanceProfile", description = "Data Model representing the conformance profile")
+public class ConformanceProfile extends ValidationArtifact {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  protected Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	protected Long id;
 
-  @JsonIgnore
+	// @JsonIgnore
+	//
+	// @ManyToOne
+	// IntegrationProfile integrationProfile;
 
-  @ManyToOne
-  IntegrationProfile integrationProfile;
+	// @JsonIgnore
+	// @Column(nullable = false)
+	// protected Long integrationProfileId;
 
-  @NotNull
-  @JsonIgnore
+	 @NotNull
+	 @JsonIgnore
+	 @Column(nullable = false)
+	 protected String sourceId;
 
-  @Column(nullable = false)
-  protected String sourceId;
+	@NotNull
+	@JsonIgnore
 
-  @NotNull
-  @JsonIgnore
+	@Column(columnDefinition = "LONGTEXT")
+	protected String json;
 
-  @Column(columnDefinition = "LONGTEXT")
-  protected String json;
+	@JsonIgnore
 
+	@Column(columnDefinition = "LONGTEXT")
+	protected String xml;
 
-  @JsonIgnore
+	// public IntegrationProfile getIntegrationProfile() {
+	// return integrationProfile;
+	// }
+	//
+	// public void setIntegrationProfile(IntegrationProfile integrationProfile)
+	// {
+	// this.integrationProfile = integrationProfile;
+	// }
 
-  @Column(columnDefinition = "LONGTEXT")
-  protected String xml;
+	public ConformanceProfile() {
+		super();
+	}
 
+	public ConformanceProfile(String json) {
+		super();
+		this.json = json;
+	}
 
-  public IntegrationProfile getIntegrationProfile() {
-    return integrationProfile;
-  }
+	public Long getId() {
+		return id;
+	}
 
-  public void setIntegrationProfile(IntegrationProfile integrationProfile) {
-    this.integrationProfile = integrationProfile;
-  }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-  public ConformanceProfile() {
-    super();
-  }
+	public String getJson() {
+		return json;
+	}
 
-  public ConformanceProfile(String json) {
-    super();
-    this.json = json;
-  }
+	public void setJson(String json) {
+		this.json = json;
+	}
+	
+	 public String getSourceId() {
+	 return sourceId;
+	 }
+	
+	 public void setSourceId(String sourceId) {
+	 this.sourceId = sourceId;
+	 }
 
-  public Long getId() {
-    return id;
-  }
+	public String getXml() {
+		return xml;
+	}
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+	public void setXml(String xml) {
+		this.xml = xml;
+	}
 
-
-  public String getJson() {
-    return json;
-  }
-
-  public void setJson(String json) {
-    this.json = json;
-  }
-
-  public String getSourceId() {
-    return sourceId;
-  }
-
-  public void setSourceId(String sourceId) {
-    this.sourceId = sourceId;
-  }
-
-  public String getXml() {
-    return xml;
-  }
-
-  public void setXml(String xml) {
-    this.xml = xml;
-  }
-
-
+	// public Long getIntegrationProfileId() {
+	// return integrationProfileId;
+	// }
+	//
+	// public void setIntegrationProfileId(Long integrationProfileId) {
+	// this.integrationProfileId = integrationProfileId;
+	// }
 
 }

@@ -308,6 +308,23 @@ public class StreamerImpl implements Streamer {
   }
 
 
+  @Override
+  public void streamTestCaseDocuments(OutputStream os, List<TestCaseDocumentation> documents)
+      throws IOException {
+    JsonGenerator jGenerator = createGenerator(os);
+    if (documents != null) {
+      jGenerator.writeStartArray();
+      for (TestCaseDocumentation child : documents) {
+        write(jGenerator, child);
+      }
+      jGenerator.writeEndArray();
+    } else {
+      jGenerator.writeNull();
+    }
+    jGenerator.close();
+  }
+
+
 
   private void write(JsonGenerator jGenerator, TestStep testStep, boolean endObject)
       throws IOException {
@@ -534,7 +551,7 @@ public class StreamerImpl implements Streamer {
       writeAbstractTest(jGenerator, testPlan);
       writeLongField(jGenerator, "id", testPlan.getId());
       writeLongField(jGenerator, "persistentId", testPlan.getPersistentId());
-      jGenerator.writeStringField("category", testPlan.getCategory());
+      // jGenerator.writeStringField("category", testPlan.getCategory());
 
       if (testPlan.getTestSteps() != null) {
         jGenerator.writeArrayFieldStart("testSteps");
@@ -566,7 +583,6 @@ public class StreamerImpl implements Streamer {
       writeAbstractTest(jGenerator, testPlan);
       jGenerator.writeBooleanField("transport", testPlan.isTransport());
       jGenerator.writeStringField("domain", testPlan.getDomain());
-      jGenerator.writeStringField("category", testPlan.getCategory());
 
       writeLongField(jGenerator, "id", testPlan.getId());
 

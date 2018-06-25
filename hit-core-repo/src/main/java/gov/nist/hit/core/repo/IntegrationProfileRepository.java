@@ -22,21 +22,26 @@ import gov.nist.hit.core.domain.IntegrationProfile;
 
 public interface IntegrationProfileRepository extends JpaRepository<IntegrationProfile, Long> {
 
-  @Query("select p from IntegrationProfile p where :mId member of p.messages")
-  public IntegrationProfile findByMessageId(@Param("mId") String mId);
+	// @Query("select p from IntegrationProfile p where :mId member of
+	// p.messages")
+	// public IntegrationProfile findByMessageId(@Param("mId") String mId);
 
-  @Query("select p from IntegrationProfile p where p.sourceId = :sourceId")
-  public IntegrationProfile findBySourceId(@Param("sourceId") String sourceId);
+	@Query("select p from IntegrationProfile p where p.sourceId = :sourceId")
+	public IntegrationProfile findBySourceId(@Param("sourceId") String sourceId);
 
+	@Modifying
+	@Transactional(value = "transactionManager")
+	@Query("delete from IntegrationProfile to where to.preloaded = true")
+	public void deletePreloaded();
 
-  @Modifying
-  @Transactional(value = "transactionManager")
-  @Query("delete from IntegrationProfile to where to.preloaded = true")
-  public void deletePreloaded();
+	@Modifying
+	@Transactional(value = "transactionManager")
+	@Query("delete from IntegrationProfile to where to.preloaded = false")
+	public void deleteNonPreloaded();
 
-  @Modifying
-  @Transactional(value = "transactionManager")
-  @Query("delete from IntegrationProfile to where to.preloaded = false")
-  public void deleteNonPreloaded();
+	@Modifying
+	@Transactional(value = "transactionManager")
+	@Query("delete from IntegrationProfile to where to.domain = :domain")
+	public void deleteByDomain(@Param("domain") String domain);
 
 }

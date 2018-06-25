@@ -23,6 +23,9 @@ public interface ConformanceProfileRepository extends JpaRepository<ConformanceP
   @Query("select conformance.json from ConformanceProfile conformance where conformance.id = :conformanceId")
   public String getJson(@Param("conformanceId") Long conformanceId);
 
+  @Query("select conformance from ConformanceProfile conformance where conformance.sourceId = :sourceId")
+  public ConformanceProfile findOneBySourceId(@Param("sourceId") String sourceId);
 
+  
 
 }

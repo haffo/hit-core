@@ -26,28 +26,26 @@ public interface CFTestPlanService {
 
   CFTestPlan findOne(Long testPlanId);
 
-  List<CFTestPlan> findAllByStageAndScope(TestingStage stage, TestScope scope);
+  List<CFTestPlan> findAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
+      String domain);
 
-  List<CFTestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
+  List<CFTestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
+      String domain);
 
-  List<CFTestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername,
-      TestScope scope);
+  List<CFTestPlan> findShortAllByStageAndAuthorAndScopeAndDomain(TestingStage stage,
+      String authorUsername, TestScope scope, String domain);
 
-  List<CFTestPlan> findShortAllByScopeAndUsername(TestScope scope, String authorUsername);
+  List<CFTestPlan> findShortAllByScopeAndUsernameAndDomain(TestScope scope, String authorUsername,
+      String domain);
 
-  List<CFTestPlan> findShortAllByScope(TestScope scope);
+  List<CFTestPlan> findShortAllByScopeAndDomain(TestScope scope, String domain);
 
-  List<CFTestPlan> findAllByScopeAndUsername(TestScope scope, String authorUsername);
+  List<CFTestPlan> findAllByScopeAndUsernameAndDomain(TestScope scope, String authorUsername,
+      String domain);
 
-  List<CFTestPlan> findAllByScope(TestScope scope);
-
-  Set<String> findAllCategoriesByScope(TestScope scope);
-
-  Set<String> findAllCategoriesByScopeAndUser(TestScope scope, String username);
+  List<CFTestPlan> findAllByScopeAndDomain(TestScope scope, String domain);
 
   List<CFTestPlan> findByIds(Set<Long> ids);
-
-  void updateCategory(Set<Long> ids, String cat);
 
   void delete(CFTestPlan testPlan);
 

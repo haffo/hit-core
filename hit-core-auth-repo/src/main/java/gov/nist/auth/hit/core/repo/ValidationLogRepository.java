@@ -10,7 +10,7 @@
  * that they have been modified.
  */
 
-package gov.nist.hit.core.repo;
+package gov.nist.auth.hit.core.repo;
 
 import java.util.List;
 
@@ -18,14 +18,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import gov.nist.hit.core.domain.TestArtifact;
-import gov.nist.hit.core.domain.log.ValidationLog;
+import gov.nist.auth.hit.core.domain.ValidationLog;
 
 public interface ValidationLogRepository extends JpaRepository<ValidationLog, Long> {
-
-
-  @Query("select testStep.testStory from TestStep testStep where testStep.id = :id")
-  public TestArtifact testStory(@Param("id") Long id);
 
 
   @Query("select log from ValidationLog log where log.userId = :userId")
@@ -33,6 +28,10 @@ public interface ValidationLogRepository extends JpaRepository<ValidationLog, Lo
 
   @Query("select log from ValidationLog log where log.testStepId = :testStepId")
   public List<ValidationLog> findByTestStepId(@Param("testStepId") Long testStepId);
+
+  @Query("select log from ValidationLog log where log.userId = :userId and log.testingStage = :testingStage")
+  public List<ValidationLog> findByUserIdAndStage(@Param("userId") Long userId,
+      @Param("testingStage") String testingStage);
 
 
 }

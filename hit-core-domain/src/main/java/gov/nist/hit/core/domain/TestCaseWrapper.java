@@ -9,7 +9,6 @@ public class TestCaseWrapper {
   private String token;
   private Long groupId;
   private String scope;
-  private String category;
   private int position = -1;
   private Set<UploadedProfileModel> added;
   private Set<UploadedProfileModel> removed;
@@ -95,16 +94,6 @@ public class TestCaseWrapper {
 
   public void setScope(String scope) {
     this.scope = scope;
-  }
-
-
-  public String getCategory() {
-    return category;
-  }
-
-
-  public void setCategory(String category) {
-    this.category = category;
   }
 
 

@@ -35,4 +35,12 @@ public interface ConstraintsRepository extends JpaRepository<Constraints, Long> 
   @Query("delete from Constraints to where to.preloaded = false")
   public void deleteNonPreloaded();
 
+
+
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from Constraints to where to.domain = :domain")
+  public void deleteByDomain(@Param("domain") String domain);
+
+
 }

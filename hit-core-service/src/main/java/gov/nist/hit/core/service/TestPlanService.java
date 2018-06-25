@@ -1,7 +1,6 @@
 package gov.nist.hit.core.service;
 
 import java.util.List;
-import java.util.Set;
 
 import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestPlan;
@@ -12,28 +11,26 @@ public interface TestPlanService {
 
   public TestPlan findOne(Long testPlanId);
 
-  public List<TestArtifact> findAllTestPackages(TestingStage stage);
+  public List<TestArtifact> findAllTestPackagesByDomain(TestingStage stage, String domain);
 
-  public List<TestPlan> findShortAllByStage(TestingStage stage);
+  public List<TestPlan> findShortAllByStageAndDomain(TestingStage stage, String domain);
 
-  public List<TestPlan> findShortAllByStageAndScope(TestingStage stage, TestScope scope);
+  public List<TestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
+      String domain);
 
-  public List<TestPlan> findShortAllByStageAndAuthor(TestingStage stage, String authorUsername);
+  public List<TestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage,
+      String authorUsername, String domain);
 
-  public List<TestPlan> findShortAllByStageAndScopeAndAuthor(TestingStage stage, TestScope scope,
-      String authorUsername);
+  public List<TestPlan> findShortAllByStageAndScopeAndAuthorAndDomain(TestingStage stage,
+      TestScope scope, String authorUsername, String domain);
 
-  public Set<String> findAllCategoriesByStageAndScope(TestingStage stage, TestScope scope);
-
-  public Set<String> findAllCategoriesByStageAndScopeAndUser(TestingStage stage, TestScope scope,
-      String username);
 
   void delete(TestPlan testPlan);
 
   public TestPlan save(TestPlan testPlan);
 
-  public List<TestPlan> findAllShortByStageAndUsernameAndScope(TestingStage stage,
-      String authorUsername, TestScope scope);
+  public List<TestPlan> findAllShortByStageAndUsernameAndScopeAndDomain(TestingStage stage,
+      String authorUsername, TestScope scope, String domain);
 
 
 
