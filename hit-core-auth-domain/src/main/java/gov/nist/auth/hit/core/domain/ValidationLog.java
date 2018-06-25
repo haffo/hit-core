@@ -106,11 +106,6 @@ public class ValidationLog extends LogEntry {
 		return simpleDateFormat.format(this.date);
 	}
 
-	@Override
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
 	public Map<String, Integer> getErrorCountInSegment() {
 		return errorCountInSegment;
 	}
