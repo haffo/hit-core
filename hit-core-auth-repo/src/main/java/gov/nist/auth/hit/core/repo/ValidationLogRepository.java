@@ -14,24 +14,22 @@ package gov.nist.auth.hit.core.repo;
 
 import java.util.List;
 
+import org.jboss.logging.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import gov.nist.auth.hit.core.domain.ValidationLog;
 
 public interface ValidationLogRepository extends JpaRepository<ValidationLog, Long> {
 
+	@Query("select log from ValidationLog log where log.userId = :userId")
+	public List<ValidationLog> findByUserId(@Param("userId") Long userId);
 
-  @Query("select log from ValidationLog log where log.userId = :userId")
-  public List<ValidationLog> findByUserId(@Param("userId") Long userId);
+	@Query("select log from ValidationLog log where log.testStepId = :testStepId")
+	public List<ValidationLog> findByTestStepId(@Param("testStepId") Long testStepId);
 
-  @Query("select log from ValidationLog log where log.testStepId = :testStepId")
-  public List<ValidationLog> findByTestStepId(@Param("testStepId") Long testStepId);
-
-  @Query("select log from ValidationLog log where log.userId = :userId and log.testingStage = :testingStage")
-  public List<ValidationLog> findByUserIdAndStage(@Param("userId") Long userId,
-      @Param("testingStage") String testingStage);
-
+	@Query("select log from ValidationLog log where log.userId = :userId and log.testingStage = :testingStage")
+	public List<ValidationLog> findByUserIdAndStage(@Param("userId") Long userId,
+			@Param("testingStage") String testingStage);
 
 }

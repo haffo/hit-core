@@ -14,12 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import gov.nist.auth.hit.core.domain.Account;
-import gov.nist.auth.hit.core.domain.ValidationLog;
-import gov.nist.hit.core.domain.TestStep;
-import gov.nist.hit.core.service.AccountService;
+import gov.nist.hit.core.domain.log.ValidationLog;
 import gov.nist.hit.core.service.TestStepService;
-import gov.nist.hit.core.service.UserIdService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationLogService;
 import gov.nist.hit.core.service.exception.NoUserFoundException;
@@ -35,13 +31,7 @@ public class ValidationLogController {
 	private ValidationLogService validationLogService;
 
 	@Autowired
-	private AccountService accountService;
-
-	@Autowired
 	private UserService userService;
-
-	@Autowired
-	private UserIdService userIdService;
 
 	@Autowired
 	protected TestStepService testStepService;
@@ -62,39 +52,7 @@ public class ValidationLogController {
 			HttpServletResponse response) throws Exception {
 		logger.info("Fetching all validation logs...");
 		checkPermission(authentication);
-		return process(validationLogService.findAll());
-	}
-
-	public List<ValidationLog> process(List<ValidationLog> logs) throws Exception {
-		if (logs != null && !logs.isEmpty()) {
-			for (ValidationLog log : logs) {
-				TestStep step = testStepService.findOneByPersistenceId(log.getTestStepId());
-				if (step != null) {
-					String userfullName = null;
-					boolean updated = false;
-					if (log.getUserId() != null) {
-						Account account = accountService.findOne(log.getUserId());
-						userfullName = account != null ? account.getFullName() : "Guest-" + log.getUserId();
-						if (log.getUserFullname() == null) {
-							log.setUserFullname(userfullName);
-							updated = true;
-						}
-						if (log.getCompanyName() == null) {
-							updated = true;
-							log.setCompanyName(account != null ? account.getEmployer() : "NA");
-						}
-					}
-					if (log.getTestStepName() == null) {
-						log.setTestStepName(step.getName());
-						updated = true;
-					}
-					if (updated) {
-						validationLogService.save(log);
-					}
-				}
-			}
-		}
-		return logs;
+		return validationLogService.findAll();
 	}
 
 	@PreAuthorize("hasRole('tester')")
