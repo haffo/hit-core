@@ -97,6 +97,9 @@ public class ValidationLogServiceImpl implements ValidationLogService {
 			log.setUserFullname(userfullName);
 			log.setCompanyName(account != null ? account.getEmployer() : "NA");
 			log.setTestStepName(step.getName());
+			log.setTestingStage(
+					(step.getStage() != null && step.getStage().name() != null ? step.getStage().name() : ""));
+
 		}
 
 		Detections detections = report.getDetections();
@@ -152,7 +155,6 @@ public class ValidationLogServiceImpl implements ValidationLogService {
 		if (testContext != null) {
 			log.setFormat((testContext.getFormat() != null ? testContext.getFormat() : ""));
 			log.setMessageId((testContext.getType() != null ? testContext.getType() : ""));
-			log.setTestingStage((testContext.getStage().name() != null ? testContext.getStage().name() : ""));
 		}
 		String validationLog = ValidationLogUtil.toString(log);
 		logger.info(validationLog.toString());

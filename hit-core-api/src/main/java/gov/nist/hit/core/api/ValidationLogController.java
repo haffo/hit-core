@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import gov.nist.hit.core.domain.log.ValidationLog;
+import gov.nist.auth.hit.core.domain.ValidationLog;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationLogService;
@@ -45,22 +45,20 @@ public class ValidationLogController {
 		}
 	}
 
-	@PreAuthorize("hasRole('tester')")
+	@PreAuthorize("hasRole('admin')")
 	@ApiOperation(value = "get all logs", nickname = "getAll")
 	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
 	public List<ValidationLog> getAll(Authentication authentication, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		logger.info("Fetching all validation logs...");
-		checkPermission(authentication);
 		return validationLogService.findAll();
 	}
 
-	@PreAuthorize("hasRole('tester')")
+	@PreAuthorize("hasRole('admin')")
 	@RequestMapping(value = "/count", method = RequestMethod.GET, produces = "application/json")
 	public long countAll(Authentication authentication, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		logger.info("Fetching all validation logs count...");
-		checkPermission(authentication);
 		return validationLogService.countAll();
 	}
 

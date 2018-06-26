@@ -62,7 +62,7 @@ public class TransportLogController {
 		return true;
 	}
 
-	@PreAuthorize("hasRole('tester')")
+	@PreAuthorize("hasRole('admin')")
 	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
 	public List<TransportLog> getAll(Authentication authentication, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -91,7 +91,7 @@ public class TransportLogController {
 		transportLogService.save(log);
 	}
 
-	@PreAuthorize("hasRole('tester')")
+	@PreAuthorize("hasRole('admin')")
 	@RequestMapping(value = "/count", method = RequestMethod.GET, produces = "application/json")
 	public long countAll(Authentication authentication, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
