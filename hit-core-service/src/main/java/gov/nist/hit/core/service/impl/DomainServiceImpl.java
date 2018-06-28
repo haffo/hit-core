@@ -180,7 +180,7 @@ public class DomainServiceImpl implements DomainService {
 		if (all != null && !all.isEmpty()) {
 			results = new ArrayList<Domain>();
 			for (Domain dom : all) {
-				if (authorUsername.equals(dom.getAuthorUsername()) || (dom.getParticipantEmails() != null
+				if (authorname.equals(dom.getAuthorUsername()) || (dom.getParticipantEmails() != null
 						&& dom.getParticipantEmails().contains(participantEmail))) {
 					results.add(dom);
 				}
