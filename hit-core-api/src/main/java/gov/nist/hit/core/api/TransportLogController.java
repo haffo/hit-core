@@ -80,7 +80,8 @@ public class TransportLogController {
 			if (log.getUserId() != null) {
 				account = accountService.findOne(log.getUserId());
 			}
-			userfullName = account != null ? account.getFullName() : "Guest-" + log.getUserId();
+			userfullName = account != null && account.getFullName() != null ? account.getFullName()
+					: "Guest-" + log.getUserId();
 			log.setUserFullname(userfullName);
 			log.setCompanyName(account != null ? account.getEmployer() : "NA");
 			log.setTestStepName(step.getName());

@@ -46,12 +46,12 @@ public class Message extends TestResource {
     this.domain = domain;
   }
 
-  public Message(String content, String domain) {
+  public Message(String name, String content) {
     super();
-    this.name = null;
+    this.name = name;
     this.description = null;
     this.content = content;
-    this.domain = domain;
+    this.domain = null;
   }
 
   @Override
