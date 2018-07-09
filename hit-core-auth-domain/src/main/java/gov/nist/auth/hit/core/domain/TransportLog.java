@@ -25,57 +25,58 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class TransportLog extends LogEntry {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	protected Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  protected Long id;
 
-	@NotNull
-	@Column(nullable = false)
-	protected String protocol;
+  @NotNull
+  @Column(nullable = false)
+  protected String protocol;
 
-	@NotNull
-	@Column(nullable = false)
-	protected String domain;
+  @NotNull
+  @Column(nullable = false)
+  protected String domain;
 
-	@NotNull
-	@Column(columnDefinition = "LONGTEXT", nullable = false)
-	protected String content;
+  @NotNull
+  @Column(columnDefinition = "LONGTEXT", nullable = false)
+  protected String content;
 
-	public TransportLog() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
 
-	public Long getId() {
-		return id;
-	}
+  public TransportLog() {
+    super();
+    // TODO Auto-generated constructor stub
+  }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public String getProtocol() {
-		return protocol;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public void setProtocol(String protocol) {
-		this.protocol = protocol;
-	}
+  public String getProtocol() {
+    return protocol;
+  }
 
-	public String getDomain() {
-		return domain;
-	}
+  public void setProtocol(String protocol) {
+    this.protocol = protocol;
+  }
 
-	public void setDomain(String domain) {
-		this.domain = domain;
-	}
+  public String getDomain() {
+    return domain;
+  }
 
-	public String getContent() {
-		return content;
-	}
+  public void setDomain(String domain) {
+    this.domain = domain;
+  }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+  public String getContent() {
+    return content;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
 
 }
