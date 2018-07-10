@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,12 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.auth.hit.core.domain.TransportLog;
+import gov.nist.hit.core.domain.ResponseMessage;
+import gov.nist.hit.core.domain.ResponseMessage.Type;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.TransportLogService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.NoUserFoundException;
+import io.swagger.annotations.ApiOperation;
 
 @RequestMapping("/logs/transport")
 @RestController
@@ -96,9 +100,19 @@ public class TransportLogController {
 	@RequestMapping(value = "/count", method = RequestMethod.GET, produces = "application/json")
 	public long countAll(Authentication authentication, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		logger.info("Fetching all validation logs count...");
+		logger.info("Fetching all transport logs count...");
 		checkPermission(authentication);
 		return transportLogService.countAll();
+	}
+
+	@PreAuthorize("hasRole('admin')")
+	@ApiOperation(value = "delete log", nickname = "getAll")
+	@RequestMapping(value = "/{id}/delete", method = RequestMethod.POST, produces = "application/json")
+	public ResponseMessage deleteLog(Authentication authentication, HttpServletRequest request,
+			@PathVariable("id") Long id, HttpServletResponse response) throws Exception {
+		logger.info("deleting transport log with id=" + id + "...");
+		transportLogService.delete(id);
+		return new ResponseMessage(Type.success, "transport Log " + id + " deleted successfully", id + "", true);
 	}
 
 }

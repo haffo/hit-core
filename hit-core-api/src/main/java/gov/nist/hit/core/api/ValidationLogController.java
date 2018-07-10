@@ -10,11 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.auth.hit.core.domain.ValidationLog;
+import gov.nist.hit.core.domain.ResponseMessage;
+import gov.nist.hit.core.domain.ResponseMessage.Type;
 import gov.nist.hit.core.service.TestStepService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.ValidationLogService;
@@ -60,6 +63,16 @@ public class ValidationLogController {
 			throws Exception {
 		logger.info("Fetching all validation logs count...");
 		return validationLogService.countAll();
+	}
+
+	@PreAuthorize("hasRole('admin')")
+	@ApiOperation(value = "delete log", nickname = "getAll")
+	@RequestMapping(value = "/{id}/delete", method = RequestMethod.POST, produces = "application/json")
+	public ResponseMessage deleteLog(Authentication authentication, HttpServletRequest request,
+			@PathVariable("id") Long id, HttpServletResponse response) throws Exception {
+		logger.info("deleting validation log with id=" + id + "...");
+		validationLogService.delete(id);
+		return new ResponseMessage(Type.success, "Validation Log " + id + " deleted successfully", id + "", true);
 	}
 
 }
