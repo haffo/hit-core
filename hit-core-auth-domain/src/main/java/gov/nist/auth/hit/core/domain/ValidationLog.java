@@ -127,6 +127,22 @@ public class ValidationLog extends LogEntry {
     this.validationResult = validationResult;
   }
 
+  public String getTestingStage() {
+    return testingStage;
+  }
+
+  public void setTestingStage(String testingStage) {
+    this.testingStage = testingStage;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
 
 
 }
