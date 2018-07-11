@@ -14,43 +14,67 @@ package gov.nist.hit.core.domain;
  * Created by Maxence Lefort on 9/13/16.
  */
 public class UserTestCaseReportRequest {
-    private Long testCaseId;
+  private Long testCaseId;
 
-    private String result;
+  private String result;
 
-    private String comments;
+  private String comments;
 
-    public UserTestCaseReportRequest() {
-        super();
-    }
+  private String testPlan, testGroup;
 
-    public UserTestCaseReportRequest(Long testCaseId, String result, String comments) {
-        this.testCaseId = testCaseId;
-        this.result = result;
-        this.comments = comments;
-    }
+  public UserTestCaseReportRequest() {
+    super();
+  }
 
-    public Long getTestCaseId() {
-        return testCaseId;
-    }
+  public UserTestCaseReportRequest(Long testCaseId, String result, String comments, String testPlan,
+      String testGroup) {
+    this.testCaseId = testCaseId;
+    this.result = result;
+    this.comments = comments;
+    this.testPlan = testPlan;
+    this.testGroup = testGroup;
+  }
 
-    public void setTestCaseId(Long testCaseId) {
-        this.testCaseId = testCaseId;
-    }
+  public Long getTestCaseId() {
+    return testCaseId;
+  }
 
-    public String getResult() {
-        return result;
-    }
+  public void setTestCaseId(Long testCaseId) {
+    this.testCaseId = testCaseId;
+  }
 
-    public void setResult(String result) {
-        this.result = result;
-    }
+  public String getResult() {
+    return result;
+  }
 
-    public String getComments() {
-        return comments;
-    }
+  public void setResult(String result) {
+    this.result = result;
+  }
 
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
+  public String getComments() {
+    return comments;
+  }
+
+  public void setComments(String comments) {
+    this.comments = comments;
+  }
+
+  public String getTestPlan() {
+    return testPlan;
+  }
+
+  public void setTestPlan(String testPlan) {
+    this.testPlan = testPlan;
+  }
+
+  public String getTestGroup() {
+    return testGroup;
+  }
+
+  public void setTestGroup(String testGroup) {
+    this.testGroup = testGroup;
+  }
+
+
+
 }
