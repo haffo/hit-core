@@ -22,6 +22,8 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -32,9 +34,7 @@ import gov.nist.hit.core.domain.TestCaseValidationResult;
 import gov.nist.hit.core.domain.TestResult;
 import gov.nist.hit.core.domain.TestStep;
 import gov.nist.hit.core.domain.TestStepValidationReport;
-import gov.nist.hit.core.repo.TestCaseValidationReportRepository;
 import gov.nist.hit.core.repo.TestStepValidationReportRepository;
-import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.TestCaseService;
 import gov.nist.hit.core.service.TestCaseValidationReportService;
 import gov.nist.hit.core.service.TestStepService;
@@ -44,6 +44,7 @@ import gov.nist.hit.core.service.util.HtmlUtil;
 import gov.nist.hit.core.service.util.ReportUtil;
 import nu.xom.Attribute;
 
+@PropertySource(value = {"classpath:app-config.properties"})
 @Service
 public class TestCaseValidationReportServiceImpl implements TestCaseValidationReportService {
 
@@ -53,8 +54,12 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
   protected static final String CSS = "/report/report.css";
   protected String css = "";
 
-  @Autowired
-  private AccountService accountService;
+  @Value("${app.header}")
+  private String appName;
+
+  @Value("${app.version}")
+  private String appVersion;
+
 
   @Autowired
   private TestStepValidationReportService testStepValidationReportService;
@@ -65,10 +70,6 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
 
   @Autowired
   private TestCaseService testCaseService;
-
-
-  @Autowired
-  private TestCaseValidationReportRepository testCaseValidationReportRepository;
 
   @Autowired
   protected TestStepValidationReportRepository testStepValidationReportRepository;
@@ -84,10 +85,10 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
 
 
   @Override
-  public InputStream generatePdf(TestCase testCase, Long userId, String result, String comments)
-      throws ValidationReportException {
+  public InputStream generatePdf(TestCase testCase, Long userId, String result, String comments,
+      String testPlan, String testGroup) throws ValidationReportException {
     try {
-      return generatePdf(generateXml(testCase, userId, result, comments));
+      return generatePdf(generateXml(testCase, userId, result, comments, testPlan, testGroup));
     } catch (Exception e) {
       throw new ValidationReportException("Failed to generate the test case report");
     }
@@ -120,6 +121,17 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
       serviceProvider.appendChild("NIST");
       headerReport.appendChild(serviceProvider);
 
+      nu.xom.Element toolName = new nu.xom.Element("testcasevalidationreport:ToolName",
+          "http://www.nist.gov/healthcare/validation/testcase/report");
+      toolName.appendChild(appName);
+      headerReport.appendChild(toolName);
+
+      nu.xom.Element toolVersion = new nu.xom.Element("testcasevalidationreport:ToolVersion",
+          "http://www.nist.gov/healthcare/validation/testcase/report");
+      toolVersion.appendChild(appVersion);
+      headerReport.appendChild(toolVersion);
+
+
       nu.xom.Element validationType = new nu.xom.Element("testcasevalidationreport:ValidationType",
           "http://www.nist.gov/healthcare/validation/testcase/report");
       validationType.appendChild("Context-Based");
@@ -143,28 +155,6 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
       comments.appendChild(result.getComments());
 
 
-      Map<String, String> nav = result.getNav();
-      if (nav != null && !nav.isEmpty()) {
-        nu.xom.Element testCaseReference =
-            new nu.xom.Element("testcasevalidationreport:TestCaseReference",
-                "http://www.nist.gov/healthcare/validation/testcase/report");
-        headerReport.appendChild(testCaseReference);
-
-        nu.xom.Element testCase = new nu.xom.Element("testcasevalidationreport:TestCase",
-            "http://www.nist.gov/healthcare/validation/testcase/report");
-        testCase.appendChild(nav.get("testCase"));
-        testCaseReference.appendChild(testCase);
-
-        nu.xom.Element testPlan = new nu.xom.Element("testcasevalidationreport:TestPlan",
-            "http://www.nist.gov/healthcare/validation/testcase/report");
-        testPlan.appendChild(nav.get("testPlan"));
-        testCaseReference.appendChild(testPlan);
-
-        nu.xom.Element testGroup = new nu.xom.Element("testcasevalidationreport:TestGroup",
-            "http://www.nist.gov/healthcare/validation/testcase/report");
-        testGroup.appendChild(nav.get("testGroup"));
-        testCaseReference.appendChild(testGroup);
-      }
 
       nu.xom.Element testCaseReportContent =
           new nu.xom.Element("testcasevalidationreport:TestCaseValidationReportBody",
@@ -181,6 +171,34 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
           }
         }
       }
+
+
+      Map<String, String> nav = result.getNav();
+      if (nav != null && !nav.isEmpty()) {
+        if (nav.containsKey("testCase") && nav.get("testCase") != null) {
+          nu.xom.Element testCase = new nu.xom.Element("testcasevalidationreport:TestCase",
+              "http://www.nist.gov/healthcare/validation/testcase/report");
+          testCase.appendChild(nav.get("testCase"));
+          headerReport.appendChild(testCase);
+        }
+
+        if (nav.containsKey("testPlan") && nav.get("testPlan") != null) {
+          nu.xom.Element testPlan = new nu.xom.Element("testcasevalidationreport:TestPlan",
+              "http://www.nist.gov/healthcare/validation/testcase/report");
+          testPlan.appendChild(nav.get("testPlan"));
+          headerReport.appendChild(testPlan);
+        }
+
+        if (nav.containsKey("testGroup") && nav.get("testGroup") != null) {
+
+          nu.xom.Element testGroup = new nu.xom.Element("testcasevalidationreport:TestGroup",
+              "http://www.nist.gov/healthcare/validation/testcase/report");
+          testGroup.appendChild(nav.get("testGroup"));
+          headerReport.appendChild(testGroup);
+        }
+
+      }
+
 
       String xml = report.toXML();
       // File f = new File("src/main/resources/TestCaseValidationReport.xml");
@@ -326,6 +344,22 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
 
 
   @Override
+  public String generateXml(TestCase testCase, Long userId, String res, String comments,
+      String testPlan, String testGroup) throws ValidationReportException {
+    try {
+      List<TestStepValidationReport> testStepReports =
+          findTestStepReportsByTestCaseAndUser(userId, testCase.getId());
+      TestCaseValidationResult result =
+          new TestCaseValidationResult(testCase, testStepReports, testPlan, testGroup);
+      result.setResult(res != null ? TestResult.valueOf(res) : null);
+      result.setComments(comments);
+      return generateXml(result);
+    } catch (Exception e) {
+      throw new ValidationReportException("Failed to download the reports");
+    }
+  }
+
+  @Override
   public String generateXml(TestCase testCase, Long userId, String res, String comments)
       throws ValidationReportException {
     try {
@@ -341,6 +375,18 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
   }
 
 
+
+  @Override
+  public String generateHtml(TestCase testCase, Long userId, String result, String comments,
+      String testPlan, String testGroup) throws ValidationReportException {
+    try {
+      return generateHtml(generateXml(testCase, userId, result, comments, testPlan, testGroup));
+    } catch (Exception e) {
+      throw new ValidationReportException("Failed to generate the test case report");
+    }
+  }
+
+
   @Override
   public String generateHtml(TestCase testCase, Long userId, String result, String comments)
       throws ValidationReportException {
@@ -350,4 +396,5 @@ public class TestCaseValidationReportServiceImpl implements TestCaseValidationRe
       throw new ValidationReportException("Failed to generate the test case report");
     }
   }
+
 }

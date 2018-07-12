@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import gov.nist.auth.hit.core.domain.TransportLog;
@@ -48,7 +49,7 @@ public class TransportLogServiceImpl implements TransportLogService {
   @Override
   public List<TransportLog> findAll() {
     // TODO Auto-generated method stub
-    return transportLogRepository.findAll();
+    return transportLogRepository.findAll(sortByDateDsc());
   }
 
   @Override
@@ -57,6 +58,15 @@ public class TransportLogServiceImpl implements TransportLogService {
     return transportLogRepository.count();
   }
 
+  @Override
+  public void delete(Long id) {
+    transportLogRepository.delete(id);
+  }
 
+
+
+  private Sort sortByDateDsc() {
+    return new Sort(Sort.Direction.DESC, "date");
+  }
 
 }

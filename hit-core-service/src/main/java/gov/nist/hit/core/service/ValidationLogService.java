@@ -24,5 +24,8 @@ public interface ValidationLogService {
 
   public long countAll();
 
+  public void delete(Long id);
+
+
 
 }

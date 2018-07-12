@@ -5,35 +5,43 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
 public class TestCaseValidationResult {
-  
-  private TestCase testCase; 
-  
-  private  List<TestStepValidationReport> testStepReports; 
-  
-  private Date date; 
-  
-  private Map<String, String> nav = new HashMap<String, String>(); 
-  
+
+  private TestCase testCase;
+
+  private List<TestStepValidationReport> testStepReports;
+
+  private Date date;
+
+  private Map<String, String> nav = new HashMap<String, String>();
+
   private TestResult result = null;
-  
+
   private String comments;
-  
-  
-  public TestCaseValidationResult(TestCase testCase, List<TestStepValidationReport> testStepReports) {
+
+
+  public TestCaseValidationResult(TestCase testCase, List<TestStepValidationReport> testStepReports,
+      String testPlan, String testGroup) {
     super();
     this.testCase = testCase;
     this.testStepReports = testStepReports;
-  } 
-  
+    this.nav.put("testPlan", testPlan);
+    this.nav.put("testGroup", testGroup);
+  }
+
+
+
+  public TestCaseValidationResult(TestCase testCase,
+      List<TestStepValidationReport> testStepReports) {
+    super();
+    this.testCase = testCase;
+    this.testStepReports = testStepReports;
+  }
+
   public TestCaseValidationResult() {
     super();
   }
-  
+
 
   public TestCase getTestCase() {
     return testCase;
@@ -43,7 +51,7 @@ public class TestCaseValidationResult {
     this.testCase = testCase;
   }
 
-  
+
 
   public List<TestStepValidationReport> getTestStepReports() {
     return testStepReports;
@@ -85,9 +93,6 @@ public class TestCaseValidationResult {
     this.result = result;
   }
 
-  
-  
-  
-  
-  
+
+
 }

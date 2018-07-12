@@ -6,20 +6,20 @@
 	xmlns:report="http://www.nist.gov/healthcare/validation/message/hl7/v2/report">
 
 	<xsl:import href="teststep-validation-report-pdf.xsl" />
- 
+
 	<xsl:output method="html" />
- 
+
 	<xsl:param name="withHeader">
 		<xsl:value-of select="false()" />
 	</xsl:param>
 	<xsl:param name="withTestCaseReference">
 		<xsl:value-of select="false()" />
 	</xsl:param>
-	
+
 	<xsl:param name="withManualBody">
 		<xsl:value-of select="false()" />
 	</xsl:param>
-	
+
 
 
 	<xsl:template match="testcasevalidationreport:TestCaseValidationReport">
@@ -62,7 +62,7 @@
 				</tbody>
 			</table>
 		</div>
-		
+
 		<div class="report-section">
 			<table class="forumline" width="100%" cellspacing="1"
 				cellpadding="2">
@@ -105,18 +105,32 @@
 			</table>
 		</div>
 
-		<!-- <div class="report-section"> <table class="forumline" width="100%" 
-			cellspacing="1" cellpadding="2"> <tbody class="cf-tbody"> <tr> <td class="row1 
-			border_right">Testing Type</td> <td class="row2"> <center> <xsl:value-of 
-			select="testcasevalidationreport:Type" /> </center> </td> </tr> </tbody> 
-			</table> </div> -->
-		<xsl:apply-templates select="testcasevalidationreport:TestCaseReference" />
 
-	</xsl:template>
-
-	<xsl:template match="testcasevalidationreport:TestCaseReference">
 		<div class="report-section">
-			
+			<table class="forumline" width="100%" cellspacing="1"
+				cellpadding="2">
+				<tbody class="cf-tbody border_right">
+					<tr class="border_bottom">
+						<td class="row1 border_right" valign="top" rowspan="2">Testing
+							Tool</td>
+						<td class="row2 border_right ">Name</td>
+						<td class="row3 ">
+							<xsl:value-of select="testcasevalidationreport:ToolName" />
+						</td>
+					</tr>
+					<tr class="border_bottom">
+						<td class="row2 border_right ">Version</td>
+						<td class="row3 ">
+							<xsl:value-of select="testcasevalidationreport:ToolVersion" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+
+		<div class="report-section">
+
 			<table class="forumline" width="100%" cellspacing="1"
 				cellpadding="2">
 				<tbody>
@@ -133,28 +147,25 @@
 							<xsl:value-of select="testcasevalidationreport:TestGroup" />
 						</td>
 					</tr>
-					<tr class="border_bottom">
-						<td class="row2 border_right dark-gray">Test Case</td>
-						<td class="row3">
-							<xsl:value-of select="testcasevalidationreport:TestCase" />
-						</td>
-					</tr>
+					<!-- <tr class="border_bottom"> <td class="row2 border_right dark-gray">Test 
+						Case</td> <td class="row3"> <xsl:value-of select="testcasevalidationreport:TestCase" 
+						/> </td> </tr> -->
 				</tbody>
 			</table>
 		</div>
+
+
 	</xsl:template>
 
+
 	<xsl:template match="testcasevalidationreport:TestCaseValidationReportBody">
-		
+
 		<xsl:apply-templates
 			select="teststepvalidationreport:TestStepValidationReport" />
 	</xsl:template>
- 
-<!-- <xsl:template
-		match="testcasevalidationreport:TestStepValidationReports">
-		<xsl:apply-templates
-			select="teststepvalidationreport:TestStepValidationReport">
-		</xsl:apply-templates>
-	</xsl:template> -->
+
+	<!-- <xsl:template match="testcasevalidationreport:TestStepValidationReports"> 
+		<xsl:apply-templates select="teststepvalidationreport:TestStepValidationReport"> 
+		</xsl:apply-templates> </xsl:template> -->
 
 </xsl:stylesheet>

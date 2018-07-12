@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import gov.nist.auth.hit.core.domain.Account;
@@ -166,8 +167,10 @@ public class ValidationLogServiceImpl implements ValidationLogService {
   @Override
   public List<ValidationLog> findAll() {
     // TODO Auto-generated method stub
-    return validationLogRepository.findAll();
+    return validationLogRepository.findAll(sortByDateDsc());
   }
+
+
 
   @Override
   public long countAll() {
@@ -175,4 +178,16 @@ public class ValidationLogServiceImpl implements ValidationLogService {
     return validationLogRepository.count();
   }
 
+  @Override
+  public void delete(Long id) {
+    validationLogRepository.delete(id);
+  }
+
+  private Sort sortByDateDsc() {
+    return new Sort(Sort.Direction.DESC, "date");
+  }
+
+
 }
+
+
