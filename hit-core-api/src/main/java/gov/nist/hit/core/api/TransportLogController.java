@@ -51,7 +51,11 @@ public class TransportLogController {
 		String username = auth.getName();
 		if (username == null)
 			throw new NoUserFoundException("User could not be found");
-		if (!userService.hasGlobalAuthorities(username)) {
+		Account account = accountService.findByTheAccountsUsername(username);
+		if (account == null) {
+			throw new NoUserFoundException("You do not have the permission to perform this task");
+		}
+		if (!userService.hasGlobalAuthorities(username) && !userService.isAdminByEmail(account.getEmail())) {
 			throw new NoUserFoundException("You do not have the permission to perform this task");
 		}
 	}
@@ -66,7 +70,7 @@ public class TransportLogController {
 		return true;
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
 	public List<TransportLog> getAll(Authentication authentication, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
@@ -96,7 +100,7 @@ public class TransportLogController {
 		transportLogService.save(log);
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/count", method = RequestMethod.GET, produces = "application/json")
 	public long countAll(Authentication authentication, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -105,12 +109,13 @@ public class TransportLogController {
 		return transportLogService.countAll();
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasRole('tester')")
 	@ApiOperation(value = "delete log", nickname = "getAll")
 	@RequestMapping(value = "/{id}/delete", method = RequestMethod.POST, produces = "application/json")
 	public ResponseMessage deleteLog(Authentication authentication, HttpServletRequest request,
 			@PathVariable("id") Long id, HttpServletResponse response) throws Exception {
 		logger.info("deleting transport log with id=" + id + "...");
+		checkPermission(authentication);
 		transportLogService.delete(id);
 		return new ResponseMessage(Type.success, "transport Log " + id + " deleted successfully", id + "", true);
 	}
