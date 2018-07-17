@@ -36,4 +36,7 @@ public interface ValidationLogRepository extends JpaRepository<ValidationLog, Lo
 	@Query("select log from ValidationLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
 	public List<ValidationLog> findAllBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
+	@Query("select count(log) from ValidationLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
+	public int countBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
 }

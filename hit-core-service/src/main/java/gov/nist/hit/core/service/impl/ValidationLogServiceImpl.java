@@ -193,8 +193,10 @@ public class ValidationLogServiceImpl implements ValidationLogService {
 
   @Override
   public long countAll() {
-    // TODO Auto-generated method stub
-    return validationLogRepository.count();
+      Date current = new Date();
+      Date startDate = DateUtil.getFirstDateOfMonth(current);
+      Date endDate = DateUtil.getLastDateOfMonth(current);
+      return validationLogRepository.countBetweenDate(startDate, endDate);
   }
 
   @Override
