@@ -12,6 +12,7 @@
 
 package gov.nist.auth.hit.core.repo;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,12 +23,16 @@ import gov.nist.auth.hit.core.domain.TransportLog;
 
 public interface TransportLogRepository extends JpaRepository<TransportLog, Long> {
 
+	@Query("select log from TransportLog log where log.userId = :userId")
+	public List<TransportLog> findByUserId(@Param("userId") Long userId);
 
-  @Query("select log from TransportLog log where log.userId = :userId")
-  public List<TransportLog> findByUserId(@Param("userId") Long userId);
+	@Query("select log from TransportLog log where log.testStepId = :testStepId")
+	public List<TransportLog> findByTestStepId(@Param("testStepId") Long testStepId);
 
-  @Query("select log from TransportLog log where log.testStepId = :testStepId")
-  public List<TransportLog> findByTestStepId(@Param("testStepId") Long testStepId);
+	@Query("select log from TransportLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
+	public List<TransportLog> findAllBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
+	@Query("select count(log) from TransportLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
+	public int countBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }
