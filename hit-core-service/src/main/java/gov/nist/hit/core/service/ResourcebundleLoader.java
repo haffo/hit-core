@@ -340,7 +340,13 @@ public abstract class ResourcebundleLoader {
   private boolean domainManagementSupported;
 
   // conformance profile source Id - integration profile id
-  protected HashMap<String, String> profilesMap = new HashMap<String, String>();
+  protected static HashMap<String, String> profilesMap;
+
+  static {
+    if(profilesMap == null){
+      profilesMap = new HashMap<String, String>();
+    }
+  }
 
   public ResourcebundleLoader() {
     idLocationMap = new HashMap<>();

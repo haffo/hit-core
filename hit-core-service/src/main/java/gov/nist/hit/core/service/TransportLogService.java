@@ -18,5 +18,7 @@ public interface TransportLogService {
 
   public long countAll();
 
+  public void delete(Long id);
+
 
 }

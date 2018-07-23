@@ -12,6 +12,7 @@
 
 package gov.nist.auth.hit.core.repo;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,5 +32,11 @@ public interface ValidationLogRepository extends JpaRepository<ValidationLog, Lo
 	@Query("select log from ValidationLog log where log.userId = :userId and log.testingStage = :testingStage")
 	public List<ValidationLog> findByUserIdAndStage(@Param("userId") Long userId,
 			@Param("testingStage") String testingStage);
+
+	@Query("select log from ValidationLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
+	public List<ValidationLog> findAllBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+	@Query("select count(log) from ValidationLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
+	public int countBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }

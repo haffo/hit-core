@@ -110,7 +110,7 @@ public class TestCaseValidationReportController {
 			userTestCaseReport.setTestCasePersistentId(testCase.getPersistentId());
 			userTestCaseReport.setVersion(testCase.getVersion());
 			String xml = testCaseValidationReportService.generateXml(testCase, userId, command.getResult(),
-					command.getComments());
+					command.getComments(), command.getTestPlan(), command.getTestGroup());
 			userTestCaseReport.setXml(xml);
 			/*
 			 * for(TestStep testStep :testCase.getTestSteps()){
@@ -226,8 +226,11 @@ public class TestCaseValidationReportController {
 	public boolean downloadTestCaseValidationReport(
 			@ApiParam(value = "the id of the test case", required = true) @RequestParam("testCaseId") final Long testCaseId,
 			@ApiParam(value = "the format of the report", required = true) @RequestParam("format") final String format,
+			@ApiParam(value = "the name of the test plan", required = false) @RequestParam("testPlan") final String testPlan,
+			@ApiParam(value = "the name of the test group", required = false) @RequestParam("testGroup") final String testGroup,
 			@ApiParam(value = "the result of the test case", required = true) @RequestParam(value = "result", required = true) String result,
 			@ApiParam(value = "the comments of the test case", required = false) @RequestParam(value = "comments", required = false) String comments,
+
 			HttpServletRequest request, HttpServletResponse response) throws ValidationReportException {
 		try {
 			logger.info("Clearing user records for testcase " + testCaseId);
@@ -240,15 +243,16 @@ public class TestCaseValidationReportController {
 			String title = testCase.getName().replaceAll(" ", "-");
 			InputStream io = null;
 			if ("HTML".equalsIgnoreCase(format)) {
-				io = IOUtils.toInputStream(
-						testCaseValidationReportService.generateHtml(testCase, userId, result, comments), "UTF-8");
+				io = IOUtils.toInputStream(testCaseValidationReportService.generateHtml(testCase, userId, result,
+						comments, testPlan, testGroup), "UTF-8");
 				response.setContentType("text/html");
 			} else if ("XML".equalsIgnoreCase(format)) {
-				io = IOUtils.toInputStream(
-						testCaseValidationReportService.generateXml(testCase, userId, result, comments), "UTF-8");
+				io = IOUtils.toInputStream(testCaseValidationReportService.generateXml(testCase, userId, result,
+						comments, testPlan, testGroup), "UTF-8");
 				response.setContentType("application/xml");
 			} else if ("PDF".equalsIgnoreCase(format)) {
-				io = testCaseValidationReportService.generatePdf(testCase, userId, result, comments);
+				io = testCaseValidationReportService.generatePdf(testCase, userId, result, comments, testPlan,
+						testGroup);
 				response.setContentType("application/pdf");
 			} else {
 				throw new ValidationReportException("Unsupported report format " + format);

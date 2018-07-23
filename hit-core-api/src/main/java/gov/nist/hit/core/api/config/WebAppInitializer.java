@@ -69,10 +69,6 @@ public class WebAppInitializer implements WebApplicationInitializer
 
 		try {
 			servletContext.setInitParameter("spring.profiles.default", "development");
-			String rsbVersion = ResourcebundleLoader.getRsbVersion();
-			if(rsbVersion != null) {
-				servletContext.setInitParameter("rsbVersion", rsbVersion);
-			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

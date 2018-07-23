@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import gov.nist.hit.core.service.ResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class TestCaseDocumentationServiceImpl implements TestCaseDocumentationSe
 
 
   @Autowired
-  private ResourcebundleLoader resourcebundleLoader;
+  private ResourceLoader resourceLoader;
 
   @Autowired
   protected TestPlanRepository testPlanRepository;
@@ -229,7 +230,7 @@ public class TestCaseDocumentationServiceImpl implements TestCaseDocumentationSe
 
   private gov.nist.hit.core.domain.TestCaseDocument generate(TestStep ts) throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc =
-        resourcebundleLoader.generateTestCaseDocument(ts.getTestContext());
+        resourceLoader.generateTestCaseDocument(ts.getTestContext());
     doc = initTestCaseDocument(ts, doc);
     if (ts.getTestContext() != null) {
       doc.setId(ts.getTestContext().getId());
@@ -239,7 +240,7 @@ public class TestCaseDocumentationServiceImpl implements TestCaseDocumentationSe
 
   private gov.nist.hit.core.domain.TestCaseDocument generate(CFTestStep ts) throws IOException {
     gov.nist.hit.core.domain.TestCaseDocument doc =
-        resourcebundleLoader.generateTestCaseDocument(ts.getTestContext());
+        resourceLoader.generateTestCaseDocument(ts.getTestContext());
     doc = initTestCaseDocument(ts, doc);
     if (ts.getTestContext() != null) {
       doc.setId(ts.getTestContext().getId());
