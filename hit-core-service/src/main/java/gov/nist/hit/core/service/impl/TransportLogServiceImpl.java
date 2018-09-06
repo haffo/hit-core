@@ -34,33 +34,33 @@ public class TransportLogServiceImpl implements TransportLogService {
 	}
 
 	@Override
-	public List<TransportLog> findByUserId(Long userId) {
+	public List<TransportLog> findByUserId(Long userId, String domain) {
 		// TODO Auto-generated method stub
-		return transportLogRepository.findByUserId(userId);
+		return transportLogRepository.findByUserId(userId, domain);
 	}
 
 	@Override
-	public List<TransportLog> findByTestStepId(Long testStepId) {
+	public List<TransportLog> findByTestStepId(Long testStepId, String domain) {
 		// TODO Auto-generated method stub
-		return transportLogRepository.findByTestStepId(testStepId);
+		return transportLogRepository.findByTestStepId(testStepId, domain);
 	}
 
 	@Override
-	public List<TransportLog> findAll() {
+	public List<TransportLog> findAll(String domain) {
 		// TODO Auto-generated method stub
 		Date current = new Date();
 		Date startDate = DateUtil.getFirstDateOfMonth(current);
 		Date endDate = DateUtil.getLastDateOfMonth(current);
-		return transportLogRepository.findAllBetweenDate(startDate, endDate);
+		return transportLogRepository.findAllBetweenDate(startDate, endDate, domain);
 	}
 
 	@Override
-	public long countAll() {
+	public long countAll(String domain) {
 		Date current = new Date();
 		Date startDate = DateUtil.getFirstDateOfMonth(current);
 		Date endDate = DateUtil.getLastDateOfMonth(current);
 		// TODO Auto-generated method stub
-		return transportLogRepository.countBetweenDate(startDate, endDate);
+		return transportLogRepository.countBetweenDate(startDate, endDate, domain);
 
 	}
 
