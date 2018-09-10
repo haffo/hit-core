@@ -23,16 +23,18 @@ import gov.nist.auth.hit.core.domain.TransportLog;
 
 public interface TransportLogRepository extends JpaRepository<TransportLog, Long> {
 
-	@Query("select log from TransportLog log where log.userId = :userId")
-	public List<TransportLog> findByUserId(@Param("userId") Long userId);
+	@Query("select log from TransportLog log where log.userId = :userId and log.domain = :domain")
+	public List<TransportLog> findByUserId(@Param("userId") Long userId, @Param("domain") String domain);
 
-	@Query("select log from TransportLog log where log.testStepId = :testStepId")
-	public List<TransportLog> findByTestStepId(@Param("testStepId") Long testStepId);
+	@Query("select log from TransportLog log where log.testStepId = :testStepId and log.domain = :domain")
+	public List<TransportLog> findByTestStepId(@Param("testStepId") Long testStepId, @Param("domain") String domain);
 
-	@Query("select log from TransportLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
-	public List<TransportLog> findAllBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+	@Query("select log from TransportLog log where log.domain = :domain and log.date >= :startDate and log.date <= :endDate order by log.date DESC")
+	public List<TransportLog> findAllBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate,
+			@Param("domain") String domain);
 
-	@Query("select count(log) from TransportLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
-	public int countBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+	@Query("select count(log) from TransportLog log where log.domain = :domain and log.date >= :startDate and log.date <= :endDate order by log.date DESC")
+	public int countBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate,
+			@Param("domain") String domain);
 
 }
