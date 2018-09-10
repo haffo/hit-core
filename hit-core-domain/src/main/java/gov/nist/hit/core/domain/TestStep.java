@@ -105,8 +105,10 @@ public class TestStep extends AbstractTestCase implements Serializable {
   }
 
   public void setTestContext(TestContext testContext) {
-    this.testContext = testContext;
-    this.testContext.setTestStep(this);
+    if(testContext != null) {
+      this.testContext = testContext;
+      this.testContext.setTestStep(this);
+    }
   }
 
   public TestingType getTestingType() {
