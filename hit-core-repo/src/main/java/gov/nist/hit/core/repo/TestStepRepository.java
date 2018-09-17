@@ -20,8 +20,10 @@ import gov.nist.hit.core.domain.TestingStage;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface TestStepRepository extends JpaRepository<TestStep, Long> {
   @Query("select testStep from TestStep testStep where testStep.stage = :stage")
@@ -45,5 +47,10 @@ public interface TestStepRepository extends JpaRepository<TestStep, Long> {
 
   @Query("select ts from TestStep ts where ts.persistentId = :id")
   public TestStep getByPersistentId(@Param("id") Long id);
+  
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from TestStep ts where ts.preloaded = true")
+  public void deletePreloaded();
 
 }
