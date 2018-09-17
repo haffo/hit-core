@@ -122,10 +122,10 @@ public class TransportController {
 	}
 
 	// @Cacheable(value = "HitCache", key = "'transport-forms'")
-	@RequestMapping(value = "/config/forms", method = RequestMethod.GET)
-	public List<TransportForms> forms() {
+	@RequestMapping(value = "/forms/{domain}", method = RequestMethod.GET)
+	public List<TransportForms> findDomainForms(@PathVariable("domain") String domain) {
 		logger.info("Fetching  all transports form");
-		List<TransportForms> forms = transportFormsRepository.findAll();
+		List<TransportForms> forms = transportFormsRepository.findAllFormsByDomain(domain);
 		return forms;
 	}
 

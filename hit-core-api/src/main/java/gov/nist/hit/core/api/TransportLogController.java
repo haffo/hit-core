@@ -71,12 +71,12 @@ public class TransportLogController {
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
-	public List<TransportLog> getAll(Authentication authentication, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	@RequestMapping(value = "/{domain}", method = RequestMethod.GET, produces = "application/json")
+	public List<TransportLog> getAll(@PathVariable("domain") String domain, Authentication authentication,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("Fetching all transport logs...");
 		checkPermission(authentication);
-		List<TransportLog> logs = transportLogService.findAll();
+		List<TransportLog> logs = transportLogService.findAll(domain);
 		return logs;
 	}
 
@@ -95,18 +95,19 @@ public class TransportLogController {
 			log.setTestStepName(step.getName());
 			log.setTestStepId(step.getPersistentId());
 			log.setTestingType(step.getTestingType() != null ? step.getTestingType().toString() : null);
+			log.setDomain(step.getDomain());
 		}
 		log.setDate(new Date());
 		transportLogService.save(log);
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@RequestMapping(value = "/count", method = RequestMethod.GET, produces = "application/json")
-	public long countAll(Authentication authentication, HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	@RequestMapping(value = "/{domain}/count", method = RequestMethod.GET, produces = "application/json")
+	public long countAll(@PathVariable("domain") String domain, Authentication authentication,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("Fetching all transport logs count...");
 		checkPermission(authentication);
-		return transportLogService.countAll();
+		return transportLogService.countAll(domain);
 	}
 
 	@PreAuthorize("hasRole('tester')")

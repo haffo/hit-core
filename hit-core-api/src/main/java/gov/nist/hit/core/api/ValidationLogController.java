@@ -59,25 +59,25 @@ public class ValidationLogController {
 
 	@PreAuthorize("hasRole('tester')")
 	@ApiOperation(value = "get all logs", nickname = "getAll")
-	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
-	public List<ValidationLog> getAll(Authentication authentication, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	@RequestMapping(value = "/{domain}/", method = RequestMethod.GET, produces = "application/json")
+	public List<ValidationLog> getAll(@PathVariable("domain") String domain, Authentication authentication,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("Fetching all validation logs...");
 		checkPermission(authentication);
-		return validationLogService.findAll();
+		return validationLogService.findAll(domain);
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@RequestMapping(value = "/count", method = RequestMethod.GET, produces = "application/json")
-	public long countAll(Authentication authentication, HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	@RequestMapping(value = "/{domain}/count", method = RequestMethod.GET, produces = "application/json")
+	public long countAll(@PathVariable("domain") String domain, Authentication authentication,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("Fetching all validation logs count...");
 		checkPermission(authentication);
-		return validationLogService.countAll();
+		return validationLogService.countAll(domain);
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@ApiOperation(value = "delete log", nickname = "getAll")
+	@ApiOperation(value = "delete log", nickname = "delete log by id")
 	@RequestMapping(value = "/{id}/delete", method = RequestMethod.POST, produces = "application/json")
 	public ResponseMessage deleteLog(Authentication authentication, HttpServletRequest request,
 			@PathVariable("id") Long id, HttpServletResponse response) throws Exception {

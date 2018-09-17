@@ -23,20 +23,22 @@ import gov.nist.auth.hit.core.domain.ValidationLog;
 
 public interface ValidationLogRepository extends JpaRepository<ValidationLog, Long> {
 
-	@Query("select log from ValidationLog log where log.userId = :userId")
-	public List<ValidationLog> findByUserId(@Param("userId") Long userId);
+	@Query("select log from ValidationLog log where log.userId = :userId and log.domain = :domain")
+	public List<ValidationLog> findByUserId(@Param("userId") Long userId, @Param("domain") String domain);
 
-	@Query("select log from ValidationLog log where log.testStepId = :testStepId")
-	public List<ValidationLog> findByTestStepId(@Param("testStepId") Long testStepId);
+	@Query("select log from ValidationLog log where log.testStepId = :testStepId and log.domain = :domain")
+	public List<ValidationLog> findByTestStepId(@Param("testStepId") Long testStepId, @Param("domain") String domain);
 
-	@Query("select log from ValidationLog log where log.userId = :userId and log.testingStage = :testingStage")
+	@Query("select log from ValidationLog log where log.userId = :userId and log.testingStage = :testingStage and log.domain = :domain")
 	public List<ValidationLog> findByUserIdAndStage(@Param("userId") Long userId,
-			@Param("testingStage") String testingStage);
+			@Param("testingStage") String testingStage, @Param("domain") String domain);
 
-	@Query("select log from ValidationLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
-	public List<ValidationLog> findAllBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+	@Query("select log from ValidationLog log where log.domain = :domain and log.date >= :startDate and log.date <= :endDate order by log.date DESC")
+	public List<ValidationLog> findAllBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate,
+			@Param("domain") String domain);
 
-	@Query("select count(log) from ValidationLog log where log.date >= :startDate and log.date <= :endDate order by log.date DESC")
-	public int countBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+	@Query("select count(log) from ValidationLog log where log.domain = :domain and log.date >= :startDate and log.date <= :endDate order by log.date DESC")
+	public int countBetweenDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate,
+			@Param("domain") String domain);
 
 }

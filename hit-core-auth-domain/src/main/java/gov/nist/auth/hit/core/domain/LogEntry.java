@@ -45,6 +45,10 @@ public class LogEntry {
 	protected String testStepName;
 	protected String companyName;
 
+	@NotNull
+	@Column(nullable = false)
+	protected String domain;
+
 	public LogEntry() {
 
 	}
@@ -103,6 +107,14 @@ public class LogEntry {
 
 	public void setTestingType(String testingType) {
 		this.testingType = testingType;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	public void setDomain(String domain) {
+		this.domain = domain;
 	}
 
 }
