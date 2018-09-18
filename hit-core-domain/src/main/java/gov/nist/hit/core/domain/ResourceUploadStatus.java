@@ -6,6 +6,7 @@ public class ResourceUploadStatus {
 	private ResourceType type;
 	private String id;
 	private String message;
+	private String token;
 	
 	
 	public ResourceUploadStatus() {
@@ -59,6 +60,13 @@ public class ResourceUploadStatus {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+	public String getToken() {
+		return token;
+	}
+	public void setToken(String token) {
+		this.token = token;
+	}
+	
 	
 	
 }

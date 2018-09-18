@@ -16,8 +16,10 @@ import gov.nist.hit.core.domain.TestArtifact;
 import gov.nist.hit.core.domain.TestCase;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface TestCaseRepository extends JpaRepository<TestCase, Long> {
 
@@ -27,4 +29,9 @@ public interface TestCaseRepository extends JpaRepository<TestCase, Long> {
   @Query("select tc from TestCase tc where tc.persistentId = :id")
   public TestCase getByPersistentId(@Param("id") Long id);
 
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from TestCase tc where tc.preloaded = true")
+  public void deletePreloaded();
+  
 }
