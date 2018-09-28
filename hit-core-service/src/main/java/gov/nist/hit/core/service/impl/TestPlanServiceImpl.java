@@ -82,6 +82,11 @@ public class TestPlanServiceImpl implements TestPlanService {
     return testPlanRepository.save(testPlan);
   }
 
+	@Override
+	public TestPlan findByPersistentId(Long persistentId) {
+		return testPlanRepository.getByPersistentId(persistentId);
+	}
+
 
 
 }

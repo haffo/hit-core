@@ -1,6 +1,8 @@
 package gov.nist.hit.core.service;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import gov.nist.hit.core.domain.CFTestPlan;
 import gov.nist.hit.core.domain.CFTestStepGroup;
@@ -26,4 +28,5 @@ public interface BundleHandler {
   GVTSaveInstance createSaveInstance(String dir, CFTestStepGroup tp)
       throws IOException, ProfileParserException;
 
+  public Set<File> findFiles(String dir,String fileName);
 }
