@@ -1,5 +1,5 @@
 package gov.nist.hit.core.domain;
 
 public enum ResourceUploadAction {
-	ADD,UPDATE,DELETE
+	ADD,UPDATE,DELETE,UPLOAD
 }

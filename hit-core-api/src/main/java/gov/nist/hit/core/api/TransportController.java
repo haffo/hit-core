@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gov.nist.auth.hit.core.domain.TestingType;
 import gov.nist.auth.hit.core.domain.TransportConfig;
+import gov.nist.hit.core.api.exception.TransportConfigException;
 import gov.nist.hit.core.domain.SaveConfigRequest;
 import gov.nist.hit.core.domain.Transaction;
 import gov.nist.hit.core.domain.TransportFormContent;
@@ -41,7 +42,6 @@ import gov.nist.hit.core.service.TransactionService;
 import gov.nist.hit.core.service.TransportConfigService;
 import gov.nist.hit.core.service.TransportMessageService;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 
 /**
  * @author Harold Affo (NIST)
@@ -70,8 +70,7 @@ public class TransportController {
 
 	@RequestMapping(value = "/config/form", method = RequestMethod.GET)
 	public TransportFormContent getConfigurationForm(@RequestParam("type") TestingType type,
-			@RequestParam("protocol") @ApiParam(value = "the targeted protocol (rest,soap etc...)", required = true) String protocol,
-			@RequestParam("domain") @ApiParam(value = "the targeted domain (iz,erx etc...)", required = true) String domain) {
+			@RequestParam("protocol") String protocol, @RequestParam("domain") String domain) {
 		String content = null;
 		if (TestingType.SUT_INITIATOR.equals(type)) {
 			content = transportFormsRepository.getSutInitiatorFormByProtocolAndDomain(protocol, domain);
@@ -83,7 +82,7 @@ public class TransportController {
 	}
 
 	@RequestMapping(value = "/config/save", method = RequestMethod.POST)
-	public boolean saveConfig(@RequestBody SaveConfigRequest request) {
+	public boolean saveConfig(@RequestBody SaveConfigRequest request) throws TransportConfigException {
 		TransportConfig config = transportConfigService.findOneByUserAndProtocolAndDomain(request.getUserId(),
 				request.getProtocol(), request.getDomain());
 		if (config != null) {
@@ -98,7 +97,8 @@ public class TransportController {
 			}
 			transportConfigService.save(config);
 		}
-		return true;
+		throw new TransportConfigException("No transport's configuration found for domain=" + request.getDomain()
+				+ ", protocol=" + request.getProtocol());
 	}
 
 	@RequestMapping(value = "/transaction/{transactionId}/delete", method = RequestMethod.POST)

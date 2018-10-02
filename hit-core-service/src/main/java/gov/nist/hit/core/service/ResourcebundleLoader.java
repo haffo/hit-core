@@ -102,6 +102,8 @@ import gov.nist.hit.core.repo.DocumentRepository;
 import gov.nist.hit.core.repo.IntegrationProfileRepository;
 import gov.nist.hit.core.repo.MessageRepository;
 import gov.nist.hit.core.repo.TestCaseDocumentationRepository;
+import gov.nist.hit.core.repo.TestCaseGroupRepository;
+import gov.nist.hit.core.repo.TestCaseRepository;
 import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.repo.TestStepValidationReportRepository;
@@ -234,6 +236,13 @@ public abstract class ResourcebundleLoader {
 
   @Autowired
   protected VocabularyLibraryRepository vocabularyLibraryRepository;
+  
+  @Autowired
+  protected TestCaseGroupRepository testCaseGroupRepository;
+  
+  @Autowired
+  protected TestCaseRepository testCaseRepository;
+  
 
   private Map<Long, String> idLocationMap;
 
@@ -366,6 +375,11 @@ public abstract class ResourcebundleLoader {
     domainService.deletePreloaded();
     validationResultRepository.deleteAll();
     testPlanRepository.deletePreloaded();
+    
+    testStepRepository.deletePreloaded();
+    testCaseGroupRepository.deletePreloaded();
+    testCaseRepository.deletePreloaded();
+    
     cfTestPlanRepository.deletePreloaded();
     vocabularyLibraryRepository.deletePreloaded();
     constraintsRepository.deletePreloaded();
@@ -456,6 +470,7 @@ public abstract class ResourcebundleLoader {
     Domain entry = new Domain();
     String key = node.get("key").textValue();
     entry.setDomain(key);
+    entry.setPreloaded(true);
     entry.setScope(node.get("scope") != null ? TestScope.valueOf(node.get("scope").textValue())
         : TestScope.GLOBAL);
     entry.setName(node.get("name").textValue());

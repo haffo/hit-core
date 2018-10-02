@@ -55,7 +55,7 @@ public class ContextFreeController {
 
 	static final Logger logger = LoggerFactory.getLogger(ContextFreeController.class);
 
-
+    public static final String CF_UPLOAD_DIR = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath() + "/cf";
 
 	@Autowired
 	private CFTestStepService testStepService;
