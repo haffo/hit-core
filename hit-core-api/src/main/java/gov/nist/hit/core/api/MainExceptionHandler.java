@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import gov.nist.hit.core.api.exception.TransportConfigException;
 import gov.nist.hit.core.domain.ResponseMessage;
 import gov.nist.hit.core.service.exception.DocumentationException;
 import gov.nist.hit.core.service.exception.DomainException;
@@ -221,6 +222,14 @@ public class MainExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public String domainException(DomainException ex) {
 		logger.error("ERROR: Domain Exception", ex);
+		return ex.getMessage();
+	}
+
+	@ResponseBody
+	@ExceptionHandler(TransportConfigException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public String domainException(TransportConfigException ex) {
+		logger.error("ERROR: TransportConfigException Exception", ex);
 		return ex.getMessage();
 	}
 
