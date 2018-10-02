@@ -59,7 +59,7 @@ public class ValidationLogController {
 
 	@PreAuthorize("hasRole('tester')")
 	@ApiOperation(value = "get all logs", nickname = "getAll")
-	@RequestMapping(value = "/{domain}/", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/{domain}", method = RequestMethod.GET, produces = "application/json")
 	public List<ValidationLog> getAll(@PathVariable("domain") String domain, Authentication authentication,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("Fetching all validation logs...");
