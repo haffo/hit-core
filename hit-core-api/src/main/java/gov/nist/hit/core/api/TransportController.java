@@ -96,6 +96,7 @@ public class TransportController {
 				config.setTaInitiator(request.getConfig());
 			}
 			transportConfigService.save(config);
+			return true;
 		}
 		throw new TransportConfigException("No transport's configuration found for domain=" + request.getDomain()
 				+ ", protocol=" + request.getProtocol());
