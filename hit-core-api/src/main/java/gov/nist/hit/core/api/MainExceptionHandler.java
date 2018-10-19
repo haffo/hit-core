@@ -220,15 +220,15 @@ public class MainExceptionHandler {
 	@ResponseBody
 	@ExceptionHandler(DomainException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public String domainException(DomainException ex) {
+	public ResponseMessage domainException(DomainException ex) {
 		logger.error("ERROR: Domain Exception", ex);
-		return ex.getMessage();
+		return new ResponseMessage(ResponseMessage.Type.danger, ex.getMessage());
 	}
 
 	@ResponseBody
 	@ExceptionHandler(TransportConfigException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public String domainException(TransportConfigException ex) {
+	public String transportConfigException(TransportConfigException ex) {
 		logger.error("ERROR: TransportConfigException Exception", ex);
 		return ex.getMessage();
 	}
