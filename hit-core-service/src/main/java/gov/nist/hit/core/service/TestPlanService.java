@@ -32,6 +32,7 @@ public interface TestPlanService {
   public List<TestPlan> findAllShortByStageAndUsernameAndScopeAndDomain(TestingStage stage,
       String authorUsername, TestScope scope, String domain);
 
+  public TestPlan findByPersistentId(Long persistentId);
 
 
 }
