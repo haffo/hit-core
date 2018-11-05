@@ -55,22 +55,20 @@ public class MainExceptionHandler {
 		super();
 	}
 
+	@ExceptionHandler(Exception.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseBody
+	public ResponseMessage exception(Exception ex) {
+		logger.error(ex.getMessage(), ex);
+		return new ResponseMessage(ResponseMessage.Type.danger, "internalError");
+	}
+
 	@ExceptionHandler(RuntimeException.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ResponseBody
-	public String exception(RuntimeException ex) {
+	public ResponseMessage runtimeException(RuntimeException ex) {
 		logger.error(ex.getMessage(), ex);
-		ex.printStackTrace();
-		return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
-	}
-
-	@ResponseBody
-	@ExceptionHandler(Exception.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public String exception(Exception ex) {
-		logger.error(ex.getMessage(), ex);
-		ex.printStackTrace();
-		return "Sorry, something went wrong.\n" + "DEBUG:\n" + ex.getMessage();
+		return new ResponseMessage(ResponseMessage.Type.danger, "internalError");
 	}
 
 	@ResponseBody

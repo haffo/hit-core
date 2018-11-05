@@ -366,6 +366,8 @@ public abstract class ResourcebundleLoader {
 		AppInfo appInfo = appInfoService.get();
 		String create = System.getProperty("RELOAD_DB");
 		create = create == null ? System.getenv("RELOAD_DB") : create;
+		logger.info("RELOAD_DB is set to " + create);
+		System.out.println("RELOAD_DB is set to " + create);
 		return (create != null && (Boolean.valueOf(create) == true)) || appInfo == null;
 	}
 
