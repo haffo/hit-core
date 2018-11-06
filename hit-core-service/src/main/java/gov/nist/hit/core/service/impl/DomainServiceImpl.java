@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import gov.nist.auth.hit.core.domain.Account;
 import gov.nist.hit.core.domain.Domain;
 import gov.nist.hit.core.domain.TestScope;
 import gov.nist.hit.core.repo.AppInfoRepository;
@@ -23,10 +24,11 @@ import gov.nist.hit.core.repo.TestPlanRepository;
 import gov.nist.hit.core.repo.TestStepRepository;
 import gov.nist.hit.core.repo.TransportFormsRepository;
 import gov.nist.hit.core.repo.VocabularyLibraryRepository;
+import gov.nist.hit.core.service.AccountService;
 import gov.nist.hit.core.service.DomainService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.DomainException;
-import gov.nist.hit.core.service.exception.PermissionException;
+import gov.nist.hit.core.service.exception.NoUserFoundException;
 
 @Service
 public class DomainServiceImpl implements DomainService {
@@ -76,6 +78,9 @@ public class DomainServiceImpl implements DomainService {
 	@Autowired
 	protected VocabularyLibraryRepository vocabularyLibraryRepository;
 
+	@Autowired
+	private AccountService accountService;
+
 	@Override
 	public Domain findOneByKey(String key) {
 		// TODO Auto-generated method stub
@@ -121,6 +126,7 @@ public class DomainServiceImpl implements DomainService {
 	@Override
 	public List<Domain> findShortAllWithGlobalOrAuthornameOrParticipantEmail(String authorUsername,
 			String participantEmail) {
+
 		// TODO Auto-generated method stub
 		List<Domain> all = domainRepo.findAll();
 		List<Domain> results = null;
@@ -149,20 +155,67 @@ public class DomainServiceImpl implements DomainService {
 	}
 
 	@Override
-	public void hasPermission(String domainKey, Authentication auth) throws Exception {
-		String username = auth.getName();
-		if (!"app".equalsIgnoreCase(domainKey)) {
-			Domain domain = findOneByKey(domainKey);
-			if (domain == null) {
-				throw new DomainException("Unknown domain " + domainKey);
+	public void hasPermission(String domainKey, Authentication auth) throws DomainException {
+		try {
+			String username = auth.getName();
+			if (!"app".equalsIgnoreCase(domainKey)) {
+				Domain domain = findOneByKey(domainKey);
+				if (domain == null) {
+					throw new DomainException("Unknown domain " + domainKey);
+				}
+				if (!domain.getAuthorUsername().equals(auth.getName()) && !userService.isAdmin(username)) {
+					Account account = accountService.findByTheAccountsUsername(auth.getName());
+					if (account != null) {
+						String email = account.getEmail();
+						if (!userService.isAdminByEmail(email)) {
+							throw new DomainException("You do not have the permission to perform this operation");
+						}
+
+					} else {
+						throw new DomainException("This operation is not supported by this tool");
+					}
+				}
+			} else {
+				if (!userService.isAdmin(username)) {
+					Account account = accountService.findByTheAccountsUsername(auth.getName());
+					if (account != null) {
+						String email = account.getEmail();
+						if (!userService.isAdminByEmail(email)) {
+							throw new DomainException("You do not have the permission to perform this operation");
+						}
+					} else {
+						throw new DomainException("This operation is not supported by this tool");
+					}
+				}
 			}
-			if (!domain.getAuthorUsername().equals(auth.getName()) && !userService.isAdmin(username)) {
-				throw new PermissionException("You do not have the permission to perform this task");
-			}
-		} else {
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
+		}
+	}
+
+	@Override
+	public void canDelete(String domainKey, Authentication auth) throws DomainException {
+		hasPermission(domainKey, auth);
+	}
+
+	@Override
+	public void canPublish(String domainKey, Authentication auth) throws DomainException {
+		try {
+			String username = auth.getName();
 			if (!userService.isAdmin(username)) {
-				throw new PermissionException("You do not have the permission to perform this task");
+				Account account = accountService.findByTheAccountsUsername(auth.getName());
+				if (account != null) {
+					String email = account.getEmail();
+					if (!userService.isAdminByEmail(email)) {
+						throw new DomainException("You do not have the permission to perform this operation");
+					}
+
+				} else {
+					throw new DomainException("This operation is not supported by this tool");
+				}
 			}
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
 		}
 	}
 
@@ -187,6 +240,11 @@ public class DomainServiceImpl implements DomainService {
 			}
 		}
 		return results;
+	}
+
+	@Override
+	public List<Domain> findShortAll() {
+		return domainRepo.findAll();
 	}
 
 }
