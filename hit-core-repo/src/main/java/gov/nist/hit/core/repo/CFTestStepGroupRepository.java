@@ -31,5 +31,9 @@ public interface CFTestStepGroupRepository extends JpaRepository<CFTestStepGroup
   @Query("delete from CFTestStepGroup to where to.scope = :scope")
   public void deleteByScope(@Param("scope") TestScope scope);
 
+  @Modifying
+  @Transactional(value = "transactionManager")
+  @Query("delete from CFTestStepGroup tsg where tsg.preloaded = true")
+  public void deletePreloaded();
 
 }

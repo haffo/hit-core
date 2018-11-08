@@ -77,7 +77,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
     } else {
       result.setAction(ResourceUploadAction.ADD);
       if (testStepGroupId != null && testStepGroupId != -1) {
-        CFTestStepGroup parent = this.cfTestSteGroupRepository.getByPersistentId(testStepGroupId);
+        CFTestStepGroup parent = this.cfTestStepGroupRepository.getByPersistentId(testStepGroupId);
         if (parent == null) {
           result.setStatus(ResourceUploadResult.FAILURE);
           result.setMessage("CFTestStepGroup(" + testStepGroupId + ") not found");
@@ -90,7 +90,7 @@ public abstract class ResourceLoader extends ResourcebundleLoader {
                 + tc.getPersistentId() + ") cannot belong to different domains");
             return result;
           }
-          this.cfTestSteGroupRepository.saveAndFlush(parent);
+          this.cfTestStepGroupRepository.saveAndFlush(parent);
           result.setStatus(ResourceUploadResult.SUCCESS);
           return result;
         }
