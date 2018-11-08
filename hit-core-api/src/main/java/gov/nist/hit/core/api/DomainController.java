@@ -37,6 +37,7 @@ import gov.nist.hit.core.service.AppInfoService;
 import gov.nist.hit.core.service.DomainService;
 import gov.nist.hit.core.service.UserService;
 import gov.nist.hit.core.service.exception.DomainException;
+import gov.nist.hit.core.service.exception.NoUserFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -64,46 +65,112 @@ public class DomainController {
 	@Autowired
 	private AccountService accountService;
 
-	private void checkManagementSupport() throws Exception {
-		if (!appInfoService.get().isDomainManagementSupported()) {
-			throw new Exception("This operation is not supported by this tool");
+	private void checkManagementSupport(Authentication auth) throws DomainException {
+		if (!isDomainManagementSupported()) {
+			try {
+				if (!userService.hasGlobalAuthorities(auth.getName()) && !userService.isAdmin(auth.getName())
+						&& !userService.isSupervisor(auth.getName()) && !userService.isDeployer(auth.getName())) {
+					Account account = accountService.findByTheAccountsUsername(auth.getName());
+					if (account != null) {
+						String email = account.getEmail();
+						if (!userService.isAdminByEmail(email)) {
+							throw new DomainException("You do not have the permission to perform this operation");
+						}
+					} else {
+						throw new DomainException("You do not have the permission to perform this operation");
+					}
+				}
+			} catch (NoUserFoundException e) {
+				throw new DomainException(e);
+			}
 		}
+	}
+
+	private boolean isDomainManagementSupported() throws DomainException {
+		return appInfoService.get().isDomainManagementSupported();
 	}
 
 	@ApiOperation(value = "Find all tool scopes", nickname = "findDomains")
 	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
-	public List<Domain> findDomains(HttpServletRequest request) {
-		logger.info("Fetching all tool scopes ...");
-		Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-		if (userId != null) {
-			Account account = accountService.findOne(userId);
-			if (account != null && !account.isGuestAccount()) {
-				return domainService.findShortAllWithGlobalOrAuthornameOrParticipantEmail(account.getUsername(),
-						account.getEmail());
+	public List<Domain> findDomains(HttpServletRequest request) throws DomainException {
+		try {
+			logger.info("Fetching all tool scopes ...");
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId != null) {
+				Account account = accountService.findOne(userId);
+				if (account != null && !account.isGuestAccount()) {
+					String email = account.getEmail();
+					if (userService.isAdminByEmail(email) || userService.isAdmin(account.getUsername())) {
+						return domainService.findShortAll();
+					} else {
+						return domainService.findShortAllWithGlobalOrAuthornameOrParticipantEmail(account.getUsername(),
+								account.getEmail());
+					}
+				}
 			}
+			return domainService.findShortAllGlobalDomains();
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
 		}
-		return domainService.findShortAllGlobalDomains();
+
 	}
 
 	@PreAuthorize("hasRole('tester')")
 	@ApiOperation(value = "Find all tool scopes", nickname = "findDomainByUsername")
 	@RequestMapping(method = RequestMethod.GET, value = "/findByUser", produces = "application/json")
-	public List<Domain> findDomainByUsername(HttpServletRequest request, Authentication authentication) {
+	public List<Domain> findDomainByUsername(HttpServletRequest request, Authentication authentication)
+			throws DomainException {
 		logger.info("Fetching all tool scopes ...");
-		return domainService.findShortAllByAuthorname(authentication.getName());
-	}
+		try {
+			Account account = accountService.findByTheAccountsUsername(authentication.getName());
+			String email = account.getEmail();
+			if (userService.isAdminByEmail(email) || userService.isAdmin(account.getUsername())) {
+				return domainService.findShortAll();
+			} else {
+				return domainService.findShortAllByAuthorname(account.getUsername());
+			}
 
-	private void hasScopeAccess(TestScope scope, Authentication auth) throws Exception {
-		if (scope.equals(TestScope.GLOBAL) && !userService.hasGlobalAuthorities(auth.getName())
-				&& !userService.isAdmin(auth.getName()) && !userService.isSupervisor(auth.getName())) {
-			throw new DomainException("You do not have the permission to perform this task");
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
 		}
 	}
 
-	private void hasDomainAccess(Domain domain, Authentication auth) throws Exception {
-		if (!userService.hasGlobalAuthorities(auth.getName()) && !userService.isAdmin(auth.getName())
-				&& !userService.isSupervisor(auth.getName())) {
-			throw new DomainException("You do not have the permission to perform this task");
+	private void hasScopeAccess(TestScope scope, Authentication auth) throws DomainException {
+		try {
+			if (scope.equals(TestScope.GLOBAL) && !userService.hasGlobalAuthorities(auth.getName())
+					&& !userService.isAdmin(auth.getName()) && !userService.isSupervisor(auth.getName())
+					&& !userService.isDeployer(auth.getName())) {
+				Account account = accountService.findByTheAccountsUsername(auth.getName());
+				if (account != null) {
+					String email = account.getEmail();
+					if (!userService.isAdminByEmail(email)) {
+						throw new DomainException("You do not have the permission to perform this operation");
+					}
+				} else {
+					throw new DomainException("You do not have the permission to perform this operation");
+				}
+			}
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
+		}
+	}
+
+	private void hasDomainAccess(Domain domain, Authentication auth) throws DomainException {
+		try {
+			if (!userService.hasGlobalAuthorities(auth.getName()) && !userService.isAdmin(auth.getName())
+					&& !userService.isSupervisor(auth.getName()) && !userService.isDeployer(auth.getName())) {
+				Account account = accountService.findByTheAccountsUsername(auth.getName());
+				if (account != null) {
+					String email = account.getEmail();
+					if (!userService.isAdminByEmail(email)) {
+						throw new DomainException("You do not have the permission to perform this operation");
+					}
+				} else {
+					throw new DomainException("You do not have the permission to perform this operation");
+				}
+			}
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
 		}
 	}
 
@@ -111,79 +178,128 @@ public class DomainController {
 	@RequestMapping(value = "/searchByKey", method = RequestMethod.GET, produces = "application/json")
 	public Domain findDomainByKey(HttpServletRequest request, @RequestParam(name = "key", required = true) String key)
 			throws DomainException {
-		Domain domain = domainService.findOneByKey(key);
-		if (domain == null) {
-			throw new DomainException("Unknown tool scope with key=" + key);
-		}
-		if (domain.getScope().equals(TestScope.USER)) {
-			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-			Account account = accountService.findOne(userId);
-			if (!domain.getAuthorUsername().equals(account.getUsername())
-					|| domain.getParticipantEmails().contains(account.getEmail())) {
-				throw new DomainException("You do not have the permission to access this tool scope");
+		try {
+			Domain domain = domainService.findOneByKey(key);
+			if (domain == null) {
+				throw new DomainException("Unknown tool scope with key=" + key);
 			}
+			if (domain.getScope().equals(TestScope.USER)) {
+				Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+				Account account = accountService.findOne(userId);
+				if (account != null && !account.isGuestAccount()) {
+					String email = account.getEmail();
+					if (!domain.getAuthorUsername().equals(account.getUsername())
+							&& !domain.getParticipantEmails().contains(account.getEmail())
+							&& !userService.isAdminByEmail(email) && !userService.isAdmin(account.getUsername())) {
+						throw new DomainException("You do not have the permission to access this tool scope");
+					}
+				} else {
+					throw new DomainException("You do not have the permission to access this tool scope");
+				}
+			}
+			return domain;
+
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
+
 		}
-		return domain;
 	}
 
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/searchByScope", method = RequestMethod.GET, produces = "application/json")
 	public List<Domain> findUserDomains(HttpServletRequest request,
 			@RequestParam(name = "scope", required = true) TestScope scope, Authentication authentication)
-			throws Exception {
-		checkManagementSupport();
+			throws DomainException {
+		checkManagementSupport(authentication);
 		String username = authentication.getName();
 		return domainService.findShortAllByScopeAndAuthorname(scope, username);
 	}
 
+	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json")
-	public Domain findDomainById(HttpServletRequest request, @PathVariable("id") Long id) throws Exception {
-		checkManagementSupport();
-		Domain domain = domainService.findOne(id);
-		if (domain == null) {
-			throw new DomainException("Unknown tool scope");
-		}
-		if (domain.getScope().equals(TestScope.USER)) {
-			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-			Account account = accountService.findOne(userId);
-			if (!domain.getAuthorUsername().equals(account.getUsername())
-					|| domain.getParticipantEmails().contains(account.getEmail())) {
-				throw new DomainException("You do not have the permission to access this tool scope");
+	public Domain findDomainById(HttpServletRequest request, @PathVariable("id") Long id, Authentication auth)
+			throws DomainException {
+		try {
+			checkManagementSupport(auth);
+			Domain domain = domainService.findOne(id);
+			if (domain == null) {
+				throw new DomainException("Unknown tool scope");
 			}
+			if (domain.getScope().equals(TestScope.USER)) {
+				Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+				Account account = accountService.findOne(userId);
+				if (account != null && !account.isGuestAccount()) {
+					String email = account.getEmail();
+					if (!domain.getAuthorUsername().equals(account.getUsername())
+							&& !domain.getParticipantEmails().contains(account.getEmail())
+							&& !userService.isAdminByEmail(email) && !userService.isAdmin(account.getUsername())) {
+						throw new DomainException("You do not have the permission to access this tool scope");
+					}
+				} else {
+					throw new DomainException("You do not have the permission to access this tool scope");
+				}
+
+			}
+			return domain;
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
+
 		}
-		return domain;
 	}
 
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.POST, produces = "application/json")
 	public Domain saveDomain(HttpServletRequest request, @PathVariable("id") Long id, @RequestBody Domain domain,
-			Authentication authentication) throws Exception {
-		checkManagementSupport();
-		domainService.hasPermission(domain.getDomain(), authentication);
-		Domain result = domainService.findOne(id);
-		if (result == null) {
-			throw new DomainException("Unknown tool scope " + domain);
+			Authentication authentication) throws DomainException {
+		try {
+			checkManagementSupport(authentication);
+			domainService.hasPermission(domain.getDomain(), authentication);
+			Domain result = domainService.findOne(id);
+			if (result == null) {
+				throw new DomainException("Unknown tool scope " + domain);
+			}
+			result.merge(domain);
+			result.setPreloaded(false);
+			hasScopeAccess(result.getScope(), authentication);
+			domainService.save(result);
+			return result;
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
+		} catch (Exception e) {
+			throw new DomainException(e);
 		}
-		result.merge(domain);
-		result.setPreloaded(false);
-		hasScopeAccess(result.getScope(), authentication);
-		domainService.save(result);
-		return result;
 	}
 
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/{id}/canModify", method = RequestMethod.GET, produces = "application/json")
 	public boolean canModify(HttpServletRequest request, @PathVariable("id") Long id, Authentication authentication)
-			throws Exception {
-		Domain domain = findDomainById(request, id);
-		return domain.getAuthorUsername().equals(authentication.getName());
+			throws DomainException {
+		try {
+			Domain domain = findDomainById(request, id, authentication);
+			Account account = accountService.findByTheAccountsUsername(authentication.getName());
+			if (account != null && !account.isGuestAccount()) {
+				String email = account.getEmail();
+				if (!domain.getAuthorUsername().equals(account.getUsername())
+						&& !domain.getParticipantEmails().contains(account.getEmail())
+						&& !userService.isAdminByEmail(email) && !userService.isAdmin(account.getUsername())) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+			return true;
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
+		} catch (Exception e) {
+			throw new DomainException(e);
+		}
 	}
 
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json")
 	public Domain createDomain(HttpServletRequest request, @RequestBody Domain domain, Authentication authentication)
-			throws Exception {
-		checkManagementSupport();
+			throws DomainException {
+		checkManagementSupport(authentication);
 
 		String key = domain.getDomain();
 		String name = domain.getName();
@@ -221,7 +337,7 @@ public class DomainController {
 	@RequestMapping(value = "/new", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded; charset=UTF-8", produces = "application/json")
 	public Domain createDomain(HttpServletRequest request, @RequestParam("key") String key,
 			@RequestParam("name") String name, @RequestParam("homeTitle") String homeTitle,
-			Authentication authentication) throws Exception {
+			Authentication authentication) throws DomainException {
 		Domain d = new Domain();
 		d.setDomain(key);
 		d.setName(name);
@@ -234,35 +350,42 @@ public class DomainController {
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/{id}/delete", method = RequestMethod.POST, produces = "application/json")
 	public boolean deleteDomain(HttpServletRequest request, @PathVariable("id") Long id, Authentication authentication)
-			throws Exception {
-		checkManagementSupport();
-		Domain found = domainService.findOne(id);
-		if (found == null) {
-			throw new DomainException("Tool Scope with id=" + id + " not found");
+			throws DomainException {
+		try {
+			checkManagementSupport(authentication);
+			Domain found = domainService.findOne(id);
+			if (found == null) {
+				throw new DomainException("Tool Scope with id=" + id + " not found");
+			}
+			domainService.canDelete(found.getDomain(), authentication);
+			domainService.delete(found);
+			return true;
+		} catch (Exception e) {
+			throw new DomainException(e);
 		}
-		domainService.hasPermission(found.getDomain(), authentication);
-		domainService.delete(found);
-		return true;
 	}
 
 	@PreAuthorize("hasRole('tester')")
 	@RequestMapping(value = "/{id}/publish", method = RequestMethod.POST, produces = "application/json")
 	public Domain publishDomain(HttpServletRequest request, @PathVariable("id") Long id, @RequestBody Domain domain,
-			Authentication authentication) throws Exception {
-		checkManagementSupport();
-		domainService.hasPermission(domain.getDomain(), authentication);
-		Domain found = domainService.findOne(id);
-		if (found == null) {
-			throw new DomainException("Tool Scope with id=" + id + " not found");
+			Authentication authentication) throws DomainException {
+		checkManagementSupport(authentication);
+		try {
+			domainService.canPublish(domain.getDomain(), authentication);
+			Domain found = domainService.findOne(id);
+			if (found == null) {
+				throw new DomainException("Tool Scope with id=" + id + " not found");
+			}
+			found.merge(domain);
+			found.setScope(TestScope.GLOBAL);
+			found.setPreloaded(false);
+			domainService.save(found);
+			// TODO : publish artifacts
+			return found;
+		} catch (Exception e) {
+			throw new DomainException(e);
 		}
-		hasDomainAccess(found, authentication);
-		found.merge(domain);
-		found.setScope(TestScope.GLOBAL);
-		found.setPreloaded(false);
-		hasScopeAccess(found.getScope(), authentication);
-		domainService.save(found);
-		// TODO : publish artifacts
-		return found;
+
 	}
 
 }

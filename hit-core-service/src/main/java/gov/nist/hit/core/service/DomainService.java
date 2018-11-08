@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 
 import gov.nist.hit.core.domain.Domain;
 import gov.nist.hit.core.domain.TestScope;
+import gov.nist.hit.core.service.exception.DomainException;
 
 public interface DomainService {
 
@@ -32,5 +33,11 @@ public interface DomainService {
 	public void deletePreloaded();
 
 	public void hasPermission(String domainKey, Authentication auth) throws Exception;
+
+	void canPublish(String domainKey, Authentication auth) throws DomainException;
+
+	void canDelete(String domainKey, Authentication auth) throws DomainException;
+
+	List<Domain> findShortAll();
 
 }

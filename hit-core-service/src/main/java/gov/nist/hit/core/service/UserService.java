@@ -145,4 +145,6 @@ public interface UserService {
 
 	public boolean isAdminByEmail(String email) throws NoUserFoundException;
 
+	boolean isDeployer(String username) throws NoUserFoundException;
+
 }
