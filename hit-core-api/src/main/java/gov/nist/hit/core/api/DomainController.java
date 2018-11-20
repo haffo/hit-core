@@ -121,18 +121,7 @@ public class DomainController {
 	public List<Domain> findDomainByUsername(HttpServletRequest request, Authentication authentication)
 			throws DomainException {
 		logger.info("Fetching all tool scopes ...");
-		try {
-			Account account = accountService.findByTheAccountsUsername(authentication.getName());
-			String email = account.getEmail();
-			if (userService.isAdminByEmail(email) || userService.isAdmin(account.getUsername())) {
-				return domainService.findShortAll();
-			} else {
-				return domainService.findShortAllByAuthorname(account.getUsername());
-			}
-
-		} catch (NoUserFoundException e) {
-			throw new DomainException(e);
-		}
+		return domainService.findShortAllByAuthorname(authentication.getName());
 	}
 
 	private void hasScopeAccess(TestScope scope, Authentication auth) throws DomainException {
