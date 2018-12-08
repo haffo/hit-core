@@ -23,6 +23,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -116,7 +117,7 @@ public class DomainController {
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@ApiOperation(value = "Find all tool scopes", nickname = "findDomainByUsername")
+	@ApiOperation(value = "Find the user scopes", nickname = "findDomainByUsername")
 	@RequestMapping(method = RequestMethod.GET, value = "/findByUser", produces = "application/json")
 	public List<Domain> findDomainByUsername(HttpServletRequest request, Authentication authentication)
 			throws DomainException {
@@ -355,21 +356,67 @@ public class DomainController {
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@RequestMapping(value = "/{id}/publish", method = RequestMethod.POST, produces = "application/json")
-	public Domain publishDomain(HttpServletRequest request, @PathVariable("id") Long id, @RequestBody Domain domain,
+	@PostMapping(value = "/save-publish", produces = "application/json")
+	public Domain publishDomain(HttpServletRequest request, @RequestBody Domain domain, Authentication authentication)
+			throws DomainException {
+		return saveAndupdateScope(domain, TestScope.GLOBAL, authentication);
+	}
+
+	@PreAuthorize("hasRole('tester')")
+	@PostMapping(value = "/save-unpublish", produces = "application/json")
+	public Domain unpublishDomain(HttpServletRequest request, @RequestBody Domain domain, Authentication authentication)
+			throws DomainException {
+		return saveAndupdateScope(domain, TestScope.USER, authentication);
+	}
+
+	@PreAuthorize("hasRole('tester')")
+	@PostMapping(value = "/{id}/publish", produces = "application/json")
+	public Domain publishDomain(HttpServletRequest request, @PathVariable("id") Long id, Authentication authentication)
+			throws DomainException {
+		return updateScope(id, TestScope.GLOBAL, authentication);
+	}
+
+	@PreAuthorize("hasRole('tester')")
+	@PostMapping(value = "/{id}/unpublish", produces = "application/json")
+	public Domain unpublishDomain(HttpServletRequest request, @PathVariable("id") Long id,
 			Authentication authentication) throws DomainException {
+		return updateScope(id, TestScope.USER, authentication);
+	}
+
+	public Domain saveAndupdateScope(Domain domain, TestScope scope, Authentication authentication)
+			throws DomainException {
 		checkManagementSupport(authentication);
 		try {
+			if (domain.getId() == null) {
+				throw new DomainException("Invalid Tool Scope");
+			}
+			Domain found = domainService.findOne(domain.getId());
+			if (found == null) {
+				throw new DomainException("Tool Scope with id=" + domain.getId() + " not found");
+			}
 			domainService.canPublish(domain.getDomain(), authentication);
+			found.merge(domain);
+			found.setScope(scope);
+			domainService.save(found);
+			return found;
+		} catch (Exception e) {
+			throw new DomainException(e);
+		}
+	}
+
+	public Domain updateScope(Long id, TestScope scope, Authentication authentication) throws DomainException {
+		checkManagementSupport(authentication);
+		try {
+			if (id == null) {
+				throw new DomainException("Invalid Tool Scope");
+			}
 			Domain found = domainService.findOne(id);
 			if (found == null) {
 				throw new DomainException("Tool Scope with id=" + id + " not found");
 			}
-			found.merge(domain);
-			found.setScope(TestScope.GLOBAL);
-			found.setPreloaded(false);
+			domainService.canPublish(found.getDomain(), authentication);
+			found.setScope(scope);
 			domainService.save(found);
-			// TODO : publish artifacts
 			return found;
 		} catch (Exception e) {
 			throw new DomainException(e);
