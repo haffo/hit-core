@@ -58,6 +58,7 @@ public class UserServiceImpl implements UserService {
 	private final String ADMIN_AUTHORITY = "admin";
 	private final String DEPLOYER_AUTHORITY = "deployer";
 	private final String SUPERVISOR_AUTHORITY = "supervisor";
+	private final String PUBLISHER_AUTHORITY = "publisher";
 
 	@Value("${admin.emails}")
 	private String adminEmailsString;
@@ -339,6 +340,21 @@ public class UserServiceImpl implements UserService {
 		Collection<GrantedAuthority> authorit = user.getAuthorities();
 		for (GrantedAuthority auth : authorit) {
 			if (SUPERVISOR_AUTHORITY.equals(auth.getAuthority())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isPublisher(String username) throws NoUserFoundException {
+		User user = this.retrieveUserByUsername(username);
+		if (user == null) {
+			throw new NoUserFoundException("User could not be found");
+		}
+		Collection<GrantedAuthority> authorit = user.getAuthorities();
+		for (GrantedAuthority auth : authorit) {
+			if (PUBLISHER_AUTHORITY.equals(auth.getAuthority())) {
 				return true;
 			}
 		}

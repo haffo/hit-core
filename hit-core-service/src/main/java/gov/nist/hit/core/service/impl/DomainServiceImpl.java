@@ -199,20 +199,23 @@ public class DomainServiceImpl implements DomainService {
 	}
 
 	@Override
-	public void canPublish(String domainKey, Authentication auth) throws DomainException {
+	public void canPublish(Domain domain, Authentication auth) throws DomainException {
 		try {
 			String username = auth.getName();
-			if (!userService.isAdmin(username)) {
+			if (!userService.isAdmin(username) && !userService.isPublisher(username)) {
 				Account account = accountService.findByTheAccountsUsername(auth.getName());
 				if (account != null) {
 					String email = account.getEmail();
 					if (!userService.isAdminByEmail(email)) {
 						throw new DomainException("You do not have the permission to perform this operation");
 					}
-
 				} else {
 					throw new DomainException("This operation is not supported by this tool");
 				}
+			}
+
+			if (!userService.isAdmin(username) && !domain.getAuthorUsername().equals(auth.getName())) {
+				throw new DomainException("You do not have the permission to perform this operation");
 			}
 		} catch (NoUserFoundException e) {
 			throw new DomainException(e);
