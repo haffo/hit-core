@@ -86,7 +86,7 @@ public class TestPlanServiceImpl implements TestPlanService {
 	}
 
 	@Override
-	private boolean updateScope(TestPlan testPlan, TestScope scope) {
+	public boolean updateScope(TestPlan testPlan, TestScope scope) {
 		testPlan.setScope(scope);
 		Set<TestCase> testCases = testPlan.getTestCases();
 		if (testCases != null) {
