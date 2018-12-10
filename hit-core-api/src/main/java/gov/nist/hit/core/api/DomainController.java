@@ -397,7 +397,7 @@ public class DomainController {
 			if (found == null) {
 				throw new DomainException("Tool Scope with id=" + domain.getId() + " not found");
 			}
-			domainService.canPublish(domain.getDomain(), authentication);
+			domainService.canPublish(found, authentication);
 			found.merge(domain);
 			found.setScope(scope);
 			domainService.save(found);
@@ -417,7 +417,7 @@ public class DomainController {
 			if (found == null) {
 				throw new DomainException("Tool Scope with id=" + id + " not found");
 			}
-			domainService.canPublish(found.getDomain(), authentication);
+			domainService.canPublish(found, authentication);
 			found.setScope(scope);
 			domainService.save(found);
 			return found;

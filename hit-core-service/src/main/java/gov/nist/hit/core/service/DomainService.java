@@ -34,7 +34,7 @@ public interface DomainService {
 
 	public void hasPermission(String domainKey, Authentication auth) throws Exception;
 
-	void canPublish(String domainKey, Authentication auth) throws DomainException;
+	void canPublish(Domain domain, Authentication auth) throws DomainException;
 
 	void canDelete(String domainKey, Authentication auth) throws DomainException;
 
