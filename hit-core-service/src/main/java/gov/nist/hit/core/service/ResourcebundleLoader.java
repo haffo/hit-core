@@ -189,7 +189,7 @@ public abstract class ResourcebundleLoader {
 	protected CFTestStepRepository cfTestStepRepository;
 
 	@Autowired
-	protected CFTestStepGroupRepository cfTestSteGroupRepository;
+	protected CFTestStepGroupRepository cfTestStepGroupRepository;
 
 	@Autowired
 	protected CFTestPlanRepository cfTestPlanRepository;
@@ -381,6 +381,7 @@ public abstract class ResourcebundleLoader {
 		testCaseGroupRepository.deletePreloaded();
 		testCaseRepository.deletePreloaded();
 
+		cfTestStepGroupRepository.deletePreloaded();
 		cfTestPlanRepository.deletePreloaded();
 		vocabularyLibraryRepository.deletePreloaded();
 		constraintsRepository.deletePreloaded();
