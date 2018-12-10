@@ -9,30 +9,29 @@ import gov.nist.hit.core.domain.TestingStage;
 
 public interface TestPlanService {
 
-  public TestPlan findOne(Long testPlanId);
+	public TestPlan findOne(Long testPlanId);
 
-  public List<TestArtifact> findAllTestPackagesByDomain(TestingStage stage, String domain);
+	public List<TestArtifact> findAllTestPackagesByDomain(TestingStage stage, String domain);
 
-  public List<TestPlan> findShortAllByStageAndDomain(TestingStage stage, String domain);
+	public List<TestPlan> findShortAllByStageAndDomain(TestingStage stage, String domain);
 
-  public List<TestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope,
-      String domain);
+	public List<TestPlan> findShortAllByStageAndScopeAndDomain(TestingStage stage, TestScope scope, String domain);
 
-  public List<TestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage,
-      String authorUsername, String domain);
+	public List<TestPlan> findShortAllByStageAndAuthorAndDomain(TestingStage stage, String authorUsername,
+			String domain);
 
-  public List<TestPlan> findShortAllByStageAndScopeAndAuthorAndDomain(TestingStage stage,
-      TestScope scope, String authorUsername, String domain);
+	public List<TestPlan> findShortAllByStageAndScopeAndAuthorAndDomain(TestingStage stage, TestScope scope,
+			String authorUsername, String domain);
 
+	void delete(TestPlan testPlan);
 
-  void delete(TestPlan testPlan);
+	public TestPlan save(TestPlan testPlan);
 
-  public TestPlan save(TestPlan testPlan);
+	public List<TestPlan> findAllShortByStageAndUsernameAndScopeAndDomain(TestingStage stage, String authorUsername,
+			TestScope scope, String domain);
 
-  public List<TestPlan> findAllShortByStageAndUsernameAndScopeAndDomain(TestingStage stage,
-      String authorUsername, TestScope scope, String domain);
+	public TestPlan findByPersistentId(Long persistentId);
 
-  public TestPlan findByPersistentId(Long persistentId);
-
+	public boolean updateScope(TestPlan testPlan, TestScope scope);
 
 }
