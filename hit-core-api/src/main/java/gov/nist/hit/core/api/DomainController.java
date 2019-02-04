@@ -127,6 +127,33 @@ public class DomainController {
 		return domainService.findShortAllByAuthorname(authentication.getName());
 	}
 
+	@PreAuthorize("hasRole('tester')")
+	@ApiOperation(value = "Find the user scopes", nickname = "findDomainByUserAndRole")
+	@RequestMapping(method = RequestMethod.GET, value = "/findByUserAndRole", produces = "application/json")
+	public List<Domain> findByUserAndRole(HttpServletRequest request, Authentication authentication)
+			throws DomainException {
+		try {
+			logger.info("Fetching all tool scopes ...");
+			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
+			if (userId != null) {
+				Account account = accountService.findOne(userId);
+				if (account != null && !account.isGuestAccount()) {
+					String email = account.getEmail();
+					if (userService.isAdminByEmail(email) || userService.isAdmin(account.getUsername())) {
+						return domainService.findShortAll();
+					} else {
+						return domainService.findShortAllByAuthorname(authentication.getName());
+					}
+				}
+			}
+
+			return null;
+
+		} catch (NoUserFoundException e) {
+			throw new DomainException(e);
+		}
+	}
+
 	private void hasScopeAccess(TestScope scope, Authentication auth) throws DomainException {
 		try {
 			if (scope.equals(TestScope.GLOBAL) && !userService.hasGlobalAuthorities(auth.getName())
@@ -173,7 +200,7 @@ public class DomainController {
 		try {
 			Domain domain = domainService.findOneByKey(key);
 			if (domain == null) {
-				String safeKey = Jsoup.clean(key, Whitelist.simpleText());								
+				String safeKey = Jsoup.clean(key, Whitelist.simpleText());
 				throw new DomainException("Unknown tool scope with key=" + safeKey);
 			}
 			if (domain.getScope().equals(TestScope.USER)) {
