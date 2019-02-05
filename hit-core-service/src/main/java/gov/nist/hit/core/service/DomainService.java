@@ -20,6 +20,8 @@ public interface DomainService {
 
 	List<Domain> findShortAllByAuthorname(String authorname);
 
+	List<Domain> findAllByAuthorname(String authorname);
+
 	Domain findOne(Long id);
 
 	void delete(Domain domain);

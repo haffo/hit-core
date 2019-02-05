@@ -229,6 +229,12 @@ public class DomainServiceImpl implements DomainService {
 	}
 
 	@Override
+	public List<Domain> findAllByAuthorname(String authorname) {
+		// TODO Auto-generated method stub
+		return domainRepo.findAllByAuthorname(authorname);
+	}
+
+	@Override
 	public List<Domain> findShortAllWithAuthornameOrParticipantEmail(String authorname, String participantEmail) {
 		// TODO Auto-generated method stub
 		List<Domain> all = domainRepo.findAll();

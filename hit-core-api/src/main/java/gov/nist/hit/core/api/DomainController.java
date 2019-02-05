@@ -137,7 +137,7 @@ public class DomainController {
 				if (userService.isAdminByEmail(email) || userService.isAdmin(account.getUsername())) {
 					return domainService.findShortAll();
 				} else {
-					return domainService.findShortAllByAuthorname(authentication.getName());
+					return domainService.findAllByAuthorname(authentication.getName());
 				}
 			}
 			return null;
