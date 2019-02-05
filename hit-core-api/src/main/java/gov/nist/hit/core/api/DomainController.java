@@ -93,7 +93,6 @@ public class DomainController {
 		return appInfoService.get().isDomainManagementSupported();
 	}
 
-	@ApiOperation(value = "Find all tool scopes", nickname = "findDomains")
 	@RequestMapping(method = RequestMethod.GET, produces = "application/json")
 	public List<Domain> findDomains(HttpServletRequest request) throws DomainException {
 		try {
@@ -119,7 +118,6 @@ public class DomainController {
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@ApiOperation(value = "Find the user scopes", nickname = "findDomainByUsername")
 	@RequestMapping(method = RequestMethod.GET, value = "/findByUser", produces = "application/json")
 	public List<Domain> findDomainByUsername(HttpServletRequest request, Authentication authentication)
 			throws DomainException {
@@ -128,27 +126,21 @@ public class DomainController {
 	}
 
 	@PreAuthorize("hasRole('tester')")
-	@ApiOperation(value = "Find the user scopes", nickname = "findDomainByUserAndRole")
 	@RequestMapping(method = RequestMethod.GET, value = "/findByUserAndRole", produces = "application/json")
 	public List<Domain> findByUserAndRole(HttpServletRequest request, Authentication authentication)
 			throws DomainException {
 		try {
 			logger.info("Fetching all tool scopes ...");
-			Long userId = SessionContext.getCurrentUserId(request.getSession(false));
-			if (userId != null) {
-				Account account = accountService.findOne(userId);
-				if (account != null && !account.isGuestAccount()) {
-					String email = account.getEmail();
-					if (userService.isAdminByEmail(email) || userService.isAdmin(account.getUsername())) {
-						return domainService.findShortAll();
-					} else {
-						return domainService.findShortAllByAuthorname(authentication.getName());
-					}
+			Account account = accountService.findByTheAccountsUsername(authentication.getName());
+			if (account != null && !account.isGuestAccount()) {
+				String email = account.getEmail();
+				if (userService.isAdminByEmail(email) || userService.isAdmin(account.getUsername())) {
+					return domainService.findShortAll();
+				} else {
+					return domainService.findShortAllByAuthorname(authentication.getName());
 				}
 			}
-
 			return null;
-
 		} catch (NoUserFoundException e) {
 			throw new DomainException(e);
 		}
